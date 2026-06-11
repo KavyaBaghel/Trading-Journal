@@ -1,0 +1,14 @@
+.app-profile/
+node_modules/
+.DS_Store
+Thumbs.db
+*.log
+*.tmp
+*.bak
+.env
+.env.*
+dist/
+build/
+coverage/
+AGENTS.md
+CLAUDE.md

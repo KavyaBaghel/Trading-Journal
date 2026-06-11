@@ -1,0 +1,43 @@
+{
+  "name": "Krishna's Trading Journal",
+  "short_name": "Krishna Journal",
+  "id": "/krishna-trading-journal",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "display_override": ["window-controls-overlay", "standalone", "minimal-ui"],
+  "orientation": "portrait-primary",
+  "background_color": "#090b10",
+  "theme_color": "#121822",
+  "description": "A local trading journal app with AI coaching, analytics, calendar, goals, and trade reviews.",
+  "categories": ["finance", "productivity"],
+  "prefer_related_applications": false,
+  "icons": [
+    {
+      "src": "assets/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "assets/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Open Journal",
+      "short_name": "Journal",
+      "url": "./index.html#journalpage",
+      "description": "Open the trade journal page."
+    },
+    {
+      "name": "AI Lab",
+      "short_name": "AI Lab",
+      "url": "./index.html#ailab",
+      "description": "Ask the local AI coach about your trades."
+    }
+  ]
+}

@@ -1,0 +1,46 @@
+{
+  "name": "Krishna's Trading Journal",
+  "type": "local-windows-pwa",
+  "entry": "index.html",
+  "run": "Krishna Trading Journal App.vbs",
+  "install": "Install App.bat",
+  "localServer": {
+    "script": "local-server.ps1",
+    "host": "127.0.0.1",
+    "port": 8787,
+    "url": "http://127.0.0.1:8787/index.html"
+  },
+  "mobile": {
+    "launcher": "Open Mobile App.bat",
+    "script": "start-mobile.ps1",
+    "sameWifiRequired": true,
+    "installMethod": "Open the LAN URL on the phone browser, then use Add to Home Screen."
+  },
+  "desktopLauncher": {
+    "script": "launch-app.ps1",
+    "browser": "Microsoft Edge app mode",
+    "profileDirectory": ".app-profile"
+  },
+  "chromeLauncher": {
+    "script": "launch-chrome-app.ps1",
+    "launcher": "Krishna Journal Chrome.vbs",
+    "debugLauncher": "Krishna Journal Chrome.bat",
+    "installer": "Install Chrome App Shortcut.bat",
+    "browser": "Google Chrome app mode",
+    "profileDirectory": ".chrome-app-profile"
+  },
+  "pwa": {
+    "manifest": "manifest.webmanifest",
+    "serviceWorker": "service-worker.js",
+    "icons": [
+      "assets/icon-192.png",
+      "assets/icon-512.png",
+      "assets/app-icon.ico"
+    ]
+  },
+  "ai": {
+    "provider": "Ollama",
+    "url": "http://localhost:11434",
+    "defaultModel": "llama3.2"
+  }
+}
