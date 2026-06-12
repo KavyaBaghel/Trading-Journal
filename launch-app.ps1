@@ -7,9 +7,11 @@ $ErrorActionPreference = 'Stop'
 $appRoot = Split-Path -Parent $MyInvocation.MyCommand.Path
 $indexPath = Join-Path $appRoot 'index.html'
 $serverScript = Join-Path $appRoot 'local-server.ps1'
+$ragScript = Join-Path $appRoot 'rag_server.py'
 $profilePath = Join-Path $appRoot '.app-profile'
 $logPath = Join-Path $appRoot 'app-launch.log'
 $port = 8787
+$ragPort = 8790
 
 function Write-AppLog([string]$Message) {
   $stamp = Get-Date -Format 'yyyy-MM-dd HH:mm:ss'
@@ -50,6 +52,48 @@ function Test-AppServer([int]$Port) {
     if ($client) { $client.Close() }
   }
 }
+
+function Get-PythonExe {
+  $candidates = @(
+    "$env:LOCALAPPDATA\Programs\Python\Python313\python.exe",
+    "$env:LOCALAPPDATA\Programs\Python\Python312\python.exe",
+    "$env:LOCALAPPDATA\Programs\Python\Python311\python.exe",
+    "$env:LOCALAPPDATA\Programs\Python\Python310\python.exe",
+    "$env:ProgramFiles\Python313\python.exe",
+    "$env:ProgramFiles\Python312\python.exe",
+    "$env:ProgramFiles\Python311\python.exe",
+    "$env:ProgramFiles\Python310\python.exe",
+    'python.exe',
+    'py.exe'
+  )
+  foreach ($candidate in $candidates) {
+    try {
+      if ($candidate -like '*\*') {
+        if (Test-Path -LiteralPath $candidate) { return $candidate }
+      } else {
+        $cmd = Get-Command $candidate -ErrorAction SilentlyContinue
+        if ($cmd) { return $cmd.Source }
+      }
+    } catch {}
+  }
+  return $null
+}
+
+function Start-RagServer {
+  if (-not (Test-Path -LiteralPath $ragScript)) { return }
+  if (Test-AppServer $ragPort) { return }
+
+  $python = Get-PythonExe
+  if (-not $python) {
+    Write-AppLog 'Python was not found, so RAG server was not started.'
+    return
+  }
+
+  Write-AppLog 'Starting ChromaDB/Ollama RAG server.'
+  Start-Process -FilePath $python -WindowStyle Hidden -WorkingDirectory $appRoot -ArgumentList @($ragScript)
+}
+
+Start-RagServer
 
 try {
   if (-not (Test-AppServer $port)) { throw 'Server is not running.' }

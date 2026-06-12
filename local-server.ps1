@@ -110,6 +110,65 @@ function Invoke-OllamaProxy($Stream, [string]$Method, [string]$RawPath, [byte[]]
   }
 }
 
+function Invoke-LocalProxy($Stream, [string]$Method, [string]$RawPath, [byte[]]$BodyBytes, [string]$Prefix, [string]$TargetBase, [string]$Name) {
+  if ($Method -eq 'OPTIONS') {
+    Send-Response $Stream 204 'No Content' ([byte[]]::new(0)) 'text/plain; charset=utf-8'
+    return
+  }
+
+  if ($Method -ne 'GET' -and $Method -ne 'POST') {
+    $body = [System.Text.Encoding]::UTF8.GetBytes('Method not allowed')
+    Send-Response $Stream 405 'Method Not Allowed' $body 'text/plain; charset=utf-8'
+    return
+  }
+
+  $targetPath = $RawPath -replace "^/$Prefix", ''
+  if ([string]::IsNullOrWhiteSpace($targetPath)) { $targetPath = '/' }
+  $targetUrl = "$TargetBase$targetPath"
+
+  try {
+    $request = [System.Net.HttpWebRequest]::Create($targetUrl)
+    $request.Method = $Method
+    $request.Timeout = 180000
+    $request.ReadWriteTimeout = 180000
+    $request.ContentType = 'application/json'
+
+    if ($Method -eq 'POST') {
+      $request.ContentLength = $BodyBytes.Length
+      $requestStream = $request.GetRequestStream()
+      $requestStream.Write($BodyBytes, 0, $BodyBytes.Length)
+      $requestStream.Close()
+    }
+
+    $response = $request.GetResponse()
+    try {
+      $responseStream = $response.GetResponseStream()
+      $memory = [System.IO.MemoryStream]::new()
+      $responseStream.CopyTo($memory)
+      Send-Response $Stream ([int]$response.StatusCode) $response.StatusDescription $memory.ToArray() 'application/json; charset=utf-8'
+    } finally {
+      $response.Close()
+    }
+  } catch [System.Net.WebException] {
+    $err = $_.Exception
+    if ($err.Response) {
+      $statusCode = [int]$err.Response.StatusCode
+      $statusText = $err.Response.StatusDescription
+      $responseStream = $err.Response.GetResponseStream()
+      $memory = [System.IO.MemoryStream]::new()
+      if ($responseStream) { $responseStream.CopyTo($memory) }
+      Send-Response $Stream $statusCode $statusText $memory.ToArray() 'application/json; charset=utf-8'
+      $err.Response.Close()
+    } else {
+      $body = [System.Text.Encoding]::UTF8.GetBytes("{`"error`":`"$Name proxy failed: $($err.Message)`"}")
+      Send-Response $Stream 502 'Bad Gateway' $body 'application/json; charset=utf-8'
+    }
+  } catch {
+    $body = [System.Text.Encoding]::UTF8.GetBytes("{`"error`":`"$Name proxy failed: $($_.Exception.Message)`"}")
+    Send-Response $Stream 502 'Bad Gateway' $body 'application/json; charset=utf-8'
+  }
+}
+
 while ($true) {
   $client = $listener.AcceptTcpClient()
   try {
@@ -150,6 +209,11 @@ while ($true) {
 
     if ($rawPath -like '/ollama/*') {
       Invoke-OllamaProxy $stream $method $rawPath $bodyBytes
+      continue
+    }
+
+    if ($rawPath -like '/rag/*') {
+      Invoke-LocalProxy $stream $method $rawPath $bodyBytes 'rag' 'http://127.0.0.1:8790' 'RAG'
       continue
     }
 

@@ -22,6 +22,7 @@ Journall is a local-first trading journal and analytics dashboard built for revi
 - Service Worker / Web Manifest
 - PowerShell Windows launch scripts
 - Local Ollama AI integration
+- ChromaDB local vector database with `nomic-embed-text` embeddings
 
 ## Why I Built It
 
@@ -62,15 +63,23 @@ http://127.0.0.1:8787/index.html
 ## Local AI Setup
 
 1. Install Ollama from `https://ollama.com`
-2. Run:
+2. Install the Python dependencies:
 
 ```powershell
-ollama run llama3.2
+py -m pip install -r requirements.txt
 ```
 
-3. Open Journall
-4. Go to AI Coach
-5. Use `http://localhost:11434` with model `llama3.2`
+3. Pull the local chat and embedding models:
+
+```powershell
+ollama pull llama3.2
+ollama pull nomic-embed-text
+```
+
+4. Open Journall with the desktop launcher
+5. Go to AI Coach and ask a question
+
+The launcher starts the local RAG server on `http://127.0.0.1:8790`. The AI Coach indexes trades into ChromaDB, retrieves the most relevant journal entries, then asks Ollama for specific feedback.
 
 The app still works without Ollama, but AI coaching features require the local Ollama server.
 
@@ -81,4 +90,3 @@ Journall is designed to run locally. Trade data, notes, screenshots, and recordi
 ## Portfolio Summary
 
 Built a local-first trading journal dashboard with interactive analytics, journal workflows, risk tracking, calendar review, and local AI coaching to help traders review execution quality and improve discipline.
-

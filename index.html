@@ -5906,6 +5906,8 @@ th,td{
   const OLLAMA_URL_STORAGE = 'krishna_real_ai_ollama_url';
   const DEFAULT_OLLAMA_MODEL = 'llama3.2';
   const DEFAULT_OLLAMA_URL = location.protocol === 'http:' ? `${location.origin}/ollama` : 'http://localhost:11434';
+  const RAG_URL = location.protocol === 'http:' ? `${location.origin}/rag` : 'http://127.0.0.1:8790';
+  let ragLastSyncKey = '';
 
   function textOnly(value){
     return String(value == null ? '' : value)
@@ -6014,7 +6016,80 @@ th,td{
   }
 
   async function askRealAI(prompt){
-    return askOllamaAI(prompt, 'chat');
+    try{
+      return await askRagAI(prompt);
+    }catch(err){
+      console.warn('RAG coach unavailable, falling back to direct Ollama context.', err);
+      return askOllamaAI(prompt, 'chat');
+    }
+  }
+
+  function buildRagTrades(){
+    let data = [];
+    try{
+      data = Array.isArray(trades) ? trades : [];
+    }catch(_){
+      data = [];
+    }
+    return data.map((t, idx) => ({
+      ...t,
+      _ragId: t.id || `${t.date || 'date'}-${t.time || 'time'}-${t.symbol || 'symbol'}-${idx}`,
+      mistakes: typeof mistakes === 'function' ? mistakes(t) : []
+    }));
+  }
+
+  function getRagSyncKey(ragTrades){
+    return `${ragTrades.length}:${ragTrades.slice(-12).map(t => [
+      t._ragId,
+      t.date,
+      t.time,
+      t.symbol,
+      t.side,
+      t.pnl,
+      t.reason || t.exitReason || '',
+      t.notes || t.comment || ''
+    ].join('|')).join('~')}`;
+  }
+
+  async function syncRagIndex(force=false){
+    const ragTrades = buildRagTrades();
+    if(!ragTrades.length) return {indexed:0,total:0};
+    const syncKey = getRagSyncKey(ragTrades);
+    if(!force && syncKey === ragLastSyncKey) return {skipped:true,total:ragTrades.length};
+
+    const response = await fetch(`${RAG_URL}/index`, {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({trades:ragTrades})
+    });
+    const data = await response.json().catch(() => ({}));
+    if(!response.ok) throw new Error(data?.error || `RAG index failed (${response.status})`);
+    ragLastSyncKey = syncKey;
+    return data;
+  }
+
+  async function askRagAI(prompt){
+    const ragTrades = buildRagTrades();
+    if(!ragTrades.length) throw new Error('No trades are available to index.');
+    await syncRagIndex();
+
+    const response = await fetch(`${RAG_URL}/ask`, {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        question:prompt,
+        model:getOllamaModel(),
+        topK:5
+      })
+    });
+    const data = await response.json().catch(() => ({}));
+    if(!response.ok) throw new Error(data?.error || `RAG coach failed (${response.status})`);
+    return {
+      fallback:false,
+      rag:true,
+      relevantCount:data.relevantCount || 0,
+      text:data.answer || 'RAG coach replied, but no text was returned.'
+    };
   }
 
   function buildOllamaPrompt(prompt, mode, context){
@@ -6089,6 +6164,9 @@ th,td{
       if(result.fallback){
         addMessage('bot', result.text);
         setStatus('Rule-based coach answered. Start Ollama and install the selected model to enable real local AI.', 'warn');
+      }else if(result.rag){
+        addMessage('bot', `<strong>Trading Coach:</strong> ${textOnly(result.text).replace(/\\n/g,'<br>')}`);
+        setStatus(`RAG coach answered with ${result.relevantCount || 0} relevant trades from ChromaDB + nomic-embed-text.`, 'good');
       }else{
         addMessage('bot', `<strong>Trading Coach:</strong> ${textOnly(result.text).replace(/\\n/g,'<br>')}`);
         setStatus(`Real AI answered using Ollama ${getOllamaModel()}.`, 'good');
@@ -6123,7 +6201,7 @@ th,td{
         <input value="${DEFAULT_OLLAMA_URL}" disabled aria-label="Permanent Ollama URL">
         <button class="btn" type="button" onclick="saveAISettings()">Save AI</button>
       </div>
-      <div id="realAiStatus" class="real-ai-status warn">Trading Coach ready. It uses your local Ollama model and your journal data to improve process, risk control, and consistency.</div>
+      <div id="realAiStatus" class="real-ai-status warn">Trading Coach ready. It uses ChromaDB + nomic-embed-text for relevant trade memory, then Ollama for coaching.</div>
     `;
     const chipRow = card.querySelector('.ai-chip-row');
     card.insertBefore(settings, chipRow || card.children[1]);
