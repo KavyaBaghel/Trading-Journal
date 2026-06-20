@@ -1785,6 +1785,7 @@ body.modal-open .sidebar{
       <div class="hero">
         
         <h1>Today's Summary</h1>
+        <span class="hero-tag">Local AI • RAG memory • Trade review</span>
         
       </div>
       <div class="quick-actions"></div>
@@ -6884,6 +6885,10 @@ body{
 .main{
   max-width:1680px!important;
 }
+.top{
+  align-items:stretch!important;
+  gap:16px!important;
+}
 .hero{
   min-height:88px!important;
   display:flex!important;
@@ -6900,10 +6905,10 @@ body{
   letter-spacing:0!important;
   color:var(--ink-high)!important;
 }
-.hero::after{
-  content:"Local AI • RAG memory • Trade review";
+.hero-tag{
   display:inline-flex;
   align-items:center;
+  justify-content:center;
   min-height:34px;
   padding:0 13px;
   border-radius:999px;
@@ -6914,6 +6919,13 @@ body{
   font-size:11px;
   letter-spacing:.08em;
   text-transform:uppercase;
+  white-space:nowrap;
+}
+.quick-actions{
+  display:flex!important;
+  flex-direction:column!important;
+  gap:8px!important;
+  min-width:178px!important;
 }
 .sidebar{
   background:
@@ -7064,6 +7076,13 @@ input::placeholder,textarea::placeholder{
   background:linear-gradient(135deg,var(--mint),#9cc7ff)!important;
   border:0!important;
 }
+.btn:hover{
+  transform:translateY(-1px);
+  border-color:rgba(139,184,255,.28)!important;
+}
+.btn:active{
+  transform:translateY(0);
+}
 .file-picker-btn{
   justify-content:center!important;
 }
@@ -7115,7 +7134,8 @@ input::placeholder,textarea::placeholder{
   color:var(--ink-mid)!important;
 }
 .widget-grid{
-  grid-template-columns:repeat(auto-fit,minmax(260px,1fr))!important;
+  grid-template-columns:repeat(auto-fit,minmax(280px,1fr))!important;
+  gap:14px!important;
 }
 .widget{
   min-height:188px!important;
@@ -7161,6 +7181,9 @@ input::placeholder,textarea::placeholder{
 .calendar-controls select{
   min-width:120px!important;
 }
+.calendar-summary-card{
+  border-radius:16px!important;
+}
 .enhanced-calendar{
   gap:8px!important;
 }
@@ -7172,8 +7195,16 @@ input::placeholder,textarea::placeholder{
   border-color:rgba(114,230,180,.28)!important;
 }
 @media(max-width:1280px){
-  .hero::after{
+  .hero-tag{
     display:none!important;
+  }
+  .top{
+    flex-direction:column!important;
+  }
+  .quick-actions{
+    flex-direction:row!important;
+    flex-wrap:wrap!important;
+    min-width:0!important;
   }
   .journal-page-layout{
     grid-template-columns:1fr!important;
@@ -7202,4 +7233,3 @@ input::placeholder,textarea::placeholder{
 </style>
 </body>
 </html>
-
