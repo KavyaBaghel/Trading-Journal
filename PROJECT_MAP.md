@@ -2,7 +2,7 @@
 
 ## What This Is
 
-Krishna's Trading Journal App is a local PWA-style desktop app. It uses a PowerShell local server and opens in Microsoft Edge app mode.
+Journall is a local PWA-style desktop app. It uses a PowerShell local server and opens in Microsoft Edge app mode.
 
 ## File Map
 
@@ -16,7 +16,7 @@ Krishna's Trading Journal App is a local PWA-style desktop app. It uses a PowerS
 | `service-worker.js` | Offline cache for the app shell. |
 | `local-server.ps1` | Local HTTP server at port `8787`. |
 | `launch-app.ps1` | Starts server and opens app-mode Edge window. |
-| `Krishna Trading Journal App.bat` | Double-click app launcher. |
+| `Journall App.bat` | Double-click app launcher. |
 | `Install App.bat` | Double-click shortcut installer. |
 | `install-desktop-shortcut.ps1` | Creates Desktop and Start Menu shortcuts. |
 | `assets/icon-192.png` | PWA icon. |

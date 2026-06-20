@@ -1,8 +1,8 @@
 {
-  "name": "Krishna's Trading Journal",
+  "name": "Journall",
   "type": "local-windows-pwa",
   "entry": "index.html",
-  "run": "Krishna Trading Journal App.vbs",
+  "run": "Journall App.vbs",
   "install": "Install App.bat",
   "localServer": {
     "script": "local-server.ps1",
@@ -23,8 +23,8 @@
   },
   "chromeLauncher": {
     "script": "launch-chrome-app.ps1",
-    "launcher": "Krishna Journal Chrome.vbs",
-    "debugLauncher": "Krishna Journal Chrome.bat",
+    "launcher": "Journall Chrome.vbs",
+    "debugLauncher": "Journall Chrome.bat",
     "installer": "Install Chrome App Shortcut.bat",
     "browser": "Google Chrome app mode",
     "profileDirectory": ".chrome-app-profile"

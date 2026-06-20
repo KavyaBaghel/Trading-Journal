@@ -1,5 +1,5 @@
 {
-  "name": "krishnas-trading-journal-app",
+  "name": "journall-trading-journal-app",
   "version": "1.0.0",
   "private": true,
   "description": "Local desktop-style trading journal app with analytics, AI widgets, Ollama AI coach, calendar, goals, and journal pages.",
@@ -7,9 +7,9 @@
   "main": "index.html",
   "scripts": {
     "start": "powershell -NoProfile -ExecutionPolicy Bypass -File ./local-server.ps1 -Root . -Port 8787",
-    "app": "wscript \"Krishna Trading Journal App.vbs\"",
+    "app": "wscript \"Journall App.vbs\"",
     "app:debug": "powershell -NoProfile -ExecutionPolicy Bypass -File ./launch-app.ps1",
-    "chrome": "wscript \"Krishna Journal Chrome.vbs\"",
+    "chrome": "wscript \"Journall Chrome.vbs\"",
     "chrome:debug": "powershell -NoProfile -ExecutionPolicy Bypass -File ./launch-chrome-app.ps1",
     "mobile": "powershell -NoProfile -ExecutionPolicy Bypass -File ./start-mobile.ps1",
     "install-app": "powershell -NoProfile -ExecutionPolicy Bypass -File ./install-desktop-shortcut.ps1"
@@ -24,9 +24,9 @@
   "app": {
     "entry": "index.html",
     "localUrl": "http://127.0.0.1:8787/index.html",
-    "launcher": "Krishna Trading Journal App.vbs",
-    "chromeLauncher": "Krishna Journal Chrome.vbs",
-    "fallbackLauncher": "Krishna Trading Journal App.bat",
+    "launcher": "Journall App.vbs",
+    "chromeLauncher": "Journall Chrome.vbs",
+    "fallbackLauncher": "Journall App.bat",
     "installer": "Install App.bat",
     "openHere": "OPEN_APP_HERE.bat",
     "manifest": "manifest.webmanifest",

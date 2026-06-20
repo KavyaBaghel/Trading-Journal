@@ -1,13 +1,17 @@
 $ErrorActionPreference = 'Stop'
 
 $appRoot = Split-Path -Parent $MyInvocation.MyCommand.Path
-$launcher = Join-Path $appRoot 'Krishna Journal Chrome.vbs'
-$fallbackLauncher = Join-Path $appRoot 'Krishna Journal Chrome.bat'
+$launcher = Join-Path $appRoot 'Journall Chrome.vbs'
+$fallbackLauncher = Join-Path $appRoot 'Journall Chrome.bat'
 $icon = Join-Path $appRoot 'assets\app-icon.ico'
 $desktop = [Environment]::GetFolderPath('Desktop')
-$startMenu = Join-Path ([Environment]::GetFolderPath('Programs')) 'Krishna Trading Journal'
-$shortcutPath = Join-Path $desktop 'Krishna Journal Chrome.lnk'
-$startShortcutPath = Join-Path $startMenu 'Krishna Journal Chrome.lnk'
+$programs = [Environment]::GetFolderPath('Programs')
+$startMenu = Join-Path $programs 'Journall'
+$oldStartMenu = Join-Path $programs 'Krishna Trading Journal'
+$shortcutPath = Join-Path $desktop 'Journall Chrome.lnk'
+$startShortcutPath = Join-Path $startMenu 'Journall Chrome.lnk'
+$oldShortcutPath = Join-Path $desktop 'Krishna Journal Chrome.lnk'
+$oldStartShortcutPath = Join-Path $oldStartMenu 'Krishna Journal Chrome.lnk'
 
 if (-not (Test-Path -LiteralPath $launcher)) {
   $launcher = $fallbackLauncher
@@ -18,6 +22,11 @@ if (-not (Test-Path -LiteralPath $launcher)) {
 }
 
 New-Item -ItemType Directory -Force -Path $startMenu | Out-Null
+foreach ($oldPath in @($oldShortcutPath, $oldStartShortcutPath)) {
+  if (Test-Path -LiteralPath $oldPath) {
+    Remove-Item -LiteralPath $oldPath -Force
+  }
+}
 
 $shell = New-Object -ComObject WScript.Shell
 foreach ($path in @($shortcutPath, $startShortcutPath)) {
@@ -25,7 +34,7 @@ foreach ($path in @($shortcutPath, $startShortcutPath)) {
   $shortcut.TargetPath = $launcher
   $shortcut.WorkingDirectory = $appRoot
   $shortcut.WindowStyle = 7
-  $shortcut.Description = "Krishna's Trading Journal App for Chrome"
+  $shortcut.Description = "Journall trading journal app for Chrome"
   if (Test-Path -LiteralPath $icon) {
     $shortcut.IconLocation = $icon
   }

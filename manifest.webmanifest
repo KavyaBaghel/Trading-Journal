@@ -1,7 +1,7 @@
 {
-  "name": "Krishna's Trading Journal",
-  "short_name": "Krishna Journal",
-  "id": "/krishna-trading-journal",
+  "name": "Journall",
+  "short_name": "Journall",
+  "id": "/journall",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",

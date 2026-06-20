@@ -39,13 +39,13 @@ OPEN_APP_HERE.bat
 Or launch the desktop-style app:
 
 ```text
-Krishna Trading Journal App.vbs
+Journall App.vbs
 ```
 
 Chrome app mode:
 
 ```text
-Krishna Journal Chrome.bat
+Journall Chrome.bat
 ```
 
 Local server:

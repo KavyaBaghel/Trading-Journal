@@ -137,7 +137,7 @@ if ($Tab) {
 $args = @(
   "--app=$appUrl",
   "--user-data-dir=$profilePath",
-  '--class=KrishnaTradingJournal',
+  '--class=Journall',
   '--no-first-run',
   '--disable-features=Translate',
   '--disable-background-mode'
