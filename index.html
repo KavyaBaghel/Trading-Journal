@@ -1816,6 +1816,7 @@ body.modal-open .sidebar{
   .ai-input-row{flex-direction:column}
 }
 
+
 </style>
 </head>
 <body>
@@ -6118,6 +6119,7 @@ th,td{
     transition-duration:.01ms!important;
   }
 }
+
 </style>
 <!-- PREMIUM_UI_REFRESH_END -->
 
@@ -6159,6 +6161,7 @@ th,td{
 @media(max-width:760px){
   .real-ai-settings{grid-template-columns:1fr}
 }
+
 </style>
 <script>
 (function(){
@@ -6502,6 +6505,7 @@ if ('serviceWorker' in navigator && location.protocol !== 'file:') {
 }
 .real-ai-status{border-radius:12px!important}
 @media(max-width:760px){.real-ai-settings{grid-template-columns:1fr!important}}
+
 </style>
 <style>
 /* Coach desk polish: calmer scan, clearer focus, smoother daily workflow. */
@@ -6643,6 +6647,7 @@ html{
     scroll-behavior:auto!important;
   }
 }
+
 </style>
 <style>
 /* Mobile app shell */
@@ -7757,6 +7762,36 @@ div.checklist-item{
   }
   .panel-title{
     border-bottom:0!important;
+  }
+}
+
+/* Today Command Center - focused card polish */
+.command-center .cmd-card{
+  padding:15px 18px!important;
+  gap:10px!important;
+  border-radius:14px!important;
+  border-color:rgba(139,184,255,.18)!important;
+  background:
+    linear-gradient(180deg,rgba(18,27,39,.98),rgba(9,14,21,.98))!important;
+  box-shadow:0 12px 28px rgba(0,0,0,.22),inset 0 1px 0 rgba(255,255,255,.04)!important;
+  transition:box-shadow .16s ease,border-color .16s ease,transform .16s ease!important;
+}
+.command-center .cmd-card:hover{
+  border-color:rgba(114,230,180,.28)!important;
+  box-shadow:0 18px 38px rgba(0,0,0,.30),0 0 0 1px rgba(114,230,180,.06),inset 0 1px 0 rgba(255,255,255,.05)!important;
+  transform:translateY(-1px);
+}
+@media(max-width:900px){
+  .command-center{
+    grid-template-columns:repeat(auto-fit,minmax(150px,1fr))!important;
+    gap:10px!important;
+  }
+  .command-center .cmd-card{
+    min-height:96px!important;
+    padding:13px 14px!important;
+  }
+  .command-center .cmd-value{
+    font-size:20px!important;
   }
 }
 </style>
