@@ -1,8 +1,9 @@
-const CACHE_NAME = 'krishna-trading-journal-mobile-v1';
+const CACHE_NAME = 'journall-website-v2';
 const APP_SHELL = [
   './',
   './index.html',
   './manifest.webmanifest',
+  './service-worker.js',
   './assets/icon-192.png',
   './assets/icon-512.png'
 ];

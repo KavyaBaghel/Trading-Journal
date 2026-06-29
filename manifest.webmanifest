@@ -1,7 +1,7 @@
 {
   "name": "Journall",
   "short_name": "Journall",
-  "id": "/journall",
+  "id": "./index.html",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
@@ -9,7 +9,7 @@
   "orientation": "portrait-primary",
   "background_color": "#090b10",
   "theme_color": "#121822",
-  "description": "A local trading journal app with AI coaching, analytics, calendar, goals, and trade reviews.",
+  "description": "A trading journal website and local-first PWA with AI coaching, analytics, calendar, goals, and trade reviews.",
   "categories": ["finance", "productivity"],
   "prefer_related_applications": false,
   "icons": [

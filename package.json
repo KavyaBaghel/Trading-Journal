@@ -1,12 +1,15 @@
 {
   "name": "journall-trading-journal-app",
   "version": "1.0.0",
-  "private": true,
-  "description": "Local desktop-style trading journal app with analytics, AI widgets, Ollama AI coach, calendar, goals, and journal pages.",
+  "private": false,
+  "description": "Deployable trading journal website and local desktop-style PWA with analytics, AI widgets, Ollama AI coach, calendar, goals, and journal pages.",
+  "homepage": "https://kavyabaghel.github.io/Trading-Journal/",
   "type": "module",
   "main": "index.html",
   "scripts": {
     "start": "powershell -NoProfile -ExecutionPolicy Bypass -File ./local-server.ps1 -Root . -Port 8787",
+    "serve": "powershell -NoProfile -ExecutionPolicy Bypass -File ./local-server.ps1 -Root . -Port 8787",
+    "website": "powershell -NoProfile -ExecutionPolicy Bypass -File ./local-server.ps1 -Root . -Port 8787",
     "app": "wscript \"Journall App.vbs\"",
     "app:debug": "powershell -NoProfile -ExecutionPolicy Bypass -File ./launch-app.ps1",
     "chrome": "wscript \"Journall Chrome.vbs\"",
@@ -19,7 +22,11 @@
     "pwa",
     "ollama",
     "local-ai",
-    "desktop-app"
+    "desktop-app",
+    "website",
+    "static-site",
+    "github-pages",
+    "trading-dashboard"
   ],
   "app": {
     "entry": "index.html",

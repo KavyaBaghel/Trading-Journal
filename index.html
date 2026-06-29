@@ -508,7 +508,7 @@ tr:hover td{background:rgba(255,255,255,.028)}
 .buy{color:var(--blue);background:rgba(139,184,255,.14)}.sell{color:var(--amber);background:rgba(255,211,110,.14)}
 .win{color:var(--green);background:rgba(113,230,170,.12)}.loss{color:var(--red);background:rgba(255,119,136,.12)}.breakeven{color:var(--muted)!important;background:rgba(255,255,255,.045)!important}.tag{color:var(--purple);background:rgba(197,166,255,.12)}
 
-.calendar{display:grid;grid-template-columns:repeat(7,1fr);gap:10px}
+.calendar{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
 .dayhead{font-family:var(--mono);font-size:11px;color:var(--faint);text-align:center;padding:8px}
 .day{min-height:105px;border-radius:18px;background:rgba(255,255,255,.035);border:1px solid var(--border);padding:10px;display:flex;flex-direction:column;justify-content:space-between}
 .day.empty{opacity:.33}
@@ -977,7 +977,7 @@ td{
 .neutral-bg{background:var(--faint)}
 .enhanced-calendar{
   display:grid;
-  grid-template-columns:repeat(7,minmax(118px,1fr));
+  grid-template-columns:repeat(5,minmax(118px,1fr));
   gap:12px;
   overflow:auto;
 }
@@ -1097,7 +1097,7 @@ td{
     grid-template-columns:repeat(2,minmax(0,1fr));
   }
   .enhanced-calendar{
-    grid-template-columns:repeat(7,minmax(96px,1fr));
+    grid-template-columns:repeat(5,minmax(96px,1fr));
   }
 }
 
@@ -2038,18 +2038,9 @@ body.modal-open .sidebar{
                 <option value="">Select setup...</option>
                 <option value="Buy Setup">Buy Setup</option>
                 <option value="Sell Setup">Sell Setup</option>
-                <option value="No Confirmation Setup">No Confirmation Setup</option>
               </select>
             </div>
           </div>
-          <button class="checklist-item" type="button" data-check="sl" onclick="toggleChecklistCheck('sl')">
-            <div class="checklist-icon pending">?</div>
-            <div class="checklist-text">Stop Loss Placed</div>
-          </button>
-          <button class="checklist-item" type="button" data-check="risk" onclick="toggleChecklistCheck('risk')">
-            <div class="checklist-icon pending">?</div>
-            <div class="checklist-text">Risk Under Daily Limit</div>
-          </button>
           <button class="checklist-item" type="button" data-check="news" onclick="toggleChecklistCheck('news')">
             <div class="checklist-icon pending">?</div>
             <div class="checklist-text">News Checked</div>
@@ -2058,9 +2049,21 @@ body.modal-open .sidebar{
             <div class="checklist-icon pending">?</div>
             <div class="checklist-text">Emotion Calm</div>
           </button>
-          <button class="checklist-item" type="button" data-check="confirmation" onclick="toggleChecklistCheck('confirmation')">
+          <button class="checklist-item" type="button" data-check="risk" onclick="toggleChecklistCheck('risk')">
             <div class="checklist-icon pending">?</div>
-            <div class="checklist-text">Confirmation Present</div>
+            <div class="checklist-text">Risk Under 50 Pips</div>
+          </button>
+          <button class="checklist-item" type="button" data-check="obFvg" onclick="toggleChecklistCheck('obFvg')">
+            <div class="checklist-icon pending">?</div>
+            <div class="checklist-text">Entry at OB or FVG Confirmation</div>
+          </button>
+          <button class="checklist-item" type="button" data-check="liquiditySweep" onclick="toggleChecklistCheck('liquiditySweep')">
+            <div class="checklist-icon pending">?</div>
+            <div class="checklist-text">Liquidity Sweep Confirmation</div>
+          </button>
+          <button class="checklist-item" type="button" data-check="rrExit" onclick="toggleChecklistCheck('rrExit')">
+            <div class="checklist-icon pending">?</div>
+            <div class="checklist-text">Exit With 1:2 At Least</div>
           </button>
         </div>
         <div class="checklist-result">
@@ -3587,8 +3590,10 @@ function renderCalendar(){
   const first=new Date(dates[0]), last=new Date(dates[dates.length-1]);
   const start=new Date(first); start.setDate(first.getDate()-((first.getDay()+6)%7));
   const end=new Date(last); end.setDate(last.getDate()+(6-((last.getDay()+6)%7)));
-  let html=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'].map(x=>`<div class="dayhead">${x}</div>`).join('');
+  let html=['Mon','Tue','Wed','Thu','Fri'].map(x=>`<div class="dayhead">${x}</div>`).join('');
   for(let d=new Date(start); d<=end; d.setDate(d.getDate()+1)){
+    const dayOfWeek = d.getDay();
+    if(dayOfWeek === 0 || dayOfWeek === 6) continue;
     const iso=d.toISOString().slice(0,10), p=pnl[iso]||0, c=count[iso]||0;
     html+=`<div class="day ${c?'':'empty'}"><div class="day-num">${d.getDate()}</div><div class="day-pnl ${c?pnlClass(p):'neutral'}">${c?fmt(p):'—'}</div><div class="day-meta">${c?c+' trades':'No trades'}</div></div>`;
   }
@@ -3694,9 +3699,15 @@ function renderCalendar(){
 
   const start = new Date(year, month, 1);
   const end = new Date(year, month + 1, 0);
-  const firstDay = (start.getDay() + 6) % 7;
   const totalDays = end.getDate();
-  const weekdays = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+  const weekdays = ['Mon','Tue','Wed','Thu','Fri'];
+  let firstVisibleDay = 1;
+  while(firstVisibleDay <= totalDays){
+    const candidateDay = new Date(year, month, firstVisibleDay).getDay();
+    if(candidateDay !== 0 && candidateDay !== 6) break;
+    firstVisibleDay++;
+  }
+  const firstDay = firstVisibleDay <= totalDays ? (new Date(year, month, firstVisibleDay).getDay() + 6) % 7 : 0;
 
   let out = weekdays.map(d=>`<div class="calendar-head">${d}</div>`).join('');
 
@@ -3709,6 +3720,9 @@ function renderCalendar(){
 
   for(let day=1; day<=totalDays; day++){
     const dateObj = new Date(year, month, day);
+    const dayOfWeek = dateObj.getDay();
+    if(dayOfWeek === 0 || dayOfWeek === 6) continue;
+    const weekdayIndex = (dayOfWeek + 6) % 7;
     const mm = String(month + 1).padStart(2,'0');
     const dd = String(day).padStart(2,'0');
     const dateKey = `${year}-${mm}-${dd}`;
@@ -3726,7 +3740,7 @@ function renderCalendar(){
       <div class="calendar-day ${cls} ${arr.length ? 'clickable' : ''}" title="${dateKey} | ${arr.length} trades | ${fmt(pnl)}" ${arr.length ? `onclick="openCalendarDayTrades('${dateKey}')"` : ''}>
         <div class="calendar-date-row">
           <div class="calendar-date">${day}</div>
-          <div class="calendar-weekday-small">${weekdays[(dateObj.getDay()+6)%7]}</div>
+          <div class="calendar-weekday-small">${weekdays[weekdayIndex]}</div>
         </div>
 
         <div class="calendar-count">${arr.length ? `${arr.length} trade${arr.length>1?'s':''} • ${winCount}P/${lossCount}L/${beCount}BE` : 'No trades'}</div>
@@ -3749,7 +3763,7 @@ function renderCalendar(){
 
 function renderHeatmap(){
   if(!filtered.length){ document.getElementById('heatmap').innerHTML='<div class="insight">No trades yet. Upload CSV to build heatmap.</div>'; return; }
-  const days=['Mon','Tue','Wed','Thu','Fri','Sat','Sun']; let h='<div class="heatcell heatlabel">Day / Hr</div>';
+  const days=['Mon','Tue','Wed','Thu','Fri']; let h='<div class="heatcell heatlabel">Day / Hr</div>';
   for(let i=0;i<24;i++) h+=`<div class="heatcell">${i}</div>`;
   days.forEach(day=>{h+=`<div class="heatcell heatlabel">${day}</div>`; for(let hr=0;hr<24;hr++){const arr=filtered.filter(t=>t.weekday===day&&t.hour===hr); const p=arr.reduce((a,b)=>a+b.pnl,0); h+=`<div class="heatcell" title="${day} ${hr}:00 | ${arr.length} trades | ${fmt(p)}" style="background:${arr.length?(p>0?'rgba(113,230,170,.18)':p<0?'rgba(255,119,136,.18)':'rgba(100,116,139,.16)'):'rgba(255,255,255,.025)'};color:${p>0?'var(--green)':p<0?'var(--red)':'var(--muted)'}">${arr.length||''}</div>`;}});
   document.getElementById('heatmap').innerHTML=h;
@@ -4524,11 +4538,12 @@ function renderTradingPage(){
 }
 
 const preTradeChecklistState = {
-  sl:false,
-  risk:false,
   news:false,
   emotion:false,
-  confirmation:false
+  risk:false,
+  obFvg:false,
+  liquiditySweep:false,
+  rrExit:false
 };
 
 function renderCommandCenter(todayTrades){
@@ -4592,11 +4607,12 @@ function updateChecklist(){
   const setup = document.getElementById('preTradeSetup')?.value || '';
   const checks = [
     {id:'setup', pass:!!setup},
-    {id:'sl', pass:preTradeChecklistState.sl},
-    {id:'risk', pass:preTradeChecklistState.risk},
     {id:'news', pass:preTradeChecklistState.news},
     {id:'emotion', pass:preTradeChecklistState.emotion},
-    {id:'confirmation', pass:preTradeChecklistState.confirmation}
+    {id:'risk', pass:preTradeChecklistState.risk},
+    {id:'obFvg', pass:preTradeChecklistState.obFvg},
+    {id:'liquiditySweep', pass:preTradeChecklistState.liquiditySweep},
+    {id:'rrExit', pass:preTradeChecklistState.rrExit}
   ];
 
   checks.forEach(c=>{
@@ -4621,17 +4637,17 @@ function updateChecklist(){
     resultIcon.textContent = '✓';
     resultIcon.className = 'checklist-result-icon pass';
     resultTitle.textContent = 'Ready to Trade';
-    resultSub.textContent = 'All checks passed. Execute with discipline.';
+    resultSub.textContent = 'All checks passed. Execute only the planned setup.';
   }else if(setup){
     resultIcon.textContent = '!';
     resultIcon.className = 'checklist-result-icon fail';
     resultTitle.textContent = 'Do Not Trade Yet';
-    resultSub.textContent = 'Finish every risk and psychology check before entry.';
+    resultSub.textContent = 'News, emotion, risk, entry confirmation, liquidity, and 1:2 exit must all pass.';
   }else{
     resultIcon.textContent = '?';
     resultIcon.className = 'checklist-result-icon pending';
     resultTitle.textContent = 'Choose Setup First';
-    resultSub.textContent = 'Select Buy, Sell, or No Confirmation before checking the trade.';
+    resultSub.textContent = 'Select Buy Setup or Sell Setup before checking the trade.';
   }
 }
 
@@ -6894,7 +6910,7 @@ html{
     gap:8px!important;
   }
   .enhanced-calendar{
-    grid-template-columns:repeat(7,minmax(42px,1fr))!important;
+    grid-template-columns:repeat(5,minmax(42px,1fr))!important;
     gap:5px!important;
   }
   .calendar-head{
@@ -6972,7 +6988,7 @@ html{
     font-size:11px!important;
   }
   .enhanced-calendar{
-    grid-template-columns:repeat(7,minmax(36px,1fr))!important;
+    grid-template-columns:repeat(5,minmax(36px,1fr))!important;
   }
   .calendar-day{
     min-height:72px!important;
