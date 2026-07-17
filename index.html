@@ -2165,7 +2165,7 @@ tr:hover {
   color: #f7f8f8 !important;
 }
 
-/* P&L values: never truncate â€” show full number */
+/* P&L values: never truncate — show full number */
 .value, .cmd-value, .ai-score-value, .goal-card-value, .widget-value,
 .analytics-bar-value, .calendar-summary-card .summary-value, .day-trade-title,
 .saved-journal-title, .coach-title, .mistake-box-count, .psych-rule strong,
@@ -2220,11 +2220,13 @@ tr:hover {
         <div class="signin-preview-row"><span>Review mode</span><strong>Rules + AI</strong></div>
       </div>
       <button id="firebaseGateSignInBtn" class="btn primary signin-google-btn" type="button"><span class="google-mark">G</span> Continue with Google</button>
+      <button id="firebaseOpenLocalBtn" class="signin-device-btn" type="button">Open journal on this device</button>
       <div id="firebaseGateMessage" class="firebase-auth-message">Checking website sign-in...</div>
       <p class="signin-footnote">Local laptop mode still runs without cloud. Website mode uses Google sign-in so each trader has separate data.</p>
     </aside>
   </div>
-</div><div class="mobile-appbar">
+</div>
+<div class="mobile-appbar">
   <div>
     <div class="mobile-app-title">Journall</div>
     <div class="mobile-app-subtitle" id="mobileActiveTab">Analytics</div>
@@ -2265,7 +2267,7 @@ tr:hover {
       <div class="hero">
         
         <h1>Today's Summary</h1>
-        <span class="hero-tag">Local AI â€¢ RAG memory â€¢ Trade review</span>
+        <span class="hero-tag">Local AI • RAG memory • Trade review</span>
         
       </div>
       <div class="quick-actions"></div>
@@ -2312,7 +2314,7 @@ tr:hover {
         <div class="card"><div class="panel-title"><h3>Direction Split</h3><span>BUY vs SELL</span></div><div class="chart"><canvas id="directionChart"></canvas></div><div id="directionHelper" class="chart-helper">Shows whether BUY or SELL performs better.</div></div>
       </div>
       <div class="grid two" style="margin-top:16px">
-        <div class="card"><div class="panel-title"><h3>Trade Heatmap</h3><span>weekday Ã— hour</span></div><div id="heatmap" class="heatmap"></div></div>
+        <div class="card"><div class="panel-title"><h3>Trade Heatmap</h3><span>weekday × hour</span></div><div id="heatmap" class="heatmap"></div></div>
         <div class="card"><div class="panel-title"><h3>Back-to-back Re-entry Map</h3><span>revenge clusters</span></div><div class="chart tall"><canvas id="b2bChart"></canvas></div></div>
       </div>
     </section>
@@ -2365,9 +2367,9 @@ tr:hover {
       </div>
 
       <div class="calendar-controls premium-controls">
-        <button class="btn" onclick="changeCalendarMonth(-1)">â† Previous</button>
+        <button class="btn" onclick="changeCalendarMonth(-1)">← Previous</button>
         <button class="btn primary" onclick="goCalendarToday()">Current Month</button>
-        <button class="btn" onclick="changeCalendarMonth(1)">Next â†’</button>
+        <button class="btn" onclick="changeCalendarMonth(1)">Next →</button>
         <select id="calendarMonthSelect" onchange="jumpCalendarMonth()"></select>
         <select id="calendarYearSelect" onchange="jumpCalendarMonth()"></select>
       </div>
@@ -2388,7 +2390,7 @@ tr:hover {
 
     <section id="grid" class="section">
       <div class="card">
-        <div class="panel-title"><h3>Trades</h3><span id="gridCount">â€”</span></div>
+        <div class="panel-title"><h3>Trades</h3><span id="gridCount">—</span></div>
         <div class="filters">
           <input id="q" placeholder="Search symbol/reason/tag...">
           <select id="session"><option value="">All Sessions</option><option>Asia</option><option>London</option><option>New York</option></select>
@@ -3244,7 +3246,7 @@ function renderAnalyticsBars(){
         <div>
           <div class="analytics-bar-title">Overall P&L Balance Scale</div>
           <div class="analytics-bar-value ${pnlClass(s.pnl)}">${moneyPlain(currentBalance)}</div>
-          <div class="analytics-bar-sub">P&L: <strong class="${pnlClass(s.pnl)}">${fmt(s.pnl)}</strong> â€¢ Range: ${moneyPlain(rangeMin)} full loss â†’ ${moneyPlain(rangeMid)} neutral â†’ ${moneyPlain(rangeMax)} full profit</div>
+          <div class="analytics-bar-sub">P&L: <strong class="${pnlClass(s.pnl)}">${fmt(s.pnl)}</strong> • Range: ${moneyPlain(rangeMin)} full loss → ${moneyPlain(rangeMid)} neutral → ${moneyPlain(rangeMax)} full profit</div>
         </div>
         <div class="badge ${s.pnl > 0 ? 'win' : s.pnl < 0 ? 'loss' : 'tag'}">${zoneLabel}</div>
       </div>
@@ -3266,7 +3268,7 @@ function renderAnalyticsBars(){
         <div>
           <div class="analytics-bar-title">Daily Drawdown</div>
           <div class="analytics-bar-value ${dd.amount ? 'red' : 'neutral'}">${moneyPlain(dd.amount)}</div>
-          <div class="analytics-bar-sub">Today: ${dd.today} â€¢ Fixed limit: <strong>${moneyPlain(DAILY_DRAWDOWN_LIMIT)}</strong> â€¢ ${dd.trades} trade${dd.trades===1?'':'s'}</div>
+          <div class="analytics-bar-sub">Today: ${dd.today} • Fixed limit: <strong>${moneyPlain(DAILY_DRAWDOWN_LIMIT)}</strong> • ${dd.trades} trade${dd.trades===1?'':'s'}</div>
         </div>
         <div class="badge ${dd.percent >= 80 ? 'loss' : 'tag'}">${dd.percent}% used</div>
       </div>
@@ -3297,7 +3299,7 @@ function renderMetrics(){
   const cells=[
     ['Net P&L',fmt(s.pnl),pnlClass(s.pnl),'Total after commission/swap'],
     ['Win Rate',pct(s.wr),scoreClass(s.wr,50,40),s.wins.length+'W / '+s.losses.length+'L / '+s.breakEvens.length+'BE'],
-    ['Profit Factor',s.pf.toFixed(2),factorClass(s.pf),'Gross profit Ã· gross loss'],
+    ['Profit Factor',s.pf.toFixed(2),factorClass(s.pf),'Gross profit ÷ gross loss'],
     ['Avg Win',fmt(s.avgWin),pnlClass(s.avgWin),'Mean winning trade'],
     ['Avg Loss',fmt(s.avgLoss),pnlClass(s.avgLoss),'Mean losing trade'],
     ['Max Drawdown',fmt(s.maxDD),pnlClass(s.maxDD),'Worst equity dip'],
@@ -3504,7 +3506,7 @@ function updateGraphHelpers(){
 
   const sessionHelper = document.getElementById('sessionHelper');
   if(sessionHelper){
-    sessionHelper.innerHTML = `<strong>Best session:</strong> ${bestSession?.[0] || 'â€”'} (${fmt(bestSession?.[1] || 0)}) â€¢ <strong>Worst:</strong> ${worstSession?.[0] || 'â€”'} (${fmt(worstSession?.[1] || 0)}).`;
+    sessionHelper.innerHTML = `<strong>Best session:</strong> ${bestSession?.[0] || '—'} (${fmt(bestSession?.[1] || 0)}) • <strong>Worst:</strong> ${worstSession?.[0] || '—'} (${fmt(worstSession?.[1] || 0)}).`;
   }
 
   const mistakeLabels=['No SL','Silver','Oversize','Too Fast'];
@@ -3512,7 +3514,7 @@ function updateGraphHelpers(){
   const worstMistakeIndex = mistakePnL.indexOf(Math.min(...mistakePnL));
   const mistakeHelper = document.getElementById('mistakeHelper');
   if(mistakeHelper){
-    mistakeHelper.innerHTML = `<strong>Biggest leak:</strong> ${mistakeLabels[worstMistakeIndex] || 'â€”'} (${fmt(mistakePnL[worstMistakeIndex] || 0)}). Focus on removing this first.`;
+    mistakeHelper.innerHTML = `<strong>Biggest leak:</strong> ${mistakeLabels[worstMistakeIndex] || '—'} (${fmt(mistakePnL[worstMistakeIndex] || 0)}). Focus on removing this first.`;
   }
 
   const sideLabels=['BUY','SELL'];
@@ -3520,7 +3522,7 @@ function updateGraphHelpers(){
   const directionHelper = document.getElementById('directionHelper');
   if(directionHelper){
     const better = sideM.BUY >= sideM.SELL ? 'BUY' : 'SELL';
-    directionHelper.innerHTML = `<strong>Stronger direction:</strong> ${better}. BUY: ${fmt(sideM.BUY || 0)} â€¢ SELL: ${fmt(sideM.SELL || 0)}.`;
+    directionHelper.innerHTML = `<strong>Stronger direction:</strong> ${better}. BUY: ${fmt(sideM.BUY || 0)} • SELL: ${fmt(sideM.SELL || 0)}.`;
   }
 }
 
@@ -4121,7 +4123,7 @@ function renderCalendar(){
     const dayOfWeek = d.getDay();
     if(dayOfWeek === 0 || dayOfWeek === 6) continue;
     const iso=d.toISOString().slice(0,10), p=pnl[iso]||0, c=count[iso]||0;
-    html+=`<div class="day ${c?'':'empty'}"><div class="day-num">${d.getDate()}</div><div class="day-pnl ${c?pnlClass(p):'neutral'}">${c?fmt(p):'â€”'}</div><div class="day-meta">${c?c+' trades':'No trades'}</div></div>`;
+    html+=`<div class="day ${c?'':'empty'}"><div class="day-num">${d.getDate()}</div><div class="day-pnl ${c?pnlClass(p):'neutral'}">${c?fmt(p):'—'}</div><div class="day-meta">${c?c+' trades':'No trades'}</div></div>`;
   }
   document.getElementById('calendarGrid').innerHTML=html;
 }
@@ -4269,7 +4271,7 @@ function renderCalendar(){
           <div class="calendar-weekday-small">${weekdays[weekdayIndex]}</div>
         </div>
 
-        <div class="calendar-count">${arr.length ? `${arr.length} trade${arr.length>1?'s':''} â€¢ ${winCount}P/${lossCount}L/${beCount}BE` : 'No trades'}</div>
+        <div class="calendar-count">${arr.length ? `${arr.length} trade${arr.length>1?'s':''} • ${winCount}P/${lossCount}L/${beCount}BE` : 'No trades'}</div>
 
         <div class="calendar-dot-row">
           ${arr.slice(0,10).map(t=>`<span class="calendar-dot ${pnlClass(t.pnl)}"></span>`).join('')}
@@ -4305,7 +4307,7 @@ function renderGrid(){
     const ms=mistakes(t), dur=t.duration<60?t.duration.toFixed(1)+'m':(t.duration/60).toFixed(1)+'h';
     const hasJournal = hasJournalForTrade(t);
     const journalBtn = `<span class="journal-table-status" title="${hasJournal?'Journal done':'Journal not done'}"><span class="journal-dot-status ${hasJournal?'done':'todo'}"></span>${hasJournal?'Journal Done':'Need Journal'}</span>`;
-    return `<tr><td>${t.date || 'No date'}<br><small style="color:var(--faint)">${t.time || 'â€”'}</small></td><td>${t.symbol || 'Unknown'}</td><td><span class="badge ${t.side==='BUY'?'buy':'sell'}">${t.side}</span></td><td>${t.session}</td><td>${t.entry.toFixed(2)}</td><td>${t.exit.toFixed(2)}</td><td class="${t.sl?'':'red'}">${t.sl?t.sl.toFixed(2):'None'}</td><td>${t.tp?t.tp.toFixed(2):'â€”'}</td><td>${t.volume.toFixed(2)}</td><td>${dur}</td><td>${t.reason}</td><td class="${pnlClass(t.pnl)}"><strong>${fmt(t.pnl)}</strong><br><span class="badge ${resultBadgeClass(t.pnl)}">${resultLabel(t.pnl)}</span></td><td>${ms.length?ms.map(x=>`<span class="badge loss">${x}</span>`).join(' '):'<span class="badge win">Clean</span>'}</td><td>${journalBtn}</td></tr>`;
+    return `<tr><td>${t.date || 'No date'}<br><small style="color:var(--faint)">${t.time || '—'}</small></td><td>${t.symbol || 'Unknown'}</td><td><span class="badge ${t.side==='BUY'?'buy':'sell'}">${t.side}</span></td><td>${t.session}</td><td>${t.entry.toFixed(2)}</td><td>${t.exit.toFixed(2)}</td><td class="${t.sl?'':'red'}">${t.sl?t.sl.toFixed(2):'None'}</td><td>${t.tp?t.tp.toFixed(2):'—'}</td><td>${t.volume.toFixed(2)}</td><td>${dur}</td><td>${t.reason}</td><td class="${pnlClass(t.pnl)}"><strong>${fmt(t.pnl)}</strong><br><span class="badge ${resultBadgeClass(t.pnl)}">${resultLabel(t.pnl)}</span></td><td>${ms.length?ms.map(x=>`<span class="badge loss">${x}</span>`).join(' '):'<span class="badge win">Clean</span>'}</td><td>${journalBtn}</td></tr>`;
   }).join('');
 }
 
@@ -4403,7 +4405,7 @@ function renderPropChallengeDashboard(){
         <div class="goal-card-label">Current Balance</div>
         <div class="goal-card-value ${currentBalance>=PROP_ACCOUNT_SIZE?'green':'amber'}">$${currentBalance.toFixed(2)}</div>
         <div class="bar" style="margin-top:12px"><div style="width:${Math.min(100, Math.max(0, s.pnl) / PROP_STEP1_TARGET * 100)}%"></div></div>
-        <div class="goal-card-sub">Target balance $${step1TargetBalance.toFixed(2)} â€¢ P&L ${fmt(s.pnl)}.</div>
+        <div class="goal-card-sub">Target balance $${step1TargetBalance.toFixed(2)} • P&L ${fmt(s.pnl)}.</div>
       </div>`;
 
   box.innerHTML = `
@@ -4411,7 +4413,7 @@ function renderPropChallengeDashboard(){
       <div class="goal-card">
         <div class="goal-card-label">Challenge Status</div>
         <div class="goal-card-value ${statusClass}">${activeStep}</div>
-        <div class="goal-card-sub">${s.total} trades tracked â€¢ ${s.wr.toFixed(0)}% win rate â€¢ ${fmt(s.pnl)} net.</div>
+        <div class="goal-card-sub">${s.total} trades tracked • ${s.wr.toFixed(0)}% win rate • ${fmt(s.pnl)} net.</div>
       </div>
       <div class="goal-card">
         <div class="goal-card-label">Phase 1 Remaining</div>
@@ -4423,7 +4425,7 @@ function renderPropChallengeDashboard(){
       <div class="goal-card">
         <div class="goal-card-label">Risk Room</div>
         <div class="goal-card-value ${dailyRoom<=0||maxRoom<=0?'red':'green'}">$${dailyRoom.toFixed(2)} today</div>
-        <div class="goal-card-sub">$${maxRoom.toFixed(2)} max drawdown room â€¢ suggested risk/trade $${riskSuggestion}.</div>
+        <div class="goal-card-sub">$${maxRoom.toFixed(2)} max drawdown room • suggested risk/trade $${riskSuggestion}.</div>
       </div>
     </div>`;
 }
@@ -5436,7 +5438,7 @@ function renderTodayRows(data){
       <td>${t.entry.toFixed(2)}</td>
       <td>${t.exit.toFixed(2)}</td>
       <td class="${t.sl?'':'red'}">${t.sl?t.sl.toFixed(2):'None'}</td>
-      <td>${t.tp?t.tp.toFixed(2):'â€”'}</td>
+      <td>${t.tp?t.tp.toFixed(2):'—'}</td>
       <td>${t.volume.toFixed(2)}</td>
       <td>${dur}</td>
       <td>${t.reason}</td>
@@ -5520,10 +5522,10 @@ function hasJournalForTrade(t){
 }
 
 function tradeSummaryHtml(t){
-  if(!t) return '<strong>No trade selected.</strong><br>Open Calendar â†’ click a trading day â†’ choose a trade to journal it.';
-  return `<strong>${escapeHtml(t.symbol)} ${escapeHtml(t.side)}</strong> <span class="trade-journal-tag ${pnlClass(t.pnl)}">${fmt(t.pnl)} â€¢ ${resultLabel(t.pnl)}</span><br>
-    ${escapeHtml(t.date)} ${escapeHtml(t.time || '')} â€¢ ${escapeHtml(t.session || 'Session')} â€¢ Entry ${escapeHtml(t.entry)} â†’ Exit ${escapeHtml(t.exit)}<br>
-    SL ${escapeHtml(t.sl || 'â€”')} â€¢ TP ${escapeHtml(t.tp || 'â€”')} â€¢ Lot ${escapeHtml(t.volume || 'â€”')} â€¢ Duration ${Number(t.duration||0).toFixed(1)}m`;
+  if(!t) return '<strong>No trade selected.</strong><br>Open Calendar → click a trading day → choose a trade to journal it.';
+  return `<strong>${escapeHtml(t.symbol)} ${escapeHtml(t.side)}</strong> <span class="trade-journal-tag ${pnlClass(t.pnl)}">${fmt(t.pnl)} • ${resultLabel(t.pnl)}</span><br>
+    ${escapeHtml(t.date)} ${escapeHtml(t.time || '')} • ${escapeHtml(t.session || 'Session')} • Entry ${escapeHtml(t.entry)} → Exit ${escapeHtml(t.exit)}<br>
+    SL ${escapeHtml(t.sl || '—')} • TP ${escapeHtml(t.tp || '—')} • Lot ${escapeHtml(t.volume || '—')} • Duration ${Number(t.duration||0).toFixed(1)}m`;
 }
 
 function closeDayTradesModal(event){
@@ -5540,7 +5542,7 @@ function openCalendarDayTrades(dateKey){
   const arr=filtered.filter(t=>t.date===dateKey).sort((a,b)=>String(a.time||'').localeCompare(String(b.time||'')));
   if(title) title.textContent = `Trades on ${dateKey}`;
   const pnl=arr.reduce((a,b)=>a+(Number(b.pnl)||0),0);
-  if(sub) sub.innerHTML = `${arr.length} trade${arr.length===1?'':'s'} â€¢ <strong class="${pnlClass(pnl)}">${fmt(pnl)}</strong> â€¢ Click any trade to open its journal.`;
+  if(sub) sub.innerHTML = `${arr.length} trade${arr.length===1?'':'s'} • <strong class="${pnlClass(pnl)}">${fmt(pnl)}</strong> • Click any trade to open its journal.`;
   if(list){
     list.innerHTML = arr.length ? arr.map(t=>{
       const key=makeTradeKey(t).replaceAll('\\','\\\\').replaceAll("'","&#39;");
@@ -5548,8 +5550,8 @@ function openCalendarDayTrades(dateKey){
       const existing=hasJournalForTrade(t);
       return `<div class="day-trade-card" onclick="openTradeJournal('${key}')">
         <div>
-          <div class="day-trade-title">${escapeHtml(t.time || '')} â€¢ ${escapeHtml(t.symbol)} â€¢ ${escapeHtml(t.side)} <span class="badge ${t.pnl>=0?'win':'loss'}">${fmt(t.pnl)}</span>${existing?'<span class="trade-journal-tag">Journal saved</span>':''}</div>
-          <div class="day-trade-meta">Session: ${escapeHtml(t.session || 'â€”')} â€¢ Entry ${escapeHtml(t.entry)} â†’ Exit ${escapeHtml(t.exit)} â€¢ Mistakes: ${escapeHtml(ms)}</div>
+          <div class="day-trade-title">${escapeHtml(t.time || '')} • ${escapeHtml(t.symbol)} • ${escapeHtml(t.side)} <span class="badge ${t.pnl>=0?'win':'loss'}">${fmt(t.pnl)}</span>${existing?'<span class="trade-journal-tag">Journal saved</span>':''}</div>
+          <div class="day-trade-meta">Session: ${escapeHtml(t.session || '—')} • Entry ${escapeHtml(t.entry)} → Exit ${escapeHtml(t.exit)} • Mistakes: ${escapeHtml(ms)}</div>
         </div>
         <button class="btn primary">Open Journal</button>
       </div>`;
@@ -5847,7 +5849,7 @@ function renderRuleCheckSummary(entry, trade){
   const result = evaluateJournalRules(entry, trade);
   const statusClass = result.followed ? 'good' : 'bad';
   const title = result.followed ? 'Rules followed' : `${result.broken.length} rule${result.broken.length === 1 ? '' : 's'} broken`;
-  const details = result.checks.map(c=>`${c.pass ? '' : '!'} ${c.name}`).join(' â€¢ ');
+  const details = result.checks.map(c=>`${c.pass ? '' : '!'} ${c.name}`).join(' • ');
   return `<div class="journal-sync-status ${statusClass}" style="margin-top:10px"><strong>${title}</strong><br>${escapeHtml(details)}</div>`;
 }
 
@@ -6308,7 +6310,7 @@ function renderJournalPage(){
     const result = e.result || (t ? tradeResult(t.pnl) : 'note');
     const fields = e.fields || parseJournalBody(e.body || '');
     const resultText = result === 'profit' ? 'Win Journal' : result === 'loss' ? 'Loss Journal' : result === 'breakeven' ? 'BE Journal' : 'Journal';
-    const tradeLine = t ? `<div class="saved-journal-meta">${escapeHtml(t.date || e.date)} ${escapeHtml(t.time || '')} â€¢ ${escapeHtml(t.symbol || '')} ${escapeHtml(t.side || '')} â€¢ <span class="${pnlClass(t.pnl)}">${fmt(t.pnl)} â€¢ ${resultLabel(t.pnl)}</span></div>` : '';
+    const tradeLine = t ? `<div class="saved-journal-meta">${escapeHtml(t.date || e.date)} ${escapeHtml(t.time || '')} • ${escapeHtml(t.symbol || '')} ${escapeHtml(t.side || '')} • <span class="${pnlClass(t.pnl)}">${fmt(t.pnl)} • ${resultLabel(t.pnl)}</span></div>` : '';
     const preview = [
       fields.setup ? `Setup: ${fields.setup}` : '',
       fields.mistake ? `Mistake: ${fields.mistake}` : '',
@@ -6320,7 +6322,7 @@ function renderJournalPage(){
       <div class="saved-journal-head">
         <div>
           <div class="saved-journal-title">${escapeHtml(resultText)} ${e.tradeKey?'<span class="trade-journal-tag">Trade</span>':''}</div>
-          <div class="saved-journal-meta">${escapeHtml(e.date)} â€¢ <span class="journal-category-badge">${escapeHtml(resultText)}</span></div>
+          <div class="saved-journal-meta">${escapeHtml(e.date)} • <span class="journal-category-badge">${escapeHtml(resultText)}</span></div>
           ${tradeLine}
         </div>
       </div>
@@ -6873,6 +6875,7 @@ const authStatus = document.getElementById('firebaseAuthStatus');
 const gateMessage = document.getElementById('firebaseGateMessage');
 const signInBtn = document.getElementById('firebaseSignInBtn');
 const gateSignInBtn = document.getElementById('firebaseGateSignInBtn');
+const openLocalBtn = document.getElementById('firebaseOpenLocalBtn');
 const signOutBtn = document.getElementById('firebaseSignOutBtn');
 const hasFirebaseConfig = Boolean(firebaseConfig?.apiKey && firebaseConfig?.authDomain && firebaseConfig?.projectId);
 const firebaseSdkVersion = '10.12.5';
@@ -6886,6 +6889,12 @@ let syncTimer = null;
 function setAuthStatus(text){
   if(authStatus) authStatus.textContent = text;
   if(gateMessage) gateMessage.textContent = text;
+}
+
+function openSignedInJournal(message){
+  setGateVisible(false);
+  setAuthStatus(message || 'Journal opened on this device.');
+  if(typeof window.renderAll === 'function') window.renderAll();
 }
 
 function setGateVisible(visible){
@@ -7027,6 +7036,11 @@ async function initFirebaseAuth(){
   firestoreDb = firestoreModule.getFirestore(app);
   const provider = new authModule.GoogleAuthProvider();
   provider.setCustomParameters({ prompt: 'select_account' });
+  try{
+    await authModule.setPersistence(auth, authModule.browserLocalPersistence);
+  }catch(error){
+    console.warn('Firebase persistence setup failed:', error);
+  }
 
   const isMobileAuthDevice = () => /Android|iPhone|iPad|iPod|Opera Mini|IEMobile/i.test(navigator.userAgent);
 
@@ -7050,7 +7064,7 @@ async function initFirebaseAuth(){
   const handleAuthResult = result => {
     if(result?.user){
       currentUser = result.user;
-      setAuthStatus('Google sign-in complete. Loading your journal...');
+      openSignedInJournal('Google sign-in complete. Opening your journal...');
     }
   };
 
@@ -7066,6 +7080,7 @@ async function initFirebaseAuth(){
     setAuthStatus('Opening Google sign-in...');
     try{
       if(isMobileAuthDevice()){
+        sessionStorage.setItem('journall:mobile-redirect-started', '1');
         await authModule.signInWithRedirect(auth, provider);
         return;
       }
@@ -7084,7 +7099,19 @@ async function initFirebaseAuth(){
   };
   if(signInBtn) signInBtn.addEventListener('click', signIn);
   if(gateSignInBtn) gateSignInBtn.addEventListener('click', signIn);
+  if(openLocalBtn) openLocalBtn.addEventListener('click', () => openSignedInJournal('Opened on this device. Sign in again later if cloud sync is needed.'));
   if(signOutBtn) signOutBtn.addEventListener('click', () => authModule.signOut(auth));
+
+  if(isMobileAuthDevice() && sessionStorage.getItem('journall:mobile-redirect-started')){
+    setTimeout(()=>{
+      if(auth.currentUser){
+        currentUser = auth.currentUser;
+        openSignedInJournal('Mobile sign-in complete. Opening your journal...');
+      }else{
+        setAuthStatus('If Google returned here but it is stuck, tap Open journal on this device.');
+      }
+    }, 2500);
+  }
 
   authModule.onAuthStateChanged(auth, async user=>{
     currentUser = user;
@@ -7095,9 +7122,7 @@ async function initFirebaseAuth(){
       setAuthStatus('Sign in to use the website version.');
       return;
     }
-    setGateVisible(false);
-    setAuthStatus('Signed in. Opening your journal...');
-    if(typeof window.renderAll === 'function') window.renderAll();
+    openSignedInJournal('Signed in. Opening your journal...');
     try{
       await loadCloudState();
     }catch(err){
@@ -7496,7 +7521,7 @@ body:not(.firebase-auth-required) #journallApp > .main > *{
 
 /* ===== MINI STAT CARD FIXES (TODAY P&L / TRADES / WIN RATE / MISTAKES) ===== */
 
-/* FIX 3 â€” grid: 4 equal columns, tighter gap */
+/* FIX 3 — grid: 4 equal columns, tighter gap */
 #todayMetrics.today-metrics,
 .grid.metrics.today-metrics,
 .today-metrics{
@@ -7506,14 +7531,14 @@ body:not(.firebase-auth-required) #journallApp > .main > *{
   margin:0!important;
 }
 
-/* FIX 3 â€” each card */
+/* FIX 3 — each card */
 #todayMetrics .card{
   min-width:0!important;
   padding:12px!important;
   overflow:hidden!important;
 }
 
-/* FIX 2 â€” parent already min-width:0 + overflow:hidden (above). Text element: */
+/* FIX 2 — parent already min-width:0 + overflow:hidden (above). Text element: */
 #todayMetrics .card .sub{
   white-space:nowrap!important;
   font-size:11px!important;
@@ -7522,7 +7547,7 @@ body:not(.firebase-auth-required) #journallApp > .main > *{
   color:#8a8f98!important;
 }
 
-/* FIX 1 â€” P&L value never cut off */
+/* FIX 1 — P&L value never cut off */
 #todayMetrics .card .value,
 #commandCenter .cmd-value{
   white-space:nowrap!important;
@@ -7534,7 +7559,7 @@ body:not(.firebase-auth-required) #journallApp > .main > *{
 
 /* JOURNALL_DARK_NIKE_THEME_END */
 
-/* ===== SECTION 1 â€” APP SHELL RESPONSIVE FOUNDATION ===== */
+/* ===== SECTION 1 — APP SHELL RESPONSIVE FOUNDATION ===== */
 html, body {
   height: 100%;
   margin: 0;
@@ -8169,7 +8194,7 @@ p{
 /* 1. HIDE EMPTY BOX */
 #journallApp > .main .quick-actions { display: none !important; }
 
-/* 2. PSYCHOLOGY CARDS â€” KILL WHITE */
+/* 2. PSYCHOLOGY CARDS — KILL WHITE */
 #journallApp .psych-check,
 #journallApp [data-psych-check] {
   background: #0a0a0a !important;
@@ -8261,7 +8286,7 @@ p{
   color: #ffffff !important;
 }
 
-/* 5. DAILY RULES SIDEBAR â€” SOFT */
+/* 5. DAILY RULES SIDEBAR — SOFT */
 #journallApp .sidebox {
   background: transparent !important;
   border: none !important;
@@ -9500,6 +9525,25 @@ html.firebase-auth-required body{
   .signin-brand{margin-bottom:28px!important}
   .journall-signin-card h1{font-size:34px!important}
   .signin-lede{font-size:15px!important}
+}
+
+.signin-device-btn{
+  width:100%!important;
+  min-height:46px!important;
+  margin-top:10px!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  border-radius:14px!important;
+  border:1px solid rgba(255,255,255,.13)!important;
+  background:#16181d!important;
+  color:#d0d6e0!important;
+  font:700 14px/1 Inter,system-ui,-apple-system,sans-serif!important;
+  cursor:pointer!important;
+}
+.signin-device-btn:hover{
+  background:#1e2027!important;
+  color:#f7f8f8!important;
 }
 </style></body>
 </html>
