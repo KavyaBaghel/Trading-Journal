@@ -7011,8 +7011,12 @@ async function initFirebaseAuth(){
       setAuthStatus(`Google sign-in blocked. Add ${location.hostname} in Firebase Authentication > Settings > Authorized domains.`);
       return;
     }
-    if(code === 'auth/configuration-not-found' || code === 'auth/api-key-not-valid'){
-      setAuthStatus('Firebase config is missing or wrong. Fill firebase-config.js with your Firebase Web App config.');
+    if(code === 'auth/api-key-not-valid'){
+      setAuthStatus('Firebase API key is not valid. Recheck firebase-config.js from Firebase Project settings > Web app.');
+      return;
+    }
+    if(code === 'auth/configuration-not-found'){
+      setAuthStatus('Firebase Authentication is not enabled yet. In Firebase, open Authentication > Sign-in method, enable Google, then add kavyabaghel.github.io in Authorized domains.');
       return;
     }
     setAuthStatus(`Sign-in failed: ${error?.message || error}`);
