@@ -2200,13 +2200,13 @@ tr:hover {
           <div class="brand-sub">Trading command center</div>
         </div>
       </div>
-      <div class="signin-kicker">Private trading journal</div>
-      <h1>Review trades. Protect risk. Improve every session.</h1>
-      <p class="signin-lede">Sign in to open your cloud journal. Your trades, psychology notes, rules, and AI review stay under your own Google account.</p>
+      <div class="signin-kicker">AI-powered trading journal</div>
+      <h1>Sign in to Journall</h1>
+      <p class="signin-lede">Your personal AI-powered trading journal. Data stays private to your account.</p>
       <div class="signin-feature-grid">
         <div class="signin-feature"><span>01</span><strong>Daily discipline</strong><p>Track P&L, rule breaks, risk limit, and next action.</p></div>
         <div class="signin-feature"><span>02</span><strong>AI coaching</strong><p>Review weak patterns and psychology with local-first tools.</p></div>
-        <div class="signin-feature"><span>03</span><strong>Cloud access</strong><p>Open the same journal from laptop or phone after sign-in.</p></div>
+        <div class="signin-feature"><span>03</span><strong>Private access</strong><p>Use the same journal across devices after sign-in.</p></div>
       </div>
     </section>
     <aside class="signin-panel" aria-label="Sign in">
@@ -2219,10 +2219,10 @@ tr:hover {
         <div class="signin-preview-row"><span>Market</span><strong>XAUUSD only</strong></div>
         <div class="signin-preview-row"><span>Review mode</span><strong>Rules + AI</strong></div>
       </div>
-      <button id="firebaseGateSignInBtn" class="btn primary signin-google-btn" type="button"><span class="google-mark">G</span> Continue with Google</button>
-      <button id="firebaseOpenLocalBtn" class="signin-device-btn" type="button">Open journal on this device</button>
+      <button id="firebaseGateSignInBtn" class="btn primary signin-google-btn" type="button"><span class="google-mark">G</span> Sign in with Google</button>
+      <button id="firebaseOpenLocalBtn" class="signin-device-btn" type="button">Or use local mode - data stays on this device</button>
       <div id="firebaseGateMessage" class="firebase-auth-message">Checking website sign-in...</div>
-      <p class="signin-footnote">Local laptop mode still runs without cloud. Website mode uses Google sign-in so each trader has separate data.</p>
+      <p class="signin-footnote">Use Journall privately with your own account, or keep a local journal on this device.</p>
     </aside>
   </div>
 </div>
@@ -6866,7 +6866,9 @@ document.addEventListener('DOMContentLoaded', installRealAIControls);
 import { firebaseConfig } from './firebase-config.js?v=20260717-valid-api-key';
 
 const localHosts = new Set(['', 'localhost', '127.0.0.1', '::1']);
+const isStandaloneJournall = window.matchMedia?.('(display-mode: standalone)')?.matches || window.navigator.standalone === true || new URLSearchParams(location.search).get('source') === 'pwa';
 const isLocalJournall = location.protocol === 'file:' || localHosts.has(location.hostname);
+const shouldUseLocalAppMode = isLocalJournall || isStandaloneJournall;
 const authBar = document.getElementById('firebaseAuthBar');
 const authGate = document.getElementById('firebaseAuthGate');
 const journallApp = document.getElementById('journallApp');
@@ -7011,11 +7013,14 @@ async function loadCloudState(){
 }
 
 async function initFirebaseAuth(){
-  if(isLocalJournall){
+  if(shouldUseLocalAppMode){
     setGateVisible(false);
-    setAuthStatus('Local mode - data stays on this laptop');
+    setAuthStatus(isStandaloneJournall ? 'Local mode - data stays on this device' : 'Local mode - data stays on this device');
     if(signInBtn) signInBtn.style.display = 'none';
+    if(gateSignInBtn) gateSignInBtn.style.display = 'none';
+    if(openLocalBtn) openLocalBtn.style.display = 'none';
     if(signOutBtn) signOutBtn.style.display = 'none';
+    if(typeof window.renderAll === 'function') window.renderAll();
     return;
   }
 
@@ -7099,7 +7104,7 @@ async function initFirebaseAuth(){
   };
   if(signInBtn) signInBtn.addEventListener('click', signIn);
   if(gateSignInBtn) gateSignInBtn.addEventListener('click', signIn);
-  if(openLocalBtn) openLocalBtn.addEventListener('click', () => openSignedInJournal('Opened on this device. Sign in again later if cloud sync is needed.'));
+  if(openLocalBtn) openLocalBtn.addEventListener('click', () => openSignedInJournal('Opened on this device without cloud sync.'));
   if(signOutBtn) signOutBtn.addEventListener('click', () => authModule.signOut(auth));
 
   if(isMobileAuthDevice() && sessionStorage.getItem('journall:mobile-redirect-started')){
@@ -7134,7 +7139,7 @@ async function initFirebaseAuth(){
 }
 
 initFirebaseAuth().catch(err=>{
-  setGateVisible(!isLocalJournall);
+  setGateVisible(!shouldUseLocalAppMode);
   setAuthStatus(`Firebase failed to start: ${err?.message || err}`);
 });
 </script>
@@ -9544,6 +9549,59 @@ html.firebase-auth-required body{
 .signin-device-btn:hover{
   background:#1e2027!important;
   color:#f7f8f8!important;
+}
+
+/* PUBLIC_LOGIN_AND_PSYCH_STEP_FIX */
+.psych-progress .psych-step,
+.psych-step {
+  background: #16181a !important;
+  background-color: #16181a !important;
+  border: 1px solid rgba(255,255,255,0.12) !important;
+  border-radius: 9999px !important;
+  color: rgba(255,255,255,0.5) !important;
+  padding: 10px 20px !important;
+  font-size: 14px !important;
+  font-weight: 500 !important;
+  line-height: 1.2 !important;
+  min-width: 0 !important;
+  width: auto !important;
+  height: auto !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+.psych-progress .psych-step.active,
+.psych-step.active {
+  background: #494fdf !important;
+  background-color: #494fdf !important;
+  border-color: #494fdf !important;
+  color: #ffffff !important;
+  font-weight: 600 !important;
+}
+.psych-progress .psych-step.completed,
+.psych-step.completed,
+.psych-progress .psych-step.done,
+.psych-step.done {
+  background: rgba(39,166,68,0.15) !important;
+  background-color: rgba(39,166,68,0.15) !important;
+  border-color: rgba(39,166,68,0.3) !important;
+  color: #27a644 !important;
+}
+.psych-check {
+  background: #0a0a0a !important;
+  background-color: #0a0a0a !important;
+  border: 1px solid rgba(255,255,255,0.08) !important;
+  border-radius: 12px !important;
+  padding: 16px !important;
+}
+.psych-check * {
+  background: transparent !important;
+  background-color: transparent !important;
+}
+.firebase-auth-card .signin-lede,
+.firebase-auth-card .signin-footnote,
+.firebase-auth-message {
+  max-width: 100% !important;
 }
 </style></body>
 </html>
