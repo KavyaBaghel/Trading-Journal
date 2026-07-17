@@ -2,7 +2,7 @@
 // Keep this file public-safe: Firebase web config is not a secret, but Firestore
 // security rules must protect user data.
 export const firebaseConfig = {
-  apiKey: "AIzaSyDmTVCBVnjha1gSurY2zbpocvSCjm6dY4",
+  apiKey: "AIzaSyDmnTyCBVnjha1gSurY2zbpocvSCjm6dY4",
   authDomain: "journal-trading-journal.firebaseapp.com",
   projectId: "journal-trading-journal",
   storageBucket: "journal-trading-journal.firebasestorage.app",
