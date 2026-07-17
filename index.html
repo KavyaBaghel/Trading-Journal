@@ -7001,10 +7001,58 @@ async function initFirebaseAuth(){
   const auth = authModule.getAuth(app);
   firestoreDb = firestoreModule.getFirestore(app);
   const provider = new authModule.GoogleAuthProvider();
+  provider.setCustomParameters({ prompt: 'select_account' });
 
-  const signIn = () => authModule.signInWithPopup(auth, provider).catch(err=>{
-    setAuthStatus(`Sign-in failed: ${err?.message || err}`);
-  });
+  const isMobileAuthDevice = () => /Android|iPhone|iPad|iPod|Opera Mini|IEMobile/i.test(navigator.userAgent);
+
+  const handleAuthError = error => {
+    const code = error?.code || '';
+    if(code === 'auth/unauthorized-domain'){
+      setAuthStatus(`Google sign-in blocked. Add ${location.hostname} in Firebase Authentication > Settings > Authorized domains.`);
+      return;
+    }
+    if(code === 'auth/configuration-not-found' || code === 'auth/api-key-not-valid'){
+      setAuthStatus('Firebase config is missing or wrong. Fill firebase-config.js with your Firebase Web App config.');
+      return;
+    }
+    setAuthStatus(`Sign-in failed: ${error?.message || error}`);
+  };
+
+  const handleAuthResult = result => {
+    if(result?.user){
+      currentUser = result.user;
+      setAuthStatus('Google sign-in complete. Loading your journal...');
+    }
+  };
+
+  try{
+    const redirectResult = await authModule.getRedirectResult(auth);
+    if(redirectResult?.user) handleAuthResult(redirectResult);
+  }catch(error){
+    console.error('Redirect error:', error);
+    handleAuthError(error);
+  }
+
+  const signIn = async () => {
+    setAuthStatus('Opening Google sign-in...');
+    try{
+      if(isMobileAuthDevice()){
+        await authModule.signInWithRedirect(auth, provider);
+        return;
+      }
+      const result = await authModule.signInWithPopup(auth, provider);
+      handleAuthResult(result);
+    }catch(error){
+      const code = error?.code || '';
+      if(!isMobileAuthDevice() && (code === 'auth/popup-blocked' || code === 'auth/popup-closed-by-user' || code === 'auth/cancelled-popup-request')){
+        setAuthStatus('Popup blocked. Switching to redirect sign-in...');
+        await authModule.signInWithRedirect(auth, provider);
+        return;
+      }
+      console.error(error);
+      handleAuthError(error);
+    }
+  };
   if(signInBtn) signInBtn.addEventListener('click', signIn);
   if(gateSignInBtn) gateSignInBtn.addEventListener('click', signIn);
   if(signOutBtn) signOutBtn.addEventListener('click', () => authModule.signOut(auth));
