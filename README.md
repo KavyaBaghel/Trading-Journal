@@ -13,6 +13,7 @@ Journall is a local-first trading journal and analytics dashboard built for revi
 - AI widgets and reports that summarize trading weaknesses, strong sessions, risk issues, and next actions
 - Local Windows launchers for desktop-style use
 - Website deployment support for GitHub Pages, Netlify, and Vercel
+- Optional Firebase Google sign-in with Firestore user data sync for the public website
 - Mobile/PWA support through the included local server, service worker, and manifest
 
 ## Tech Stack
@@ -21,6 +22,7 @@ Journall is a local-first trading journal and analytics dashboard built for revi
 - Chart.js
 - LocalStorage and IndexedDB
 - Service Worker / Web Manifest
+- Firebase Auth and Firestore for website sign-in/data sync
 - PowerShell Windows launch scripts
 - Local Ollama AI integration
 - ChromaDB local vector database with `nomic-embed-text` embeddings
@@ -63,7 +65,7 @@ http://127.0.0.1:8787/index.html
 
 ## Website Deployment
 
-Journall can be hosted as a static website because the main app lives in `index.html` and uses browser storage for journal data.
+Journall can be hosted as a static website because the main app lives in `index.html`. Local use keeps data on the laptop. Public website use can require Google sign-in and sync each user's journal data to Firestore.
 
 ### GitHub Pages
 
@@ -84,7 +86,41 @@ https://kavyabaghel.github.io/Trading-Journal/
 
 Import the GitHub repository and use the project root as the publish directory. No build command is required.
 
-The public website works for dashboard, journal, analytics, calendar, goals, and local browser storage. Local Ollama/RAG AI features still require Ollama and the local RAG server running on the same computer.
+The public website works for dashboard, journal, analytics, calendar, goals, and Google sign-in cloud sync. Local Ollama/RAG AI features still require Ollama and the local RAG server running on the same computer.
+
+## Firebase Sign-In Setup
+
+The website sign-in code is already in the app. To activate it:
+
+1. Open `https://console.firebase.google.com`
+2. Create a Firebase project.
+3. Add a Web app.
+4. Copy the Firebase config into `firebase-config.js`.
+5. Go to `Authentication` -> `Sign-in method`.
+6. Enable `Google`.
+7. Go to `Firestore Database`.
+8. Create a database.
+9. Add these Firestore rules:
+
+```text
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /users/{userId}/journallState/{docId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+  }
+}
+```
+
+10. Go to `Authentication` -> `Settings` -> `Authorized domains`.
+11. Add:
+
+```text
+kavyabaghel.github.io
+```
+
+When Journall runs on `localhost`, `127.0.0.1`, or from the desktop launcher, it stays in local mode and does not force sign-in.
 
 ## Local AI Setup
 
@@ -111,7 +147,7 @@ The app still works without Ollama, but AI coaching features require the local O
 
 ## Privacy
 
-Journall is designed to run locally first. Trade data, notes, screenshots, and recordings are stored in the local app/browser profile, not sent to a cloud backend by this project. If you publish the website publicly, the code is public, but each visitor's journal data stays inside their own browser.
+Journall is designed to run locally first. On your laptop, trade data, notes, screenshots, and recordings stay in the local app/browser profile. On the public website, Google sign-in stores each user's synced journal state under their own Firebase user id.
 
 ## Portfolio Summary
 

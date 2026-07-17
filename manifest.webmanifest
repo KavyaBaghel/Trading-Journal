@@ -1,16 +1,16 @@
 {
-  "name": "Journall",
+  "name": "Journall - Trading Journal",
   "short_name": "Journall",
-  "id": "./index.html",
-  "start_url": "./index.html",
+  "id": "/index.html",
+  "start_url": "./index.html?source=pwa",
   "scope": "./",
   "display": "standalone",
-  "display_override": ["window-controls-overlay", "standalone", "minimal-ui"],
+  "display_override": ["standalone", "minimal-ui"],
   "orientation": "portrait-primary",
-  "background_color": "#090b10",
-  "theme_color": "#121822",
-  "description": "A trading journal website and local-first PWA with AI coaching, analytics, calendar, goals, and trade reviews.",
-  "categories": ["finance", "productivity"],
+  "background_color": "#0b0b0c",
+  "theme_color": "#0b0b0c",
+  "description": "Installable Android trading journal with analytics, psychology checks, goals, calendar, and AI coaching.",
+  "categories": ["finance", "productivity", "business"],
   "prefer_related_applications": false,
   "icons": [
     {
@@ -28,16 +28,22 @@
   ],
   "shortcuts": [
     {
-      "name": "Open Journal",
-      "short_name": "Journal",
-      "url": "./index.html#journalpage",
-      "description": "Open the trade journal page."
+      "name": "Today Summary",
+      "short_name": "Today",
+      "url": "./index.html#tradingpage",
+      "description": "Open today summary."
     },
     {
-      "name": "AI Lab",
-      "short_name": "AI Lab",
+      "name": "Old Trades",
+      "short_name": "Trades",
+      "url": "./index.html#journalpage",
+      "description": "Open saved trade journals."
+    },
+    {
+      "name": "AI Coach",
+      "short_name": "AI",
       "url": "./index.html#ailab",
-      "description": "Ask the local AI coach about your trades."
+      "description": "Ask the AI coach about your trades."
     }
   ]
 }

@@ -1,7 +1,8 @@
-const CACHE_NAME = 'journall-website-v2';
+const CACHE_NAME = 'journall-android-pwa-v1';
 const APP_SHELL = [
   './',
   './index.html',
+  './firebase-config.js',
   './manifest.webmanifest',
   './service-worker.js',
   './assets/icon-192.png',
