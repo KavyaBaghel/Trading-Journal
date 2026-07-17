@@ -1,8 +1,7 @@
-const CACHE_NAME = 'journall-android-pwa-v1';
+const CACHE_NAME = 'journall-android-pwa-v2';
 const APP_SHELL = [
   './',
   './index.html',
-  './firebase-config.js',
   './manifest.webmanifest',
   './service-worker.js',
   './assets/icon-192.png',
@@ -31,6 +30,22 @@ self.addEventListener('fetch', event => {
   const url = new URL(event.request.url);
   const isAppFile = url.origin === self.location.origin;
   const isHtmlRequest = event.request.mode === 'navigate' || url.pathname.endsWith('/index.html') || url.pathname === '/';
+  const isFirebaseConfig = isAppFile && url.pathname.endsWith('/firebase-config.js');
+
+  if (isFirebaseConfig) {
+    event.respondWith(
+      fetch(event.request, { cache: 'no-store' })
+        .then(response => {
+          if (response.ok) {
+            const copy = response.clone();
+            caches.open(CACHE_NAME).then(cache => cache.put(event.request, copy));
+          }
+          return response;
+        })
+        .catch(() => caches.match(event.request))
+    );
+    return;
+  }
 
   if (isHtmlRequest) {
     event.respondWith(
