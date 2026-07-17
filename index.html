@@ -7070,12 +7070,15 @@ async function initFirebaseAuth(){
       setAuthStatus('Sign in to use the website version.');
       return;
     }
-    setAuthStatus('Loading your cloud journal...');
+    setGateVisible(false);
+    setAuthStatus('Signed in. Opening your journal...');
+    if(typeof window.renderAll === 'function') window.renderAll();
     try{
       await loadCloudState();
     }catch(err){
-      setGateVisible(true);
-      setAuthStatus(`Cloud load failed: ${err?.message || err}`);
+      console.error('Cloud load failed:', err);
+      setGateVisible(false);
+      setAuthStatus(`Signed in. Journal opened locally; cloud sync needs Firebase setup: ${err?.message || err}`);
     }
   });
 }
