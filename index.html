@@ -2191,15 +2191,40 @@ tr:hover {
   </div>
 </div>
 <div id="firebaseAuthGate" class="firebase-auth-gate">
-  <div class="firebase-auth-card">
-    <div class="brand" style="margin-bottom:16px"><div class="logo" aria-hidden="true"></div><div><div class="brand-title">Journall</div><div class="brand-sub">Cloud trading journal</div></div></div>
-    <h1>Sign in to open Journall</h1>
-    <p>Your public website keeps each trader's journal under their own Google account. Your laptop version still runs locally.</p>
-    <button id="firebaseGateSignInBtn" class="btn primary" type="button">Sign in with Google</button>
-    <div id="firebaseGateMessage" class="firebase-auth-message">Checking website sign-in...</div>
+  <div class="firebase-auth-card journall-signin-card">
+    <section class="signin-copy" aria-label="Journall overview">
+      <div class="brand signin-brand">
+        <div class="logo" aria-hidden="true"></div>
+        <div>
+          <div class="brand-title">Journall</div>
+          <div class="brand-sub">Trading command center</div>
+        </div>
+      </div>
+      <div class="signin-kicker">Private trading journal</div>
+      <h1>Review trades. Protect risk. Improve every session.</h1>
+      <p class="signin-lede">Sign in to open your cloud journal. Your trades, psychology notes, rules, and AI review stay under your own Google account.</p>
+      <div class="signin-feature-grid">
+        <div class="signin-feature"><span>01</span><strong>Daily discipline</strong><p>Track P&L, rule breaks, risk limit, and next action.</p></div>
+        <div class="signin-feature"><span>02</span><strong>AI coaching</strong><p>Review weak patterns and psychology with local-first tools.</p></div>
+        <div class="signin-feature"><span>03</span><strong>Cloud access</strong><p>Open the same journal from laptop or phone after sign-in.</p></div>
+      </div>
+    </section>
+    <aside class="signin-panel" aria-label="Sign in">
+      <div class="signin-panel-top">
+        <span class="signin-status-dot"></span>
+        <span>Secure Google sign-in</span>
+      </div>
+      <div class="signin-preview-card">
+        <div class="signin-preview-row"><span>Risk limit</span><strong>$30/day</strong></div>
+        <div class="signin-preview-row"><span>Market</span><strong>XAUUSD only</strong></div>
+        <div class="signin-preview-row"><span>Review mode</span><strong>Rules + AI</strong></div>
+      </div>
+      <button id="firebaseGateSignInBtn" class="btn primary signin-google-btn" type="button"><span class="google-mark">G</span> Continue with Google</button>
+      <div id="firebaseGateMessage" class="firebase-auth-message">Checking website sign-in...</div>
+      <p class="signin-footnote">Local laptop mode still runs without cloud. Website mode uses Google sign-in so each trader has separate data.</p>
+    </aside>
   </div>
-</div>
-<div class="mobile-appbar">
+</div><div class="mobile-appbar">
   <div>
     <div class="mobile-app-title">Journall</div>
     <div class="mobile-app-subtitle" id="mobileActiveTab">Analytics</div>
@@ -9220,5 +9245,261 @@ main,
     if(active) showJournallTab(active.dataset.tab);
   });
 })();
-</script></body>
+</script>
+<style id="journall-signin-polish">
+html.firebase-auth-required body{
+  background:#010102!important;
+}
+.firebase-auth-gate.show{
+  min-height:100vh!important;
+  display:grid!important;
+  place-items:center!important;
+  padding:clamp(18px,4vw,56px)!important;
+  background:
+    radial-gradient(circle at 18% 14%, rgba(94,106,210,.22), transparent 30%),
+    radial-gradient(circle at 82% 10%, rgba(39,166,68,.10), transparent 24%),
+    linear-gradient(180deg,#010102 0%,#090a0d 52%,#010102 100%)!important;
+}
+.journall-signin-card{
+  width:min(1120px,100%)!important;
+  min-height:min(680px,calc(100vh - 72px))!important;
+  display:grid!important;
+  grid-template-columns:minmax(0,1.15fr) minmax(360px,.85fr)!important;
+  gap:0!important;
+  overflow:hidden!important;
+  background:rgba(13,14,17,.94)!important;
+  border:1px solid rgba(255,255,255,.11)!important;
+  border-radius:28px!important;
+  box-shadow:0 24px 80px rgba(0,0,0,.42)!important;
+  color:#f7f8f8!important;
+  padding:0!important;
+}
+.signin-copy{
+  display:flex!important;
+  flex-direction:column!important;
+  justify-content:center!important;
+  padding:clamp(32px,6vw,72px)!important;
+  position:relative!important;
+}
+.signin-copy:before{
+  content:""!important;
+  position:absolute!important;
+  inset:28px!important;
+  border:1px solid rgba(255,255,255,.05)!important;
+  border-radius:24px!important;
+  pointer-events:none!important;
+}
+.signin-brand{
+  gap:14px!important;
+  margin-bottom:44px!important;
+  position:relative!important;
+  z-index:1!important;
+}
+.signin-brand .logo{
+  width:48px!important;
+  height:48px!important;
+  border-radius:14px!important;
+  background:#16181d!important;
+  border:1px solid rgba(255,255,255,.12)!important;
+  box-shadow:none!important;
+}
+.signin-brand .brand-title{
+  color:#f7f8f8!important;
+  font-size:18px!important;
+  font-weight:700!important;
+  letter-spacing:-.04em!important;
+}
+.signin-brand .brand-sub{
+  color:#8a8f98!important;
+  font-size:13px!important;
+}
+.signin-kicker{
+  width:max-content!important;
+  color:#8a8f98!important;
+  border:1px solid rgba(255,255,255,.10)!important;
+  background:#16181d!important;
+  border-radius:999px!important;
+  padding:7px 12px!important;
+  font-size:12px!important;
+  font-weight:600!important;
+  letter-spacing:.06em!important;
+  text-transform:uppercase!important;
+  margin-bottom:18px!important;
+  position:relative!important;
+  z-index:1!important;
+}
+.journall-signin-card h1{
+  max-width:760px!important;
+  margin:0!important;
+  color:#f7f8f8!important;
+  font-size:clamp(42px,5.6vw,76px)!important;
+  line-height:.96!important;
+  font-weight:700!important;
+  letter-spacing:-.065em!important;
+  position:relative!important;
+  z-index:1!important;
+}
+.signin-lede{
+  max-width:640px!important;
+  margin:22px 0 0!important;
+  color:#d0d6e0!important;
+  font-size:clamp(16px,1.7vw,20px)!important;
+  line-height:1.55!important;
+  position:relative!important;
+  z-index:1!important;
+}
+.signin-feature-grid{
+  display:grid!important;
+  grid-template-columns:repeat(3,minmax(0,1fr))!important;
+  gap:12px!important;
+  margin-top:42px!important;
+  position:relative!important;
+  z-index:1!important;
+}
+.signin-feature{
+  background:#0d0e11!important;
+  border:1px solid rgba(255,255,255,.09)!important;
+  border-radius:16px!important;
+  padding:16px!important;
+}
+.signin-feature span{
+  display:block!important;
+  color:#5e6ad2!important;
+  font-size:12px!important;
+  font-weight:700!important;
+  margin-bottom:12px!important;
+}
+.signin-feature strong{
+  display:block!important;
+  color:#f7f8f8!important;
+  font-size:14px!important;
+  font-weight:700!important;
+  margin-bottom:7px!important;
+}
+.signin-feature p{
+  margin:0!important;
+  color:#8a8f98!important;
+  font-size:13px!important;
+  line-height:1.45!important;
+}
+.signin-panel{
+  display:flex!important;
+  flex-direction:column!important;
+  justify-content:center!important;
+  padding:clamp(28px,4vw,56px)!important;
+  background:
+    linear-gradient(180deg,rgba(22,24,29,.96),rgba(13,14,17,.98))!important;
+  border-left:1px solid rgba(255,255,255,.08)!important;
+}
+.signin-panel-top{
+  display:flex!important;
+  align-items:center!important;
+  gap:10px!important;
+  color:#d0d6e0!important;
+  font-size:14px!important;
+  font-weight:600!important;
+  margin-bottom:22px!important;
+}
+.signin-status-dot{
+  width:10px!important;
+  height:10px!important;
+  border-radius:50%!important;
+  background:#27a644!important;
+  box-shadow:0 0 0 6px rgba(39,166,68,.12)!important;
+}
+.signin-preview-card{
+  background:#010102!important;
+  border:1px solid rgba(255,255,255,.10)!important;
+  border-radius:18px!important;
+  overflow:hidden!important;
+  margin-bottom:20px!important;
+}
+.signin-preview-row{
+  display:flex!important;
+  justify-content:space-between!important;
+  align-items:center!important;
+  gap:16px!important;
+  padding:17px 18px!important;
+  border-bottom:1px solid rgba(255,255,255,.08)!important;
+}
+.signin-preview-row:last-child{border-bottom:0!important}
+.signin-preview-row span{
+  color:#8a8f98!important;
+  font-size:13px!important;
+}
+.signin-preview-row strong{
+  color:#f7f8f8!important;
+  font-size:14px!important;
+  font-weight:700!important;
+  text-align:right!important;
+}
+.signin-google-btn{
+  width:100%!important;
+  height:54px!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:12px!important;
+  background:#f7f8f8!important;
+  color:#010102!important;
+  border:1px solid #f7f8f8!important;
+  border-radius:14px!important;
+  font-size:15px!important;
+  font-weight:800!important;
+  letter-spacing:-.02em!important;
+  cursor:pointer!important;
+}
+.signin-google-btn:hover{
+  background:#d0d6e0!important;
+  border-color:#d0d6e0!important;
+}
+.google-mark{
+  width:24px!important;
+  height:24px!important;
+  display:grid!important;
+  place-items:center!important;
+  border-radius:50%!important;
+  background:#fff!important;
+  color:#1a73e8!important;
+  font-weight:900!important;
+  font-size:15px!important;
+  border:1px solid rgba(0,0,0,.08)!important;
+}
+.firebase-auth-message{
+  margin-top:16px!important;
+  min-height:24px!important;
+  color:#d0d6e0!important;
+  font-size:14px!important;
+  line-height:1.45!important;
+}
+.signin-footnote{
+  margin:18px 0 0!important;
+  color:#8a8f98!important;
+  font-size:12px!important;
+  line-height:1.55!important;
+}
+@media(max-width:900px){
+  .journall-signin-card{
+    grid-template-columns:1fr!important;
+    min-height:auto!important;
+    border-radius:22px!important;
+  }
+  .signin-copy{padding:30px!important}
+  .signin-copy:before{display:none!important}
+  .signin-panel{
+    border-left:0!important;
+    border-top:1px solid rgba(255,255,255,.08)!important;
+    padding:24px 30px 30px!important;
+  }
+  .signin-feature-grid{grid-template-columns:1fr!important;margin-top:28px!important}
+  .journall-signin-card h1{font-size:42px!important;line-height:1!important}
+}
+@media(max-width:560px){
+  .firebase-auth-gate.show{padding:12px!important;align-items:start!important}
+  .signin-copy,.signin-panel{padding:22px!important}
+  .signin-brand{margin-bottom:28px!important}
+  .journall-signin-card h1{font-size:34px!important}
+  .signin-lede{font-size:15px!important}
+}
+</style></body>
 </html>
