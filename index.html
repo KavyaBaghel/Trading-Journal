@@ -2218,6 +2218,41 @@ tr:hover {
 #journallApp .psych-intro {
   margin:0 0 16px !important;
   color:rgba(255,255,255,.62) !important;
+}
+
+/* Login loading and public preview polish */
+.login-loading {
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  height:100vh;
+  width:100%;
+  background:#0a0a0a;
+  gap:16px;
+}
+.login-loading[hidden], .journall-signin-card[hidden] { display:none !important; }
+.spinner {
+  width:32px;
+  height:32px;
+  border:3px solid rgba(255,255,255,0.1);
+  border-top-color:#494fdf;
+  border-radius:50%;
+  animation:spin .8s linear infinite;
+}
+@keyframes spin { to { transform:rotate(360deg); } }
+.login-loading p {
+  color:rgba(255,255,255,0.5);
+  font-size:14px;
+  margin:0;
+}
+.signin-copy {
+  background:
+    radial-gradient(circle at 20% 10%, rgba(94,106,210,.24), transparent 30%),
+    linear-gradient(135deg, rgba(94,106,210,.12), rgba(13,14,17,.98) 55%) !important;
+}
+.signin-feature-grid {
+  grid-template-columns:repeat(2,minmax(0,1fr)) !important;
 }</style>
 </head>
 <body>
@@ -2233,7 +2268,8 @@ tr:hover {
   </div>
 </div>
 <div id="firebaseAuthGate" class="firebase-auth-gate">
-  <div class="firebase-auth-card journall-signin-card">
+    <div id="firebaseAuthLoading" class="login-loading"><div class="spinner" aria-hidden="true"></div><p id="firebaseAuthLoadingText">Loading Journall...</p><button id="firebaseAuthRetryBtn" class="btn primary" type="button" hidden>Retry</button></div>
+<div class="firebase-auth-card journall-signin-card" hidden>
     <section class="signin-copy" aria-label="Journall overview">
       <div class="brand signin-brand">
         <div class="logo" aria-hidden="true"></div>
@@ -2244,11 +2280,11 @@ tr:hover {
       </div>
       <div class="signin-kicker">AI-powered trading journal</div>
       <h1>Sign in to Journall</h1>
-      <p class="signin-lede">Your personal AI-powered trading journal. Data stays private to your account.</p>
+      <p class="signin-lede">Your personal trading discipline system. Data stays private to your account.</p>
       <div class="signin-feature-grid">
         <div class="signin-feature"><span>01</span><strong>Daily discipline</strong><p>Track P&L, rule breaks, risk limit, and next action.</p></div>
-        <div class="signin-feature"><span>02</span><strong>AI coaching</strong><p>Review weak patterns and psychology with local-first tools.</p></div>
-        <div class="signin-feature"><span>03</span><strong>Private access</strong><p>Use the same journal across devices after sign-in.</p></div>
+        <div class="signin-feature"><span>02</span><strong>AI-powered review</strong><p>Review weak patterns, mistakes, and psychology from your own journal.</p></div>
+        <div class="signin-feature"><span>03</span><strong>Psychology check-ins</strong><p>Complete mind checks before planning or logging trades.</p></div><div class="signin-feature"><span>04</span><strong>Drawdown tracking</strong><p>Keep daily rules, risk limits, and account progress visible.</p></div>
       </div>
     </section>
     <aside class="signin-panel" aria-label="Sign in">
@@ -2258,7 +2294,7 @@ tr:hover {
       </div>
       <div class="signin-preview-card">
         <div class="signin-preview-row"><span>Risk control</span><strong>Custom limit</strong></div>
-        <div class="signin-preview-row"><span>Market</span><strong>Your strategy</strong></div>
+        <div class="signin-preview-row"><span>Psychology</span><strong>Pre-trade check</strong></div>
         <div class="signin-preview-row"><span>Review mode</span><strong>Rules + AI</strong></div>
       </div>
       <button id="firebaseGateSignInBtn" class="btn primary signin-google-btn" type="button"><span class="google-mark">G</span> Sign in with Google</button>
@@ -6903,6 +6939,10 @@ const authStatus = document.getElementById('firebaseAuthStatus');
 const gateMessage = document.getElementById('firebaseGateMessage');
 const signInBtn = document.getElementById('firebaseSignInBtn');
 const gateSignInBtn = document.getElementById('firebaseGateSignInBtn');
+const authLoading = document.getElementById('firebaseAuthLoading');
+const authLoadingText = document.getElementById('firebaseAuthLoadingText');
+const authRetryBtn = document.getElementById('firebaseAuthRetryBtn');
+const signInCard = document.querySelector('.journall-signin-card');
 const signOutBtn = document.getElementById('firebaseSignOutBtn');
 const hasFirebaseConfig = Boolean(firebaseConfig?.apiKey && firebaseConfig?.authDomain && firebaseConfig?.projectId);
 const firebaseSdkVersion = '10.12.5';
@@ -6912,12 +6952,25 @@ let firestoreDb = null;
 let currentUser = null;
 let cloudReady = false;
 let syncTimer = null;
+if(authRetryBtn) authRetryBtn.addEventListener('click', () => location.reload());
 
 function setAuthStatus(text){
   if(authStatus) authStatus.textContent = text;
   if(gateMessage) gateMessage.textContent = text;
 }
 
+
+function setAuthLoading(loading){
+  const isLoading = Boolean(loading);
+  if(authLoading){
+    authLoading.hidden = !isLoading;
+    authLoading.style.display = isLoading ? 'flex' : 'none';
+  }
+  if(signInCard){
+    signInCard.hidden = isLoading;
+    signInCard.style.display = isLoading ? 'none' : 'grid';
+  }
+}
 function openSignedInJournal(message){
   setGateVisible(false);
   setAuthStatus(message || 'Journal opened on this device.');
@@ -7039,10 +7092,18 @@ async function loadCloudState(){
 }
 
 async function initFirebaseAuth(){
-setGateVisible(true);
+  setGateVisible(true);
+  setAuthLoading(true);
+  const initTimeout = setTimeout(()=>{
+    setAuthLoading(false);
+    setAuthStatus('Taking longer than usual - check your connection. Refresh to retry.');
+  }, 8000);
 
   if(!hasFirebaseConfig){
-    setAuthStatus('Firebase is not configured yet. Fill firebase-config.js first.');
+    clearTimeout(initTimeout);
+    setAuthLoading(false);
+    setAuthStatus('Sign-in is temporarily unavailable. Please try again later.');
+    console.error('Firebase config is missing or incomplete.');
     if(signInBtn) signInBtn.disabled = true;
     if(gateSignInBtn) gateSignInBtn.disabled = true;
     return;
@@ -7051,6 +7112,7 @@ setGateVisible(true);
   const appModule = await import(`https://www.gstatic.com/firebasejs/${firebaseSdkVersion}/firebase-app.js`);
   const authModule = await import(`https://www.gstatic.com/firebasejs/${firebaseSdkVersion}/firebase-auth.js`);
   const firestoreModule = await import(`https://www.gstatic.com/firebasejs/${firebaseSdkVersion}/firebase-firestore.js`);
+  const functionsModule = await import(`https://www.gstatic.com/firebasejs/${firebaseSdkVersion}/firebase-functions.js`);
   const app = appModule.initializeApp(firebaseConfig);
   const auth = authModule.getAuth(app);
   firestoreDb = firestoreModule.getFirestore(app);
@@ -7135,6 +7197,8 @@ if(signOutBtn) signOutBtn.addEventListener('click', () => { authModule.signOut(a
   }
 
   authModule.onAuthStateChanged(auth, async user=>{
+    clearTimeout(initTimeout);
+    setAuthLoading(false);
     currentUser = user;
     cloudReady = false;
     if(!user){
@@ -7155,8 +7219,10 @@ if(signOutBtn) signOutBtn.addEventListener('click', () => { authModule.signOut(a
 }
 
 initFirebaseAuth().catch(err=>{
+  console.error('Firebase failed to start:', err);
   setGateVisible(true);
-  setAuthStatus('Firebase failed to start: ' + (err?.message || err) + '. Please refresh and sign in with Google.');
+  setAuthLoading(false);
+  setAuthStatus('Network error - try again.');
 });
 </script>
 
@@ -8209,6 +8275,7 @@ p{
   }
 }
 
+
 </style>
 <style>
 /* USER-REQUESTED UI FIXES */
@@ -9250,6 +9317,7 @@ main,
   .android-install-btn { display: none !important; }
 }
 /* END JOURNALL_ANDROID_PWA_INSTALL */
+
 </style>
 <script>
 (function(){
@@ -9602,9 +9670,11 @@ html.firebase-auth-required body{
   max-width: 100% !important;
 }
 
+
 </style>
 <style id="journall-account-risk-theme">
 .account-onboarding-gate{position:fixed;inset:0;z-index:10000;display:none;place-items:center;background:rgba(0,0,0,.85);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);padding:24px;color:#f7f8f8}.account-onboarding-gate.show{display:grid}.account-onboarding-card{width:min(980px,96vw);max-height:92vh;overflow:auto;background:#16181d;border:1px solid #2e3038;border-radius:18px;padding:32px}.account-onboarding-head{display:flex;justify-content:space-between;gap:18px;align-items:flex-start;margin-bottom:22px}.account-kicker{display:block;color:#8a8f98;font-size:12px;letter-spacing:.4px;text-transform:uppercase;margin-bottom:8px}.account-onboarding-card h2{margin:0;color:#f7f8f8;font-size:32px;letter-spacing:-.8px}.account-onboarding-card p{color:#d0d6e0;margin:8px 0 0}.setup-section{background:#0d0e10;border:1px solid rgba(255,255,255,.06);border-radius:14px;padding:20px;margin-bottom:16px}.setup-section-label{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.4);margin-bottom:12px}.account-form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}.setup-section:first-of-type .account-form-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.account-form-grid label{display:flex;flex-direction:column;gap:8px;color:#8a8f98;font-size:12px;text-transform:uppercase;letter-spacing:.4px}.account-onboarding-card input,.account-onboarding-card select{background:#16181a!important;border:1px solid rgba(255,255,255,.08)!important;border-radius:10px!important;color:#fff!important;padding:12px 14px!important;font-size:15px!important;font-family:'Inter',sans-serif!important;transition:border-color .15s ease,box-shadow .15s ease}.account-onboarding-card input:focus,.account-onboarding-card select:focus{border-color:#494fdf!important;outline:none!important;box-shadow:0 0 0 3px rgba(73,79,223,.15)!important}.account-onboarding-card input[type=number]{-moz-appearance:textfield;appearance:textfield}.account-onboarding-card input[type=number]::-webkit-outer-spin-button,.account-onboarding-card input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}.number-stepper,.stepper-group{display:flex;align-items:center;gap:6px;width:100%}.number-stepper input{min-width:48px;flex:1;color:#fff!important;-webkit-text-fill-color:#fff!important;opacity:1!important}.account-inline-field{display:flex;gap:10px;align-items:center}.account-inline-field .number-stepper{flex:1}.account-inline-field select{width:92px}.account-inline-field span{color:#d0d6e0}.stepper-btn{background:#16181a!important;border:1px solid rgba(255,255,255,.08)!important;color:rgba(255,255,255,.5)!important;flex-shrink:0!important;width:32px!important;height:32px!important;border-radius:6px!important;display:flex!important;align-items:center!important;justify-content:center!important;padding:0!important;font-size:16px!important;line-height:1!important;cursor:pointer!important}.stepper-btn:hover{background:#1f2124!important;color:#fff!important}.setup-preview{background:rgba(73,79,223,.08);border:1px solid rgba(73,79,223,.25);border-radius:12px;padding:16px 20px;margin-top:4px}.setup-preview-row{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.08)}.setup-preview-row:last-child{border-bottom:0}.setup-preview-row span{color:rgba(255,255,255,.58);font-size:13px}.setup-preview-row strong{color:#fff;font-size:15px;font-weight:700;text-align:right}.account-onboarding-actions{display:flex;align-items:center;gap:14px;margin-top:22px}.account-onboarding-actions p{margin:0;color:#8a8f98}.save-setup-btn{background:#494fdf!important;color:#fff!important;border:none!important;font-weight:600!important}.save-setup-btn:hover{background:#5a5ff0!important}.risk-calc-card{grid-column:span 2}.risk-calc-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:12px 0}.risk-calc-grid label{display:flex;flex-direction:column;gap:6px;color:#8a8f98;font-size:12px;text-transform:uppercase;letter-spacing:.4px}.risk-calc-grid input{background:#010102!important;border:1px solid #23252a!important;color:#f7f8f8!important;border-radius:8px!important;padding:9px 10px!important}@media(max-width:760px){.account-form-grid,.setup-section:first-of-type .account-form-grid,.risk-calc-grid{grid-template-columns:1fr}.risk-calc-card{grid-column:auto}.account-onboarding-head{flex-direction:column}.account-onboarding-card{padding:20px}.account-inline-field{align-items:stretch;flex-direction:column}.account-inline-field select{width:100%}.setup-preview-row{align-items:flex-start;flex-direction:column}.setup-preview-row strong{text-align:left}}
+
 
 </style>
 </body>
