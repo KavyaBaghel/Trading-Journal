@@ -2183,7 +2183,7 @@ tr:hover {
 <div id="firebaseAuthBar" class="firebase-auth-bar">
   <div>
     <strong>Journall</strong>
-    <span id="firebaseAuthStatus">Local mode</span>
+    <span id="firebaseAuthStatus">Sign in required</span>
   </div>
   <div class="firebase-auth-actions">
     <button id="firebaseSignInBtn" class="btn primary" type="button">Sign in with Google</button>
@@ -2220,9 +2220,8 @@ tr:hover {
         <div class="signin-preview-row"><span>Review mode</span><strong>Rules + AI</strong></div>
       </div>
       <button id="firebaseGateSignInBtn" class="btn primary signin-google-btn" type="button"><span class="google-mark">G</span> Sign in with Google</button>
-      <button id="firebaseOpenLocalBtn" class="signin-device-btn" type="button">Or use local mode - data stays on this device</button>
       <div id="firebaseGateMessage" class="firebase-auth-message">Checking website sign-in...</div>
-      <p class="signin-footnote">Use Journall privately with your own account, or keep a local journal on this device.</p>
+      <p class="signin-footnote">Use Journall privately with your own Google account. Your journal data stays tied to your sign-in.</p>
     </aside>
   </div>
 </div>
@@ -2241,14 +2240,13 @@ tr:hover {
         <h2>Set up your trading account</h2>
         <p>Journall will calculate risk, targets, drawdown room, and rules from your own account size.</p>
       </div>
-      <button class="btn account-close-btn" type="button" onclick="closeAccountSetup()">Close</button>
     </div>
 
     <div class="setup-section">
       <div class="setup-section-label">Account</div>
       <div class="account-form-grid">
-        <label>Account size ($)<div class="number-stepper"><button class="stepper-btn" type="button" onclick="stepAccountNumber('accountSizeInput',-100)">-</button><input id="accountSizeInput" type="number" min="1" step="100" placeholder="5000" oninput="renderAccountSetupPreview()"><button class="stepper-btn" type="button" onclick="stepAccountNumber('accountSizeInput',100)">+</button></div></label>
-        <label>Current balance ($)<div class="number-stepper"><button class="stepper-btn" type="button" onclick="stepAccountNumber('currentBalanceInput',-100)">-</button><input id="currentBalanceInput" type="number" min="0" step="100" placeholder="5000" oninput="renderAccountSetupPreview()"><button class="stepper-btn" type="button" onclick="stepAccountNumber('currentBalanceInput',100)">+</button></div></label>
+        <label>Account size ($)<div class="number-stepper"><button class="stepper-btn" type="button" onclick="stepAccountNumber('accountSizeInput',-100)">-</button><input id="accountSizeInput" type="number" min="1" step="100" placeholder="Enter a value" oninput="renderAccountSetupPreview()"><button class="stepper-btn" type="button" onclick="stepAccountNumber('accountSizeInput',100)">+</button></div></label>
+        <label>Current balance ($)<div class="number-stepper"><button class="stepper-btn" type="button" onclick="stepAccountNumber('currentBalanceInput',-100)">-</button><input id="currentBalanceInput" type="number" min="0" step="100" placeholder="Enter a value" oninput="renderAccountSetupPreview()"><button class="stepper-btn" type="button" onclick="stepAccountNumber('currentBalanceInput',100)">+</button></div></label>
         <label>Account phase<select id="accountPhaseInput" onchange="toggleFundedFields()"><option>Phase 1</option><option>Phase 2</option><option>Funded</option><option>Personal</option></select></label>
       </div>
     </div>
@@ -2256,7 +2254,7 @@ tr:hover {
     <div class="setup-section">
       <div class="setup-section-label">Targets</div>
       <div class="account-form-grid">
-        <label>Profit target<div class="account-inline-field"><div class="number-stepper"><button class="stepper-btn" type="button" onclick="stepAccountNumber('profitTargetInput',-1)">-</button><input id="profitTargetInput" type="number" min="0" step="1" placeholder="10" oninput="renderAccountSetupPreview()"><button class="stepper-btn" type="button" onclick="stepAccountNumber('profitTargetInput',1)">+</button></div><select id="profitTargetType" onchange="renderAccountSetupPreview()"><option value="percent">%</option><option value="amount">$</option></select></div></label>
+        <label>Profit target<div class="account-inline-field"><div class="number-stepper"><button class="stepper-btn" type="button" onclick="stepAccountNumber('profitTargetInput',-1)">-</button><input id="profitTargetInput" type="number" min="0" step="1" placeholder="Enter a value" oninput="renderAccountSetupPreview()"><button class="stepper-btn" type="button" onclick="stepAccountNumber('profitTargetInput',1)">+</button></div><select id="profitTargetType" onchange="renderAccountSetupPreview()"><option value="percent">%</option><option value="amount">$</option></select></div></label>
         <label>Phase deadline (optional)<input id="phaseDeadlineInput" type="date"></label>
       </div>
     </div>
@@ -2264,9 +2262,9 @@ tr:hover {
     <div class="setup-section">
       <div class="setup-section-label">Risk limits</div>
       <div class="account-form-grid">
-        <label>Risk per trade<div class="account-inline-field"><div class="number-stepper"><button class="stepper-btn" type="button" onclick="stepAccountNumber('riskPercentInput',-0.1)">-</button><input id="riskPercentInput" type="number" min="0.5" max="2" step="0.1" placeholder="1" oninput="renderAccountSetupPreview()"><button class="stepper-btn" type="button" onclick="stepAccountNumber('riskPercentInput',0.1)">+</button></div><span>%</span></div></label>
-        <label class="funded-only">Max daily loss<div class="account-inline-field"><div class="number-stepper"><button class="stepper-btn" type="button" onclick="stepAccountNumber('maxDailyLossInput',-1)">-</button><input id="maxDailyLossInput" type="number" min="0" step="1" placeholder="5" oninput="renderAccountSetupPreview()"><button class="stepper-btn" type="button" onclick="stepAccountNumber('maxDailyLossInput',1)">+</button></div><select id="maxDailyLossType" onchange="renderAccountSetupPreview()"><option value="percent">%</option><option value="amount">$</option></select></div></label>
-        <label class="funded-only">Max overall drawdown<div class="account-inline-field"><div class="number-stepper"><button class="stepper-btn" type="button" onclick="stepAccountNumber('maxDrawdownInput',-1)">-</button><input id="maxDrawdownInput" type="number" min="0" step="1" placeholder="10" oninput="renderAccountSetupPreview()"><button class="stepper-btn" type="button" onclick="stepAccountNumber('maxDrawdownInput',1)">+</button></div><select id="maxDrawdownType" onchange="renderAccountSetupPreview()"><option value="percent">%</option><option value="amount">$</option></select></div></label>
+        <label>Risk per trade<div class="account-inline-field"><div class="number-stepper"><button class="stepper-btn" type="button" onclick="stepAccountNumber('riskPercentInput',-0.1)">-</button><input id="riskPercentInput" type="number" min="0.5" max="2" step="0.1" placeholder="Enter a value" oninput="renderAccountSetupPreview()"><button class="stepper-btn" type="button" onclick="stepAccountNumber('riskPercentInput',0.1)">+</button></div><span>%</span></div></label>
+        <label class="funded-only">Max daily loss<div class="account-inline-field"><div class="number-stepper"><button class="stepper-btn" type="button" onclick="stepAccountNumber('maxDailyLossInput',-1)">-</button><input id="maxDailyLossInput" type="number" min="0" step="1" placeholder="Enter a value" oninput="renderAccountSetupPreview()"><button class="stepper-btn" type="button" onclick="stepAccountNumber('maxDailyLossInput',1)">+</button></div><select id="maxDailyLossType" onchange="renderAccountSetupPreview()"><option value="percent">%</option><option value="amount">$</option></select></div></label>
+        <label class="funded-only">Max overall drawdown<div class="account-inline-field"><div class="number-stepper"><button class="stepper-btn" type="button" onclick="stepAccountNumber('maxDrawdownInput',-1)">-</button><input id="maxDrawdownInput" type="number" min="0" step="1" placeholder="Enter a value" oninput="renderAccountSetupPreview()"><button class="stepper-btn" type="button" onclick="stepAccountNumber('maxDrawdownInput',1)">+</button></div><select id="maxDrawdownType" onchange="renderAccountSetupPreview()"><option value="percent">%</option><option value="amount">$</option></select></div></label>
       </div>
     </div>
 
@@ -4455,19 +4453,19 @@ function renderAccountSetupPreview(){
 }
 function openAccountSetup(){
   const gate = document.getElementById('accountOnboardingGate');
-  const config = getAccountConfig() || {accountSize:'',phase:'Phase 1',profitTarget:'',profitTargetType:'percent',maxDailyLoss:'',maxDailyLossType:'percent',maxDrawdown:'',maxDrawdownType:'percent',currentBalance:'',riskPercent:DEFAULT_RISK_PERCENT,phaseDeadline:''};
+  const config = getAccountConfig() || {accountSize:'',phase:'Phase 1',profitTarget:'',profitTargetType:'percent',maxDailyLoss:'',maxDailyLossType:'percent',maxDrawdown:'',maxDrawdownType:'percent',currentBalance:'',riskPercent:'',phaseDeadline:''};
   const set = (id,value)=>{ const el=document.getElementById(id); if(el) el.value = value ?? ''; };
-  set('accountSizeInput', config.accountSize); set('currentBalanceInput', config.currentBalance || config.accountSize || '');
+  set('accountSizeInput', config.accountSize ?? ''); set('currentBalanceInput', config.currentBalance ?? '');
   set('accountPhaseInput', config.phase || 'Phase 1'); set('profitTargetInput', config.profitTarget);
-  set('profitTargetType', config.profitTargetType || 'percent'); set('riskPercentInput', config.riskPercent || DEFAULT_RISK_PERCENT);
+  set('profitTargetType', config.profitTargetType || 'percent'); set('riskPercentInput', config.riskPercent ?? '');
   set('phaseDeadlineInput', config.phaseDeadline || ''); set('maxDailyLossInput', config.maxDailyLoss ?? '');
   set('maxDailyLossType', config.maxDailyLossType || 'percent'); set('maxDrawdownInput', config.maxDrawdown ?? '');
   set('maxDrawdownType', config.maxDrawdownType || 'percent'); toggleFundedFields(); renderAccountSetupPreview();
   if(gate){ gate.hidden = false; gate.classList.add('show'); }
 }
-function closeAccountSetup(){
+function hideAccountSetupAfterSave(){
   const gate = document.getElementById('accountOnboardingGate');
-  if(gate && getAccountConfig()){ gate.hidden = true; gate.classList.remove('show'); }
+  if(gate){ gate.hidden = true; gate.classList.remove('show'); }
 }
 function ensureAccountOnboarding(){
   if(document.documentElement.classList.contains('firebase-auth-required')) return;
@@ -4475,15 +4473,31 @@ function ensureAccountOnboarding(){
 }
 function saveAccountSetup(){
   const msg = document.getElementById('accountSetupMessage');
-  const accountSize = toNumber(document.getElementById('accountSizeInput')?.value, 0);
   const phase = document.getElementById('accountPhaseInput')?.value || 'Phase 1';
-  const currentBalance = toNumber(document.getElementById('currentBalanceInput')?.value, accountSize);
-  const riskPercent = clampNumber(document.getElementById('riskPercentInput')?.value || DEFAULT_RISK_PERCENT, 0.5, 2);
-  if(accountSize <= 0){ if(msg) msg.textContent = 'Enter a valid account size.'; return; }
-  const config = {accountSize,phase,profitTarget:toNumber(document.getElementById('profitTargetInput')?.value,0),profitTargetType:document.getElementById('profitTargetType')?.value || 'percent',maxDailyLoss:isFundedPhase(phase)?toNumber(document.getElementById('maxDailyLossInput')?.value,0):null,maxDailyLossType:document.getElementById('maxDailyLossType')?.value || 'percent',maxDrawdown:isFundedPhase(phase)?toNumber(document.getElementById('maxDrawdownInput')?.value,0):null,maxDrawdownType:document.getElementById('maxDrawdownType')?.value || 'percent',currentBalance:currentBalance || accountSize,riskPercent,phaseDeadline:document.getElementById('phaseDeadlineInput')?.value || '',startDate:getAccountConfig()?.startDate || new Date().toISOString().slice(0,10)};
+  const readRequiredNumber = (id,label,min=0)=>{
+    const raw = String(document.getElementById(id)?.value ?? '').trim();
+    const value = Number(raw);
+    if(raw === '' || !Number.isFinite(value) || value <= min) throw new Error(`${label} is required.`);
+    return value;
+  };
+  let accountSize, currentBalance, riskPercent, profitTarget, maxDailyLoss = null, maxDrawdown = null;
+  try{
+    accountSize = readRequiredNumber('accountSizeInput','Account size');
+    currentBalance = readRequiredNumber('currentBalanceInput','Current balance');
+    profitTarget = readRequiredNumber('profitTargetInput','Profit target');
+    riskPercent = clampNumber(readRequiredNumber('riskPercentInput','Risk per trade'), 0.5, 2);
+    if(isFundedPhase(phase)){
+      maxDailyLoss = readRequiredNumber('maxDailyLossInput','Max daily loss');
+      maxDrawdown = readRequiredNumber('maxDrawdownInput','Max overall drawdown');
+    }
+  }catch(error){
+    if(msg) msg.textContent = error.message;
+    return;
+  }
+  const config = {accountSize,phase,profitTarget,profitTargetType:document.getElementById('profitTargetType')?.value || 'percent',maxDailyLoss:isFundedPhase(phase)?maxDailyLoss:null,maxDailyLossType:document.getElementById('maxDailyLossType')?.value || 'percent',maxDrawdown:isFundedPhase(phase)?maxDrawdown:null,maxDrawdownType:document.getElementById('maxDrawdownType')?.value || 'percent',currentBalance,riskPercent,phaseDeadline:document.getElementById('phaseDeadlineInput')?.value || '',startDate:getAccountConfig()?.startDate || new Date().toISOString().slice(0,10)};
   localStorage.setItem(ACCOUNT_CONFIG_KEY, JSON.stringify(config));
   if(msg) msg.textContent = 'Saved. Journall will recalculate goals and risk from this account.';
-  closeAccountSetup(); renderAll();
+  hideAccountSetupAfterSave(); renderAll();
 }
 function riskCalculatorMarkup(metrics){
   const config = metrics?.config; if(!config) return '';
@@ -6927,8 +6941,6 @@ document.addEventListener('DOMContentLoaded', installRealAIControls);
 <script type="module">
 import { firebaseConfig } from './firebase-config.js?v=20260717-valid-api-key';
 
-const LOCAL_MODE_KEY = 'journall:explicit-local-mode';
-const hasExplicitLocalMode = () => localStorage.getItem(LOCAL_MODE_KEY) === '1';
 const authBar = document.getElementById('firebaseAuthBar');
 const authGate = document.getElementById('firebaseAuthGate');
 const journallApp = document.getElementById('journallApp');
@@ -6937,7 +6949,6 @@ const authStatus = document.getElementById('firebaseAuthStatus');
 const gateMessage = document.getElementById('firebaseGateMessage');
 const signInBtn = document.getElementById('firebaseSignInBtn');
 const gateSignInBtn = document.getElementById('firebaseGateSignInBtn');
-const openLocalBtn = document.getElementById('firebaseOpenLocalBtn');
 const signOutBtn = document.getElementById('firebaseSignOutBtn');
 const hasFirebaseConfig = Boolean(firebaseConfig?.apiKey && firebaseConfig?.authDomain && firebaseConfig?.projectId);
 const firebaseSdkVersion = '10.12.5';
@@ -6952,12 +6963,6 @@ function setAuthStatus(text){
   if(authStatus) authStatus.textContent = text;
   if(gateMessage) gateMessage.textContent = text;
 }
-
-function openLocalJournalMode(){
-  localStorage.setItem(LOCAL_MODE_KEY, '1');
-  openSignedInJournal('Local mode - data stays on this device');
-}
-if(openLocalBtn) openLocalBtn.addEventListener('click', openLocalJournalMode);
 
 function openSignedInJournal(message){
   setGateVisible(false);
@@ -7080,12 +7085,7 @@ async function loadCloudState(){
 }
 
 async function initFirebaseAuth(){
-  if(hasExplicitLocalMode()){
-    openSignedInJournal('Local mode - data stays on this device');
-    return;
-  }
-
-  setGateVisible(true);
+setGateVisible(true);
 
   if(!hasFirebaseConfig){
     setAuthStatus('Firebase is not configured yet. Fill firebase-config.js first.');
@@ -7165,8 +7165,7 @@ async function initFirebaseAuth(){
   };
   if(signInBtn) signInBtn.addEventListener('click', signIn);
   if(gateSignInBtn) gateSignInBtn.addEventListener('click', signIn);
-  if(openLocalBtn) openLocalBtn.addEventListener('click', openLocalJournalMode);
-  if(signOutBtn) signOutBtn.addEventListener('click', () => { localStorage.removeItem(LOCAL_MODE_KEY); authModule.signOut(auth); });
+if(signOutBtn) signOutBtn.addEventListener('click', () => { authModule.signOut(auth); });
 
   if(isMobileAuthDevice() && sessionStorage.getItem('journall:mobile-redirect-started')){
     setTimeout(()=>{
@@ -7201,7 +7200,7 @@ async function initFirebaseAuth(){
 
 initFirebaseAuth().catch(err=>{
   setGateVisible(true);
-  setAuthStatus('Firebase failed to start: ' + (err?.message || err) + '. Sign in later or choose local mode explicitly.');
+  setAuthStatus('Firebase failed to start: ' + (err?.message || err) + '. Please refresh and sign in with Google.');
 });
 </script>
 
@@ -7355,7 +7354,7 @@ textarea{border-radius:24px!important}input::placeholder,textarea::placeholder{c
 .psych-check.checked{background:var(--ink)!important;color:var(--on-primary)!important;border-color:var(--ink)!important}.psych-check.checked strong,.psych-check.checked em{color:var(--on-primary)!important}.psych-check.checked>span{background:var(--on-primary)!important;border-color:var(--on-primary)!important;color:var(--ink)!important}.psych-status{background:var(--soft-cloud)!important;color:var(--ink)!important;border:1px solid var(--hairline)!important;border-radius:0!important}
 .calendar-day,.calendar-day.profit,.calendar-day.lossday,.calendar-day.flatday{background:var(--canvas)!important;border:1px solid var(--hairline)!important;border-radius:0!important}.calendar-day:hover{border-color:var(--ink)!important}.calendar-pnl{font-weight:500!important}
 .ai-msg.user{background:var(--ink)!important;color:var(--on-primary)!important;border-color:var(--ink)!important}.ai-msg.user strong{color:var(--on-primary)!important}.ai-msg.bot{background:var(--soft-cloud)!important;color:var(--ink)!important}.coach-avatar{background:var(--ink)!important;color:var(--on-primary)!important}.coach-confidence{background:var(--soft-cloud)!important;color:var(--ink)!important;border:1px solid var(--hairline)!important;border-radius:9999px!important}.coach-confidence.low{color:var(--sale)!important;border-color:var(--sale)!important}.coach-confidence.high{color:var(--success)!important;border-color:var(--success)!important}
-.modal-backdrop{background:rgba(1,1,2,.72)!important;backdrop-filter:none!important}.mistake-modal,.day-trades-modal,.firebase-auth-gate .firebase-auth-card{background:var(--surface-2)!important;border:1px solid var(--hairline-strong)!important;border-radius:var(--rounded-xl)!important;color:var(--ink)!important}.firebase-auth-gate{display:none!important;min-height:100vh!important;place-items:center!important;background:var(--canvas)!important;padding:var(--space-xl)!important}.firebase-auth-gate.show{display:grid!important}.firebase-auth-gate[hidden],#journallApp[hidden],.mobile-appbar[hidden],.firebase-auth-bar[hidden]{display:none!important}html.firebase-auth-required body{overflow:hidden!important}html.firebase-auth-required #journallApp,html.firebase-auth-required .mobile-appbar{display:none!important}html:not(.firebase-auth-required) #firebaseAuthGate,html:not(.firebase-auth-required) #firebaseAuthBar{display:none!important}.firebase-auth-bar,.mobile-appbar{background:var(--canvas)!important;color:var(--ink)!important;border-color:var(--hairline)!important}.firebase-auth-bar .btn,.firebase-auth-bar .btn.primary{background:var(--primary)!important;color:var(--ink)!important;border-color:var(--primary)!important}
+.modal-backdrop{background:rgba(0,0,0,.85)!important;backdrop-filter:blur(8px)!important;-webkit-backdrop-filter:blur(8px)!important;z-index:1000!important}.mistake-modal,.day-trades-modal,.firebase-auth-gate .firebase-auth-card{background:var(--surface-2)!important;border:1px solid var(--hairline-strong)!important;border-radius:var(--rounded-xl)!important;color:var(--ink)!important}.firebase-auth-gate{display:none!important;min-height:100vh!important;place-items:center!important;background:var(--canvas)!important;padding:var(--space-xl)!important}.firebase-auth-gate.show{display:grid!important}.firebase-auth-gate[hidden],#journallApp[hidden],.mobile-appbar[hidden],.firebase-auth-bar[hidden]{display:none!important}html.firebase-auth-required body{overflow:hidden!important}html.firebase-auth-required #journallApp,html.firebase-auth-required .mobile-appbar{display:none!important}html:not(.firebase-auth-required) #firebaseAuthGate,html:not(.firebase-auth-required) #firebaseAuthBar{display:none!important}.firebase-auth-bar,.mobile-appbar{background:var(--canvas)!important;color:var(--ink)!important;border-color:var(--hairline)!important}.firebase-auth-bar .btn,.firebase-auth-bar .btn.primary{background:var(--primary)!important;color:var(--ink)!important;border-color:var(--primary)!important}
 /* Emil Kowalski motion layer: fast, subtle, purposeful. */
 .card,.hero,.sidebox,.goal-card,.widget,.saved-journal-card,.analytics-bar-card,.cmd-card,.ai-score-card,.calendar-summary-card,.journal-main-card,.coach-card,.mistake-box,.mistake-modal-section,.mistake-row,.day-trade-card{transition:transform var(--dur-base) var(--ease-out),border-color var(--dur-base) var(--ease-out),opacity var(--dur-fast) var(--ease-out)!important}
 .card:hover,.goal-card:hover,.widget:hover,.saved-journal-card:hover,.cmd-card:hover,.analytics-bar-card:hover,.calendar-summary-card:hover,.day-trade-card:hover{transform:translateY(-2px)!important;border-color:var(--hairline-strong)!important}
@@ -9592,26 +9591,6 @@ html.firebase-auth-required body{
   .journall-signin-card h1{font-size:34px!important}
   .signin-lede{font-size:15px!important}
 }
-
-.signin-device-btn{
-  width:100%!important;
-  min-height:46px!important;
-  margin-top:10px!important;
-  display:flex!important;
-  align-items:center!important;
-  justify-content:center!important;
-  border-radius:14px!important;
-  border:1px solid rgba(255,255,255,.13)!important;
-  background:#16181d!important;
-  color:#d0d6e0!important;
-  font:700 14px/1 Inter,system-ui,-apple-system,sans-serif!important;
-  cursor:pointer!important;
-}
-.signin-device-btn:hover{
-  background:#1e2027!important;
-  color:#f7f8f8!important;
-}
-
 /* PUBLIC_LOGIN_AND_PSYCH_STEP_FIX */
 .psych-progress .psych-step,
 .psych-step {
@@ -9666,7 +9645,7 @@ html.firebase-auth-required body{
 }
 </style>
 <style id="journall-account-risk-theme">
-.account-onboarding-gate{position:fixed;inset:0;z-index:9999;display:none;place-items:center;background:rgba(1,1,2,.78);padding:24px;color:#f7f8f8}.account-onboarding-gate.show{display:grid}.account-onboarding-card{width:min(980px,96vw);max-height:92vh;overflow:auto;background:#16181d;border:1px solid #2e3038;border-radius:18px;padding:32px}.account-onboarding-head{display:flex;justify-content:space-between;gap:18px;align-items:flex-start;margin-bottom:22px}.account-kicker{display:block;color:#8a8f98;font-size:12px;letter-spacing:.4px;text-transform:uppercase;margin-bottom:8px}.account-onboarding-card h2{margin:0;color:#f7f8f8;font-size:32px;letter-spacing:-.8px}.account-onboarding-card p{color:#d0d6e0;margin:8px 0 0}.setup-section{background:#0d0e10;border:1px solid rgba(255,255,255,.06);border-radius:14px;padding:20px;margin-bottom:16px}.setup-section-label{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.4);margin-bottom:12px}.account-form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}.setup-section:first-of-type .account-form-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.account-form-grid label{display:flex;flex-direction:column;gap:8px;color:#8a8f98;font-size:12px;text-transform:uppercase;letter-spacing:.4px}.account-onboarding-card input,.account-onboarding-card select{background:#16181a!important;border:1px solid rgba(255,255,255,.08)!important;border-radius:10px!important;color:#fff!important;padding:12px 14px!important;font-size:15px!important;font-family:'Inter',sans-serif!important;transition:border-color .15s ease,box-shadow .15s ease}.account-onboarding-card input:focus,.account-onboarding-card select:focus{border-color:#494fdf!important;outline:none!important;box-shadow:0 0 0 3px rgba(73,79,223,.15)!important}.account-onboarding-card input[type=number]{-moz-appearance:textfield;appearance:textfield}.account-onboarding-card input[type=number]::-webkit-outer-spin-button,.account-onboarding-card input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}.number-stepper{display:grid;grid-template-columns:28px minmax(0,1fr) 28px;gap:8px;align-items:center}.account-inline-field{display:flex;gap:10px;align-items:center}.account-inline-field .number-stepper{flex:1}.account-inline-field select{width:92px}.account-inline-field span{color:#d0d6e0}.stepper-btn{background:#16181a!important;border:1px solid rgba(255,255,255,.08)!important;color:rgba(255,255,255,.5)!important;width:28px!important;height:28px!important;border-radius:6px!important;display:grid!important;place-items:center!important;padding:0!important;font-size:16px!important;line-height:1!important;cursor:pointer!important}.stepper-btn:hover{background:#1f2124!important;color:#fff!important}.setup-preview{background:rgba(73,79,223,.08);border:1px solid rgba(73,79,223,.25);border-radius:12px;padding:16px 20px;margin-top:4px}.setup-preview-row{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.08)}.setup-preview-row:last-child{border-bottom:0}.setup-preview-row span{color:rgba(255,255,255,.58);font-size:13px}.setup-preview-row strong{color:#fff;font-size:15px;font-weight:700;text-align:right}.account-onboarding-actions{display:flex;align-items:center;gap:14px;margin-top:22px}.account-onboarding-actions p{margin:0;color:#8a8f98}.save-setup-btn{background:#494fdf!important;color:#fff!important;border:none!important;font-weight:600!important}.save-setup-btn:hover{background:#5a5ff0!important}.account-close-btn{background:#26282f!important;border:1px solid rgba(255,255,255,.08)!important;color:#fff!important}.risk-calc-card{grid-column:span 2}.risk-calc-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:12px 0}.risk-calc-grid label{display:flex;flex-direction:column;gap:6px;color:#8a8f98;font-size:12px;text-transform:uppercase;letter-spacing:.4px}.risk-calc-grid input{background:#010102!important;border:1px solid #23252a!important;color:#f7f8f8!important;border-radius:8px!important;padding:9px 10px!important}@media(max-width:760px){.account-form-grid,.setup-section:first-of-type .account-form-grid,.risk-calc-grid{grid-template-columns:1fr}.risk-calc-card{grid-column:auto}.account-onboarding-head{flex-direction:column}.account-onboarding-card{padding:20px}.account-inline-field{align-items:stretch;flex-direction:column}.account-inline-field select{width:100%}.setup-preview-row{align-items:flex-start;flex-direction:column}.setup-preview-row strong{text-align:left}}
+.account-onboarding-gate{position:fixed;inset:0;z-index:10000;display:none;place-items:center;background:rgba(0,0,0,.85);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);padding:24px;color:#f7f8f8}.account-onboarding-gate.show{display:grid}.account-onboarding-card{width:min(980px,96vw);max-height:92vh;overflow:auto;background:#16181d;border:1px solid #2e3038;border-radius:18px;padding:32px}.account-onboarding-head{display:flex;justify-content:space-between;gap:18px;align-items:flex-start;margin-bottom:22px}.account-kicker{display:block;color:#8a8f98;font-size:12px;letter-spacing:.4px;text-transform:uppercase;margin-bottom:8px}.account-onboarding-card h2{margin:0;color:#f7f8f8;font-size:32px;letter-spacing:-.8px}.account-onboarding-card p{color:#d0d6e0;margin:8px 0 0}.setup-section{background:#0d0e10;border:1px solid rgba(255,255,255,.06);border-radius:14px;padding:20px;margin-bottom:16px}.setup-section-label{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.4);margin-bottom:12px}.account-form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}.setup-section:first-of-type .account-form-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.account-form-grid label{display:flex;flex-direction:column;gap:8px;color:#8a8f98;font-size:12px;text-transform:uppercase;letter-spacing:.4px}.account-onboarding-card input,.account-onboarding-card select{background:#16181a!important;border:1px solid rgba(255,255,255,.08)!important;border-radius:10px!important;color:#fff!important;padding:12px 14px!important;font-size:15px!important;font-family:'Inter',sans-serif!important;transition:border-color .15s ease,box-shadow .15s ease}.account-onboarding-card input:focus,.account-onboarding-card select:focus{border-color:#494fdf!important;outline:none!important;box-shadow:0 0 0 3px rgba(73,79,223,.15)!important}.account-onboarding-card input[type=number]{-moz-appearance:textfield;appearance:textfield}.account-onboarding-card input[type=number]::-webkit-outer-spin-button,.account-onboarding-card input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}.number-stepper,.stepper-group{display:flex;align-items:center;gap:6px;width:100%}.number-stepper input{min-width:0;flex:1}.account-inline-field{display:flex;gap:10px;align-items:center}.account-inline-field .number-stepper{flex:1}.account-inline-field select{width:92px}.account-inline-field span{color:#d0d6e0}.stepper-btn{background:#16181a!important;border:1px solid rgba(255,255,255,.08)!important;color:rgba(255,255,255,.5)!important;flex-shrink:0!important;width:32px!important;height:32px!important;border-radius:6px!important;display:flex!important;align-items:center!important;justify-content:center!important;padding:0!important;font-size:16px!important;line-height:1!important;cursor:pointer!important}.stepper-btn:hover{background:#1f2124!important;color:#fff!important}.setup-preview{background:rgba(73,79,223,.08);border:1px solid rgba(73,79,223,.25);border-radius:12px;padding:16px 20px;margin-top:4px}.setup-preview-row{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.08)}.setup-preview-row:last-child{border-bottom:0}.setup-preview-row span{color:rgba(255,255,255,.58);font-size:13px}.setup-preview-row strong{color:#fff;font-size:15px;font-weight:700;text-align:right}.account-onboarding-actions{display:flex;align-items:center;gap:14px;margin-top:22px}.account-onboarding-actions p{margin:0;color:#8a8f98}.save-setup-btn{background:#494fdf!important;color:#fff!important;border:none!important;font-weight:600!important}.save-setup-btn:hover{background:#5a5ff0!important}.risk-calc-card{grid-column:span 2}.risk-calc-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:12px 0}.risk-calc-grid label{display:flex;flex-direction:column;gap:6px;color:#8a8f98;font-size:12px;text-transform:uppercase;letter-spacing:.4px}.risk-calc-grid input{background:#010102!important;border:1px solid #23252a!important;color:#f7f8f8!important;border-radius:8px!important;padding:9px 10px!important}@media(max-width:760px){.account-form-grid,.setup-section:first-of-type .account-form-grid,.risk-calc-grid{grid-template-columns:1fr}.risk-calc-card{grid-column:auto}.account-onboarding-head{flex-direction:column}.account-onboarding-card{padding:20px}.account-inline-field{align-items:stretch;flex-direction:column}.account-inline-field select{width:100%}.setup-preview-row{align-items:flex-start;flex-direction:column}.setup-preview-row strong{text-align:left}}
 </style>
 </body>
 </html>

@@ -120,7 +120,7 @@ service cloud.firestore {
 kavyabaghel.github.io
 ```
 
-When Journall runs on `localhost`, `127.0.0.1`, or from the desktop launcher, it stays in local mode and does not force sign-in.
+The public Journall website requires Google sign-in before opening the dashboard.
 
 ## Local AI Setup
 
