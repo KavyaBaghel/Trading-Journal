@@ -2215,8 +2215,8 @@ tr:hover {
         <span>Secure Google sign-in</span>
       </div>
       <div class="signin-preview-card">
-        <div class="signin-preview-row"><span>Risk limit</span><strong>$30/day</strong></div>
-        <div class="signin-preview-row"><span>Market</span><strong>XAUUSD only</strong></div>
+        <div class="signin-preview-row"><span>Risk control</span><strong>Custom limit</strong></div>
+        <div class="signin-preview-row"><span>Market</span><strong>Your strategy</strong></div>
         <div class="signin-preview-row"><span>Review mode</span><strong>Rules + AI</strong></div>
       </div>
       <button id="firebaseGateSignInBtn" class="btn primary signin-google-btn" type="button"><span class="google-mark">G</span> Sign in with Google</button>
@@ -2255,14 +2255,14 @@ tr:hover {
       <div class="setup-section-label">Targets</div>
       <div class="account-form-grid">
         <label>Profit target<div class="account-inline-field"><div class="number-stepper"><button class="stepper-btn" type="button" onclick="stepAccountNumber('profitTargetInput',-1)">-</button><input id="profitTargetInput" type="number" min="0" step="1" placeholder="Enter a value" oninput="renderAccountSetupPreview()"><button class="stepper-btn" type="button" onclick="stepAccountNumber('profitTargetInput',1)">+</button></div><select id="profitTargetType" onchange="renderAccountSetupPreview()"><option value="percent">%</option><option value="amount">$</option></select></div></label>
-        <label>Phase deadline (optional)<input id="phaseDeadlineInput" type="date"></label>
+        <label>Phase deadline (optional)<input id="phaseDeadlineInput" type="date"></label><label>Max trades per day<div class="number-stepper"><button class="stepper-btn" type="button" onclick="stepAccountNumber('maxTradesInput',-1)">-</button><input id="maxTradesInput" type="number" min="1" step="1" placeholder="Enter a value" oninput="renderAccountSetupPreview()"><button class="stepper-btn" type="button" onclick="stepAccountNumber('maxTradesInput',1)">+</button></div></label>
       </div>
     </div>
 
     <div class="setup-section">
       <div class="setup-section-label">Risk limits</div>
       <div class="account-form-grid">
-        <label>Risk per trade<div class="account-inline-field"><div class="number-stepper"><button class="stepper-btn" type="button" onclick="stepAccountNumber('riskPercentInput',-0.1)">-</button><input id="riskPercentInput" type="number" min="0.5" max="2" step="0.1" placeholder="Enter a value" oninput="renderAccountSetupPreview()"><button class="stepper-btn" type="button" onclick="stepAccountNumber('riskPercentInput',0.1)">+</button></div><span>%</span></div></label>
+        <label>Risk per trade<div class="account-inline-field"><div class="number-stepper"><button class="stepper-btn" type="button" onclick="stepAccountNumber('riskPercentInput',-0.1)">-</button><input id="riskPercentInput" type="number" min="0.5" max="2" step="0.1" placeholder="Enter a value" oninput="renderAccountSetupPreview()"><button class="stepper-btn" type="button" onclick="stepAccountNumber('riskPercentInput',0.1)">+</button></div><span>%</span></div></label><label>Minimum RR<div class="number-stepper"><button class="stepper-btn" type="button" onclick="stepAccountNumber('minRrInput',-0.5)">-</button><input id="minRrInput" type="number" min="1" step="0.5" placeholder="Enter a value" oninput="renderAccountSetupPreview()"><button class="stepper-btn" type="button" onclick="stepAccountNumber('minRrInput',0.5)">+</button></div></label>
         <label class="funded-only">Max daily loss<div class="account-inline-field"><div class="number-stepper"><button class="stepper-btn" type="button" onclick="stepAccountNumber('maxDailyLossInput',-1)">-</button><input id="maxDailyLossInput" type="number" min="0" step="1" placeholder="Enter a value" oninput="renderAccountSetupPreview()"><button class="stepper-btn" type="button" onclick="stepAccountNumber('maxDailyLossInput',1)">+</button></div><select id="maxDailyLossType" onchange="renderAccountSetupPreview()"><option value="percent">%</option><option value="amount">$</option></select></div></label>
         <label class="funded-only">Max overall drawdown<div class="account-inline-field"><div class="number-stepper"><button class="stepper-btn" type="button" onclick="stepAccountNumber('maxDrawdownInput',-1)">-</button><input id="maxDrawdownInput" type="number" min="0" step="1" placeholder="Enter a value" oninput="renderAccountSetupPreview()"><button class="stepper-btn" type="button" onclick="stepAccountNumber('maxDrawdownInput',1)">+</button></div><select id="maxDrawdownType" onchange="renderAccountSetupPreview()"><option value="percent">%</option><option value="amount">$</option></select></div></label>
       </div>
@@ -2438,7 +2438,7 @@ tr:hover {
           <input id="q" placeholder="Search symbol/reason/tag...">
           <select id="session"><option value="">All Sessions</option><option>Asia</option><option>London</option><option>New York</option></select>
           <select id="side"><option value="">BUY + SELL</option><option>BUY</option><option>SELL</option></select>
-          <select id="mistake"><option value="">All Mistakes</option><option>No SL</option><option>Silver</option><option>Oversize</option><option>Too Fast</option></select>
+          <select id="mistake"><option value="">All Mistakes</option><option>Revenge Trade</option><option>Increased Lot Size</option><option>Moved Stop Loss</option><option>No Confirmation Entry</option><option>Overtrading</option><option>No Patience</option></select>
           <select id="result"><option value="">All Results</option><option value="profit">Profit &gt; $2</option><option value="loss">Loss &lt; -$2</option><option value="breakeven">Break Even (-$2 to +$2)</option></select>
         </div>
         <div class="table-wrap"><table><thead><tr>
@@ -2456,11 +2456,11 @@ tr:hover {
         </div>
         <div class="cmd-card">
       <div class="cmd-label">Daily Loss Used</div>
-      <div class="cmd-value" id="cmdDailyLoss">$0.00 / $30.00</div>
+      <div class="cmd-value" id="cmdDailyLoss">$0.00 / not set</div>
         </div>
         <div class="cmd-card">
           <div class="cmd-label">Trades</div>
-          <div class="cmd-value" id="cmdTrades">0 / 5</div>
+          <div class="cmd-value" id="cmdTrades">0 / not set</div>
         </div>
         <div class="cmd-card">
           <div class="cmd-label">Rule Breaks</div>
@@ -2560,9 +2560,9 @@ tr:hover {
             <button class="psych-check" type="button" data-psych-check="patience" onclick="togglePsychCheck('patience')"><span></span><strong>Patience ready</strong><em>I can wait for activation without chasing.</em></button>
             <button class="psych-check" type="button" data-psych-check="lossAccept" onclick="togglePsychCheck('lossAccept')"><span></span><strong>Loss accepted</strong><em>If SL hits, I will pause, feel it, journal it, and not revenge trade.</em></button>
             <button class="psych-check" type="button" data-psych-check="noNeed" onclick="togglePsychCheck('noNeed')"><span></span><strong>No need to trade</strong><em>I am okay with no valid setup today.</em></button>
-            <button class="psych-check" type="button" data-psych-check="rules" onclick="togglePsychCheck('rules')"><span></span><strong>Rules first</strong><em>I will not enter if both zones activate or SL is too large.</em></button>
-            <button class="psych-check" type="button" data-psych-check="risk" onclick="togglePsychCheck('risk')"><span></span><strong>Risk accepted</strong><em>SL must stay under 60 pips live and preferably under 50 pips.</em></button>
-            <button class="psych-check" type="button" data-psych-check="time" onclick="togglePsychCheck('time')"><span></span><strong>5-minute discipline</strong><em>Wait for the 5-minute candle close. No trade before or after the plan.</em></button>
+            <button class="psych-check" type="button" data-psych-check="rules" onclick="togglePsychCheck('rules')"><span></span><strong>Rules first</strong><em>I will only enter when my plan and risk rules are fully met.</em></button>
+            <button class="psych-check" type="button" data-psych-check="risk" onclick="togglePsychCheck('risk')"><span></span><strong>Risk accepted</strong><em>I know my max risk for this trade and accept it.</em></button>
+            <button class="psych-check" type="button" data-psych-check="time" onclick="togglePsychCheck('time')"><span></span><strong>Entry timing discipline</strong><em>I wait for my setup's confirmed candle or timeframe close before entering.</em></button>
             <button class="psych-check" type="button" data-psych-check="journal" onclick="togglePsychCheck('journal')"><span></span><strong>Journal commitment</strong><em>After the trade I will screenshot, pause, and journal honestly.</em></button>
           </div>
           <div class="journal-form-actions">
@@ -2590,10 +2590,10 @@ tr:hover {
               </div>
               <button class="checklist-item" type="button" data-check="news" onclick="toggleChecklistCheck('news')"><div class="checklist-icon pending">?</div><div class="checklist-text">News Checked</div></button>
               <button class="checklist-item" type="button" data-check="emotion" onclick="toggleChecklistCheck('emotion')"><div class="checklist-icon pending">?</div><div class="checklist-text">Emotion Calm</div></button>
-              <button class="checklist-item" type="button" data-check="risk" onclick="toggleChecklistCheck('risk')"><div class="checklist-icon pending">?</div><div class="checklist-text">Risk Under 50 Pips</div></button>
-              <button class="checklist-item" type="button" data-check="obFvg" onclick="toggleChecklistCheck('obFvg')"><div class="checklist-icon pending">?</div><div class="checklist-text">Entry at OB/FVG Confirmation</div></button>
-              <button class="checklist-item" type="button" data-check="liquiditySweep" onclick="toggleChecklistCheck('liquiditySweep')"><div class="checklist-icon pending">?</div><div class="checklist-text">Liquidity Sweep Confirmation</div></button>
-              <button class="checklist-item" type="button" data-check="rrExit" onclick="toggleChecklistCheck('rrExit')"><div class="checklist-icon pending">?</div><div class="checklist-text">Exit With 1:2 At Least</div></button>
+              <button class="checklist-item" type="button" data-check="risk" onclick="toggleChecklistCheck('risk')"><div class="checklist-icon pending">?</div><div class="checklist-text">Risk Under Limit</div></button>
+              <button class="checklist-item" type="button" data-check="obFvg" onclick="toggleChecklistCheck('obFvg')"><div class="checklist-icon pending">?</div><div class="checklist-text">Entry Confirmed</div></button>
+              <button class="checklist-item" type="button" data-check="liquiditySweep" onclick="toggleChecklistCheck('liquiditySweep')"><div class="checklist-icon pending">?</div><div class="checklist-text">Confirmation Signal</div></button>
+              <button class="checklist-item" type="button" data-check="rrExit" onclick="toggleChecklistCheck('rrExit')"><div class="checklist-icon pending">?</div><div class="checklist-text">Exit Plan Set</div></button>
             </div>
             <div class="checklist-result">
               <div class="checklist-result-icon" id="checklistResultIcon">?</div>
@@ -2626,12 +2626,12 @@ tr:hover {
           <div class="card">
             <div class="panel-title"><h3>Live Trade Rules</h3><span>during execution</span></div>
             <div class="psych-rule-list">
-              <div class="psych-rule"><strong>SL under 60 pips.</strong><span>Not a single live trade above that.</span></div>
-              <div class="psych-rule"><strong>Prefer SL under 50 pips.</strong><span>Keep SL fixed after entry.</span></div>
-              <div class="psych-rule"><strong>No SL adjusting.</strong><span>Do not move the stop to emotionally feel safer.</span></div>
-              <div class="psych-rule"><strong>If both zones activate, exit.</strong><span>Respect confusion as invalidation.</span></div>
-              <div class="psych-rule"><strong>First quantity at 70 pips.</strong><span>Close first quantity and let half lot continue.</span></div>
-              <div class="psych-rule"><strong>No fixed TP on runner.</strong><span>Let continuation work after partial.</span></div>
+              <div class="psych-rule"><strong>Risk stays under my limit.</strong><span>The planned risk must match my saved account rules.</span></div>
+              <div class="psych-rule"><strong>Keep stop fixed after entry.</strong><span>No emotional stop widening.</span></div>
+              <div class="psych-rule"><strong>No stop widening.</strong><span>Do not move risk to emotionally feel safer.</span></div>
+              <div class="psych-rule"><strong>If the setup becomes unclear, exit or stand down.</strong><span>Respect confusion as invalidation.</span></div>
+              <div class="psych-rule"><strong>Follow the written exit plan.</strong><span>Scale or exit only according to the planned management rules.</span></div>
+              <div class="psych-rule"><strong>No emotional target changes.</strong><span>Manage the trade according to the plan.</span></div>
             </div>
           </div>
           <div class="card">
@@ -3101,12 +3101,71 @@ function destroy(id){ if(charts[id]) charts[id].destroy(); }
 
 function sorted(data=filtered){ return [...data].sort((a,b)=>new Date(a.openUtc)-new Date(b.openUtc)); }
 
+function accountDailyLossLimitAmount(config=getAccountConfig()){
+  if(!config) return null;
+  return limitAmount(config.maxDailyLoss, config.maxDailyLossType || 'percent', toNumber(config.accountSize,0));
+}
+function accountMaxTrades(config=getAccountConfig()){
+  const n = Number(config?.maxTradesPerDay);
+  return Number.isFinite(n) && n > 0 ? n : null;
+}
+function accountMinRr(config=getAccountConfig()){
+  const n = Number(config?.minRr);
+  return Number.isFinite(n) && n > 0 ? n : null;
+}
+function previousTradeFor(trade, data=filtered){
+  const s = sorted(data);
+  const i = s.indexOf(trade);
+  return i > 0 ? s[i-1] : null;
+}
+function tradePlannedRr(t){
+  const rr = Number(t.rr || t.riskReward || t.rewardRisk || 0);
+  if(Number.isFinite(rr) && rr > 0) return rr;
+  const entry = Number(t.entry), sl = Number(t.sl), tp = Number(t.tp);
+  if(Number.isFinite(entry) && Number.isFinite(sl) && Number.isFinite(tp) && Math.abs(entry-sl) > 0){
+    return Math.abs(tp-entry) / Math.abs(entry-sl);
+  }
+  return null;
+}
+function todayTradingState(data=[]){
+  const metrics = accountMetrics(trades || []);
+  const config = metrics?.config || getAccountConfig();
+  const todayPnl = data.reduce((a,t)=>a+(Number(t.pnl)||0),0);
+  const lossUsed = Math.abs(Math.min(0, todayPnl));
+  const tradesCount = data.length;
+  const maxDailyLoss = accountDailyLossLimitAmount(config);
+  const maxTrades = accountMaxTrades(config);
+  const mistakesToday = data.reduce((a,t)=>a+mistakes(t).length,0);
+  const b2bToday = getB2B(data).length;
+  const hasOpenTrade = data.some(t=>String(t.status || t.result || '').toLowerCase().includes('open'));
+  const dailyLossHit = maxDailyLoss != null && lossUsed >= maxDailyLoss;
+  const tradeLimitHit = maxTrades != null && tradesCount >= maxTrades;
+  let nextAction = 'Wait for A+ setup';
+  let status = 'Safe to Trade';
+  let statusClass = 'safe';
+  if(dailyLossHit){ nextAction = 'Stop trading - daily loss limit reached'; status = 'Stop Trading'; statusClass = 'stop'; }
+  else if(tradeLimitHit){ nextAction = 'Stop trading - trade limit reached for today'; status = 'Stop Trading'; statusClass = 'stop'; }
+  else if(hasOpenTrade){ nextAction = 'Manage open position'; status = 'Manage Trade'; statusClass = 'caution'; }
+  else if(mistakesToday > 0 || b2bToday > 0){ nextAction = "Review today's rule break before next trade"; status = 'Caution'; statusClass = 'caution'; }
+  return {config,todayPnl,lossUsed,tradesCount,maxDailyLoss,maxTrades,mistakesToday,b2bToday,hasOpenTrade,dailyLossHit,tradeLimitHit,nextAction,status,statusClass};
+}
 function mistakes(t){
   const m=[];
-  if(!t.sl || t.sl===0) m.push('No SL');
-  if(t.symbol.includes('XAG')) m.push('Silver');
-  if(t.volume>0.01) m.push('Oversize');
-  if(t.duration<=5) m.push('Too Fast');
+  const prev = previousTradeFor(t);
+  const minRr = accountMinRr() || 3;
+  const rr = tradePlannedRr(t);
+  const vol = Number(t.volume || t.lot || t.size || 0);
+  const prevVol = prev ? Number(prev.volume || prev.lot || prev.size || 0) : 0;
+  const diffMinutes = prev ? (new Date(t.openUtc)-new Date(prev.openUtc))/60000 : Infinity;
+  if(prev && prev.pnl < 0 && diffMinutes >= 0 && diffMinutes <= 15) m.push('Revenge Trade');
+  if(prev && prevVol > 0 && vol > prevVol) m.push('Increased Lot Size');
+  if(String(t.stopMoved || t.movedStop || t.slAdjusted || '').toLowerCase()==='yes') m.push('Moved Stop Loss');
+  if(String(t.entryConfirmed || t.entryConfirmation || '').toLowerCase()==='no') m.push('No Confirmation Entry');
+  const todayCount = sorted(trades || []).filter(x=>x.date === t.date && new Date(x.openUtc) <= new Date(t.openUtc)).length;
+  const maxTrades = accountMaxTrades();
+  if(maxTrades && todayCount > maxTrades) m.push('Overtrading');
+  if(rr != null && rr < minRr) m.push('No Patience');
+  if(!m.length && t.reason && /revenge|fomo/i.test(String(t.reason))) m.push('Revenge Trade');
   return m;
 }
 
@@ -3126,10 +3185,10 @@ function stats(data=filtered){
   const breakEvens=data.filter(t=>tradeResult(t.pnl)==='breakeven');
   const pnl=data.reduce((a,b)=>a+b.pnl,0);
   const grossWin=wins.reduce((a,b)=>a+b.pnl,0), grossLoss=Math.abs(losses.reduce((a,b)=>a+b.pnl,0));
-  const noSL=data.filter(t=>!t.sl||t.sl===0).length, silver=data.filter(t=>t.symbol.includes('XAG')).length, oversize=data.filter(t=>t.volume>0.01).length, fast=data.filter(t=>t.duration<=5).length, b2b=getB2B(data).length;
+  const mistakeTotal=data.reduce((a,t)=>a+mistakes(t).length,0), b2b=getB2B(data).length;
   let peak=0,cum=0,maxDD=0; sorted(data).forEach(t=>{cum+=t.pnl; peak=Math.max(peak,cum); maxDD=Math.min(maxDD,cum-peak);});
-  const discipline=Math.max(0,100-noSL*7-silver*18-oversize*6-b2b*2-fast*.5);
-  return {total,wins,losses,breakEvens,pnl,wr:total?wins.length/total*100:0,pf:grossLoss?grossWin/grossLoss:grossWin,avgWin:wins.length?grossWin/wins.length:0,avgLoss:losses.length?losses.reduce((a,b)=>a+b.pnl,0)/losses.length:0,noSL,silver,oversize,fast,b2b,maxDD,discipline};
+  const discipline=Math.max(0,100-mistakeTotal*5-b2b*2);
+  return {total,wins,losses,breakEvens,pnl,wr:total?wins.length/total*100:0,pf:grossLoss?grossWin/grossLoss:grossWin,avgWin:wins.length?grossWin/wins.length:0,avgLoss:losses.length?losses.reduce((a,b)=>a+b.pnl,0)/losses.length:0,mistakeTotal,b2b,maxDD,discipline};
 }
 
 function by(keyFn, labels=null, data=filtered){
@@ -3167,14 +3226,18 @@ function applyFilters(){
 
 
 function renderSide(){
-  const DAILY_LOSS_LIMIT = 30;
   const today = todayDateKey();
   const todayTrades = sorted(trades).filter(t=>t.date === today);
-  const todayPnl = todayTrades.reduce((a,t)=>a+(Number(t.pnl)||0),0);
-  const lossUsed = Math.abs(Math.min(0, todayPnl));
-  const profitProgress = Math.min(100, Math.max(0, todayPnl) / 50 * 100);
-  const tradeProgress = Math.min(100, todayTrades.length / 5 * 100);
-  const lossProgress = Math.min(100, lossUsed / DAILY_LOSS_LIMIT * 100);
+  const state = todayTradingState(todayTrades);
+  const m = accountMetrics(trades || []);
+  const todayPnl = state.todayPnl;
+  const lossUsed = state.lossUsed;
+  const dailyLimit = state.maxDailyLoss;
+  const maxTrades = state.maxTrades;
+  const profitTarget = Math.max(1, m?.profitTargetAmount || 1);
+  const profitProgress = Math.min(100, Math.max(0, todayPnl) / profitTarget * 100);
+  const tradeProgress = maxTrades ? Math.min(100, todayTrades.length / maxTrades * 100) : 0;
+  const lossProgress = dailyLimit ? Math.min(100, lossUsed / dailyLimit * 100) : 0;
   const todayJournalEntries = journalPageEntries.filter(e=>{
     const t = e.trade || (e.tradeKey ? findTradeByKey(e.tradeKey) : null);
     return (t?.date || e.date) === today;
@@ -3187,12 +3250,13 @@ function renderSide(){
   const sideDailyRules = document.getElementById('sideDailyRules');
   if(sideDailyRules){
     sideDailyRules.innerHTML = `
-      <div class="mini-stat"><span>Only Market</span><strong>Gold</strong></div>
-      <div class="mini-stat"><span>Loss Limit</span><strong class="${lossUsed >= DAILY_LOSS_LIMIT ? 'red' : 'neutral'}">$${DAILY_LOSS_LIMIT}/day</strong></div>
+      <div class="mini-stat"><span>Market</span><strong>User defined</strong></div>
+      <div class="mini-stat"><span>Loss Limit</span><strong class="${dailyLimit && lossUsed >= dailyLimit ? 'red' : 'neutral'}">${dailyLimit ? '$'+dailyLimit.toFixed(2)+'/day' : 'Set in account'}</strong></div>
+      <div class="mini-stat"><span>Trade Limit</span><strong class="${maxTrades && todayTrades.length >= maxTrades ? 'red' : 'neutral'}">${maxTrades ? todayTrades.length+'/'+maxTrades : 'Set in account'}</strong></div>
       <div class="mini-stat"><span>Entry Rule</span><strong>Good point + confirmation</strong></div>
       <div class="mini-stat"><span>Exit Rule</span><strong>With confirmation</strong></div>
       <div class="mini-stat"><span>Today P&L</span><strong class="${pnlClass(todayPnl)}">${fmt(todayPnl)}</strong></div>
-      <div class="mini-stat"><span>Max Loss</span><strong class="${lossUsed >= DAILY_LOSS_LIMIT ? 'red' : 'neutral'}">$${lossUsed.toFixed(2)}/$${DAILY_LOSS_LIMIT}</strong></div>
+      <div class="mini-stat"><span>Max Loss</span><strong class="${dailyLimit && lossUsed >= dailyLimit ? 'red' : 'neutral'}">$${lossUsed.toFixed(2)}/${dailyLimit ? '$'+dailyLimit.toFixed(2) : 'not set'}</strong></div>
       <div class="bar" title="Daily profit target progress" style="margin-top:10px"><div style="width:${profitProgress}%"></div></div>
       <div class="bar" title="Daily trade count progress" style="margin-top:8px"><div style="width:${tradeProgress}%;background:linear-gradient(90deg,var(--amber),var(--blue))"></div></div>
       <div class="bar" title="Daily loss limit used" style="margin-top:8px"><div style="width:${lossProgress}%;background:linear-gradient(90deg,var(--amber),var(--red))"></div></div>`;
@@ -3207,12 +3271,13 @@ function renderSide(){
 
 function mistakeBreakdown(data=filtered){
   const categories = [
-    {key:'No SL', label:'No SL', desc:'Losses where stop loss was missing.'},
-    {key:'Silver', label:'Silver', desc:'Losses from XAG / silver trades.'},
-    {key:'Oversize', label:'Lot Size', desc:'Losses where lot size was above 0.01.'},
-    {key:'Too Fast', label:'Fast Close', desc:'Losses closed within 5 minutes.'}
+    {key:'Revenge Trade', label:'Revenge Trade', desc:'A trade was taken too soon after a loss or with revenge/FOMO behavior.'},
+    {key:'Increased Lot Size', label:'Increased Lot Size', desc:'Size increased compared with the previous trade instead of staying planned.'},
+    {key:'Moved Stop Loss', label:'Moved Stop Loss', desc:'Stop loss was adjusted after entry instead of respecting the plan.'},
+    {key:'No Confirmation Entry', label:'No Confirmation Entry', desc:'Entry happened before setup confirmation was complete.'},
+    {key:'Overtrading', label:'Overtrading', desc:'Trades exceeded the saved daily trade limit.'},
+    {key:'No Patience', label:'No Patience', desc:'Trade quality or planned RR did not meet the saved minimum requirement.'}
   ];
-
   return categories.map(c=>{
     const all = data.filter(t=>mistakes(t).includes(c.key));
     const losses = all.filter(t=>t.pnl < 0);
@@ -3346,7 +3411,7 @@ function renderMetrics(){
     ['Avg Win',fmt(s.avgWin),pnlClass(s.avgWin),'Mean winning trade'],
     ['Avg Loss',fmt(s.avgLoss),pnlClass(s.avgLoss),'Mean losing trade'],
     ['Max Drawdown',fmt(s.maxDD),pnlClass(s.maxDD),'Worst equity dip'],
-    ['Mistake Count',s.noSL+s.silver+s.oversize+s.fast,countClass(s.noSL+s.silver+s.oversize+s.fast),'Open dashboard: No SL / Silver / Lot Size / Fast Close']
+    ['Mistake Count',s.mistakeTotal,countClass(s.mistakeTotal),'Open dashboard: universal rule mistakes']
   ];
   document.getElementById('metrics').innerHTML=cells.map(c=>{
       const isMistake = c[0] === 'Mistake Count';
@@ -3552,7 +3617,7 @@ function updateGraphHelpers(){
     sessionHelper.innerHTML = `<strong>Best session:</strong> ${bestSession?.[0] || '-'} (${fmt(bestSession?.[1] || 0)}) &bull; <strong>Worst:</strong> ${worstSession?.[0] || '-'} (${fmt(worstSession?.[1] || 0)}).`;
   }
 
-  const mistakeLabels=['No SL','Silver','Oversize','Too Fast'];
+  const mistakeLabels=['Revenge Trade','Increased Lot Size','Moved Stop Loss','No Confirmation Entry','Overtrading','No Patience'];
   const mistakePnL=mistakeLabels.map(l=>filtered.filter(t=>mistakes(t).includes(l)).reduce((a,b)=>a+b.pnl,0));
   const worstMistakeIndex = mistakePnL.indexOf(Math.min(...mistakePnL));
   const mistakeHelper = document.getElementById('mistakeHelper');
@@ -3615,7 +3680,7 @@ function renderCharts(){
   }
   chartBar('sessionChart',sessions,sessions.map(x=>+sm[x].toFixed(2)));
 
-  const mistakeLabels=['No SL','Silver','Oversize','Too Fast'];
+  const mistakeLabels=['Revenge Trade','Increased Lot Size','Moved Stop Loss','No Confirmation Entry','Overtrading','No Patience'];
   const mistakePnL=mistakeLabels.map(l=>filtered.filter(t=>mistakes(t).includes(l)).reduce((a,b)=>a+b.pnl,0));
   chartBar('mistakeChart',mistakeLabels,mistakePnL);
 
@@ -3715,7 +3780,7 @@ function isBadAIWidgetText(text){
 
 function aiWidgetTone(raw){
   const q = String(raw || '').toLowerCase();
-  if(/loss|worst|mistake|leak|drawdown|oversize|no sl|too fast|revenge|risk/.test(q)) return 'widget-danger';
+  if(/loss|worst|mistake|leak|drawdown|revenge|risk|overtrading|confirmation|patience/.test(q)) return 'widget-danger';
   if(/best|profit|winner|edge|strong|clean|discipline/.test(q)) return 'widget-good';
   return '';
 }
@@ -3725,7 +3790,7 @@ function aiWidgetFocus(raw){
   const focus = {label:'All trades', count:filtered.length, data:filtered, filters:{}};
   const sessions = ['Asia','London','New York'];
   const sides = ['BUY','SELL'];
-  const mistakeLabels = ['No SL','Silver','Oversize','Too Fast'];
+  const mistakeLabels = ['Revenge Trade','Increased Lot Size','Moved Stop Loss','No Confirmation Entry','Overtrading','No Patience'];
 
   const session = sessions.find(x=>q.includes(x.toLowerCase()));
   const side = sides.find(x=>q.includes(x.toLowerCase()));
@@ -3809,7 +3874,7 @@ function buildRuleBasedWidgetText(){
   const sessions = by(t=>t.session,['Asia','London','New York']);
   const sides = by(t=>t.side,['BUY','SELL']);
   const weekdays = by(t=>t.weekday,['Mon','Tue','Wed','Thu','Fri']);
-  const mistakeLabels = ['No SL','Silver','Oversize','Too Fast'];
+  const mistakeLabels = ['Revenge Trade','Increased Lot Size','Moved Stop Loss','No Confirmation Entry','Overtrading','No Patience'];
   const leaks = mistakeLabels
     .map(name=>({name,count:data.filter(t=>mistakes(t).includes(name)).length}))
     .sort((a,b)=>b.count-a.count);
@@ -3980,7 +4045,7 @@ function aiReportPayload(){
   const sessions = by(t=>t.session,['Asia','London','New York']);
   const sides = by(t=>t.side,['BUY','SELL']);
   const weekdays = by(t=>t.weekday,['Mon','Tue','Wed','Thu','Fri']);
-  const mistakeLabels = ['No SL','Silver','Oversize','Too Fast'];
+  const mistakeLabels = ['Revenge Trade','Increased Lot Size','Moved Stop Loss','No Confirmation Entry','Overtrading','No Patience'];
   const mistakeCounts = Object.fromEntries(mistakeLabels.map(label=>[label, data.filter(t=>mistakes(t).includes(label)).length]));
   const recent = sorted(data).slice(-40).map(t=>({
     date:t.date,time:t.time,symbol:t.symbol,side:t.side,session:t.session,
@@ -4011,7 +4076,7 @@ function renderRuleBasedDashboardInsights(){
   const s = stats(filtered);
   const sessions = by(t=>t.session,['Asia','London','New York']);
   const worstSession = Object.entries(sessions).sort((a,b)=>a[1]-b[1])[0] || ['Session',0];
-  const mistakeNames = ['No SL','Silver','Oversize','Too Fast'];
+  const mistakeNames = ['Revenge Trade','Increased Lot Size','Moved Stop Loss','No Confirmation Entry','Overtrading','No Patience'];
   const leaks = mistakeNames.map(name=>({name,count:filtered.filter(t=>mistakes(t).includes(name)).length})).sort((a,b)=>b.count-a.count);
   const mainLeak = leaks[0] || {name:'Rule discipline',count:0};
   const cards = [
@@ -4384,6 +4449,8 @@ function getAccountConfig(){
       maxDrawdownType:raw.maxDrawdownType || 'percent',
       currentBalance:Number(raw.currentBalance) || Number(raw.accountSize),
       riskPercent:clampNumber(raw.riskPercent || DEFAULT_RISK_PERCENT, 0.5, 2),
+      maxTradesPerDay:raw.maxTradesPerDay === '' || raw.maxTradesPerDay == null ? null : Number(raw.maxTradesPerDay),
+      minRr:raw.minRr === '' || raw.minRr == null ? null : Number(raw.minRr),
       phaseDeadline:raw.phaseDeadline || '',
       startDate:raw.startDate || new Date().toISOString().slice(0,10)
     };
@@ -4444,23 +4511,26 @@ function renderAccountSetupPreview(){
   const profitTargetType = document.getElementById('profitTargetType')?.value || 'percent';
   const maxDailyLoss = toNumber(document.getElementById('maxDailyLossInput')?.value, 0);
   const maxDailyLossType = document.getElementById('maxDailyLossType')?.value || 'percent';
+  const maxTrades = toNumber(document.getElementById('maxTradesInput')?.value, 0);
+  const minRr = toNumber(document.getElementById('minRrInput')?.value, 0);
   const riskAmount = accountSize * riskPercent / 100;
   const targetAmount = limitAmount(profitTarget, profitTargetType, accountSize);
   const targetBalance = currentBalance + targetAmount;
   const dailyLossAmount = isFundedPhase(phase) ? limitAmount(maxDailyLoss, maxDailyLossType, accountSize) : null;
   const money = value => `$${(Number.isFinite(value) ? value : 0).toFixed(2)}`;
-  box.innerHTML = `<div class="setup-preview-row"><span>$ risk per trade</span><strong>${money(riskAmount)}</strong></div><div class="setup-preview-row"><span>Profit target</span><strong>${money(targetAmount)} (${money(targetBalance)} target balance)</strong></div><div class="setup-preview-row"><span>Daily loss limit</span><strong>${dailyLossAmount == null ? 'Skipped for this phase' : money(dailyLossAmount)}</strong></div>`;
+  box.innerHTML = `<div class="setup-preview-row"><span>$ risk per trade</span><strong>${money(riskAmount)}</strong></div><div class="setup-preview-row"><span>Profit target</span><strong>${money(targetAmount)} (${money(targetBalance)} target balance)</strong></div><div class="setup-preview-row"><span>Daily loss limit</span><strong>${dailyLossAmount == null ? 'Skipped for this phase' : money(dailyLossAmount)}</strong></div><div class="setup-preview-row"><span>Trade limit / Minimum RR</span><strong>${maxTrades || '-'} trades / ${minRr || '-'}R</strong></div>`;
 }
 function openAccountSetup(){
   const gate = document.getElementById('accountOnboardingGate');
-  const config = getAccountConfig() || {accountSize:'',phase:'Phase 1',profitTarget:'',profitTargetType:'percent',maxDailyLoss:'',maxDailyLossType:'percent',maxDrawdown:'',maxDrawdownType:'percent',currentBalance:'',riskPercent:'',phaseDeadline:''};
+  const config = getAccountConfig() || {accountSize:'',phase:'Phase 1',profitTarget:'',profitTargetType:'percent',maxDailyLoss:'',maxDailyLossType:'percent',maxDrawdown:'',maxDrawdownType:'percent',currentBalance:'',riskPercent:'',maxTradesPerDay:'',minRr:'',phaseDeadline:''};
   const set = (id,value)=>{ const el=document.getElementById(id); if(el) el.value = value ?? ''; };
   set('accountSizeInput', config.accountSize ?? ''); set('currentBalanceInput', config.currentBalance ?? '');
   set('accountPhaseInput', config.phase || 'Phase 1'); set('profitTargetInput', config.profitTarget);
   set('profitTargetType', config.profitTargetType || 'percent'); set('riskPercentInput', config.riskPercent ?? '');
-  set('phaseDeadlineInput', config.phaseDeadline || ''); set('maxDailyLossInput', config.maxDailyLoss ?? '');
-  set('maxDailyLossType', config.maxDailyLossType || 'percent'); set('maxDrawdownInput', config.maxDrawdown ?? '');
-  set('maxDrawdownType', config.maxDrawdownType || 'percent'); toggleFundedFields(); renderAccountSetupPreview();
+  set('phaseDeadlineInput', config.phaseDeadline || ''); set('maxTradesInput', config.maxTradesPerDay ?? ''); set('minRrInput', config.minRr ?? '');
+  set('maxDailyLossInput', config.maxDailyLoss ?? ''); set('maxDailyLossType', config.maxDailyLossType || 'percent');
+  set('maxDrawdownInput', config.maxDrawdown ?? ''); set('maxDrawdownType', config.maxDrawdownType || 'percent');
+  toggleFundedFields(); renderAccountSetupPreview();
   if(gate){ gate.hidden = false; gate.classList.add('show'); }
 }
 function hideAccountSetupAfterSave(){
@@ -4480,12 +4550,14 @@ function saveAccountSetup(){
     if(raw === '' || !Number.isFinite(value) || value <= min) throw new Error(`${label} is required.`);
     return value;
   };
-  let accountSize, currentBalance, riskPercent, profitTarget, maxDailyLoss = null, maxDrawdown = null;
+  let accountSize, currentBalance, riskPercent, profitTarget, maxTradesPerDay, minRr, maxDailyLoss = null, maxDrawdown = null;
   try{
     accountSize = readRequiredNumber('accountSizeInput','Account size');
     currentBalance = readRequiredNumber('currentBalanceInput','Current balance');
     profitTarget = readRequiredNumber('profitTargetInput','Profit target');
     riskPercent = clampNumber(readRequiredNumber('riskPercentInput','Risk per trade'), 0.5, 2);
+    maxTradesPerDay = readRequiredNumber('maxTradesInput','Max trades per day');
+    minRr = readRequiredNumber('minRrInput','Minimum RR');
     if(isFundedPhase(phase)){
       maxDailyLoss = readRequiredNumber('maxDailyLossInput','Max daily loss');
       maxDrawdown = readRequiredNumber('maxDrawdownInput','Max overall drawdown');
@@ -4494,7 +4566,7 @@ function saveAccountSetup(){
     if(msg) msg.textContent = error.message;
     return;
   }
-  const config = {accountSize,phase,profitTarget,profitTargetType:document.getElementById('profitTargetType')?.value || 'percent',maxDailyLoss:isFundedPhase(phase)?maxDailyLoss:null,maxDailyLossType:document.getElementById('maxDailyLossType')?.value || 'percent',maxDrawdown:isFundedPhase(phase)?maxDrawdown:null,maxDrawdownType:document.getElementById('maxDrawdownType')?.value || 'percent',currentBalance,riskPercent,phaseDeadline:document.getElementById('phaseDeadlineInput')?.value || '',startDate:getAccountConfig()?.startDate || new Date().toISOString().slice(0,10)};
+  const config = {accountSize,phase,profitTarget,profitTargetType:document.getElementById('profitTargetType')?.value || 'percent',maxDailyLoss:isFundedPhase(phase)?maxDailyLoss:null,maxDailyLossType:document.getElementById('maxDailyLossType')?.value || 'percent',maxDrawdown:isFundedPhase(phase)?maxDrawdown:null,maxDrawdownType:document.getElementById('maxDrawdownType')?.value || 'percent',currentBalance,riskPercent,maxTradesPerDay,minRr,phaseDeadline:document.getElementById('phaseDeadlineInput')?.value || '',startDate:getAccountConfig()?.startDate || new Date().toISOString().slice(0,10)};
   localStorage.setItem(ACCOUNT_CONFIG_KEY, JSON.stringify(config));
   if(msg) msg.textContent = 'Saved. Journall will recalculate goals and risk from this account.';
   hideAccountSetupAfterSave(); renderAll();
@@ -4527,7 +4599,7 @@ function renderPropGoalText(text){
 }
 function propChallengePayload(){
   const metrics = accountMetrics(trades || []), data = trades || [], s = stats(data);
-  const mistakeLabels = ['No SL','Silver','Oversize','Too Fast'];
+  const mistakeLabels = ['Revenge Trade','Increased Lot Size','Moved Stop Loss','No Confirmation Entry','Overtrading','No Patience'];
   return {account:metrics?metrics.config:null,progress:metrics?{currentBalance:metrics.currentBalance,profitTargetAmount:metrics.profitTargetAmount,remainingToTarget:metrics.remainingToTarget,progressPercent:metrics.profitProgress,todayPnl:metrics.todayPnl,todayTradeCount:metrics.todayTrades.length,maxDailyLossRemaining:metrics.maxDailyLossRemaining,maxDrawdownRemaining:metrics.maxDrawdownRemaining,daysRemaining:metrics.daysRemaining,maxDrawdown:s.maxDD,profitFactor:s.pf,winRate:s.wr,disciplineScore:s.discipline}:null,universalRules:['Stop trading after one loss','No repeat setup trades','Minimum 3:1 RR before logging trade','Flag revenge/FOMO after rapid trades after a loss'],mistakeCounts:Object.fromEntries(mistakeLabels.map(label=>[label,data.filter(t=>mistakes(t).includes(label)).length])),recentTrades:sorted(data).slice(-30).map(t=>({date:t.date,time:t.time,symbol:t.symbol,side:t.side,pnl:t.pnl,duration:t.duration,reason:t.reason,mistakes:mistakes(t)}))};
 }
 function accountSetupEmptyMarkup(){ return `<div class="goal-card"><div class="goal-card-label">Account Setup Required</div><div class="goal-card-value neutral">Finish onboarding</div><div class="goal-card-sub">Set account size, phase, target, and risk percent so Journall can calculate risk from your real account.</div><button class="btn primary" type="button" onclick="openAccountSetup()">Set up account</button></div>`; }
@@ -4554,7 +4626,7 @@ function clearAIPropGoals(){ Object.keys(localStorage).filter(k=>k.startsWith('k
 function renderGoals(){
   const goalsBox=document.getElementById('goalsBox'), propBox=document.getElementById('propBox'); if(!goalsBox || !propBox) return;
   const m=accountMetrics(trades || []); if(!m){ goalsBox.innerHTML=accountSetupEmptyMarkup(); propBox.innerHTML='<div class="insight warn"><strong>Account setup needed.</strong><br>Complete onboarding before AI creates phase goals.</div>'; return; }
-  goalsBox.innerHTML = `<div class="goal-card-grid"><div class="goal-card"><div class="goal-card-label">Current Balance</div><div class="goal-card-value ${pnlClass(m.currentBalance-m.startBalance)}">$${m.currentBalance.toFixed(2)}</div><div class="goal-card-sub">${escapeHtml(m.config.phase)} &bull; start $${m.startBalance.toFixed(2)}.</div></div><div class="goal-card"><div class="goal-card-label">Target Remaining</div><div class="goal-card-value ${m.remainingToTarget<=0?'green':'neutral'}">$${m.remainingToTarget.toFixed(2)}</div><div class="bar" style="margin-top:12px"><div style="width:${m.profitProgress}%"></div></div><div class="goal-card-sub">Target balance $${m.targetBalance.toFixed(2)}.</div></div><div class="goal-card"><div class="goal-card-label">Daily Loss Room</div><div class="goal-card-value ${m.maxDailyLossRemaining!=null&&m.maxDailyLossRemaining<=0?'red':'neutral'}">${m.maxDailyLossRemaining==null?'Skipped':'$'+m.maxDailyLossRemaining.toFixed(2)}</div><div class="goal-card-sub">${m.maxDailyLossAmount==null?'Only shown for funded accounts.':'$'+m.dailyLossUsed.toFixed(2)+' used today of $'+m.maxDailyLossAmount.toFixed(2)}.</div></div><div class="goal-card"><div class="goal-card-label">Drawdown Buffer</div><div class="goal-card-value ${m.maxDrawdownRemaining!=null&&m.maxDrawdownRemaining<=0?'red':'neutral'}">${m.maxDrawdownRemaining==null?'Skipped':'$'+m.maxDrawdownRemaining.toFixed(2)}</div><div class="goal-card-sub">${m.maxDrawdownAmount==null?'Only shown for funded accounts.':'$'+m.maxDrawdownUsed.toFixed(2)+' used of $'+m.maxDrawdownAmount.toFixed(2)}.</div></div><div class="goal-card"><div class="goal-card-label">Days Remaining</div><div class="goal-card-value neutral">${m.daysRemaining==null?'No deadline':m.daysRemaining+' days'}</div><div class="goal-card-sub">Deadline ${m.config.phaseDeadline || 'not set'}.</div></div>${riskCalculatorMarkup(m)}</div><div class="goal"><div style="width:190px;color:var(--muted)">Today P&L</div><div class="bar"><div style="width:${Math.min(100,Math.max(0,m.todayPnl)/50*100)}%"></div></div><strong class="${pnlClass(m.todayPnl)}">${fmt(m.todayPnl)}</strong></div><div class="goal"><div style="width:190px;color:var(--muted)">Trades today</div><div class="bar"><div style="width:${Math.min(100,m.todayTrades.length/5*100)}%;background:linear-gradient(90deg,var(--amber),var(--blue))"></div></div><strong class="neutral">${m.todayTrades.length}/5</strong></div>`;
+  goalsBox.innerHTML = `<div class="goal-card-grid"><div class="goal-card"><div class="goal-card-label">Current Balance</div><div class="goal-card-value ${pnlClass(m.currentBalance-m.startBalance)}">$${m.currentBalance.toFixed(2)}</div><div class="goal-card-sub">${escapeHtml(m.config.phase)} &bull; start $${m.startBalance.toFixed(2)}.</div></div><div class="goal-card"><div class="goal-card-label">Target Remaining</div><div class="goal-card-value ${m.remainingToTarget<=0?'green':'neutral'}">$${m.remainingToTarget.toFixed(2)}</div><div class="bar" style="margin-top:12px"><div style="width:${m.profitProgress}%"></div></div><div class="goal-card-sub">Target balance $${m.targetBalance.toFixed(2)}.</div></div><div class="goal-card"><div class="goal-card-label">Daily Loss Room</div><div class="goal-card-value ${m.maxDailyLossRemaining!=null&&m.maxDailyLossRemaining<=0?'red':'neutral'}">${m.maxDailyLossRemaining==null?'Skipped':'$'+m.maxDailyLossRemaining.toFixed(2)}</div><div class="goal-card-sub">${m.maxDailyLossAmount==null?'Only shown for funded accounts.':'$'+m.dailyLossUsed.toFixed(2)+' used today of $'+m.maxDailyLossAmount.toFixed(2)}.</div></div><div class="goal-card"><div class="goal-card-label">Drawdown Buffer</div><div class="goal-card-value ${m.maxDrawdownRemaining!=null&&m.maxDrawdownRemaining<=0?'red':'neutral'}">${m.maxDrawdownRemaining==null?'Skipped':'$'+m.maxDrawdownRemaining.toFixed(2)}</div><div class="goal-card-sub">${m.maxDrawdownAmount==null?'Only shown for funded accounts.':'$'+m.maxDrawdownUsed.toFixed(2)+' used of $'+m.maxDrawdownAmount.toFixed(2)}.</div></div><div class="goal-card"><div class="goal-card-label">Days Remaining</div><div class="goal-card-value neutral">${m.daysRemaining==null?'No deadline':m.daysRemaining+' days'}</div><div class="goal-card-sub">Deadline ${m.config.phaseDeadline || 'not set'}.</div></div>${riskCalculatorMarkup(m)}</div><div class="goal"><div style="width:190px;color:var(--muted)">Today P&L</div><div class="bar"><div style="width:${Math.min(100,Math.max(0,m.todayPnl)/Math.max(1,(m.profitTargetAmount || 50))*100)}%"></div></div><strong class="${pnlClass(m.todayPnl)}">${fmt(m.todayPnl)}</strong></div><div class="goal"><div style="width:190px;color:var(--muted)">Trades today</div><div class="bar"><div style="width:${Math.min(100,m.config.maxTradesPerDay ? m.todayTrades.length/m.config.maxTradesPerDay*100 : 0)}%;background:linear-gradient(90deg,var(--amber),var(--blue))"></div></div><strong class="neutral">${m.todayTrades.length}/${m.config.maxTradesPerDay || 'not set'}</strong></div>`;
   const cached=localStorage.getItem(propGoalStorageKey());
   if(cached){ propBox.innerHTML=renderPropGoalText(cached); const status=document.getElementById('propGoalStatus'); if(status) status.textContent='AI goals are current for this account and trade data.'; }
   else{ propBox.innerHTML='<div class="insight warn"><strong>AI goals pending.</strong><br>Ollama will create goals and rules from your account setup.</div>'; generateAIPropGoals(false); }
@@ -5196,14 +5268,8 @@ function renderPsychology(){
 }
 
 function renderCommandCenter(todayTrades){
-  const DAILY_LOSS_LIMIT = 30;
   const data = Array.isArray(todayTrades) ? todayTrades : [];
-  const todayPnl = data.reduce((a,t)=>a+(Number(t.pnl)||0),0);
-  const lossUsed = Math.abs(Math.min(0, todayPnl));
-  const tradesCount = data.length;
-  const mistakesToday = data.reduce((a,t)=>a+mistakes(t).length,0);
-  const b2bToday = getB2B(data).length;
-
+  const state = todayTradingState(data);
   const pnlEl = document.getElementById('cmdTodayPnl');
   const lossEl = document.getElementById('cmdDailyLoss');
   const tradesEl = document.getElementById('cmdTrades');
@@ -5213,51 +5279,34 @@ function renderCommandCenter(todayTrades){
   const tomorrowRuleEl = document.getElementById('cmdTomorrowRule');
 
   if(pnlEl){
-    const nextPnlText = fmt(todayPnl);
+    const nextPnlText = fmt(state.todayPnl);
     const pnlChanged = pnlEl.textContent !== nextPnlText;
     pnlEl.textContent = nextPnlText;
-    pnlEl.className = 'cmd-value ' + pnlClass(todayPnl);
+    pnlEl.className = 'cmd-value ' + pnlClass(state.todayPnl);
     if(pnlChanged){
       pnlEl.classList.add('pnl-value-updating');
-      if(todayPnl > 0) pnlEl.classList.add('pnl-flash-success');
-      window.setTimeout(()=>{
-        pnlEl.classList.remove('pnl-value-updating','pnl-flash-success');
-      }, 150);
+      if(state.todayPnl > 0) pnlEl.classList.add('pnl-flash-success');
+      window.setTimeout(()=>pnlEl.classList.remove('pnl-value-updating','pnl-flash-success'), 150);
     }
   }
   if(lossEl){
-    lossEl.textContent = `$${lossUsed.toFixed(2)} / $${DAILY_LOSS_LIMIT.toFixed(2)}`;
-    lossEl.className = 'cmd-value ' + (lossUsed >= DAILY_LOSS_LIMIT ? 'danger' : lossUsed >= 20 ? 'warn' : '');
+    lossEl.textContent = `$${state.lossUsed.toFixed(2)} / ${state.maxDailyLoss == null ? 'not set' : '$'+state.maxDailyLoss.toFixed(2)}`;
+    lossEl.className = 'cmd-value ' + (state.dailyLossHit ? 'danger' : '');
   }
   if(tradesEl){
-    tradesEl.textContent = `${tradesCount} / 5`;
-    tradesEl.className = 'cmd-value ' + (tradesCount >= 5 ? 'warn' : '');
+    tradesEl.textContent = `${state.tradesCount} / ${state.maxTrades || 'not set'}`;
+    tradesEl.className = 'cmd-value ' + (state.tradeLimitHit ? 'warn' : '');
   }
   if(breaksEl){
-    breaksEl.textContent = mistakesToday;
-    breaksEl.className = 'cmd-value ' + (mistakesToday >= 2 ? 'danger' : mistakesToday ? 'warn' : '');
+    breaksEl.textContent = state.mistakesToday;
+    breaksEl.className = 'cmd-value ' + (state.mistakesToday ? 'warn' : '');
   }
-  if(actionEl){
-    if(lossUsed >= DAILY_LOSS_LIMIT || mistakesToday >= 2) actionEl.textContent = 'Stop trading';
-    else if(lossUsed >= 20 || mistakesToday >= 1 || b2bToday > 0) actionEl.textContent = 'Reduce size / pause';
-    else if(tradesCount >= 5) actionEl.textContent = 'Session complete';
-    else actionEl.textContent = 'Wait for A+ setup';
-  }
+  if(actionEl) actionEl.textContent = state.nextAction;
   if(statusEl){
-    if(lossUsed >= DAILY_LOSS_LIMIT || mistakesToday >= 2){
-      statusEl.className = 'cmd-status stop';
-      statusEl.innerHTML = '<span class="cmd-status-dot"></span>Stop Trading';
-    }else if(lossUsed >= 20 || mistakesToday >= 1 || b2bToday > 0){
-      statusEl.className = 'cmd-status caution';
-      statusEl.innerHTML = '<span class="cmd-status-dot"></span>Caution';
-    }else{
-      statusEl.className = 'cmd-status safe';
-      statusEl.innerHTML = '<span class="cmd-status-dot"></span>Safe to Trade';
-    }
+    statusEl.className = 'cmd-status ' + state.statusClass;
+    statusEl.innerHTML = `<span class="cmd-status-dot"></span>${state.status}`;
   }
-  if(tomorrowRuleEl){
-    tomorrowRuleEl.textContent = getTodayPsychologyReminder() || 'No saved rule';
-  }
+  if(tomorrowRuleEl) tomorrowRuleEl.textContent = getTodayPsychologyReminder() || 'No saved rule';
 }
 
 function toggleChecklistCheck(id){
@@ -5277,41 +5326,24 @@ function updateChecklist(){
     {id:'liquiditySweep', pass:preTradeChecklistState.liquiditySweep},
     {id:'rrExit', pass:preTradeChecklistState.rrExit}
   ];
-
-  checks.forEach(c=>{
-    const el = document.querySelector(`[data-check="${c.id}"]`);
-    if(!el) return;
-    const icon = el.querySelector('.checklist-icon');
-    el.classList.toggle('pass', c.pass);
-    el.classList.toggle('fail', !c.pass && c.id !== 'setup');
+  document.querySelectorAll('[data-check]').forEach(btn=>{
+    const id = btn.dataset.check;
+    const state = id === 'setup' ? !!setup : !!preTradeChecklistState[id];
+    btn.classList.toggle('checked', state);
+    const icon = btn.querySelector('.checklist-icon');
     if(icon){
-      icon.className = 'checklist-icon ' + (c.pass ? 'pass' : c.id === 'setup' ? 'pending' : 'fail');
-      icon.textContent = c.pass ? '' : c.id === 'setup' ? '?' : '!';
+      icon.className = 'checklist-icon ' + (state ? 'done' : 'pending');
+      icon.textContent = state ? '\u2713' : '?';
     }
   });
-
-  const allPass = checks.every(c=>c.pass);
-  const resultIcon = document.getElementById('checklistResultIcon');
-  const resultTitle = document.getElementById('checklistResultTitle');
-  const resultSub = document.getElementById('checklistResultSub');
-  if(!resultIcon || !resultTitle || !resultSub) return;
-
-  if(allPass){
-    resultIcon.textContent = '';
-    resultIcon.className = 'checklist-result-icon pass';
-    resultTitle.textContent = 'Ready to Trade';
-    resultSub.textContent = 'All checks passed. Execute only the planned setup.';
-  }else if(setup){
-    resultIcon.textContent = '!';
-    resultIcon.className = 'checklist-result-icon fail';
-    resultTitle.textContent = 'Do Not Trade Yet';
-    resultSub.textContent = 'News, emotion, risk, entry confirmation, liquidity, and 1:2 exit must all pass.';
-  }else{
-    resultIcon.textContent = '?';
-    resultIcon.className = 'checklist-result-icon pending';
-    resultTitle.textContent = 'Choose Setup First';
-    resultSub.textContent = 'Select Buy Setup or Sell Setup before checking the trade.';
-  }
+  const pass = checks.every(c=>c.pass);
+  const icon = document.getElementById('checklistResultIcon');
+  const title = document.getElementById('checklistResultTitle');
+  const sub = document.getElementById('checklistResultSub');
+  const minRr = accountMinRr() || 3;
+  if(icon){ icon.className = 'checklist-result-icon ' + (pass?'pass':'warn'); icon.textContent = pass ? '\u2713' : '!'; }
+  if(title) title.textContent = pass ? 'Cleared for planned execution' : 'Not ready yet';
+  if(sub) sub.textContent = pass ? `Entry meets your saved risk limit and minimum ${minRr}:1 RR plan.` : 'News, emotion, risk, entry criteria, confirmation signal, and exit plan must all pass.';
 }
 
 function postSessionSignature(data){
@@ -5834,40 +5866,43 @@ function dailyLossForTradeDate(trade){
 }
 
 function evaluateJournalRules(entry, trade){
-  const DAILY_LOSS_LIMIT = 30;
-  const fields = entry?.fields || parseJournalBody(entry?.body || '');
-  const checks = [
-    {
-      name:'Only trade gold',
-      pass: trade ? isGoldSymbol(trade.symbol) : false,
-      detail: trade ? `Symbol: ${trade.symbol || 'Unknown'}` : 'No trade selected'
-    },
-    {
-      name:'Trade under $30 daily loss limit',
-      pass: trade ? dailyLossForTradeDate(trade) <= DAILY_LOSS_LIMIT : false,
-      detail: trade ? `Day loss used: $${dailyLossForTradeDate(trade).toFixed(2)} / $${DAILY_LOSS_LIMIT}` : 'No trade selected'
-    },
-    {
-      name:'Entry at good point',
-      pass: normalizeYesNo(fields.goodEntryPoint) === 'Yes',
-      detail: `Journal: ${normalizeYesNo(fields.goodEntryPoint) || 'Not answered'}`
-    },
-    {
-      name:'Entry with confirmation',
-      pass: normalizeYesNo(fields.entryConfirmation) === 'Yes',
-      detail: `Journal: ${normalizeYesNo(fields.entryConfirmation) || 'Not answered'}`
-    },
-    {
-      name:'Exit with confirmation',
-      pass: normalizeYesNo(fields.exitConfirmation) === 'Yes',
-      detail: `Journal: ${normalizeYesNo(fields.exitConfirmation) || 'Not answered'}`
-    }
-  ];
-  return {
-    checks,
-    broken: checks.filter(c=>!c.pass),
-    followed: checks.every(c=>c.pass)
-  };
+  const broken=[];
+  const config = getAccountConfig();
+  const state = trade ? todayTradingState(sorted(trades || []).filter(t=>t.date === trade.date && new Date(t.openUtc) <= new Date(trade.openUtc))) : todayTradingState([]);
+  const minRr = accountMinRr(config) || 3;
+  const rr = trade ? tradePlannedRr(trade) : null;
+  const todayLoss = trade ? dailyLossForTradeDate(trade) : 0;
+  const dailyLimit = accountDailyLossLimitAmount(config);
+  const maxTrades = accountMaxTrades(config);
+  const dayCount = trade ? sorted(trades || []).filter(t=>t.date === trade.date && new Date(t.openUtc) <= new Date(trade.openUtc)).length : 0;
+  const entryConfirmed = entry.entryConfirmed === 'yes' || String(trade?.entryConfirmed || '').toLowerCase() === 'yes';
+  const exitConfirmed = entry.exitConfirmed === 'yes' || String(trade?.exitConfirmed || '').toLowerCase() === 'yes';
+
+  if(dailyLimit != null && todayLoss > dailyLimit) broken.push({
+    rule:'Trade only under saved daily loss limit',
+    detail:`Day loss used: $${todayLoss.toFixed(2)} / $${dailyLimit.toFixed(2)}`
+  });
+  if(maxTrades && dayCount > maxTrades) broken.push({
+    rule:'Respect saved max trades per day',
+    detail:`Trades taken: ${dayCount} / ${maxTrades}`
+  });
+  if(rr != null && rr < minRr) broken.push({
+    rule:`Minimum ${minRr}:1 RR before logging trade`,
+    detail:`Planned RR: ${rr.toFixed(2)}`
+  });
+  if(!entryConfirmed) broken.push({
+    rule:'Entry must have confirmation',
+    detail:'Mark entry confirmation as yes only when the setup fully confirms.'
+  });
+  if(!exitConfirmed) broken.push({
+    rule:'Exit must follow confirmation/plan',
+    detail:'Mark exit confirmation as yes only when management followed the plan.'
+  });
+  if(state.b2bToday > 0) broken.push({
+    rule:'No revenge or FOMO trades after a loss',
+    detail:'Rapid repeat trade detected near a loss.'
+  });
+  return {broken};
 }
 
 function renderRuleCheckSummary(entry, trade){
@@ -9645,7 +9680,7 @@ html.firebase-auth-required body{
 }
 </style>
 <style id="journall-account-risk-theme">
-.account-onboarding-gate{position:fixed;inset:0;z-index:10000;display:none;place-items:center;background:rgba(0,0,0,.85);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);padding:24px;color:#f7f8f8}.account-onboarding-gate.show{display:grid}.account-onboarding-card{width:min(980px,96vw);max-height:92vh;overflow:auto;background:#16181d;border:1px solid #2e3038;border-radius:18px;padding:32px}.account-onboarding-head{display:flex;justify-content:space-between;gap:18px;align-items:flex-start;margin-bottom:22px}.account-kicker{display:block;color:#8a8f98;font-size:12px;letter-spacing:.4px;text-transform:uppercase;margin-bottom:8px}.account-onboarding-card h2{margin:0;color:#f7f8f8;font-size:32px;letter-spacing:-.8px}.account-onboarding-card p{color:#d0d6e0;margin:8px 0 0}.setup-section{background:#0d0e10;border:1px solid rgba(255,255,255,.06);border-radius:14px;padding:20px;margin-bottom:16px}.setup-section-label{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.4);margin-bottom:12px}.account-form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}.setup-section:first-of-type .account-form-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.account-form-grid label{display:flex;flex-direction:column;gap:8px;color:#8a8f98;font-size:12px;text-transform:uppercase;letter-spacing:.4px}.account-onboarding-card input,.account-onboarding-card select{background:#16181a!important;border:1px solid rgba(255,255,255,.08)!important;border-radius:10px!important;color:#fff!important;padding:12px 14px!important;font-size:15px!important;font-family:'Inter',sans-serif!important;transition:border-color .15s ease,box-shadow .15s ease}.account-onboarding-card input:focus,.account-onboarding-card select:focus{border-color:#494fdf!important;outline:none!important;box-shadow:0 0 0 3px rgba(73,79,223,.15)!important}.account-onboarding-card input[type=number]{-moz-appearance:textfield;appearance:textfield}.account-onboarding-card input[type=number]::-webkit-outer-spin-button,.account-onboarding-card input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}.number-stepper,.stepper-group{display:flex;align-items:center;gap:6px;width:100%}.number-stepper input{min-width:0;flex:1}.account-inline-field{display:flex;gap:10px;align-items:center}.account-inline-field .number-stepper{flex:1}.account-inline-field select{width:92px}.account-inline-field span{color:#d0d6e0}.stepper-btn{background:#16181a!important;border:1px solid rgba(255,255,255,.08)!important;color:rgba(255,255,255,.5)!important;flex-shrink:0!important;width:32px!important;height:32px!important;border-radius:6px!important;display:flex!important;align-items:center!important;justify-content:center!important;padding:0!important;font-size:16px!important;line-height:1!important;cursor:pointer!important}.stepper-btn:hover{background:#1f2124!important;color:#fff!important}.setup-preview{background:rgba(73,79,223,.08);border:1px solid rgba(73,79,223,.25);border-radius:12px;padding:16px 20px;margin-top:4px}.setup-preview-row{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.08)}.setup-preview-row:last-child{border-bottom:0}.setup-preview-row span{color:rgba(255,255,255,.58);font-size:13px}.setup-preview-row strong{color:#fff;font-size:15px;font-weight:700;text-align:right}.account-onboarding-actions{display:flex;align-items:center;gap:14px;margin-top:22px}.account-onboarding-actions p{margin:0;color:#8a8f98}.save-setup-btn{background:#494fdf!important;color:#fff!important;border:none!important;font-weight:600!important}.save-setup-btn:hover{background:#5a5ff0!important}.risk-calc-card{grid-column:span 2}.risk-calc-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:12px 0}.risk-calc-grid label{display:flex;flex-direction:column;gap:6px;color:#8a8f98;font-size:12px;text-transform:uppercase;letter-spacing:.4px}.risk-calc-grid input{background:#010102!important;border:1px solid #23252a!important;color:#f7f8f8!important;border-radius:8px!important;padding:9px 10px!important}@media(max-width:760px){.account-form-grid,.setup-section:first-of-type .account-form-grid,.risk-calc-grid{grid-template-columns:1fr}.risk-calc-card{grid-column:auto}.account-onboarding-head{flex-direction:column}.account-onboarding-card{padding:20px}.account-inline-field{align-items:stretch;flex-direction:column}.account-inline-field select{width:100%}.setup-preview-row{align-items:flex-start;flex-direction:column}.setup-preview-row strong{text-align:left}}
+.account-onboarding-gate{position:fixed;inset:0;z-index:10000;display:none;place-items:center;background:rgba(0,0,0,.85);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);padding:24px;color:#f7f8f8}.account-onboarding-gate.show{display:grid}.account-onboarding-card{width:min(980px,96vw);max-height:92vh;overflow:auto;background:#16181d;border:1px solid #2e3038;border-radius:18px;padding:32px}.account-onboarding-head{display:flex;justify-content:space-between;gap:18px;align-items:flex-start;margin-bottom:22px}.account-kicker{display:block;color:#8a8f98;font-size:12px;letter-spacing:.4px;text-transform:uppercase;margin-bottom:8px}.account-onboarding-card h2{margin:0;color:#f7f8f8;font-size:32px;letter-spacing:-.8px}.account-onboarding-card p{color:#d0d6e0;margin:8px 0 0}.setup-section{background:#0d0e10;border:1px solid rgba(255,255,255,.06);border-radius:14px;padding:20px;margin-bottom:16px}.setup-section-label{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.4);margin-bottom:12px}.account-form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}.setup-section:first-of-type .account-form-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.account-form-grid label{display:flex;flex-direction:column;gap:8px;color:#8a8f98;font-size:12px;text-transform:uppercase;letter-spacing:.4px}.account-onboarding-card input,.account-onboarding-card select{background:#16181a!important;border:1px solid rgba(255,255,255,.08)!important;border-radius:10px!important;color:#fff!important;padding:12px 14px!important;font-size:15px!important;font-family:'Inter',sans-serif!important;transition:border-color .15s ease,box-shadow .15s ease}.account-onboarding-card input:focus,.account-onboarding-card select:focus{border-color:#494fdf!important;outline:none!important;box-shadow:0 0 0 3px rgba(73,79,223,.15)!important}.account-onboarding-card input[type=number]{-moz-appearance:textfield;appearance:textfield}.account-onboarding-card input[type=number]::-webkit-outer-spin-button,.account-onboarding-card input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}.number-stepper,.stepper-group{display:flex;align-items:center;gap:6px;width:100%}.number-stepper input{min-width:48px;flex:1;color:#fff!important;-webkit-text-fill-color:#fff!important;opacity:1!important}.account-inline-field{display:flex;gap:10px;align-items:center}.account-inline-field .number-stepper{flex:1}.account-inline-field select{width:92px}.account-inline-field span{color:#d0d6e0}.stepper-btn{background:#16181a!important;border:1px solid rgba(255,255,255,.08)!important;color:rgba(255,255,255,.5)!important;flex-shrink:0!important;width:32px!important;height:32px!important;border-radius:6px!important;display:flex!important;align-items:center!important;justify-content:center!important;padding:0!important;font-size:16px!important;line-height:1!important;cursor:pointer!important}.stepper-btn:hover{background:#1f2124!important;color:#fff!important}.setup-preview{background:rgba(73,79,223,.08);border:1px solid rgba(73,79,223,.25);border-radius:12px;padding:16px 20px;margin-top:4px}.setup-preview-row{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.08)}.setup-preview-row:last-child{border-bottom:0}.setup-preview-row span{color:rgba(255,255,255,.58);font-size:13px}.setup-preview-row strong{color:#fff;font-size:15px;font-weight:700;text-align:right}.account-onboarding-actions{display:flex;align-items:center;gap:14px;margin-top:22px}.account-onboarding-actions p{margin:0;color:#8a8f98}.save-setup-btn{background:#494fdf!important;color:#fff!important;border:none!important;font-weight:600!important}.save-setup-btn:hover{background:#5a5ff0!important}.risk-calc-card{grid-column:span 2}.risk-calc-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:12px 0}.risk-calc-grid label{display:flex;flex-direction:column;gap:6px;color:#8a8f98;font-size:12px;text-transform:uppercase;letter-spacing:.4px}.risk-calc-grid input{background:#010102!important;border:1px solid #23252a!important;color:#f7f8f8!important;border-radius:8px!important;padding:9px 10px!important}@media(max-width:760px){.account-form-grid,.setup-section:first-of-type .account-form-grid,.risk-calc-grid{grid-template-columns:1fr}.risk-calc-card{grid-column:auto}.account-onboarding-head{flex-direction:column}.account-onboarding-card{padding:20px}.account-inline-field{align-items:stretch;flex-direction:column}.account-inline-field select{width:100%}.setup-preview-row{align-items:flex-start;flex-direction:column}.setup-preview-row strong{text-align:left}}
 </style>
 </body>
 </html>
