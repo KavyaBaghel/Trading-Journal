@@ -64,13 +64,13 @@ function getAIStats(){
 function renderAISnapshot(){
   const el = document.getElementById('aiSnapshot');
   if(!el) return;
-
-  const s = getAIStats();
-
+  const s = stats(trades);
+  const leakEntries = Object.entries(s.mistakes || {}).sort((a,b)=>b[1]-a[1]);
+  const mainLeak = leakEntries.length ? `${leakEntries[0][0]} (${leakEntries[0][1]})` : 'No mistake data yet';
   el.innerHTML = `
     <div class="ai-score-card">
-      <div class="ai-score-label">AI Score</div>
-      <div class="ai-score-value ${s.discipline>=70?'green':s.discipline>=45?'amber':'red'}">${s.discipline}%</div>
+      <div class="ai-score-label">Trades Logged</div>
+      <div class="ai-score-value neutral">${s.total}</div>
     </div>
     <div class="ai-score-card">
       <div class="ai-score-label">Win Rate</div>
@@ -82,7 +82,7 @@ function renderAISnapshot(){
     </div>
     <div class="ai-score-card">
       <div class="ai-score-label">Main Leak</div>
-      <div class="ai-score-value amber" style="font-size:18px">${s.biggestMistake[0]}</div>
+      <div class="ai-score-value amber" style="font-size:18px">${mainLeak}</div>
     </div>
   `;
 }
@@ -2337,7 +2337,7 @@ tr:hover {
 
     <section id="dashboard" class="section">
       <div class="card" style="margin-bottom:16px">
-        <div class="panel-title"><h3>Prop Challenge Dashboard</h3><span>Funding Pips $5,000</span></div>
+        <div class="panel-title"><h3>Prop Challenge Dashboard</h3><span>account setup</span></div>
         <div id="propChallengeDashboard"></div>
       </div>
       <div id="analyticsBars" class="analytics-bars"></div>
@@ -2833,7 +2833,7 @@ tr:hover {
     <section id="goals" class="section">
       <div class="grid two">
         <div class="card">
-          <div class="panel-title"><h3>Funding Pips $5,000</h3><span>2-Step Challenge</span></div>
+          <div class="panel-title"><h3>Account Phase</h3><span>configured challenge</span></div>
           <div id="goalsBox"></div>
         </div>
         <div class="card">
@@ -2863,11 +2863,11 @@ tr:hover {
       </div>
 
       <div class="ai-chip-row">
-        <button class="ai-chip" onclick="askBuiltInAI('review my performance')">Review Performance</button>
-        <button class="ai-chip" onclick="askBuiltInAI('find my biggest weakness')">Biggest Weakness</button>
-        <button class="ai-chip" onclick="askBuiltInAI('what should I improve today')">Improve Today</button>
-        <button class="ai-chip" onclick="askBuiltInAI('psychology check')">Psychology Check</button>
-        <button class="ai-chip" onclick="askBuiltInAI('best setup')">Best Setup</button>
+        <button class="ai-chip" onclick="askBuiltInAI('Given these trades and mistake tags, summarize performance over this period in 3-4 sentences. Be specific about what is working and what is not. Do not sugarcoat losing patterns.')">Review Performance</button>
+        <button class="ai-chip" onclick="askBuiltInAI('Given this mistake data and trade history, identify the SINGLE most costly recurring mistake pattern. State it in one sentence, then explain in 2 sentences why it is happening based on mind-check/checklist answers around those trades.')">Biggest Weakness</button>
+        <button class="ai-chip" onclick="askBuiltInAI('Given todays trades so far, mistake count, and daily loss used vs limit, give ONE concrete action for the rest of today. If daily loss limit is close or hit, say stop trading and do not suggest a workaround.')">Improve Today</button>
+        <button class="ai-chip" onclick="askBuiltInAI('Given the last 5 Mind Stability Check submissions, identify any pattern of skipped or failed checks before losing trades specifically. State the correlation plainly, or say no clear pattern yet if data is insufficient.')">Psychology Check</button>
+        <button class="ai-chip" onclick="askBuiltInAI('Given trade history grouped by setup type, identify which setup type has the best win rate AND best average RR combined. State the setup name and the two numbers. If fewer than 10 total trades exist, say not enough data yet instead of guessing.')">Best Setup</button>
       </div>
 
       <div id="aiChatBox" class="ai-chat-box">
@@ -2939,11 +2939,6 @@ tr:hover {
 
 <script>
 const baseTrades = [];
-const ACCOUNT_START_BALANCE = 5000;
-const DAILY_DRAWDOWN_LIMIT = 50;
-const ACCOUNT_FULL_LOSS_BALANCE = 4500;
-const ACCOUNT_NEUTRAL_BALANCE = 5000;
-const ACCOUNT_FULL_PROFIT_BALANCE = 5500;
 let trades = JSON.parse(localStorage.getItem('viztrade_trades') || '[]');
 let filtered = [...trades];
 let charts = {};
@@ -3026,7 +3021,15 @@ function dailyDrawdown(data=trades){
     cum += Number(t.pnl) || 0;
     low = Math.min(low, cum);
   });
-  return {today, amount:Math.abs(low), percent:DAILY_DRAWDOWN_LIMIT ? Math.min(100, Math.round(Math.abs(low)/DAILY_DRAWDOWN_LIMIT*100)) : 0, trades:todayTrades.length};
+  const metrics = accountMetrics(data);
+  const limit = metrics?.maxDailyLossAmount || null;
+  return {
+    today,
+    amount:Math.abs(low),
+    limit,
+    percent:limit ? Math.min(100, Math.round(Math.abs(low)/limit*100)) : 0,
+    trades:todayTrades.length
+  };
 }
 
 function signedNumber(n, decimals=2){
@@ -3337,52 +3340,45 @@ function renderAnalyticsBars(){
   if(!box) return;
 
   const s = stats(trades);
-  const currentBalance = ACCOUNT_START_BALANCE + (Number(s.pnl) || 0);
+  const m = accountMetrics(trades);
+  const currentBalance = m ? m.currentBalance : (Number(s.pnl) || 0);
   const dd = dailyDrawdown(trades);
-  const rangeMin = ACCOUNT_FULL_LOSS_BALANCE;
-  const rangeMid = ACCOUNT_NEUTRAL_BALANCE;
-  const rangeMax = ACCOUNT_FULL_PROFIT_BALANCE;
-  const clampedBalance = Math.max(rangeMin, Math.min(rangeMax, currentBalance));
-  const markerPercent = ((clampedBalance - rangeMin) / (rangeMax - rangeMin)) * 100;
-  const profitFillPercent = currentBalance > rangeMid ? Math.min(50, ((Math.min(currentBalance, rangeMax) - rangeMid) / (rangeMax - rangeMid)) * 50) : 0;
-  const lossFillPercent = currentBalance < rangeMid ? Math.min(50, ((rangeMid - Math.max(currentBalance, rangeMin)) / (rangeMid - rangeMin)) * 50) : 0;
-  const zoneLabel = currentBalance > rangeMid ? 'Profit Zone' : currentBalance < rangeMid ? 'Loss Zone' : 'Neutral';
+  const accountSize = m?.accountSize || Math.max(1, Math.abs(currentBalance) || 1);
+  const drawdownRoom = m?.maxDrawdownAmount || accountSize * 0.10;
+  const targetAmount = m?.profitTargetAmount || accountSize * 0.10;
+  const rangeMin = Math.min(currentBalance, (m?.startBalance || currentBalance) - drawdownRoom);
+  const rangeMid = m?.startBalance || currentBalance;
+  const rangeMax = Math.max(currentBalance, rangeMid + targetAmount);
+  const pctPos = rangeMax === rangeMin ? 50 : clampNumber((currentBalance-rangeMin)/(rangeMax-rangeMin)*100,0,100);
+  const lossZone = currentBalance < rangeMid;
+  const ddLimitLabel = dd.limit == null ? 'not set' : moneyPlain(dd.limit);
 
   box.innerHTML = `
     <div class="analytics-bar-card">
-      <div class="analytics-bar-head">
-        <div>
-          <div class="analytics-bar-title">Overall P&L Balance Scale</div>
-          <div class="analytics-bar-value ${pnlClass(s.pnl)}">${moneyPlain(currentBalance)}</div>
-          <div class="analytics-bar-sub">P&L: <strong class="${pnlClass(s.pnl)}">${fmt(s.pnl)}</strong> &bull; Range: ${moneyPlain(rangeMin)} full loss &rarr; ${moneyPlain(rangeMid)} neutral &rarr; ${moneyPlain(rangeMax)} full profit</div>
-        </div>
-        <div class="badge ${s.pnl > 0 ? 'win' : s.pnl < 0 ? 'loss' : 'tag'}">${zoneLabel}</div>
+      <div class="panel-title">
+        <h3>Overall P&L Balance Scale</h3>
+        <span class="${lossZone?'red':'green'}">${lossZone?'Loss Zone':'Growth Zone'}</span>
       </div>
-      <div class="balance-scale">
-        ${lossFillPercent ? `<span class="balance-fill loss" style="width:${lossFillPercent}%"></span>` : ''}
-        ${profitFillPercent ? `<span class="balance-fill profit" style="width:${profitFillPercent}%"></span>` : ''}
-        <span class="balance-marker" style="left:${markerPercent}%"></span>
+      <div class="analytics-balance-value ${currentBalance>=rangeMid?'green':'red'}">${moneyPlain(currentBalance)}</div>
+      <div class="analytics-bar-sub">P&L: <strong class="${pnlClass(s.pnl)}">${fmt(s.pnl)}</strong> &bull; Range: ${moneyPlain(rangeMin)} max drawdown &rarr; ${moneyPlain(rangeMid)} start &rarr; ${moneyPlain(rangeMax)} target</div>
+      <div class="balance-track">
+        <span class="loss-area"></span>
+        <span class="profit-area"></span>
+        <i style="left:${pctPos}%"></i>
       </div>
-      <div class="balance-scale-labels">
-        <span>${moneyPlain(rangeMin)} Loss</span>
-        <span>${moneyPlain(rangeMid)} Neutral</span>
-        <span>${moneyPlain(rangeMax)} Profit</span>
-      </div>
-      <div class="analytics-bar-sub">Marker shows your current balance. Values outside the range stay pinned at the edge.</div>
+      <div class="scale-labels"><span>${moneyPlain(rangeMin)}</span><span>${moneyPlain(rangeMid)}</span><span>${moneyPlain(rangeMax)}</span></div>
     </div>
-
     <div class="analytics-bar-card">
-      <div class="analytics-bar-head">
-        <div>
-          <div class="analytics-bar-title">Daily Drawdown</div>
-          <div class="analytics-bar-value ${dd.amount ? 'red' : 'neutral'}">${moneyPlain(dd.amount)}</div>
-          <div class="analytics-bar-sub">Today: ${dd.today} &bull; Fixed limit: <strong>${moneyPlain(DAILY_DRAWDOWN_LIMIT)}</strong> &bull; ${dd.trades} trade${dd.trades===1?'':'s'}</div>
-        </div>
-        <div class="badge ${dd.percent >= 80 ? 'loss' : 'tag'}">${dd.percent}% used</div>
+      <div class="panel-title">
+        <h3>Daily Drawdown</h3>
+        <span>${dd.percent}% used</span>
       </div>
-      <div class="analytics-track"><span class="analytics-fill drawdown" style="width:${dd.percent}%"></span></div>
-      <div class="analytics-bar-sub">Bar fills from $0 to the $50 daily drawdown limit.</div>
-    </div>`;
+      <div class="analytics-balance-value ${dd.amount>0?'red':'green'}">${moneyPlain(dd.amount)}</div>
+      <div class="analytics-bar-sub">Today: ${dd.today} &bull; Saved limit: <strong>${ddLimitLabel}</strong> &bull; ${dd.trades} trade${dd.trades===1?'':'s'}</div>
+      <div class="drawdown-track"><i style="width:${dd.percent}%"></i></div>
+      <div class="analytics-bar-sub" style="margin-top:10px">${dd.limit == null ? 'Set a daily loss limit in Account Setup to activate the funded risk guard.' : `Remaining room: ${moneyPlain(Math.max(0, dd.limit - dd.amount))}`}</div>
+    </div>
+  `;
 }
 function renderMetrics(){
   const s=stats(filtered);
@@ -3996,7 +3992,7 @@ async function generateAIWidgets(force=false){
   if(status) status.textContent = 'Ollama is generating custom widgets...';
   if(grid) grid.innerHTML = '<div class="card widget"><div class="sub">Thinking with your trade data...</div></div>';
   const prompt = [
-    'You are Krishna\'s trading coach. Create useful dashboard widgets from the provided trading stats.',
+    'You are a trading psychology and discipline coach. Create useful dashboard widgets from the provided trading stats.',
     'Return exactly 8 widgets separated by one blank line. Do not return markdown tables or bullet lists.',
     'Each widget must use exactly this format: Title: short coaching title. Value: short metric. Why it matters: one trading reason. Action: one concrete next action.',
     'Use trader language only. Never mention JSON, code, JavaScript, snippets, schemas, arrays, fields, parsing, console, or data structures.',
@@ -4191,7 +4187,7 @@ async function generateAIReports(){
   if(status) status.textContent = 'Ollama is generating your AI report...';
   if(box) box.innerHTML = '<div class="insight warn"><strong>Thinking...</strong><br>Ollama is reading your statistics and recent trades.</div>';
   const prompt = [
-    'You are Krishna\'s trading coach inside his journal. Generate trading report cards from the numbers below.',
+    'You are a trading psychology and discipline coach inside Journall. Generate trading report cards from the numbers below.',
     'Do not explain the input, JSON, fields, arrays, schema, response, raw payload, market data availability, or data structure.',
     'Use the statistics as evidence, then coach the trader on behavior, risk, session selection, repeated mistakes, drawdown, and the next rule.',
     'Return exactly 6 short report cards separated by blank lines.',
@@ -4428,7 +4424,7 @@ function toNumber(value, fallback=0){
   return Number.isFinite(n) ? n : fallback;
 }
 function clampNumber(value, min, max){ return Math.min(max, Math.max(min, Number(value) || 0)); }
-function isFundedPhase(phase=''){ return /funded/i.test(String(phase || '')); }
+function isFundedPhase(phase=''){ return /funded|phase|challenge|prop/i.test(String(phase || '')); }
 function limitAmount(value, type, accountSize){
   const n = Number(value);
   if(!Number.isFinite(n) || n <= 0) return null;
@@ -4472,8 +4468,8 @@ function accountMetrics(data=trades){
   const profitProgress = profitTargetAmount ? clampNumber(Math.max(0,currentBalance-startBalance)/profitTargetAmount*100,0,100) : 0;
   const remainingToTarget = Math.max(0, targetBalance - currentBalance);
   const funded = isFundedPhase(config.phase);
-  const maxDailyLossAmount = funded ? limitAmount(config.maxDailyLoss, config.maxDailyLossType, accountSize) : null;
-  const maxDrawdownAmount = funded ? limitAmount(config.maxDrawdown, config.maxDrawdownType, accountSize) : null;
+  const maxDailyLossAmount = (funded || config.maxDailyLoss != null) ? limitAmount(config.maxDailyLoss, config.maxDailyLossType, accountSize) : null;
+  const maxDrawdownAmount = (funded || config.maxDrawdown != null) ? limitAmount(config.maxDrawdown, config.maxDrawdownType, accountSize) : null;
   const dailyLossUsed = Math.abs(Math.min(0, todayPnl));
   const maxDrawdownUsed = Math.abs(Math.min(0, s.maxDD));
   const maxDailyLossRemaining = maxDailyLossAmount == null ? null : Math.max(0, maxDailyLossAmount - dailyLossUsed);
@@ -4617,7 +4613,7 @@ async function generateAIPropGoals(force=false){
   const status=document.getElementById('propGoalStatus'), propBox=document.getElementById('propBox');
   if(status) status.textContent='Ollama is creating goals from your account setup...';
   if(propBox) propBox.innerHTML='<div class="insight warn"><strong>Thinking...</strong><br>AI is building account-specific goals and universal discipline rules.</div>';
-  const prompt = ['You are an AI trading coach for a configurable trading account.','Use the trader account setup and trade data to create updated goals, risk notes, and phase rules.','Do not assume a $5000 account. Use only the account values in the JSON.','Universal rules: stop trading after one loss, no repeat setup trades, minimum 3:1 RR before logging trade, and flag revenge/FOMO after rapid trades following a loss.','Return 6 compact blocks separated by blank lines: current phase status, target path, risk per trade, daily loss/drawdown warning, rules broken most often, next 3 actions.','Be direct. No profit promises. No generic motivation.',JSON.stringify(propChallengePayload(),null,2)].join('\n\n');
+  const prompt = ['You are an AI trading coach for a configurable trading account.','Use the trader account setup and trade data to create updated goals, risk notes, and phase rules.','Do not assume any fixed account size. Use only the saved account setup values in the evidence.','Universal rules: stop trading after one loss, no repeat setup trades, minimum 3:1 RR before logging trade, and flag revenge/FOMO after rapid trades following a loss.','Return 6 compact blocks separated by blank lines: current phase status, target path, risk per trade, daily loss/drawdown warning, rules broken most often, next 3 actions.','Be direct. No profit promises. No generic motivation.',JSON.stringify(propChallengePayload(),null,2)].join('\n\n');
   try{ const text=await window.generateOllamaJournalReport(prompt); localStorage.setItem(key,text); if(status) status.textContent='AI goals updated from your latest account and trade data.'; renderGoals(); }
   catch(err){ if(status) status.textContent='Ollama failed. Start Ollama and install the selected model.'; if(propBox) propBox.innerHTML=`<div class="insight danger"><strong>AI goals failed.</strong><br>${escapeHtml(err?.message || err || 'Ollama connection failed')}</div>`; }
   finally{ aiPropGoalGenerating = false; }
@@ -5866,43 +5862,25 @@ function dailyLossForTradeDate(trade){
 }
 
 function evaluateJournalRules(entry, trade){
-  const broken=[];
+  const fields = entry?.fields || parseJournalBody(entry?.body || '');
   const config = getAccountConfig();
-  const state = trade ? todayTradingState(sorted(trades || []).filter(t=>t.date === trade.date && new Date(t.openUtc) <= new Date(trade.openUtc))) : todayTradingState([]);
-  const minRr = accountMinRr(config) || 3;
-  const rr = trade ? tradePlannedRr(trade) : null;
-  const todayLoss = trade ? dailyLossForTradeDate(trade) : 0;
   const dailyLimit = accountDailyLossLimitAmount(config);
-  const maxTrades = accountMaxTrades(config);
-  const dayCount = trade ? sorted(trades || []).filter(t=>t.date === trade.date && new Date(t.openUtc) <= new Date(trade.openUtc)).length : 0;
-  const entryConfirmed = entry.entryConfirmed === 'yes' || String(trade?.entryConfirmed || '').toLowerCase() === 'yes';
-  const exitConfirmed = entry.exitConfirmed === 'yes' || String(trade?.exitConfirmed || '').toLowerCase() === 'yes';
-
-  if(dailyLimit != null && todayLoss > dailyLimit) broken.push({
-    rule:'Trade only under saved daily loss limit',
-    detail:`Day loss used: $${todayLoss.toFixed(2)} / $${dailyLimit.toFixed(2)}`
-  });
-  if(maxTrades && dayCount > maxTrades) broken.push({
-    rule:'Respect saved max trades per day',
-    detail:`Trades taken: ${dayCount} / ${maxTrades}`
-  });
-  if(rr != null && rr < minRr) broken.push({
-    rule:`Minimum ${minRr}:1 RR before logging trade`,
-    detail:`Planned RR: ${rr.toFixed(2)}`
-  });
-  if(!entryConfirmed) broken.push({
-    rule:'Entry must have confirmation',
-    detail:'Mark entry confirmation as yes only when the setup fully confirms.'
-  });
-  if(!exitConfirmed) broken.push({
-    rule:'Exit must follow confirmation/plan',
-    detail:'Mark exit confirmation as yes only when management followed the plan.'
-  });
-  if(state.b2bToday > 0) broken.push({
-    rule:'No revenge or FOMO trades after a loss',
-    detail:'Rapid repeat trade detected near a loss.'
-  });
-  return {broken};
+  const minRr = accountMinRr(config) || 3;
+  const rr = riskRewardRatio(trade);
+  const prev = previousTradesBefore(trade);
+  const hadLossBefore = prev.some(t=>Number(t.pnl) < 0);
+  const checks = [
+    {name:'Only trade gold', pass: trade ? isGoldSymbol(trade.symbol) : false, detail: trade ? `Symbol: ${trade.symbol || 'Unknown'}` : 'No trade selected'},
+    {name: dailyLimit == null ? 'Daily loss limit saved in account setup' : `Trade under $${dailyLimit.toFixed(2)} daily loss limit`, pass: trade ? (dailyLimit == null ? true : dailyLossForTradeDate(trade) <= dailyLimit) : false, detail: trade ? (dailyLimit == null ? 'No daily loss limit saved.' : `Day loss used: $${dailyLossForTradeDate(trade).toFixed(2)} / $${dailyLimit.toFixed(2)}`) : 'No trade selected'},
+    {name:'Stop trading after one loss', pass: trade ? !hadLossBefore : false, detail: hadLossBefore ? 'A loss already happened before this trade today.' : 'No earlier loss before this trade.'},
+    {name:'No repeat setup trades', pass: trade ? !hasRepeatSetup(entry, trade) : false, detail: normalizeJournalSetup(fields.setup) || 'No setup selected'},
+    {name:`Minimum ${minRr}:1 RR before logging trade`, pass: rr != null && rr >= minRr, detail: rr == null ? 'RR could not be calculated from entry, SL, and TP.' : `RR: ${rr.toFixed(2)}:1`},
+    {name:'No revenge/FOMO attempt after a loss', pass: trade ? !revengeTradeFlag(trade) : false, detail: revengeTradeFlag(trade) ? 'Trade came too soon after a loss.' : 'No rapid revenge pattern detected.'},
+    {name:'Entry at good point', pass: normalizeYesNo(fields.goodEntryPoint) === 'Yes', detail: `Journal: ${normalizeYesNo(fields.goodEntryPoint) || 'Not answered'}`},
+    {name:'Entry with confirmation', pass: normalizeYesNo(fields.entryConfirmation) === 'Yes', detail: `Journal: ${normalizeYesNo(fields.entryConfirmation) || 'Not answered'}`},
+    {name:'Exit with confirmation', pass: normalizeYesNo(fields.exitConfirmation) === 'Yes', detail: `Journal: ${normalizeYesNo(fields.exitConfirmation) || 'Not answered'}`}
+  ];
+  return {checks, broken: checks.filter(c=>!c.pass), followed: checks.every(c=>c.pass)};
 }
 
 function renderRuleCheckSummary(entry, trade){
@@ -5963,15 +5941,19 @@ function revengeTradeFlag(trade){
   return diffMin >= 0 && diffMin <= 15 && afterLoss.length >= 1;
 }
 function evaluateJournalRules(entry, trade){
-  const metrics = accountMetrics(trades), dailyLimit = metrics?.maxDailyLossAmount || 30;
   const fields = entry?.fields || parseJournalBody(entry?.body || '');
-  const rr = riskRewardRatio(trade), prev = previousTradesBefore(trade), hadLossBefore = prev.some(t=>Number(t.pnl) < 0);
+  const config = getAccountConfig();
+  const dailyLimit = accountDailyLossLimitAmount(config);
+  const minRr = accountMinRr(config) || 3;
+  const rr = riskRewardRatio(trade);
+  const prev = previousTradesBefore(trade);
+  const hadLossBefore = prev.some(t=>Number(t.pnl) < 0);
   const checks = [
     {name:'Only trade gold', pass: trade ? isGoldSymbol(trade.symbol) : false, detail: trade ? `Symbol: ${trade.symbol || 'Unknown'}` : 'No trade selected'},
-    {name:`Trade under $${dailyLimit.toFixed(2)} daily loss limit`, pass: trade ? dailyLossForTradeDate(trade) <= dailyLimit : false, detail: trade ? `Day loss used: $${dailyLossForTradeDate(trade).toFixed(2)} / $${dailyLimit.toFixed(2)}` : 'No trade selected'},
+    {name: dailyLimit == null ? 'Daily loss limit saved in account setup' : `Trade under $${dailyLimit.toFixed(2)} daily loss limit`, pass: trade ? (dailyLimit == null ? true : dailyLossForTradeDate(trade) <= dailyLimit) : false, detail: trade ? (dailyLimit == null ? 'No daily loss limit saved.' : `Day loss used: $${dailyLossForTradeDate(trade).toFixed(2)} / $${dailyLimit.toFixed(2)}`) : 'No trade selected'},
     {name:'Stop trading after one loss', pass: trade ? !hadLossBefore : false, detail: hadLossBefore ? 'A loss already happened before this trade today.' : 'No earlier loss before this trade.'},
     {name:'No repeat setup trades', pass: trade ? !hasRepeatSetup(entry, trade) : false, detail: normalizeJournalSetup(fields.setup) || 'No setup selected'},
-    {name:'Minimum 3:1 RR before logging trade', pass: rr != null && rr >= 3, detail: rr == null ? 'RR could not be calculated from entry, SL, and TP.' : `RR: ${rr.toFixed(2)}:1`},
+    {name:`Minimum ${minRr}:1 RR before logging trade`, pass: rr != null && rr >= minRr, detail: rr == null ? 'RR could not be calculated from entry, SL, and TP.' : `RR: ${rr.toFixed(2)}:1`},
     {name:'No revenge/FOMO attempt after a loss', pass: trade ? !revengeTradeFlag(trade) : false, detail: revengeTradeFlag(trade) ? 'Trade came too soon after a loss.' : 'No rapid revenge pattern detected.'},
     {name:'Entry at good point', pass: normalizeYesNo(fields.goodEntryPoint) === 'Yes', detail: `Journal: ${normalizeYesNo(fields.goodEntryPoint) || 'Not answered'}`},
     {name:'Entry with confirmation', pass: normalizeYesNo(fields.entryConfirmation) === 'Yes', detail: `Journal: ${normalizeYesNo(fields.entryConfirmation) || 'Not answered'}`},
@@ -6529,13 +6511,13 @@ function getAIStats(){
 function renderAISnapshot(){
   const el = document.getElementById('aiSnapshot');
   if(!el) return;
-
-  const s = getAIStats();
-
+  const s = stats(trades);
+  const leakEntries = Object.entries(s.mistakes || {}).sort((a,b)=>b[1]-a[1]);
+  const mainLeak = leakEntries.length ? `${leakEntries[0][0]} (${leakEntries[0][1]})` : 'No mistake data yet';
   el.innerHTML = `
     <div class="ai-score-card">
-      <div class="ai-score-label">AI Score</div>
-      <div class="ai-score-value ${s.discipline>=70?'green':s.discipline>=45?'amber':'red'}">${s.discipline}%</div>
+      <div class="ai-score-label">Trades Logged</div>
+      <div class="ai-score-value neutral">${s.total}</div>
     </div>
     <div class="ai-score-card">
       <div class="ai-score-label">Win Rate</div>
@@ -6547,7 +6529,7 @@ function renderAISnapshot(){
     </div>
     <div class="ai-score-card">
       <div class="ai-score-label">Main Leak</div>
-      <div class="ai-score-value amber" style="font-size:18px">${s.biggestMistake[0]}</div>
+      <div class="ai-score-value amber" style="font-size:18px">${mainLeak}</div>
     </div>
   `;
 }
@@ -6681,63 +6663,52 @@ document.querySelectorAll('.nav button').forEach(btn=>{
   }
 
   function buildTradeContext(){
-    let data = [];
-    try{
-      data = Array.isArray(trades) ? trades : [];
-    }catch(_){
-      data = [];
-    }
-    const stats = typeof getAIStats === 'function' ? getAIStats() : null;
-    const mistakeCounts = {};
-    const sessionCounts = {};
-    const sideCounts = {};
-    data.forEach(t=>{
-      (typeof mistakes === 'function' ? mistakes(t) : []).forEach(name=>{
-        mistakeCounts[name] = (mistakeCounts[name] || 0) + 1;
-      });
-      const session = t.session || 'Unknown';
-      const side = t.side || 'Unknown';
-      sessionCounts[session] = (sessionCounts[session] || 0) + 1;
-      sideCounts[side] = (sideCounts[side] || 0) + 1;
-    });
-    const recent = data.slice(-30).map(t => ({
-      date:t.date || '',
-      time:t.time || '',
-      symbol:t.symbol || '',
-      side:t.side || '',
-      session:t.session || '',
-      pnl:Number(t.pnl) || 0,
-      reason:t.reason || t.exitReason || '',
-      notes:t.notes || t.comment || '',
-      mistakes: typeof mistakes === 'function' ? mistakes(t) : []
-    }));
-    const worstRecent = [...recent].sort((a,b)=>a.pnl-b.pnl).slice(0,5);
-    const bestRecent = [...recent].sort((a,b)=>b.pnl-a.pnl).slice(0,5);
-    return {
-      summary: stats ? {
-        trades: stats.total,
-        netPnl: Number(stats.pnl) || 0,
-        winRate: stats.wr,
-        wins: stats.wins.length,
-        losses: stats.losses.length,
-        breakeven: stats.breakeven.length,
-        bestSession: stats.bestSession,
-        worstSession: stats.worstSession,
-        bestSymbol: stats.bestSymbol,
-        biggestMistake: stats.biggestMistake,
-        backToBackClusters: stats.b2b,
-        disciplineScore: stats.discipline
-      } : {},
-      evidence: {
-        mistakeCounts,
-        sessionCounts,
-        sideCounts,
-        worstRecent,
-        bestRecent
-      },
-      recentTrades: recent
-    };
-  }
+  let data = [];
+  try{ data = Array.isArray(trades) ? trades : []; }catch(_){ data = []; }
+  const sortedTrades = typeof sorted === 'function' ? sorted(data) : data;
+  const sevenDaysAgo = Date.now() - 7 * 86400000;
+  const scoped = sortedTrades
+    .filter(t => {
+      const stamp = new Date(t.openUtc || t.date || 0).getTime();
+      return Number.isFinite(stamp) ? stamp >= sevenDaysAgo : true;
+    })
+    .slice(-20);
+  const sample = scoped.length ? scoped : sortedTrades.slice(-20);
+  const s = typeof stats === 'function' ? stats(sample) : null;
+  const account = typeof accountMetrics === 'function' ? accountMetrics(data) : null;
+  const psychState = typeof getPsychologyChecks === 'function' ? getPsychologyChecks() : {};
+  const checklist = typeof preTradeChecklistState !== 'undefined' ? preTradeChecklistState : {};
+  const today = typeof todayDateKey === 'function' ? todayDateKey() : '';
+  const todayTrades = sortedTrades.filter(t=>t.date === today);
+  const todayState = typeof todayTradingState === 'function' ? todayTradingState(todayTrades) : null;
+  const setupStats = {};
+  sample.forEach(t=>{
+    const setup = t.setup || t.reason || 'Unknown setup';
+    if(!setupStats[setup]) setupStats[setup] = {count:0,wins:0,rrTotal:0,rrCount:0,pnl:0};
+    const item = setupStats[setup];
+    item.count++;
+    item.pnl += Number(t.pnl)||0;
+    if(typeof tradeResult === 'function' && tradeResult(t.pnl)==='profit') item.wins++;
+    const rr = typeof tradePlannedRr === 'function' ? tradePlannedRr(t) : null;
+    if(rr != null){ item.rrTotal += rr; item.rrCount++; }
+  });
+  const lines = [
+    'Journall psychology and trade-review context',
+    `Period: last ${sample.length} trades, scoped to last 7 days when available.`,
+    `Total logged trades in scope: ${sample.length}`,
+    s ? `Scope stats: win rate ${Number(s.wr||0).toFixed(1)}%, net P&L ${signedMoney(s.pnl)}, wins ${s.wins.length}, losses ${s.losses.length}, breakeven ${s.breakEvens.length}.` : 'Scope stats: unavailable.',
+    account ? `Account state: phase ${account.config.phase}, account size $${account.accountSize.toFixed(2)}, current balance $${account.currentBalance.toFixed(2)}, daily loss used $${account.dailyLossUsed.toFixed(2)} of ${account.maxDailyLossAmount == null ? 'not set' : '$'+account.maxDailyLossAmount.toFixed(2)}.` : 'Account state: account setup not completed.',
+    todayState ? `Today: ${todayState.tradesCount} trades, ${signedMoney(todayState.todayPnl)}, ${todayState.mistakesToday} mistake tags, action ${todayState.nextAction}.` : 'Today: unavailable.',
+    `Mind Stability Check today: ${Object.entries(psychState).map(([k,v])=>`${k}=${v?'yes':'no'}`).join(', ') || 'not logged'}.`,
+    `Pre-Trade Checklist current state: ${Object.entries(checklist).map(([k,v])=>`${k}=${v?'yes':'no'}`).join(', ') || 'not logged'}.`,
+    'Mistake tags allowed: Revenge Trade, Increased Lot Size, Moved Stop Loss, No Confirmation Entry, Overtrading, No Patience.',
+    'Setup performance:',
+    ...Object.entries(setupStats).map(([name,item])=>`- ${name}: ${item.count} trades, win rate ${item.count ? Math.round(item.wins/item.count*100) : 0}%, avg RR ${item.rrCount ? (item.rrTotal/item.rrCount).toFixed(2) : 'n/a'}, P&L ${signedMoney(item.pnl)}.`),
+    'Recent trades:',
+    ...sample.map((t,i)=>`- #${i+1} ${t.date || '-'} ${t.time || ''} ${t.symbol || ''} ${t.side || ''}: entry ${t.entry ?? '-'}, exit ${t.exit ?? '-'}, SL ${t.sl ?? '-'}, TP ${t.tp ?? '-'}, P&L ${signedMoney(t.pnl)}, setup ${t.setup || t.reason || 'unknown'}, RR ${(typeof tradePlannedRr === 'function' && tradePlannedRr(t) != null) ? tradePlannedRr(t).toFixed(2) : 'n/a'}, mistakes ${(typeof mistakes === 'function' ? mistakes(t) : []).join(', ') || 'none'}.`)
+  ];
+  return lines.join('\n');
+}
 
   async function askRealAI(prompt){
     try{
@@ -6817,35 +6788,30 @@ document.querySelectorAll('.nav button').forEach(btn=>{
   }
 
   function buildOllamaPrompt(prompt, mode, context){
-    if(mode === 'generation'){
-      return [
-        "You are Krishna's dedicated local trading coach inside his trading journal.",
-        'Follow the user requested output format exactly.',
-        'Use journal evidence, not generic advice. Cite real numbers, sessions, symbols, mistake counts, or recent trades when the format allows it.',
-        'Never mention JSON, schemas, code, arrays, fields, parsing, or data structures in the final answer.',
-        'Do not invent trades, prices, outcomes, or market context. Do not promise profits or give financial advice.',
-        `User task:\n${prompt}`,
-        `Journal evidence:\n${JSON.stringify(context, null, 2)}`
-      ].join('\n\n');
-    }
+  const evidence = typeof context === 'string' ? context : JSON.stringify(context, null, 2);
+  const guardrail = 'You are a trading psychology and discipline coach. You analyze past trades and behavior patterns only. You never suggest specific future trades, entries, or price targets. If asked to predict or suggest a trade, decline and redirect to reviewing past behavior instead.';
+  const thinDataRule = 'If total logged trades is fewer than 5, every response must begin with: "Not enough trade history yet for a reliable pattern".';
+  const styleRule = 'Answer in 3-5 sentences max. Be direct and specific. No generic motivational filler.';
+  if(mode === 'generation'){
     return [
-      "You are Krishna's dedicated local trading coach inside his trading journal.",
-      'Do not sound like a generic chatbot. Use the journal evidence below like a real coach reviewing a trader after market close.',
-      'Every answer must cite at least 2 concrete facts from the journal data: numbers, P&L, sessions, symbols, mistake counts, or a recent trade.',
-      'If the data is weak or missing, say confidence is low and explain what should be logged next. Do not invent trades, prices, outcomes, or market context.',
-      'Be direct, practical, calm, and specific. Focus on risk management, rule-following, emotional control, setup quality, session selection, and reducing repeat mistakes.',
-      'Do not promise profits, guaranteed profitability, signals, or financial advice. Give process-based actions only.',
-      'Answer in this exact structure, with short paragraphs:',
-      'Diagnosis: one direct read of the problem or strength.',
-      'Evidence: 2-4 facts from the journal data that prove the diagnosis.',
-      'Fix next: one behavior Krishna should fix before the next session.',
-      'Next-session rule: one rule he can follow while trading.',
-      'Journal question: one question he should answer after trading.',
-      'Avoid filler phrases like "based on the JSON", "as an AI", "the data suggests", or "here are some observations".',
-      `Trader question: ${prompt}`,
-      `Journal evidence:\n${JSON.stringify(context, null, 2)}`
+      guardrail,
+      thinDataRule,
+      styleRule,
+      'Use readable journal evidence, not generic advice. Never mention JSON, code, schemas, arrays, or parsing.',
+      `User task:\n${prompt}`,
+      `Journal evidence:\n${evidence}`
     ].join('\n\n');
   }
+  return [
+    guardrail,
+    thinDataRule,
+    styleRule,
+    'Every answer must cite concrete facts from the journal evidence when enough data exists.',
+    'Do not promise profits, guaranteed profitability, signals, or financial advice. Give process-based actions only.',
+    `Trader question: ${prompt}`,
+    `Journal evidence:\n${evidence}`
+  ].join('\n\n');
+}
 
   async function askOllamaAI(prompt, mode='chat'){
     const context = buildTradeContext();
