@@ -2241,20 +2241,39 @@ tr:hover {
         <h2>Set up your trading account</h2>
         <p>Journall will calculate risk, targets, drawdown room, and rules from your own account size.</p>
       </div>
-      <button class="btn" type="button" onclick="closeAccountSetup()">Close</button>
+      <button class="btn account-close-btn" type="button" onclick="closeAccountSetup()">Close</button>
     </div>
-    <div class="account-form-grid">
-      <label>Account size ($)<input id="accountSizeInput" type="number" min="1" step="100" placeholder="5000"></label>
-      <label>Current balance ($)<input id="currentBalanceInput" type="number" min="0" step="1" placeholder="5000"></label>
-      <label>Account phase<select id="accountPhaseInput" onchange="toggleFundedFields()"><option>Phase 1</option><option>Phase 2</option><option>Funded</option><option>Personal</option></select></label>
-      <label>Profit target<div class="account-inline-field"><input id="profitTargetInput" type="number" min="0" step="1" placeholder="10"><select id="profitTargetType"><option value="percent">%</option><option value="amount">$</option></select></div></label>
-      <label>Risk per trade<div class="account-inline-field"><input id="riskPercentInput" type="number" min="0.5" max="2" step="0.1" placeholder="1"><span>%</span></div></label>
-      <label>Phase deadline (optional)<input id="phaseDeadlineInput" type="date"></label>
-      <label class="funded-only">Max daily loss<div class="account-inline-field"><input id="maxDailyLossInput" type="number" min="0" step="1" placeholder="5"><select id="maxDailyLossType"><option value="percent">%</option><option value="amount">$</option></select></div></label>
-      <label class="funded-only">Max overall drawdown<div class="account-inline-field"><input id="maxDrawdownInput" type="number" min="0" step="1" placeholder="10"><select id="maxDrawdownType"><option value="percent">%</option><option value="amount">$</option></select></div></label>
+
+    <div class="setup-section">
+      <div class="setup-section-label">Account</div>
+      <div class="account-form-grid">
+        <label>Account size ($)<div class="number-stepper"><button class="stepper-btn" type="button" onclick="stepAccountNumber('accountSizeInput',-100)">-</button><input id="accountSizeInput" type="number" min="1" step="100" placeholder="5000" oninput="renderAccountSetupPreview()"><button class="stepper-btn" type="button" onclick="stepAccountNumber('accountSizeInput',100)">+</button></div></label>
+        <label>Current balance ($)<div class="number-stepper"><button class="stepper-btn" type="button" onclick="stepAccountNumber('currentBalanceInput',-100)">-</button><input id="currentBalanceInput" type="number" min="0" step="100" placeholder="5000" oninput="renderAccountSetupPreview()"><button class="stepper-btn" type="button" onclick="stepAccountNumber('currentBalanceInput',100)">+</button></div></label>
+        <label>Account phase<select id="accountPhaseInput" onchange="toggleFundedFields()"><option>Phase 1</option><option>Phase 2</option><option>Funded</option><option>Personal</option></select></label>
+      </div>
     </div>
+
+    <div class="setup-section">
+      <div class="setup-section-label">Targets</div>
+      <div class="account-form-grid">
+        <label>Profit target<div class="account-inline-field"><div class="number-stepper"><button class="stepper-btn" type="button" onclick="stepAccountNumber('profitTargetInput',-1)">-</button><input id="profitTargetInput" type="number" min="0" step="1" placeholder="10" oninput="renderAccountSetupPreview()"><button class="stepper-btn" type="button" onclick="stepAccountNumber('profitTargetInput',1)">+</button></div><select id="profitTargetType" onchange="renderAccountSetupPreview()"><option value="percent">%</option><option value="amount">$</option></select></div></label>
+        <label>Phase deadline (optional)<input id="phaseDeadlineInput" type="date"></label>
+      </div>
+    </div>
+
+    <div class="setup-section">
+      <div class="setup-section-label">Risk limits</div>
+      <div class="account-form-grid">
+        <label>Risk per trade<div class="account-inline-field"><div class="number-stepper"><button class="stepper-btn" type="button" onclick="stepAccountNumber('riskPercentInput',-0.1)">-</button><input id="riskPercentInput" type="number" min="0.5" max="2" step="0.1" placeholder="1" oninput="renderAccountSetupPreview()"><button class="stepper-btn" type="button" onclick="stepAccountNumber('riskPercentInput',0.1)">+</button></div><span>%</span></div></label>
+        <label class="funded-only">Max daily loss<div class="account-inline-field"><div class="number-stepper"><button class="stepper-btn" type="button" onclick="stepAccountNumber('maxDailyLossInput',-1)">-</button><input id="maxDailyLossInput" type="number" min="0" step="1" placeholder="5" oninput="renderAccountSetupPreview()"><button class="stepper-btn" type="button" onclick="stepAccountNumber('maxDailyLossInput',1)">+</button></div><select id="maxDailyLossType" onchange="renderAccountSetupPreview()"><option value="percent">%</option><option value="amount">$</option></select></div></label>
+        <label class="funded-only">Max overall drawdown<div class="account-inline-field"><div class="number-stepper"><button class="stepper-btn" type="button" onclick="stepAccountNumber('maxDrawdownInput',-1)">-</button><input id="maxDrawdownInput" type="number" min="0" step="1" placeholder="10" oninput="renderAccountSetupPreview()"><button class="stepper-btn" type="button" onclick="stepAccountNumber('maxDrawdownInput',1)">+</button></div><select id="maxDrawdownType" onchange="renderAccountSetupPreview()"><option value="percent">%</option><option value="amount">$</option></select></div></label>
+      </div>
+    </div>
+
+    <div id="accountSetupPreview" class="setup-preview" aria-live="polite"></div>
+
     <div class="account-onboarding-actions">
-      <button class="btn primary" type="button" onclick="saveAccountSetup()">Save account setup</button>
+      <button class="btn primary save-setup-btn" type="button" onclick="saveAccountSetup()">Save account setup</button>
       <p id="accountSetupMessage"></p>
     </div>
   </div>
@@ -4404,6 +4423,35 @@ function accountMetrics(data=trades){
 function toggleFundedFields(){
   const phase = document.getElementById('accountPhaseInput')?.value || '';
   document.querySelectorAll('.funded-only').forEach(el=>{ el.hidden = !isFundedPhase(phase); });
+  renderAccountSetupPreview();
+}
+function stepAccountNumber(id, delta){
+  const el = document.getElementById(id); if(!el) return;
+  const min = el.min === '' ? -Infinity : Number(el.min);
+  const max = el.max === '' ? Infinity : Number(el.max);
+  const step = String(el.step || '1');
+  let next = (Number(el.value) || 0) + Number(delta || 0);
+  next = Math.max(min, Math.min(max, next));
+  if(step.includes('.')) next = Number(next.toFixed(step.split('.')[1].length));
+  el.value = next;
+  renderAccountSetupPreview();
+}
+function renderAccountSetupPreview(){
+  const box = document.getElementById('accountSetupPreview'); if(!box) return;
+  const accountSize = toNumber(document.getElementById('accountSizeInput')?.value, 0);
+  const currentBalance = toNumber(document.getElementById('currentBalanceInput')?.value, accountSize);
+  const phase = document.getElementById('accountPhaseInput')?.value || 'Phase 1';
+  const riskPercent = clampNumber(document.getElementById('riskPercentInput')?.value || DEFAULT_RISK_PERCENT, 0.5, 2);
+  const profitTarget = toNumber(document.getElementById('profitTargetInput')?.value, 0);
+  const profitTargetType = document.getElementById('profitTargetType')?.value || 'percent';
+  const maxDailyLoss = toNumber(document.getElementById('maxDailyLossInput')?.value, 0);
+  const maxDailyLossType = document.getElementById('maxDailyLossType')?.value || 'percent';
+  const riskAmount = accountSize * riskPercent / 100;
+  const targetAmount = limitAmount(profitTarget, profitTargetType, accountSize);
+  const targetBalance = currentBalance + targetAmount;
+  const dailyLossAmount = isFundedPhase(phase) ? limitAmount(maxDailyLoss, maxDailyLossType, accountSize) : null;
+  const money = value => `$${(Number.isFinite(value) ? value : 0).toFixed(2)}`;
+  box.innerHTML = `<div class="setup-preview-row"><span>$ risk per trade</span><strong>${money(riskAmount)}</strong></div><div class="setup-preview-row"><span>Profit target</span><strong>${money(targetAmount)} (${money(targetBalance)} target balance)</strong></div><div class="setup-preview-row"><span>Daily loss limit</span><strong>${dailyLossAmount == null ? 'Skipped for this phase' : money(dailyLossAmount)}</strong></div>`;
 }
 function openAccountSetup(){
   const gate = document.getElementById('accountOnboardingGate');
@@ -4414,7 +4462,7 @@ function openAccountSetup(){
   set('profitTargetType', config.profitTargetType || 'percent'); set('riskPercentInput', config.riskPercent || DEFAULT_RISK_PERCENT);
   set('phaseDeadlineInput', config.phaseDeadline || ''); set('maxDailyLossInput', config.maxDailyLoss ?? '');
   set('maxDailyLossType', config.maxDailyLossType || 'percent'); set('maxDrawdownInput', config.maxDrawdown ?? '');
-  set('maxDrawdownType', config.maxDrawdownType || 'percent'); toggleFundedFields();
+  set('maxDrawdownType', config.maxDrawdownType || 'percent'); toggleFundedFields(); renderAccountSetupPreview();
   if(gate){ gate.hidden = false; gate.classList.add('show'); }
 }
 function closeAccountSetup(){
@@ -9618,7 +9666,7 @@ html.firebase-auth-required body{
 }
 </style>
 <style id="journall-account-risk-theme">
-.account-onboarding-gate{position:fixed;inset:0;z-index:9999;display:none;place-items:center;background:rgba(1,1,2,.78);padding:24px;color:#f7f8f8}.account-onboarding-gate.show{display:grid}.account-onboarding-card{width:min(920px,96vw);max-height:92vh;overflow:auto;background:#16181d;border:1px solid #2e3038;border-radius:18px;padding:28px}.account-onboarding-head{display:flex;justify-content:space-between;gap:18px;align-items:flex-start;margin-bottom:22px}.account-kicker{display:block;color:#8a8f98;font-size:12px;letter-spacing:.4px;text-transform:uppercase;margin-bottom:8px}.account-onboarding-card h2{margin:0;color:#f7f8f8;font-size:32px;letter-spacing:-.8px}.account-onboarding-card p{color:#d0d6e0;margin:8px 0 0}.account-form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}.account-form-grid label{display:flex;flex-direction:column;gap:8px;color:#8a8f98;font-size:12px;text-transform:uppercase;letter-spacing:.4px}.account-form-grid input,.account-form-grid select{background:#0d0e11!important;border:1px solid #23252a!important;border-radius:10px!important;color:#f7f8f8!important;padding:12px 14px!important;font-size:14px!important}.account-inline-field{display:flex;gap:8px;align-items:center}.account-inline-field input{flex:1}.account-inline-field select{width:84px}.account-inline-field span{color:#d0d6e0}.account-onboarding-actions{display:flex;align-items:center;gap:14px;margin-top:22px}.account-onboarding-actions p{margin:0;color:#8a8f98}.risk-calc-card{grid-column:span 2}.risk-calc-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:12px 0}.risk-calc-grid label{display:flex;flex-direction:column;gap:6px;color:#8a8f98;font-size:12px;text-transform:uppercase;letter-spacing:.4px}.risk-calc-grid input{background:#010102!important;border:1px solid #23252a!important;color:#f7f8f8!important;border-radius:8px!important;padding:9px 10px!important}@media(max-width:760px){.account-form-grid,.risk-calc-grid{grid-template-columns:1fr}.risk-calc-card{grid-column:auto}.account-onboarding-head{flex-direction:column}.account-onboarding-card{padding:20px}}
+.account-onboarding-gate{position:fixed;inset:0;z-index:9999;display:none;place-items:center;background:rgba(1,1,2,.78);padding:24px;color:#f7f8f8}.account-onboarding-gate.show{display:grid}.account-onboarding-card{width:min(980px,96vw);max-height:92vh;overflow:auto;background:#16181d;border:1px solid #2e3038;border-radius:18px;padding:32px}.account-onboarding-head{display:flex;justify-content:space-between;gap:18px;align-items:flex-start;margin-bottom:22px}.account-kicker{display:block;color:#8a8f98;font-size:12px;letter-spacing:.4px;text-transform:uppercase;margin-bottom:8px}.account-onboarding-card h2{margin:0;color:#f7f8f8;font-size:32px;letter-spacing:-.8px}.account-onboarding-card p{color:#d0d6e0;margin:8px 0 0}.setup-section{background:#0d0e10;border:1px solid rgba(255,255,255,.06);border-radius:14px;padding:20px;margin-bottom:16px}.setup-section-label{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.4);margin-bottom:12px}.account-form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}.setup-section:first-of-type .account-form-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.account-form-grid label{display:flex;flex-direction:column;gap:8px;color:#8a8f98;font-size:12px;text-transform:uppercase;letter-spacing:.4px}.account-onboarding-card input,.account-onboarding-card select{background:#16181a!important;border:1px solid rgba(255,255,255,.08)!important;border-radius:10px!important;color:#fff!important;padding:12px 14px!important;font-size:15px!important;font-family:'Inter',sans-serif!important;transition:border-color .15s ease,box-shadow .15s ease}.account-onboarding-card input:focus,.account-onboarding-card select:focus{border-color:#494fdf!important;outline:none!important;box-shadow:0 0 0 3px rgba(73,79,223,.15)!important}.account-onboarding-card input[type=number]{-moz-appearance:textfield;appearance:textfield}.account-onboarding-card input[type=number]::-webkit-outer-spin-button,.account-onboarding-card input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}.number-stepper{display:grid;grid-template-columns:28px minmax(0,1fr) 28px;gap:8px;align-items:center}.account-inline-field{display:flex;gap:10px;align-items:center}.account-inline-field .number-stepper{flex:1}.account-inline-field select{width:92px}.account-inline-field span{color:#d0d6e0}.stepper-btn{background:#16181a!important;border:1px solid rgba(255,255,255,.08)!important;color:rgba(255,255,255,.5)!important;width:28px!important;height:28px!important;border-radius:6px!important;display:grid!important;place-items:center!important;padding:0!important;font-size:16px!important;line-height:1!important;cursor:pointer!important}.stepper-btn:hover{background:#1f2124!important;color:#fff!important}.setup-preview{background:rgba(73,79,223,.08);border:1px solid rgba(73,79,223,.25);border-radius:12px;padding:16px 20px;margin-top:4px}.setup-preview-row{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.08)}.setup-preview-row:last-child{border-bottom:0}.setup-preview-row span{color:rgba(255,255,255,.58);font-size:13px}.setup-preview-row strong{color:#fff;font-size:15px;font-weight:700;text-align:right}.account-onboarding-actions{display:flex;align-items:center;gap:14px;margin-top:22px}.account-onboarding-actions p{margin:0;color:#8a8f98}.save-setup-btn{background:#494fdf!important;color:#fff!important;border:none!important;font-weight:600!important}.save-setup-btn:hover{background:#5a5ff0!important}.account-close-btn{background:#26282f!important;border:1px solid rgba(255,255,255,.08)!important;color:#fff!important}.risk-calc-card{grid-column:span 2}.risk-calc-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:12px 0}.risk-calc-grid label{display:flex;flex-direction:column;gap:6px;color:#8a8f98;font-size:12px;text-transform:uppercase;letter-spacing:.4px}.risk-calc-grid input{background:#010102!important;border:1px solid #23252a!important;color:#f7f8f8!important;border-radius:8px!important;padding:9px 10px!important}@media(max-width:760px){.account-form-grid,.setup-section:first-of-type .account-form-grid,.risk-calc-grid{grid-template-columns:1fr}.risk-calc-card{grid-column:auto}.account-onboarding-head{flex-direction:column}.account-onboarding-card{padding:20px}.account-inline-field{align-items:stretch;flex-direction:column}.account-inline-field select{width:100%}.setup-preview-row{align-items:flex-start;flex-direction:column}.setup-preview-row strong{text-align:left}}
 </style>
 </body>
 </html>
