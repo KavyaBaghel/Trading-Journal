@@ -9,7 +9,7 @@ Journall is a local-first trading journal and analytics dashboard built for revi
 - Trade journal pages with setup, emotion, mistake, improvement notes, screenshots, and recordings
 - Analytics charts for equity curve, outcome mix, session performance, mistake impact, direction split, weekdays, duration, lot size, and exit reasons
 - Calendar and heatmap views for reviewing trading days
-- AI Coach powered by local Ollama for private trade review and improvement suggestions
+- AI Coach powered by a secure Firebase Cloud Function for trade review and improvement suggestions
 - AI widgets and reports that summarize trading weaknesses, strong sessions, risk issues, and next actions
 - Local Windows launchers for desktop-style use
 - Website deployment support for GitHub Pages, Netlify, and Vercel
@@ -24,7 +24,7 @@ Journall is a local-first trading journal and analytics dashboard built for revi
 - Service Worker / Web Manifest
 - Firebase Auth and Firestore for website sign-in/data sync
 - PowerShell Windows launch scripts
-- Local Ollama AI integration
+- Secure Firebase AI coach integration
 - ChromaDB local vector database with `nomic-embed-text` embeddings
 
 ## Why I Built It
@@ -86,7 +86,7 @@ https://kavyabaghel.github.io/Trading-Journal/
 
 Import the GitHub repository and use the project root as the publish directory. No build command is required.
 
-The public website works for dashboard, journal, analytics, calendar, goals, and Google sign-in cloud sync. Local Ollama/RAG AI features still require Ollama and the local RAG server running on the same computer.
+The public website works for dashboard, journal, analytics, calendar, goals, and Google sign-in cloud sync. AI coaching requires Firebase Functions with the OPENAI_API_KEY secret configured.
 
 ## Firebase Sign-In Setup
 
@@ -124,7 +124,7 @@ The public Journall website requires Google sign-in before opening the dashboard
 
 ## Local AI Setup
 
-1. Install Ollama from `https://ollama.com`
+1. Install the Firebase CLI and configure the OpenAI secret
 2. Install the Python dependencies:
 
 ```powershell
@@ -134,16 +134,16 @@ py -m pip install -r requirements.txt
 3. Pull the local chat and embedding models:
 
 ```powershell
-ollama pull llama3.2
-ollama pull nomic-embed-text
+firebase functions:secrets:set OPENAI_API_KEY
+firebase deploy --only functions
 ```
 
 4. Open Journall with the desktop launcher
 5. Go to AI Coach and ask a question
 
-The launcher starts the local RAG server on `http://127.0.0.1:8790`. The AI Coach indexes trades into ChromaDB, retrieves the most relevant journal entries, then asks Ollama for specific feedback.
+The website AI Coach sends scoped trade context to the secure Firebase aiCoach function for specific feedback.
 
-The app still works without Ollama, but AI coaching features require the local Ollama server.
+The app still opens without AI, but coaching features require the deployed Firebase function.
 
 ## Privacy
 

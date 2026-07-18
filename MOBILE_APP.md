@@ -22,5 +22,4 @@ Keep the `Open Mobile App.bat` window open while using the app on your phone.
 - Your journal data is stored in the browser/app profile where you use it.
 - If you open it from your phone, the phone has its own browser storage.
 - Export journals/trades from desktop and import them on mobile if you want the same saved data there.
-- Ollama AI runs on the PC. Mobile browsers may not reach `localhost:11434` because `localhost` on the phone means the phone itself.
-
+- AI coaching runs through Firebase Functions, so mobile can use the assistant after the backend is deployed.

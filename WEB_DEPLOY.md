@@ -34,4 +34,4 @@ https://kavyabaghel.github.io/Trading-Journal/
 
 ## Local AI Note
 
-The website version keeps journal, analytics, reports, calendar, and goals in the browser. Local AI coaching still needs Ollama and the RAG server running on the same computer.
+The website version keeps journal, analytics, reports, calendar, and goals in the browser. AI coaching uses the secure Firebase aiCoach function after deployment.

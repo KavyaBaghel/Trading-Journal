@@ -2176,7 +2176,49 @@ tr:hover {
   min-width: 0 !important;
 }
 
-</style>
+
+
+/* AI/Psychology/Daily Rules final patch */
+#journallApp .journal-entry-form input,
+#journallApp .journal-entry-form select,
+#journallApp .journal-entry-form textarea,
+#journallApp .psych-debrief-form input,
+#journallApp .psych-debrief-form select,
+#journallApp .psych-debrief-form textarea {
+  background:#16181a !important;
+  border:1px solid rgba(255,255,255,.08) !important;
+  color:#fff !important;
+  border-radius:10px !important;
+  padding:12px 14px !important;
+}
+#journallApp .bar {
+  height:8px !important;
+  background:rgba(255,255,255,.08) !important;
+  border-radius:999px !important;
+  overflow:hidden !important;
+}
+#journallApp .bar > div {
+  height:100% !important;
+  min-width:0 !important;
+  background:#5e6ad2 !important;
+  border-radius:999px !important;
+  transition:width 180ms ease !important;
+}
+#journallApp .bar.loss > div { background:#e5484d !important; }
+#journallApp .bar.trades > div { background:#5e6ad2 !important; }
+#journallApp .bar.is-empty > div { background:transparent !important; }
+#journallApp .psych-step.locked {
+  opacity:.45 !important;
+  cursor:not-allowed !important;
+}
+#journallApp .psych-step.completed {
+  border-color:rgba(39,166,68,.45) !important;
+  color:#27a644 !important;
+}
+#journallApp .psych-intro {
+  margin:0 0 16px !important;
+  color:rgba(255,255,255,.62) !important;
+}</style>
 </head>
 <body>
 <button id="androidInstallBtn" class="android-install-btn" type="button" hidden>Install Journall</button>
@@ -2279,7 +2321,7 @@ tr:hover {
 <div id="journallApp" class="app" hidden>
   <aside class="sidebar">
     <div class="brand"><div class="logo" aria-hidden="true"></div><div><div class="brand-title">Journall</div><div class="brand-sub">Trading command center</div></div></div>
-    
+
 <div class="nav">
       <button class="active" data-tab="tradingpage">Today's Summary</button>
       <button data-tab="dashboard">Analytics</button>
@@ -2301,17 +2343,17 @@ tr:hover {
       <div style="height:1px;background:rgba(212,175,55,.10);margin:12px 0"></div>
       <div class="sidebox-title" style="margin-bottom:8px">Rule Breaks</div>
       <div class="mini-stat"><span>Today Broken Rules</span><strong id="sideRuleBreaks">0</strong></div>
-      <div class="mini-stat"><span>Journaled Trades</span><strong id="sideJournaledTrades">0</strong></div>
+      <div class="mini-stat"><span>Trades Journaled</span><strong id="sideJournaledTrades">0</strong></div><div class="mini-stat"><span>Trades Pending Journal</span><strong id="sidePendingJournalTrades">0</strong></div>
     </div>
   </aside>
 
   <main class="main">
     <div class="top">
       <div class="hero">
-        
+
         <h1>Today's Summary</h1>
         <span class="hero-tag">Local AI &bull; RAG memory &bull; Trade review</span>
-        
+
       </div>
       <div class="quick-actions"></div>
     </div>
@@ -2364,12 +2406,12 @@ tr:hover {
 
     <section id="widgets" class="section">
       <div class="card">
-        <div class="panel-title"><h3>AI Widgets</h3><span>Ollama generated</span></div>
+        <div class="panel-title"><h3>AI Widgets</h3><span>AI generated</span></div>
         <div class="journal-form-actions" style="margin-bottom:12px">
           <button class="btn primary" onclick="generateAIWidgets(true)">Generate AI Widgets</button>
           <button class="btn" onclick="clearAIWidgets()">Clear</button>
         </div>
-        <div id="aiWidgetStatus" class="sub" style="margin-bottom:12px">Widgets are created by local Ollama from your current trading data.</div>
+        <div id="aiWidgetStatus" class="sub" style="margin-bottom:12px">Widgets are created by AI from your current trading data.</div>
         <div class="widget-grid" id="widgetGrid"></div>
       </div>
     </section>
@@ -2384,13 +2426,13 @@ tr:hover {
       <div class="card" style="margin-top:16px">
         <div class="panel-title">
           <h3>AI Report Cards</h3>
-          <span>Ollama generated</span>
+          <span>AI generated</span>
         </div>
         <div class="journal-form-actions" style="margin-bottom:12px">
           <button class="btn primary" onclick="generateAIReports()">Generate AI Report</button>
           <button class="btn" onclick="clearAIReports()">Clear</button>
         </div>
-        <div id="aiReportStatus" class="sub">AI reports use your permanent local Ollama model.</div>
+        <div id="aiReportStatus" class="sub">AI reports use the secure AI assistant.</div>
         <div class="grid three" id="reportCards" style="margin-top:12px"></div>
       </div>
       <div class="card" style="margin-top:16px">
@@ -2399,7 +2441,7 @@ tr:hover {
       </div>
     </section>
 
-    
+
 <section id="calendar" class="section">
   <div class="card calendar-premium-card">
     <div class="calendar-hero">
@@ -2506,7 +2548,7 @@ tr:hover {
       </div>
 
       <div class="card" style="margin-top:16px">
-        <div class="panel-title"><h3>Post Session Review</h3><span>Ollama end-of-day coach</span></div>
+        <div class="panel-title"><h3>Post Session Review</h3><span>AI end-of-day coach</span></div>
         <div class="journal-form-actions" style="margin-bottom:12px">
           <button class="btn primary" onclick="generatePostSessionReview(true)">Generate Review</button>
           <button class="btn" onclick="clearPostSessionReview()">Clear</button>
@@ -2553,7 +2595,7 @@ tr:hover {
 
       <div class="psych-page active" id="psychPageMind">
         <div class="card">
-          <div class="panel-title"><h3>Mind Stability Check</h3><span>all 9 required</span></div>
+          <div class="panel-title"><h3>Mind Stability Check</h3><span>all 9 required</span></div><div class="sub psych-intro">Check your mental state before planning any trade.</div>
           <div class="psych-check-grid" id="psychMindChecks">
             <button class="psych-check" type="button" data-psych-check="sleep" onclick="togglePsychCheck('sleep')"><span></span><strong>Sleep clear</strong><em>I am not tired, foggy, or forcing trades.</em></button>
             <button class="psych-check" type="button" data-psych-check="calm" onclick="togglePsychCheck('calm')"><span></span><strong>Emotion calm</strong><em>No anger, fear, revenge, FOMO, or excitement spike.</em></button>
@@ -2605,7 +2647,7 @@ tr:hover {
           </div>
 
           <div class="card">
-            <div class="panel-title"><h3>Setup Scan</h3><span>zone activation rules</span></div>
+            <div class="panel-title"><h3>Setup Scan</h3><span>formation check</span></div><div class="sub psych-intro">Confirm a valid setup is actually forming before you plan an entry.</div><div id="psychSetupCriteria" class="insight empty"></div>
             <div class="psych-rule-list">
               <button class="psych-check" type="button" data-psych-check="buySellZone" onclick="togglePsychCheck('buySellZone')"><span></span><strong>Buy or sell zone exists</strong><em>No zone means no trade.</em></button>
               <button class="psych-check" type="button" data-psych-check="zoneActivated" onclick="togglePsychCheck('zoneActivated')"><span></span><strong>Zone activated</strong><em>Wick into zone, then candle closes from the zone.</em></button>
@@ -2615,7 +2657,7 @@ tr:hover {
             </div>
             <div class="journal-form-actions">
               <button class="btn" onclick="showPsychologyPage('mind')">Back</button>
-              <button class="btn primary" onclick="showPsychologyPage('live')">Go Live Rules</button>
+              <button class="btn primary" id="psychSetupCompleteBtn" onclick="completePsychologySetupScan()">Complete Setup Scan</button>
             </div>
           </div>
         </div>
@@ -2624,7 +2666,7 @@ tr:hover {
       <div class="psych-page" id="psychPageLive">
         <div class="grid two">
           <div class="card">
-            <div class="panel-title"><h3>Live Trade Rules</h3><span>during execution</span></div>
+            <div class="panel-title"><h3>Live Trade Rules</h3><span>during execution</span></div><div class="sub psych-intro">Log your entry, stop loss, and target as the trade is active.</div>
             <div class="psych-rule-list">
               <div class="psych-rule"><strong>Risk stays under my limit.</strong><span>The planned risk must match my saved account rules.</span></div>
               <div class="psych-rule"><strong>Keep stop fixed after entry.</strong><span>No emotional stop widening.</span></div>
@@ -2645,7 +2687,7 @@ tr:hover {
             <textarea id="psychTomorrowRule" placeholder="Rule violated / tomorrow reminder..."></textarea>
             <div class="journal-form-actions">
               <button class="btn" onclick="showPsychologyPage('setup')">Back</button>
-              <button class="btn primary" onclick="savePsychologyTomorrowRule()">Save Tomorrow Rule</button>
+              <button class="btn primary" id="psychLiveCompleteBtn" onclick="savePsychologyLivePlan()">Complete Live Trade</button>
               <button class="btn" onclick="document.querySelector('[data-tab=&quot;journalpage&quot;]')?.click()">Open Journal</button>
             </div>
           </div>
@@ -2654,22 +2696,31 @@ tr:hover {
 
       <div class="psych-page" id="psychPageJournal">
         <div class="card">
-          <div class="panel-title"><h3>End-of-Day Journal</h3><span>mandatory every trading day</span></div>
-          <div class="psych-rule-list">
-            <div class="psych-rule"><strong>Trade details.</strong><span>Entry, SL, TP/result, RR achieved, lot size. If no trade, write no valid setup.</span></div>
-            <div class="psych-rule"><strong>HTF bias.</strong><span>What was your bias? Did price move with it? If not, why?</span></div>
-            <div class="psych-rule"><strong>Rule violations.</strong><span>List every broken rule and near-break honestly.</span></div>
-            <div class="psych-rule"><strong>One lesson.</strong><span>One sentence: what did today teach you?</span></div>
-            <div class="psych-rule"><strong>Emotional score 1-10.</strong><span>10 is calm and process-driven.</span></div>
-            <div class="psych-rule"><strong>Discipline score 1-10.</strong><span>Score adherence, not profit.</span></div>
-            <div class="psych-rule"><strong>Tomorrow intention.</strong><span>One specific behavior to focus on tomorrow.</span></div>
-            <div class="psych-rule"><strong>Physical reset.</strong><span>Walk, workout, or move your body after session.</span></div>
-            <div class="psych-rule"><strong>Close all trading tabs.</strong><span>You are not a trader now. Preserve separation.</span></div>
+          <div class="panel-title"><h3>Debrief</h3><span>journal close loop</span></div>
+          <div class="sub psych-intro">Record the outcome and lessons - this closes the loop and saves to your Journal.</div>
+          <div class="journal-entry-form psych-debrief-form">
+            <label>Trade outcome
+              <select id="psychDebriefResult">
+                <option value="note">No trade / note</option>
+                <option value="profit">Win</option>
+                <option value="loss">Loss</option>
+                <option value="breakeven">Breakeven</option>
+              </select>
+            </label>
+            <label>Rules or mistakes flagged
+              <textarea id="psychDebriefMistakes" placeholder="Example: entered early, moved SL, revenge feeling, no patience..."></textarea>
+            </label>
+            <label>Lesson / next action
+              <textarea id="psychDebriefNotes" placeholder="What happened, what did you learn, and what rule must carry into tomorrow?"></textarea>
+            </label>
+            <div class="journal-form-actions">
+              <button class="btn" onclick="showPsychologyPage('live')">Back</button>
+              <button class="btn primary" id="psychDebriefSubmitBtn" onclick="savePsychologyDebriefToJournal()">Save Debrief to Journal</button>
+            </div>
           </div>
           <div class="insight">No-trade days still require a journal: bias, why no valid setup, emotional state, discipline score, and tomorrow intention.</div>
         </div>
-      </div>
-    </section>
+      </div>    </section>
 
     <section id="journalpage" class="section">
       <div class="journal-page-layout">
@@ -2781,7 +2832,7 @@ tr:hover {
               <div class="journal-video-head">
                 <div>
                   <strong>AI Journal Feedback</strong>
-                  <div class="saved-journal-meta">Ollama checks your journal and gives the next action.</div>
+                  <div class="saved-journal-meta">AI checks your journal and gives the next action.</div>
                 </div>
                 <button class="btn primary" onclick="generateJournalAIFeedback(true)">Check Journal</button>
               </div>
@@ -2837,7 +2888,7 @@ tr:hover {
           <div id="goalsBox"></div>
         </div>
         <div class="card">
-          <div class="panel-title"><h3>AI Prop Coach</h3><span>Ollama goals</span></div>
+          <div class="panel-title"><h3>AI Prop Coach</h3><span>AI goals</span></div>
           <div class="journal-form-actions" style="margin-bottom:12px">
             <button class="btn primary" onclick="generateAIPropGoals(true)">Update AI Goals</button>
             <button class="btn" onclick="clearAIPropGoals()">Clear</button>
@@ -2847,7 +2898,7 @@ tr:hover {
         </div>
       </div>
     </section>
-  
+
 
 
 
@@ -2859,7 +2910,7 @@ tr:hover {
     <div class="card">
       <div class="panel-title">
         <h3>AI Trading Coach</h3>
-        <span>offline smart review</span>
+        <span>AI-powered trade review</span>
       </div>
 
       <div class="ai-chip-row">
@@ -2892,7 +2943,7 @@ tr:hover {
 
       <div class="insights" style="margin-top:14px">
         <div class="insight good"><strong>Best Use:</strong> Use this after every trading day to find one mistake to fix tomorrow.</div>
-        <div class="insight warn"><strong>Note:</strong> This is built-in offline logic, not connected to ChatGPT API.</div>
+        <div class="insight warn"><strong>Note:</strong> Powered by OpenAI. Trade data is sent securely for analysis.</div>
       </div>
     </div>
   </div>
@@ -3232,43 +3283,47 @@ function renderSide(){
   const today = todayDateKey();
   const todayTrades = sorted(trades).filter(t=>t.date === today);
   const state = todayTradingState(todayTrades);
-  const m = accountMetrics(trades || []);
-  const todayPnl = state.todayPnl;
-  const lossUsed = state.lossUsed;
-  const dailyLimit = state.maxDailyLoss;
-  const maxTrades = state.maxTrades;
-  const profitTarget = Math.max(1, m?.profitTargetAmount || 1);
-  const profitProgress = Math.min(100, Math.max(0, todayPnl) / profitTarget * 100);
-  const tradeProgress = maxTrades ? Math.min(100, todayTrades.length / maxTrades * 100) : 0;
-  const lossProgress = dailyLimit ? Math.min(100, lossUsed / dailyLimit * 100) : 0;
+  const todayPnl = Number(state.todayPnl) || 0;
+  const lossUsed = Number(state.lossUsed) || 0;
+  const dailyLimit = Number(state.maxDailyLoss) || 0;
+  const maxTrades = Number(state.maxTrades) || 0;
+  const tradeProgress = maxTrades ? Math.min(100, todayTrades.length / maxTrades * 100) : null;
+  const lossProgress = dailyLimit ? Math.min(100, lossUsed / dailyLimit * 100) : null;
+  const maxLossProgress = lossProgress;
   const todayJournalEntries = journalPageEntries.filter(e=>{
     const t = e.trade || (e.tradeKey ? findTradeByKey(e.tradeKey) : null);
-    return (t?.date || e.date) === today;
+    return (t?.date || e.date) === today && (!isJournalEntryDone || isJournalEntryDone(e));
   });
   const todayBrokenRules = todayJournalEntries.reduce((sum,e)=>{
     const t = e.trade || (e.tradeKey ? findTradeByKey(e.tradeKey) : null);
     return sum + evaluateJournalRules(e, t).broken.length;
   },0);
+  const journaledTradeKeys = new Set(todayJournalEntries.map(e=>e.tradeKey || (e.trade ? makeTradeKey(e.trade) : '')).filter(Boolean));
+  const journaledTodayTrades = todayTrades.filter(t=>journaledTradeKeys.has(makeTradeKey(t)) || hasJournalForTrade(t)).length;
+  const pendingJournalTrades = Math.max(0, todayTrades.length - journaledTodayTrades);
+
+  const progressBar = (value, tone='') => value == null
+    ? '<div class="bar is-empty" title="Set account setup first"><div style="width:0%"></div></div>'
+    : `<div class="bar ${tone}" title="${Math.round(value)}% used"><div style="width:${Math.min(100, Math.max(0, value))}%"></div></div>`;
 
   const sideDailyRules = document.getElementById('sideDailyRules');
   if(sideDailyRules){
     sideDailyRules.innerHTML = `
-      <div class="mini-stat"><span>Market</span><strong>User defined</strong></div>
       <div class="mini-stat"><span>Loss Limit</span><strong class="${dailyLimit && lossUsed >= dailyLimit ? 'red' : 'neutral'}">${dailyLimit ? '$'+dailyLimit.toFixed(2)+'/day' : 'Set in account'}</strong></div>
+      ${progressBar(lossProgress, 'loss')}
       <div class="mini-stat"><span>Trade Limit</span><strong class="${maxTrades && todayTrades.length >= maxTrades ? 'red' : 'neutral'}">${maxTrades ? todayTrades.length+'/'+maxTrades : 'Set in account'}</strong></div>
-      <div class="mini-stat"><span>Entry Rule</span><strong>Good point + confirmation</strong></div>
-      <div class="mini-stat"><span>Exit Rule</span><strong>With confirmation</strong></div>
+      ${progressBar(tradeProgress, 'trades')}
       <div class="mini-stat"><span>Today P&L</span><strong class="${pnlClass(todayPnl)}">${fmt(todayPnl)}</strong></div>
-      <div class="mini-stat"><span>Max Loss</span><strong class="${dailyLimit && lossUsed >= dailyLimit ? 'red' : 'neutral'}">$${lossUsed.toFixed(2)}/${dailyLimit ? '$'+dailyLimit.toFixed(2) : 'not set'}</strong></div>
-      <div class="bar" title="Daily profit target progress" style="margin-top:10px"><div style="width:${profitProgress}%"></div></div>
-      <div class="bar" title="Daily trade count progress" style="margin-top:8px"><div style="width:${tradeProgress}%;background:linear-gradient(90deg,var(--amber),var(--blue))"></div></div>
-      <div class="bar" title="Daily loss limit used" style="margin-top:8px"><div style="width:${lossProgress}%;background:linear-gradient(90deg,var(--amber),var(--red))"></div></div>`;
+      <div class="mini-stat"><span>Max Loss</span><strong class="${dailyLimit && lossUsed >= dailyLimit ? 'red' : 'neutral'}">$${lossUsed.toFixed(2)}${dailyLimit ? ' / $'+dailyLimit.toFixed(2) : ' / not set'}</strong></div>
+      ${progressBar(maxLossProgress, 'loss')}`;
   }
 
   const sideRuleBreaks=document.getElementById('sideRuleBreaks');
   const sideJournaledTrades=document.getElementById('sideJournaledTrades');
+  const sidePendingJournalTrades=document.getElementById('sidePendingJournalTrades');
   if(sideRuleBreaks) sideRuleBreaks.textContent=todayBrokenRules;
-  if(sideJournaledTrades) sideJournaledTrades.textContent=todayJournalEntries.length;
+  if(sideJournaledTrades) sideJournaledTrades.textContent=journaledTodayTrades;
+  if(sidePendingJournalTrades) sidePendingJournalTrades.textContent=pendingJournalTrades;
 }
 
 
@@ -3989,7 +4044,7 @@ async function generateAIWidgets(force=false){
   aiWidgetGenerating = true;
   const grid = document.getElementById('widgetGrid');
   const status = document.getElementById('aiWidgetStatus');
-  if(status) status.textContent = 'Ollama is generating custom widgets...';
+  if(status) status.textContent = 'AI is generating custom widgets...';
   if(grid) grid.innerHTML = '<div class="card widget"><div class="sub">Thinking with your trade data...</div></div>';
   const prompt = [
     'You are a trading psychology and discipline coach. Create useful dashboard widgets from the provided trading stats.',
@@ -4001,12 +4056,12 @@ async function generateAIWidgets(force=false){
     JSON.stringify(aiWidgetPayload(), null, 2)
   ].join('\n\n');
   try{
-    const text = await window.generateOllamaJournalReport(prompt);
+    const text = await window.generateAIJournalReport(prompt);
     localStorage.setItem(key, isBadAIWidgetText(text) ? buildRuleBasedWidgetText() : text);
     renderWidgets();
   }catch(err){
-    if(status) status.textContent = 'Ollama failed. Start Ollama and install the selected model.';
-    if(grid) grid.innerHTML = `<div class="card widget"><div class="sub">AI widget generation failed: ${escapeHtml(err?.message || err || 'Ollama connection failed')}</div></div>`;
+    if(status) status.textContent = 'Assistant unavailable right now - try again shortly.';
+    if(grid) grid.innerHTML = `<div class="card widget"><div class="sub">AI widget generation failed: ${escapeHtml(err?.message || err || 'AI connection failed')}</div></div>`;
   }finally{
     aiWidgetGenerating = false;
   }
@@ -4080,7 +4135,7 @@ function renderRuleBasedDashboardInsights(){
     `<strong>Main leak:</strong> ${mainLeak.count ? `${mainLeak.name} appeared ${mainLeak.count} times.` : 'No repeated rule leak is dominating the sample.'} <br><strong>Action:</strong> Make this tomorrow's first checklist item before entry.`,
     `<strong>Worst session:</strong> ${worstSession[0]} is currently ${signedMoney(worstSession[1])}. <br><strong>Action:</strong> Reduce size or skip that session until the setup quality improves.`,
     `<strong>Drawdown:</strong> Max drawdown is ${signedMoney(s.maxDD)}. <br><strong>Action:</strong> Stop trading for the day after two rule breaks or after hitting your daily loss limit.`,
-    `<strong>Coach note:</strong> Generate the AI report when Ollama is running for deeper coaching. <br><strong>Action:</strong> Ask for one weakness, one rule, and one journal question.`
+    `<strong>Coach note:</strong> Generate the AI report for deeper coaching. <br><strong>Action:</strong> Ask for one weakness, one rule, and one journal question.`
   ];
   return cards.map((part,i)=>`<div class="insight ${i===0?'good':i===1?'warn':''}">${part}</div>`).join('');
 }
@@ -4097,7 +4152,7 @@ function renderAIReportText(text){
 function renderReports(){
   if(!filtered.length){
     document.getElementById('reportCards').innerHTML = `
-      <div class="insight empty"><strong>No AI report yet</strong><br>Upload CSV, then generate the Ollama report.</div>`;
+      <div class="insight empty"><strong>No AI report yet</strong><br>Upload CSV, then generate the AI report.</div>`;
     const status = document.getElementById('aiReportStatus');
     if(status) status.textContent = 'Upload trades first.';
     return;
@@ -4116,8 +4171,8 @@ function renderReports(){
     if(status) status.textContent = 'AI report loaded from local cache. Regenerate after changing filters or importing new trades.';
     return;
   }
-  document.getElementById('reportCards').innerHTML = '<div class="insight warn"><strong>AI report not generated.</strong><br>Click Generate AI Report. Ollama will read the current filtered trades and produce the report cards.</div>';
-  if(status) status.textContent = 'Ready for Ollama.';
+  document.getElementById('reportCards').innerHTML = '<div class="insight warn"><strong>AI report not generated.</strong><br>Click Generate AI Report. AI will read the current filtered trades and produce the report cards.</div>';
+  if(status) status.textContent = 'Ready for AI.';
 }
 
 function setupPerformanceRows(){
@@ -4184,8 +4239,8 @@ async function generateAIReports(){
   }
   const status = document.getElementById('aiReportStatus');
   const box = document.getElementById('reportCards');
-  if(status) status.textContent = 'Ollama is generating your AI report...';
-  if(box) box.innerHTML = '<div class="insight warn"><strong>Thinking...</strong><br>Ollama is reading your statistics and recent trades.</div>';
+  if(status) status.textContent = 'AI is generating your report...';
+  if(box) box.innerHTML = '<div class="insight warn"><strong>Thinking...</strong><br>AI is reading your statistics and recent trades.</div>';
   const prompt = [
     'You are a trading psychology and discipline coach inside Journall. Generate trading report cards from the numbers below.',
     'Do not explain the input, JSON, fields, arrays, schema, response, raw payload, market data availability, or data structure.',
@@ -4196,14 +4251,14 @@ async function generateAIReports(){
     JSON.stringify(aiReportPayload(), null, 2)
   ].join('\n\n');
   try{
-    const text = await window.generateOllamaJournalReport(prompt);
+    const text = await window.generateAIJournalReport(prompt);
     localStorage.setItem(aiReportStorageKey('main'), text);
     localStorage.setItem(aiReportStorageKey('dashboard'), text);
     renderReports();
     renderInsights();
   }catch(err){
-    if(status) status.textContent = 'Ollama failed. Start Ollama and install the selected model.';
-    if(box) box.innerHTML = `<div class="insight danger"><strong>AI report failed.</strong><br>${escapeHtml(err?.message || err || 'Ollama connection failed')}</div>`;
+    if(status) status.textContent = 'Assistant unavailable right now - try again shortly.';
+    if(box) box.innerHTML = `<div class="insight danger"><strong>AI report failed.</strong><br>${escapeHtml(err?.message || err || 'AI connection failed')}</div>`;
   }
 }
 
@@ -4611,11 +4666,11 @@ async function generateAIPropGoals(force=false){
   const key = propGoalStorageKey(); if(!force && localStorage.getItem(key)) return; if(aiPropGoalGenerating) return;
   aiPropGoalGenerating = true;
   const status=document.getElementById('propGoalStatus'), propBox=document.getElementById('propBox');
-  if(status) status.textContent='Ollama is creating goals from your account setup...';
+  if(status) status.textContent='AI is creating goals from your account setup...';
   if(propBox) propBox.innerHTML='<div class="insight warn"><strong>Thinking...</strong><br>AI is building account-specific goals and universal discipline rules.</div>';
   const prompt = ['You are an AI trading coach for a configurable trading account.','Use the trader account setup and trade data to create updated goals, risk notes, and phase rules.','Do not assume any fixed account size. Use only the saved account setup values in the evidence.','Universal rules: stop trading after one loss, no repeat setup trades, minimum 3:1 RR before logging trade, and flag revenge/FOMO after rapid trades following a loss.','Return 6 compact blocks separated by blank lines: current phase status, target path, risk per trade, daily loss/drawdown warning, rules broken most often, next 3 actions.','Be direct. No profit promises. No generic motivation.',JSON.stringify(propChallengePayload(),null,2)].join('\n\n');
-  try{ const text=await window.generateOllamaJournalReport(prompt); localStorage.setItem(key,text); if(status) status.textContent='AI goals updated from your latest account and trade data.'; renderGoals(); }
-  catch(err){ if(status) status.textContent='Ollama failed. Start Ollama and install the selected model.'; if(propBox) propBox.innerHTML=`<div class="insight danger"><strong>AI goals failed.</strong><br>${escapeHtml(err?.message || err || 'Ollama connection failed')}</div>`; }
+  try{ const text=await window.generateAIJournalReport(prompt); localStorage.setItem(key,text); if(status) status.textContent='AI goals updated from your latest account and trade data.'; renderGoals(); }
+  catch(err){ if(status) status.textContent='Assistant unavailable right now - try again shortly.'; if(propBox) propBox.innerHTML=`<div class="insight danger"><strong>AI goals failed.</strong><br>${escapeHtml(err?.message || err || 'AI connection failed')}</div>`; }
   finally{ aiPropGoalGenerating = false; }
 }
 function clearAIPropGoals(){ Object.keys(localStorage).filter(k=>k.startsWith('krishna_ai_prop_goals_')).forEach(k=>localStorage.removeItem(k)); renderGoals(); generateAIPropGoals(true); }
@@ -4625,7 +4680,7 @@ function renderGoals(){
   goalsBox.innerHTML = `<div class="goal-card-grid"><div class="goal-card"><div class="goal-card-label">Current Balance</div><div class="goal-card-value ${pnlClass(m.currentBalance-m.startBalance)}">$${m.currentBalance.toFixed(2)}</div><div class="goal-card-sub">${escapeHtml(m.config.phase)} &bull; start $${m.startBalance.toFixed(2)}.</div></div><div class="goal-card"><div class="goal-card-label">Target Remaining</div><div class="goal-card-value ${m.remainingToTarget<=0?'green':'neutral'}">$${m.remainingToTarget.toFixed(2)}</div><div class="bar" style="margin-top:12px"><div style="width:${m.profitProgress}%"></div></div><div class="goal-card-sub">Target balance $${m.targetBalance.toFixed(2)}.</div></div><div class="goal-card"><div class="goal-card-label">Daily Loss Room</div><div class="goal-card-value ${m.maxDailyLossRemaining!=null&&m.maxDailyLossRemaining<=0?'red':'neutral'}">${m.maxDailyLossRemaining==null?'Skipped':'$'+m.maxDailyLossRemaining.toFixed(2)}</div><div class="goal-card-sub">${m.maxDailyLossAmount==null?'Only shown for funded accounts.':'$'+m.dailyLossUsed.toFixed(2)+' used today of $'+m.maxDailyLossAmount.toFixed(2)}.</div></div><div class="goal-card"><div class="goal-card-label">Drawdown Buffer</div><div class="goal-card-value ${m.maxDrawdownRemaining!=null&&m.maxDrawdownRemaining<=0?'red':'neutral'}">${m.maxDrawdownRemaining==null?'Skipped':'$'+m.maxDrawdownRemaining.toFixed(2)}</div><div class="goal-card-sub">${m.maxDrawdownAmount==null?'Only shown for funded accounts.':'$'+m.maxDrawdownUsed.toFixed(2)+' used of $'+m.maxDrawdownAmount.toFixed(2)}.</div></div><div class="goal-card"><div class="goal-card-label">Days Remaining</div><div class="goal-card-value neutral">${m.daysRemaining==null?'No deadline':m.daysRemaining+' days'}</div><div class="goal-card-sub">Deadline ${m.config.phaseDeadline || 'not set'}.</div></div>${riskCalculatorMarkup(m)}</div><div class="goal"><div style="width:190px;color:var(--muted)">Today P&L</div><div class="bar"><div style="width:${Math.min(100,Math.max(0,m.todayPnl)/Math.max(1,(m.profitTargetAmount || 50))*100)}%"></div></div><strong class="${pnlClass(m.todayPnl)}">${fmt(m.todayPnl)}</strong></div><div class="goal"><div style="width:190px;color:var(--muted)">Trades today</div><div class="bar"><div style="width:${Math.min(100,m.config.maxTradesPerDay ? m.todayTrades.length/m.config.maxTradesPerDay*100 : 0)}%;background:linear-gradient(90deg,var(--amber),var(--blue))"></div></div><strong class="neutral">${m.todayTrades.length}/${m.config.maxTradesPerDay || 'not set'}</strong></div>`;
   const cached=localStorage.getItem(propGoalStorageKey());
   if(cached){ propBox.innerHTML=renderPropGoalText(cached); const status=document.getElementById('propGoalStatus'); if(status) status.textContent='AI goals are current for this account and trade data.'; }
-  else{ propBox.innerHTML='<div class="insight warn"><strong>AI goals pending.</strong><br>Ollama will create goals and rules from your account setup.</div>'; generateAIPropGoals(false); }
+  else{ propBox.innerHTML='<div class="insight warn"><strong>AI goals pending.</strong><br>AI will create goals and rules from your account setup.</div>'; generateAIPropGoals(false); }
 }
 function renderProcess(){
   const planTitleEl=document.getElementById('planTitle');
@@ -5168,25 +5223,24 @@ const preTradeChecklistState = {
 };
 
 const PSYCH_MIND_KEYS = ['sleep','calm','patience','lossAccept','noNeed','rules','risk','time','journal'];
+const PSYCH_SETUP_KEYS = ['buySellZone','zoneActivated','notBothZones','slSeven','candleClose'];
 const PSYCH_STORAGE_KEY = 'journall_psychology_checks';
+const PSYCH_FLOW_STORAGE_KEY = 'journall_psychology_flow_state';
 const PSYCH_TOMORROW_RULE_KEY = 'journall_psychology_tomorrow_rule';
 
 function getPsychologyChecks(){
-  try{
-    return JSON.parse(localStorage.getItem(PSYCH_STORAGE_KEY) || '{}') || {};
-  }catch{
-    return {};
-  }
+  try{ return JSON.parse(localStorage.getItem(PSYCH_STORAGE_KEY) || '{}') || {}; }
+  catch{ return {}; }
 }
-
-function savePsychologyChecks(state){
-  localStorage.setItem(PSYCH_STORAGE_KEY, JSON.stringify(state || {}));
+function savePsychologyChecks(state){ localStorage.setItem(PSYCH_STORAGE_KEY, JSON.stringify(state || {})); }
+function getPsychologyFlowState(){
+  try{ return JSON.parse(localStorage.getItem(PSYCH_FLOW_STORAGE_KEY) || '{}') || {}; }
+  catch{ return {}; }
 }
-
-function isMindCheckComplete(){
-  const state = getPsychologyChecks();
-  return PSYCH_MIND_KEYS.every(key=>!!state[key]);
-}
+function savePsychologyFlowState(state){ localStorage.setItem(PSYCH_FLOW_STORAGE_KEY, JSON.stringify(state || {})); }
+function isMindCheckComplete(){ const state = getPsychologyChecks(); return PSYCH_MIND_KEYS.every(key=>!!state[key]); }
+function isSetupScanComplete(){ const state = getPsychologyChecks(); return PSYCH_SETUP_KEYS.every(key=>!!state[key]); }
+function isLiveTradeComplete(){ return !!getPsychologyFlowState().liveComplete; }
 
 function togglePsychCheck(id){
   const state = getPsychologyChecks();
@@ -5197,72 +5251,139 @@ function togglePsychCheck(id){
 
 function resetPsychologyChecks(){
   savePsychologyChecks({});
+  savePsychologyFlowState({});
   renderPsychology();
 }
 
 function showPsychologyPage(page){
-  if((page === 'setup' || page === 'live') && !isMindCheckComplete()){
-    page = 'mind';
-  }
+  if(page === 'setup' && !isMindCheckComplete()) page = 'mind';
+  if(page === 'live' && (!isMindCheckComplete() || !isSetupScanComplete())) page = isMindCheckComplete() ? 'setup' : 'mind';
+  if(page === 'journal' && (!isMindCheckComplete() || !isSetupScanComplete() || !isLiveTradeComplete())) page = !isMindCheckComplete() ? 'mind' : (!isSetupScanComplete() ? 'setup' : 'live');
   document.querySelectorAll('.psych-page').forEach(el=>el.classList.remove('active'));
   const pageEl = document.getElementById(`psychPage${page.charAt(0).toUpperCase()}${page.slice(1)}`);
   if(pageEl) pageEl.classList.add('active');
-  document.querySelectorAll('[data-psych-page]').forEach(btn=>{
-    const key = btn.dataset.psychPage;
-    btn.classList.toggle('active', key === page);
-  });
+  document.querySelectorAll('[data-psych-page]').forEach(btn=>btn.classList.toggle('active', btn.dataset.psychPage === page));
   renderPsychology();
+}
+
+function completePsychologySetupScan(){
+  if(!isMindCheckComplete()){ showPsychologyPage('mind'); return; }
+  if(!isSetupScanComplete()){ alert('Finish every setup scan check before going live.'); return; }
+  const flow = getPsychologyFlowState();
+  flow.setupComplete = true;
+  savePsychologyFlowState(flow);
+  showPsychologyPage('live');
 }
 
 function savePsychologyTomorrowRule(){
   const input = document.getElementById('psychTomorrowRule');
   const text = (input?.value || '').trim();
-  if(!text){
-    alert('Write the rule you violated or the reminder for tomorrow first.');
-    return;
-  }
+  if(!text){ alert('Write the rule you violated or the reminder for tomorrow first.'); return false; }
   const tomorrow = new Date();
   tomorrow.setDate(tomorrow.getDate() + 1);
   const key = tomorrow.toISOString().slice(0,10);
   localStorage.setItem(PSYCH_TOMORROW_RULE_KEY, JSON.stringify({date:key,text}));
-  alert('Saved for tomorrow dashboard.');
   renderCommandCenter(sorted(trades).filter(t=>t.date === todayDateKey()));
+  return true;
+}
+
+function savePsychologyLivePlan(){
+  const flow = getPsychologyFlowState();
+  flow.liveComplete = true;
+  flow.liveCompletedAt = new Date().toISOString();
+  savePsychologyFlowState(flow);
+  const input = document.getElementById('psychTomorrowRule');
+  if(input && input.value.trim()) savePsychologyTomorrowRule();
+  showPsychologyPage('journal');
+}
+
+function savePsychologyDebriefToJournal(){
+  const result = document.getElementById('psychDebriefResult')?.value || 'note';
+  const mistakesText = (document.getElementById('psychDebriefMistakes')?.value || '').trim();
+  const notes = (document.getElementById('psychDebriefNotes')?.value || '').trim();
+  if(!notes && !mistakesText){ alert('Write the debrief notes or mistake flags before saving.'); return; }
+  const today = todayDateKey();
+  const todayTrades = sorted(trades).filter(t=>t.date === today);
+  const latestTrade = todayTrades[todayTrades.length - 1] || null;
+  const fields = {
+    narrative: notes || 'Psychology debrief saved.',
+    ruleViolations: mistakesText || 'No rule violation logged.',
+    lesson: notes || mistakesText,
+    emotion: `Mind check complete: ${isMindCheckComplete() ? 'yes' : 'no'}. Setup scan complete: ${isSetupScanComplete() ? 'yes' : 'no'}.`,
+    nextAction: (document.getElementById('psychTomorrowRule')?.value || '').trim()
+  };
+  const entry = {
+    id: Date.now(),
+    tradeKey: latestTrade ? makeTradeKey(latestTrade) : '',
+    trade: latestTrade ? {
+      date:latestTrade.date,time:latestTrade.time,symbol:latestTrade.symbol,side:latestTrade.side,session:latestTrade.session,
+      entry:latestTrade.entry,exit:latestTrade.exit,sl:latestTrade.sl,tp:latestTrade.tp,volume:latestTrade.volume,duration:latestTrade.duration,pnl:latestTrade.pnl,
+      mistakes:mistakes(latestTrade)
+    } : null,
+    date: today,
+    title: latestTrade ? `${resultLabel(latestTrade.pnl)} Debrief - ${latestTrade.symbol || 'Trade'}` : 'Psychology Debrief',
+    category: 'Psychology',
+    result: latestTrade ? tradeResult(latestTrade.pnl) : result,
+    fields,
+    createdAt: new Date().toISOString()
+  };
+  initJournalPage();
+  journalPageEntries = [entry, ...journalPageEntries.filter(e => latestTrade ? e.tradeKey !== makeTradeKey(latestTrade) : e.id !== entry.id)];
+  localStorage.setItem(JOURNAL_PAGE_STORAGE_KEY, JSON.stringify(journalPageEntries));
+  const flow = getPsychologyFlowState();
+  flow.debriefComplete = true;
+  savePsychologyFlowState(flow);
+  renderJournalPage();
+  renderSide();
+  renderPsychology();
+  alert('Debrief saved to Journal.');
 }
 
 function getTodayPsychologyReminder(){
   try{
     const saved = JSON.parse(localStorage.getItem(PSYCH_TOMORROW_RULE_KEY) || '{}');
     return saved?.date === todayISTDate() ? saved.text : '';
-  }catch{
-    return '';
-  }
+  }catch{ return ''; }
 }
 
 function renderPsychology(){
   const state = getPsychologyChecks();
+  const flow = getPsychologyFlowState();
   document.querySelectorAll('[data-psych-check]').forEach(el=>{
     const checked = !!state[el.dataset.psychCheck];
     el.classList.toggle('checked', checked);
     const mark = el.querySelector('span');
-    if(mark) mark.textContent = checked ? '' : '';
+    if(mark) mark.textContent = '';
   });
-  const complete = isMindCheckComplete();
-  document.querySelectorAll('[data-psych-page="setup"],[data-psych-page="live"]').forEach(btn=>{
-    btn.classList.toggle('locked', !complete);
+  const mindComplete = isMindCheckComplete();
+  const setupComplete = isSetupScanComplete() && !!flow.setupComplete;
+  const liveComplete = !!flow.liveComplete;
+  document.querySelectorAll('[data-psych-page]').forEach(btn=>{
+    const page = btn.dataset.psychPage;
+    const locked = (page === 'setup' && !mindComplete) || (page === 'live' && !setupComplete) || (page === 'journal' && !liveComplete);
+    const completed = (page === 'mind' && mindComplete) || (page === 'setup' && setupComplete) || (page === 'live' && liveComplete) || (page === 'journal' && !!flow.debriefComplete);
+    btn.classList.toggle('locked', locked);
+    btn.classList.toggle('completed', completed);
+    btn.disabled = locked && !btn.classList.contains('active');
   });
   const status = document.getElementById('psychGateStatus');
-  if(status) status.textContent = complete ? 'Mind check complete. Setup scan unlocked.' : 'Complete all 9 mind checks before setup scan.';
+  if(status) status.textContent = mindComplete ? 'Mind check complete. Setup scan unlocked.' : 'Complete all 9 mind checks before setup scan.';
   const nextBtn = document.getElementById('psychNextSetupBtn');
-  if(nextBtn) nextBtn.disabled = !complete;
+  if(nextBtn) nextBtn.disabled = !mindComplete;
+  const setupBtn = document.getElementById('psychSetupCompleteBtn');
+  if(setupBtn) setupBtn.disabled = !mindComplete || !isSetupScanComplete();
+  const liveBtn = document.getElementById('psychLiveCompleteBtn');
+  if(liveBtn) liveBtn.disabled = !setupComplete;
+  const criteria = document.getElementById('psychSetupCriteria');
+  if(criteria){
+    const cfg = getAccountConfig();
+    criteria.innerHTML = `<strong>Your setup criteria:</strong> Minimum RR ${Number(cfg.minRr || 3).toFixed(1)}:1, daily loss limit ${cfg.maxDailyLoss ? cfg.maxDailyLoss + '%' : 'set in account'}, max trades ${cfg.maxTrades || 'set in account'}.`;
+  }
   const input = document.getElementById('psychTomorrowRule');
   if(input && !input.value){
-    try{
-      const saved = JSON.parse(localStorage.getItem(PSYCH_TOMORROW_RULE_KEY) || '{}');
-      input.value = saved?.text || '';
-    }catch{}
+    try{ input.value = JSON.parse(localStorage.getItem(PSYCH_TOMORROW_RULE_KEY) || '{}')?.text || ''; }catch{}
   }
 }
-
 function renderCommandCenter(todayTrades){
   const data = Array.isArray(todayTrades) ? todayTrades : [];
   const state = todayTradingState(data);
@@ -5404,7 +5525,7 @@ function renderPostSessionReview(data){
     return;
   }
   box.innerHTML = '<div class="insight warn"><strong>Ready.</strong><br>Click Generate Review after your session ends.</div>';
-  if(status) status.textContent = 'Ready for Ollama.';
+  if(status) status.textContent = 'Ready for AI.';
 }
 
 async function generatePostSessionReview(force=false){
@@ -5419,8 +5540,8 @@ async function generatePostSessionReview(force=false){
   if(!force && localStorage.getItem(key)) return renderPostSessionReview(todayTrades);
   const box = document.getElementById('postSessionReview');
   const status = document.getElementById('postSessionStatus');
-  if(status) status.textContent = 'Ollama is reviewing today\'s session...';
-  if(box) box.innerHTML = '<div class="insight warn"><strong>Thinking...</strong><br>Ollama is reading today\'s trades.</div>';
+  if(status) status.textContent = 'AI is reviewing today\'s session...';
+  if(box) box.innerHTML = '<div class="insight warn"><strong>Thinking...</strong><br>AI is reading today\'s trades.</div>';
   const prompt = [
     'Create a post-session trading review for today.',
     'Use only the supplied today trades and stats.',
@@ -5430,12 +5551,12 @@ async function generatePostSessionReview(force=false){
     JSON.stringify(postSessionPayload(todayTrades), null, 2)
   ].join('\n\n');
   try{
-    const text = await window.generateOllamaJournalReport(prompt);
+    const text = await window.generateAIJournalReport(prompt);
     localStorage.setItem(key, text);
     renderPostSessionReview(todayTrades);
   }catch(err){
-    if(status) status.textContent = 'Ollama failed. Start Ollama and install the selected model.';
-    if(box) box.innerHTML = `<div class="insight danger"><strong>Review failed.</strong><br>${escapeHtml(err?.message || err || 'Ollama connection failed')}</div>`;
+    if(status) status.textContent = 'Assistant unavailable right now - try again shortly.';
+    if(box) box.innerHTML = `<div class="insight danger"><strong>Review failed.</strong><br>${escapeHtml(err?.message || err || 'AI connection failed')}</div>`;
   }
 }
 
@@ -6042,7 +6163,7 @@ async function generateJournalAIFeedback(force=false){
   const tradeKey = document.getElementById('journalTradeKey')?.value || '';
   const t = tradeKey ? findTradeByKey(tradeKey) : null;
   const ruleCheck = evaluateJournalRules({fields}, t);
-  box.innerHTML = '<div class="insight warn"><strong>Checking journal...</strong><br>Ollama is reading your trade, emotion, mistake, and improvement plan.</div>';
+  box.innerHTML = '<div class="insight warn"><strong>Checking journal...</strong><br>AI is reading your trade, emotion, mistake, and improvement plan.</div>';
   const prompt = [
     'You are an AI trading journal reviewer for a prop-firm challenge trader.',
     'Read this single journal and give direct feedback.',
@@ -6058,11 +6179,11 @@ async function generateJournalAIFeedback(force=false){
     }, null, 2)
   ].join('\n\n');
   try{
-    const text = await window.generateOllamaJournalReport(prompt);
+    const text = await window.generateAIJournalReport(prompt);
     localStorage.setItem(key, text);
     renderJournalAIFeedback();
   }catch(err){
-    box.innerHTML = `<div class="insight danger"><strong>AI feedback failed.</strong><br>${escapeHtml(err?.message || err || 'Ollama connection failed')}</div>`;
+    box.innerHTML = `<div class="insight danger"><strong>AI feedback failed.</strong><br>${escapeHtml(err?.message || err || 'AI connection failed')}</div>`;
   }
 }
 
@@ -6607,14 +6728,6 @@ document.querySelectorAll('.nav button').forEach(btn=>{
 
 <script>
 (function(){
-  const PROVIDER_STORAGE = 'krishna_real_ai_provider';
-  const OLLAMA_MODEL_STORAGE = 'krishna_real_ai_ollama_model';
-  const OLLAMA_URL_STORAGE = 'krishna_real_ai_ollama_url';
-  const DEFAULT_OLLAMA_MODEL = 'llama3.2';
-  const DEFAULT_OLLAMA_URL = location.protocol === 'http:' ? `${location.origin}/ollama` : 'http://localhost:11434';
-  const RAG_URL = location.protocol === 'http:' ? `${location.origin}/rag` : 'http://127.0.0.1:8790';
-  let ragLastSyncKey = '';
-
   function textOnly(value){
     return String(value == null ? '' : value)
       .replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[ch]));
@@ -6638,270 +6751,110 @@ document.querySelectorAll('.nav button').forEach(btn=>{
     status.textContent = message;
   }
 
-  function getAIProvider(){
-    return 'ollama';
-  }
-
-  function getOllamaModel(){
-    return (document.getElementById('ollamaModel')?.value || localStorage.getItem(OLLAMA_MODEL_STORAGE) || DEFAULT_OLLAMA_MODEL).trim();
-  }
-
-  function getOllamaUrl(){
-    return DEFAULT_OLLAMA_URL;
-  }
-
-  function saveAISettings(){
-    const ollamaModel = getOllamaModel();
-    if(ollamaModel) localStorage.setItem(OLLAMA_MODEL_STORAGE, ollamaModel);
-    localStorage.setItem(PROVIDER_STORAGE, 'ollama');
-    localStorage.setItem(OLLAMA_URL_STORAGE, DEFAULT_OLLAMA_URL);
-
-    const ollamaOnly = document.querySelectorAll('[data-ai-provider="ollama"]');
-    ollamaOnly.forEach(el => el.style.display = '');
-
-    setStatus(`Permanent local AI: Ollama at ${DEFAULT_OLLAMA_URL}. Selected model: ${ollamaModel}.`, 'good');
+  function scopedTradeData(){
+    let data = [];
+    try{ data = Array.isArray(trades) ? trades : []; }catch(_){ data = []; }
+    const sortedTrades = typeof sorted === 'function' ? sorted(data) : data;
+    const sevenDaysAgo = Date.now() - 7 * 86400000;
+    const scoped = sortedTrades.filter(t=>{
+      const stamp = new Date(t.openUtc || t.date || 0).getTime();
+      return Number.isFinite(stamp) ? stamp >= sevenDaysAgo : true;
+    }).slice(-20);
+    return scoped.length ? scoped : sortedTrades.slice(-20);
   }
 
   function buildTradeContext(){
-  let data = [];
-  try{ data = Array.isArray(trades) ? trades : []; }catch(_){ data = []; }
-  const sortedTrades = typeof sorted === 'function' ? sorted(data) : data;
-  const sevenDaysAgo = Date.now() - 7 * 86400000;
-  const scoped = sortedTrades
-    .filter(t => {
-      const stamp = new Date(t.openUtc || t.date || 0).getTime();
-      return Number.isFinite(stamp) ? stamp >= sevenDaysAgo : true;
-    })
-    .slice(-20);
-  const sample = scoped.length ? scoped : sortedTrades.slice(-20);
-  const s = typeof stats === 'function' ? stats(sample) : null;
-  const account = typeof accountMetrics === 'function' ? accountMetrics(data) : null;
-  const psychState = typeof getPsychologyChecks === 'function' ? getPsychologyChecks() : {};
-  const checklist = typeof preTradeChecklistState !== 'undefined' ? preTradeChecklistState : {};
-  const today = typeof todayDateKey === 'function' ? todayDateKey() : '';
-  const todayTrades = sortedTrades.filter(t=>t.date === today);
-  const todayState = typeof todayTradingState === 'function' ? todayTradingState(todayTrades) : null;
-  const setupStats = {};
-  sample.forEach(t=>{
-    const setup = t.setup || t.reason || 'Unknown setup';
-    if(!setupStats[setup]) setupStats[setup] = {count:0,wins:0,rrTotal:0,rrCount:0,pnl:0};
-    const item = setupStats[setup];
-    item.count++;
-    item.pnl += Number(t.pnl)||0;
-    if(typeof tradeResult === 'function' && tradeResult(t.pnl)==='profit') item.wins++;
-    const rr = typeof tradePlannedRr === 'function' ? tradePlannedRr(t) : null;
-    if(rr != null){ item.rrTotal += rr; item.rrCount++; }
-  });
-  const lines = [
-    'Journall psychology and trade-review context',
-    `Period: last ${sample.length} trades, scoped to last 7 days when available.`,
-    `Total logged trades in scope: ${sample.length}`,
-    s ? `Scope stats: win rate ${Number(s.wr||0).toFixed(1)}%, net P&L ${signedMoney(s.pnl)}, wins ${s.wins.length}, losses ${s.losses.length}, breakeven ${s.breakEvens.length}.` : 'Scope stats: unavailable.',
-    account ? `Account state: phase ${account.config.phase}, account size $${account.accountSize.toFixed(2)}, current balance $${account.currentBalance.toFixed(2)}, daily loss used $${account.dailyLossUsed.toFixed(2)} of ${account.maxDailyLossAmount == null ? 'not set' : '$'+account.maxDailyLossAmount.toFixed(2)}.` : 'Account state: account setup not completed.',
-    todayState ? `Today: ${todayState.tradesCount} trades, ${signedMoney(todayState.todayPnl)}, ${todayState.mistakesToday} mistake tags, action ${todayState.nextAction}.` : 'Today: unavailable.',
-    `Mind Stability Check today: ${Object.entries(psychState).map(([k,v])=>`${k}=${v?'yes':'no'}`).join(', ') || 'not logged'}.`,
-    `Pre-Trade Checklist current state: ${Object.entries(checklist).map(([k,v])=>`${k}=${v?'yes':'no'}`).join(', ') || 'not logged'}.`,
-    'Mistake tags allowed: Revenge Trade, Increased Lot Size, Moved Stop Loss, No Confirmation Entry, Overtrading, No Patience.',
-    'Setup performance:',
-    ...Object.entries(setupStats).map(([name,item])=>`- ${name}: ${item.count} trades, win rate ${item.count ? Math.round(item.wins/item.count*100) : 0}%, avg RR ${item.rrCount ? (item.rrTotal/item.rrCount).toFixed(2) : 'n/a'}, P&L ${signedMoney(item.pnl)}.`),
-    'Recent trades:',
-    ...sample.map((t,i)=>`- #${i+1} ${t.date || '-'} ${t.time || ''} ${t.symbol || ''} ${t.side || ''}: entry ${t.entry ?? '-'}, exit ${t.exit ?? '-'}, SL ${t.sl ?? '-'}, TP ${t.tp ?? '-'}, P&L ${signedMoney(t.pnl)}, setup ${t.setup || t.reason || 'unknown'}, RR ${(typeof tradePlannedRr === 'function' && tradePlannedRr(t) != null) ? tradePlannedRr(t).toFixed(2) : 'n/a'}, mistakes ${(typeof mistakes === 'function' ? mistakes(t) : []).join(', ') || 'none'}.`)
-  ];
-  return lines.join('\n');
-}
-
-  async function askRealAI(prompt){
-    try{
-      return await askRagAI(prompt);
-    }catch(err){
-      console.warn('RAG coach unavailable, falling back to direct Ollama context.', err);
-      return askOllamaAI(prompt, 'chat');
-    }
-  }
-
-  function buildRagTrades(){
-    let data = [];
-    try{
-      data = Array.isArray(trades) ? trades : [];
-    }catch(_){
-      data = [];
-    }
-    return data.map((t, idx) => ({
-      ...t,
-      _ragId: t.id || `${t.date || 'date'}-${t.time || 'time'}-${t.symbol || 'symbol'}-${idx}`,
-      mistakes: typeof mistakes === 'function' ? mistakes(t) : []
-    }));
-  }
-
-  function getRagSyncKey(ragTrades){
-    return `${ragTrades.length}:${ragTrades.slice(-12).map(t => [
-      t._ragId,
-      t.date,
-      t.time,
-      t.symbol,
-      t.side,
-      t.pnl,
-      t.reason || t.exitReason || '',
-      t.notes || t.comment || ''
-    ].join('|')).join('~')}`;
-  }
-
-  async function syncRagIndex(force=false){
-    const ragTrades = buildRagTrades();
-    if(!ragTrades.length) return {indexed:0,total:0};
-    const syncKey = getRagSyncKey(ragTrades);
-    if(!force && syncKey === ragLastSyncKey) return {skipped:true,total:ragTrades.length};
-
-    const response = await fetch(`${RAG_URL}/index`, {
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({trades:ragTrades})
+    let allTrades = [];
+    try{ allTrades = Array.isArray(trades) ? trades : []; }catch(_){ allTrades = []; }
+    const sample = scopedTradeData();
+    const s = typeof stats === 'function' ? stats(sample) : null;
+    const account = typeof accountMetrics === 'function' ? accountMetrics(allTrades) : null;
+    const psychState = typeof getPsychologyChecks === 'function' ? getPsychologyChecks() : {};
+    const checklist = typeof preTradeChecklistState !== 'undefined' ? preTradeChecklistState : {};
+    const today = typeof todayDateKey === 'function' ? todayDateKey() : '';
+    const todayTrades = (typeof sorted === 'function' ? sorted(allTrades) : allTrades).filter(t=>t.date === today);
+    const todayState = typeof todayTradingState === 'function' ? todayTradingState(todayTrades) : null;
+    const setupStats = {};
+    sample.forEach(t=>{
+      const setup = t.setup || t.reason || 'Unknown setup';
+      if(!setupStats[setup]) setupStats[setup] = {count:0,wins:0,rrTotal:0,rrCount:0,pnl:0};
+      const item = setupStats[setup];
+      item.count++;
+      item.pnl += Number(t.pnl)||0;
+      if(typeof tradeResult === 'function' && tradeResult(t.pnl)==='profit') item.wins++;
+      const rr = typeof tradePlannedRr === 'function' ? tradePlannedRr(t) : null;
+      if(rr != null){ item.rrTotal += rr; item.rrCount++; }
     });
-    const data = await response.json().catch(() => ({}));
-    if(!response.ok) throw new Error(data?.error || `RAG index failed (${response.status})`);
-    ragLastSyncKey = syncKey;
-    return data;
+    const lines = [
+      'Journall psychology and trade-review context',
+      `Period: last ${sample.length} trades, scoped to last 7 days when available.`,
+      `Total logged trades in scope: ${sample.length}`,
+      s ? `Scope stats: win rate ${Number(s.wr||0).toFixed(1)}%, net P&L ${signedMoney(s.pnl)}, wins ${s.wins.length}, losses ${s.losses.length}, breakeven ${s.breakEvens.length}.` : 'Scope stats: unavailable.',
+      account ? `Account state: phase ${account.config.phase}, account size $${account.accountSize.toFixed(2)}, current balance $${account.currentBalance.toFixed(2)}, daily loss used $${account.dailyLossUsed.toFixed(2)} of ${account.maxDailyLossAmount == null ? 'not set' : '$'+account.maxDailyLossAmount.toFixed(2)}.` : 'Account state: account setup not completed.',
+      todayState ? `Today: ${todayState.tradesCount} trades, ${signedMoney(todayState.todayPnl)}, ${todayState.mistakesToday} mistake tags, action ${todayState.nextAction}.` : 'Today: unavailable.',
+      `Mind Stability Check today: ${Object.entries(psychState).map(([k,v])=>`${k}=${v?'yes':'no'}`).join(', ') || 'not logged'}.`,
+      `Pre-Trade Checklist current state: ${Object.entries(checklist).map(([k,v])=>`${k}=${v?'yes':'no'}`).join(', ') || 'not logged'}.`,
+      'Mistake tags allowed: Revenge Trade, Increased Lot Size, Moved Stop Loss, No Confirmation Entry, Overtrading, No Patience.',
+      'Setup performance:',
+      ...Object.entries(setupStats).map(([name,item])=>`- ${name}: ${item.count} trades, win rate ${item.count ? Math.round(item.wins/item.count*100) : 0}%, avg RR ${item.rrCount ? (item.rrTotal/item.rrCount).toFixed(2) : 'n/a'}, P&L ${signedMoney(item.pnl)}.`),
+      'Recent trades:',
+      ...sample.map((t,i)=>`- #${i+1} ${t.date || '-'} ${t.time || ''} ${t.symbol || ''} ${t.side || ''}: entry ${t.entry ?? '-'}, exit ${t.exit ?? '-'}, SL ${t.sl ?? '-'}, TP ${t.tp ?? '-'}, P&L ${signedMoney(t.pnl)}, setup ${t.setup || t.reason || 'unknown'}, RR ${(typeof tradePlannedRr === 'function' && tradePlannedRr(t) != null) ? tradePlannedRr(t).toFixed(2) : 'n/a'}, mistakes ${(typeof mistakes === 'function' ? mistakes(t) : []).join(', ') || 'none'}.`)
+    ];
+    return lines.join('\n');
   }
 
-  async function askRagAI(prompt){
-    const ragTrades = buildRagTrades();
-    if(!ragTrades.length) throw new Error('No trades are available to index.');
-    await syncRagIndex();
-
-    const response = await fetch(`${RAG_URL}/ask`, {
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({
-        question:prompt,
-        model:getOllamaModel(),
-        topK:5
-      })
-    });
-    const data = await response.json().catch(() => ({}));
-    if(!response.ok) throw new Error(data?.error || `RAG coach failed (${response.status})`);
-    return {
-      fallback:false,
-      rag:true,
-      relevantCount:data.relevantCount || 0,
-      text:data.answer || 'RAG coach replied, but no text was returned.'
-    };
-  }
-
-  function buildOllamaPrompt(prompt, mode, context){
-  const evidence = typeof context === 'string' ? context : JSON.stringify(context, null, 2);
-  const guardrail = 'You are a trading psychology and discipline coach. You analyze past trades and behavior patterns only. You never suggest specific future trades, entries, or price targets. If asked to predict or suggest a trade, decline and redirect to reviewing past behavior instead.';
-  const thinDataRule = 'If total logged trades is fewer than 5, every response must begin with: "Not enough trade history yet for a reliable pattern".';
-  const styleRule = 'Answer in 3-5 sentences max. Be direct and specific. No generic motivational filler.';
-  if(mode === 'generation'){
-    return [
-      guardrail,
-      thinDataRule,
-      styleRule,
-      'Use readable journal evidence, not generic advice. Never mention JSON, code, schemas, arrays, or parsing.',
-      `User task:\n${prompt}`,
-      `Journal evidence:\n${evidence}`
-    ].join('\n\n');
-  }
-  return [
-    guardrail,
-    thinDataRule,
-    styleRule,
-    'Every answer must cite concrete facts from the journal evidence when enough data exists.',
-    'Do not promise profits, guaranteed profitability, signals, or financial advice. Give process-based actions only.',
-    `Trader question: ${prompt}`,
-    `Journal evidence:\n${evidence}`
-  ].join('\n\n');
-}
-
-  async function askOllamaAI(prompt, mode='chat'){
-    const context = buildTradeContext();
-    const model = getOllamaModel();
-    const endpoint = `${getOllamaUrl()}/api/generate`;
-    const response = await fetch(endpoint, {
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({
-        model,
-        stream:false,
-        prompt:buildOllamaPrompt(prompt, mode, context)
-      })
-    });
-    const data = await response.json().catch(() => ({}));
-    if(!response.ok){
-      const msg = data?.error || `Ollama request failed (${response.status})`;
-      throw new Error(msg);
+  async function askCloudAI(prompt, mode='chat'){
+    if(typeof window.journallAiCoachCallable !== 'function'){
+      throw new Error('AI backend is not ready. Deploy Firebase Functions and refresh.');
     }
-    return {fallback:false, text: data.response || 'Ollama replied, but no text was returned.'};
+    const result = await window.journallAiCoachCallable({
+      prompt,
+      mode,
+      context: buildTradeContext()
+    });
+    const text = result?.data?.text;
+    if(!text) throw new Error('AI backend returned no text.');
+    return text;
   }
 
-  window.generateOllamaJournalReport = async function(prompt){
-    const result = await askOllamaAI(prompt, 'generation');
-    return result.text;
+  window.generateAIJournalReport = async function(prompt){
+    return askCloudAI(prompt, 'generation');
   };
 
-  window.saveAISettings = saveAISettings;
+
   window.askBuiltInAI = async function(preset){
     const input = document.getElementById('aiPromptInput');
     const prompt = preset || (input ? input.value.trim() : '');
     if(!prompt) return;
-
     addMessage('user', `<strong>You:</strong> ${textOnly(prompt)}`);
-    const loading = addMessage('bot', '<strong>AI Coach:</strong> Thinking with your journal data...', 'loading');
-
+    const loading = addMessage('bot', '<strong>AI Coach:</strong> Reading your journal data...', 'loading');
     try{
-      const result = await askRealAI(prompt);
+      const text = await askCloudAI(prompt, 'chat');
       if(loading) loading.remove();
-      if(result.fallback){
-        addMessage('bot', result.text);
-        setStatus('Rule-based coach answered. Start Ollama and install the selected model to enable real local AI.', 'warn');
-      }else if(result.rag){
-        addMessage('bot', `<strong>Trading Coach:</strong> ${textOnly(result.text).replace(/\\n/g,'<br>')}`);
-        setStatus(`RAG coach answered with ${result.relevantCount || 0} relevant trades from ChromaDB + nomic-embed-text.`, 'good');
-      }else{
-        addMessage('bot', `<strong>Trading Coach:</strong> ${textOnly(result.text).replace(/\\n/g,'<br>')}`);
-        setStatus(`Real AI answered using Ollama ${getOllamaModel()}.`, 'good');
-      }
+      addMessage('bot', `<strong>Trading Coach:</strong> ${textOnly(text).replace(/\n/g,'<br>')}`);
+      setStatus('AI Trading Assistant answered from your scoped journal context.', 'good');
     }catch(err){
       if(loading) loading.remove();
-      addMessage('bot', `<strong>AI Coach:</strong> Real AI could not connect: ${textOnly(err.message)}<br><br>${aiAnswer(prompt)}`);
-      setStatus('Local Ollama connection failed, so the rule-based coach answered instead. Confirm Ollama is running and the selected model is installed.', 'bad');
+      addMessage('bot', '<strong>AI Coach:</strong> Assistant unavailable right now - try again shortly.');
+      setStatus('Assistant unavailable right now - try again shortly.', 'bad');
+      console.error('AI coach failed:', err);
     }
-
     if(input) input.value = '';
     if(typeof renderAISnapshot === 'function') renderAISnapshot();
   };
 
   function installRealAIControls(){
     const card = document.querySelector('#ailab .card');
-    if(!card || document.getElementById('ollamaModel')) return;
-
+    if(!card || document.getElementById('realAiStatus')) return;
     const title = card.querySelector('.panel-title span');
-    if(title) title.textContent = 'permanent local Ollama coach';
-
+    if(title) title.textContent = 'AI Trading Assistant';
     const settings = document.createElement('div');
-    settings.innerHTML = `
-      <div class="real-ai-settings">
-        <select id="ollamaModel" data-ai-provider="ollama" aria-label="Ollama model">
-          <option value="llama3.2">llama3.2 - balanced</option>
-          <option value="llama3.1:8b">llama3.1:8b - stronger</option>
-          <option value="qwen2.5:7b">qwen2.5:7b - sharp analysis</option>
-          <option value="mistral">mistral - fast</option>
-          <option value="gemma2:9b">gemma2:9b - detailed</option>
-        </select>
-        <input value="${DEFAULT_OLLAMA_URL}" disabled aria-label="Permanent Ollama URL">
-        <button class="btn" type="button" onclick="saveAISettings()">Save AI</button>
-      </div>
-      <div id="realAiStatus" class="real-ai-status warn">Trading Coach ready. It uses ChromaDB + nomic-embed-text for relevant trade memory, then Ollama for coaching.</div>
-    `;
+    settings.innerHTML = '<div id="realAiStatus" class="real-ai-status warn">AI Trading Assistant ready. Sign in and deploy Firebase Functions to enable coaching.</div>';
     const chipRow = card.querySelector('.ai-chip-row');
     card.insertBefore(settings, chipRow || card.children[1]);
-
-    document.getElementById('ollamaModel').value = localStorage.getItem(OLLAMA_MODEL_STORAGE) || DEFAULT_OLLAMA_MODEL;
-    document.getElementById('ollamaModel').addEventListener('change', saveAISettings);
-    saveAISettings();
   }
 
-document.addEventListener('DOMContentLoaded', installRealAIControls);
+  document.addEventListener('DOMContentLoaded', installRealAIControls);
   installRealAIControls();
 })();
 </script>
@@ -7101,6 +7054,8 @@ setGateVisible(true);
   const app = appModule.initializeApp(firebaseConfig);
   const auth = authModule.getAuth(app);
   firestoreDb = firestoreModule.getFirestore(app);
+  const functions = functionsModule.getFunctions(app);
+  window.journallAiCoachCallable = functionsModule.httpsCallable(functions, 'aiCoach');
   const provider = new authModule.GoogleAuthProvider();
   provider.setCustomParameters({ prompt: 'select_account' });
   try{
@@ -8253,6 +8208,7 @@ p{
     max-width:1300px!important;
   }
 }
+
 </style>
 <style>
 /* USER-REQUESTED UI FIXES */
@@ -9293,7 +9249,8 @@ main,
 @media (display-mode: standalone) {
   .android-install-btn { display: none !important; }
 }
-/* END JOURNALL_ANDROID_PWA_INSTALL */</style>
+/* END JOURNALL_ANDROID_PWA_INSTALL */
+</style>
 <script>
 (function(){
   function showJournallTab(tab){
@@ -9644,9 +9601,11 @@ html.firebase-auth-required body{
 .firebase-auth-message {
   max-width: 100% !important;
 }
+
 </style>
 <style id="journall-account-risk-theme">
 .account-onboarding-gate{position:fixed;inset:0;z-index:10000;display:none;place-items:center;background:rgba(0,0,0,.85);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);padding:24px;color:#f7f8f8}.account-onboarding-gate.show{display:grid}.account-onboarding-card{width:min(980px,96vw);max-height:92vh;overflow:auto;background:#16181d;border:1px solid #2e3038;border-radius:18px;padding:32px}.account-onboarding-head{display:flex;justify-content:space-between;gap:18px;align-items:flex-start;margin-bottom:22px}.account-kicker{display:block;color:#8a8f98;font-size:12px;letter-spacing:.4px;text-transform:uppercase;margin-bottom:8px}.account-onboarding-card h2{margin:0;color:#f7f8f8;font-size:32px;letter-spacing:-.8px}.account-onboarding-card p{color:#d0d6e0;margin:8px 0 0}.setup-section{background:#0d0e10;border:1px solid rgba(255,255,255,.06);border-radius:14px;padding:20px;margin-bottom:16px}.setup-section-label{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.4);margin-bottom:12px}.account-form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}.setup-section:first-of-type .account-form-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.account-form-grid label{display:flex;flex-direction:column;gap:8px;color:#8a8f98;font-size:12px;text-transform:uppercase;letter-spacing:.4px}.account-onboarding-card input,.account-onboarding-card select{background:#16181a!important;border:1px solid rgba(255,255,255,.08)!important;border-radius:10px!important;color:#fff!important;padding:12px 14px!important;font-size:15px!important;font-family:'Inter',sans-serif!important;transition:border-color .15s ease,box-shadow .15s ease}.account-onboarding-card input:focus,.account-onboarding-card select:focus{border-color:#494fdf!important;outline:none!important;box-shadow:0 0 0 3px rgba(73,79,223,.15)!important}.account-onboarding-card input[type=number]{-moz-appearance:textfield;appearance:textfield}.account-onboarding-card input[type=number]::-webkit-outer-spin-button,.account-onboarding-card input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}.number-stepper,.stepper-group{display:flex;align-items:center;gap:6px;width:100%}.number-stepper input{min-width:48px;flex:1;color:#fff!important;-webkit-text-fill-color:#fff!important;opacity:1!important}.account-inline-field{display:flex;gap:10px;align-items:center}.account-inline-field .number-stepper{flex:1}.account-inline-field select{width:92px}.account-inline-field span{color:#d0d6e0}.stepper-btn{background:#16181a!important;border:1px solid rgba(255,255,255,.08)!important;color:rgba(255,255,255,.5)!important;flex-shrink:0!important;width:32px!important;height:32px!important;border-radius:6px!important;display:flex!important;align-items:center!important;justify-content:center!important;padding:0!important;font-size:16px!important;line-height:1!important;cursor:pointer!important}.stepper-btn:hover{background:#1f2124!important;color:#fff!important}.setup-preview{background:rgba(73,79,223,.08);border:1px solid rgba(73,79,223,.25);border-radius:12px;padding:16px 20px;margin-top:4px}.setup-preview-row{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.08)}.setup-preview-row:last-child{border-bottom:0}.setup-preview-row span{color:rgba(255,255,255,.58);font-size:13px}.setup-preview-row strong{color:#fff;font-size:15px;font-weight:700;text-align:right}.account-onboarding-actions{display:flex;align-items:center;gap:14px;margin-top:22px}.account-onboarding-actions p{margin:0;color:#8a8f98}.save-setup-btn{background:#494fdf!important;color:#fff!important;border:none!important;font-weight:600!important}.save-setup-btn:hover{background:#5a5ff0!important}.risk-calc-card{grid-column:span 2}.risk-calc-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:12px 0}.risk-calc-grid label{display:flex;flex-direction:column;gap:6px;color:#8a8f98;font-size:12px;text-transform:uppercase;letter-spacing:.4px}.risk-calc-grid input{background:#010102!important;border:1px solid #23252a!important;color:#f7f8f8!important;border-radius:8px!important;padding:9px 10px!important}@media(max-width:760px){.account-form-grid,.setup-section:first-of-type .account-form-grid,.risk-calc-grid{grid-template-columns:1fr}.risk-calc-card{grid-column:auto}.account-onboarding-head{flex-direction:column}.account-onboarding-card{padding:20px}.account-inline-field{align-items:stretch;flex-direction:column}.account-inline-field select{width:100%}.setup-preview-row{align-items:flex-start;flex-direction:column}.setup-preview-row strong{text-align:left}}
+
 </style>
 </body>
 </html>

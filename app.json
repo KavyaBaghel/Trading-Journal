@@ -37,10 +37,4 @@
       "assets/icon-512.png",
       "assets/app-icon.ico"
     ]
-  },
-  "ai": {
-    "provider": "Ollama",
-    "url": "http://localhost:11434",
-    "defaultModel": "llama3.2"
-  }
-}
+  }}

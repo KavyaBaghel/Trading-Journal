@@ -31,7 +31,7 @@ Journall is a local PWA-style desktop app. It uses a PowerShell local server and
 | Stats helpers | `stats(`, `mistakes(`, `getB2B(` |
 | Dashboard | `renderMetrics`, `renderCharts`, `renderInsights` |
 | AI widgets | `renderWidgets`, `renderAIWidgetsText`, `generateAIWidgets` |
-| AI Lab | `askBuiltInAI`, `generateOllamaJournalReport` |
+| AI Lab | `askBuiltInAI`, `generateAIJournalReport` |
 | Calendar | `renderCalendar`, `openCalendarDayTrades` |
 | Trade table | `renderGrid`, `applyFilters` |
 | Journal | `renderJournalPage`, `openTradeJournal`, `saveJournalPageEntry` |
