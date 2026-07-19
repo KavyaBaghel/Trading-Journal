@@ -86,7 +86,7 @@ https://kavyabaghel.github.io/Trading-Journal/
 
 Import the GitHub repository and use the project root as the publish directory. No build command is required.
 
-The public website works for dashboard, journal, analytics, calendar, goals, and Google sign-in cloud sync. AI coaching requires Firebase Functions with the OPENAI_API_KEY secret configured.
+The public website works for dashboard, journal, analytics, calendar, goals, and Google sign-in cloud sync. AI coaching requires Firebase Functions with the GROQ_API_KEY secret configured.
 
 ## Firebase Sign-In Setup
 
@@ -122,28 +122,27 @@ kavyabaghel.github.io
 
 The public Journall website requires Google sign-in before opening the dashboard.
 
-## Local AI Setup
+## Website AI Setup
 
-1. Install the Firebase CLI and configure the OpenAI secret
-2. Install the Python dependencies:
+1. Install the Firebase CLI and configure the Groq secret
+2. Set your Groq API key as a Firebase Functions secret:
 
 ```powershell
-py -m pip install -r requirements.txt
+firebase functions:secrets:set GROQ_API_KEY
 ```
 
-3. Pull the local chat and embedding models:
+3. Deploy the secure backend function:
 
 ```powershell
-firebase functions:secrets:set OPENAI_API_KEY
 firebase deploy --only functions
 ```
 
-4. Open Journall with the desktop launcher
+4. Open the public Journall website
 5. Go to AI Coach and ask a question
 
-The website AI Coach sends scoped trade context to the secure Firebase aiCoach function for specific feedback.
+The website AI Coach sends scoped trade context to the secure Firebase aiCoach function backed by Groq for specific feedback.
 
-The app still opens without AI, but coaching features require the deployed Firebase function.
+The app still opens without AI, but coaching features require the deployed Firebase function. Website users do not need Ollama or any local model installed.
 
 ## Privacy
 

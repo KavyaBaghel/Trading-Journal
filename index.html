@@ -2395,7 +2395,7 @@ tr:hover {
       <div class="hero">
 
         <h1>Today's Summary</h1>
-        <span class="hero-tag">Local AI &bull; RAG memory &bull; Trade review</span>
+        <span class="hero-tag">AI-powered &bull; Trade review</span>
 
       </div>
       <div class="quick-actions"></div>
@@ -3000,7 +3000,7 @@ tr:hover {
 
       <div class="insights" style="margin-top:14px">
         <div class="insight good"><strong>Best Use:</strong> Use this after every trading day to find one mistake to fix tomorrow.</div>
-        <div class="insight warn"><strong>Note:</strong> Local AI runs through Ollama on this device. Your trade data is not sent to an external AI API.</div>
+        <div class="insight warn"><strong>Note:</strong> AI Coach runs through a secure cloud backend. Users do not need Ollama or any local model installed.</div>
       </div>
     </div>
   </div>
@@ -6926,8 +6926,6 @@ document.querySelectorAll('.nav button').forEach(btn=>{
 
 <script>
 (function(){
-  const LOCAL_AI_SETTINGS_KEY = 'journall_local_ai_settings_v1';
-
   function textOnly(value){
     return String(value == null ? '' : value)
       .replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[ch]));
@@ -6949,25 +6947,6 @@ document.querySelectorAll('.nav button').forEach(btn=>{
     if(!status) return;
     status.className = `real-ai-status ${tone || ''}`.trim();
     status.textContent = message;
-  }
-
-  function getLocalAISettings(){
-    try{
-      const saved = JSON.parse(localStorage.getItem(LOCAL_AI_SETTINGS_KEY) || '{}') || {};
-      return {
-        url: String(saved.url || 'http://127.0.0.1:11434').replace(/\/+$/,''),
-        model: String(saved.model || 'llama3.2').trim() || 'llama3.2'
-      };
-    }catch{
-      return { url:'http://127.0.0.1:11434', model:'llama3.2' };
-    }
-  }
-
-  function saveLocalAISettings(){
-    const url = document.getElementById('localAiUrl')?.value || 'http://127.0.0.1:11434';
-    const model = document.getElementById('localAiModel')?.value || 'llama3.2';
-    localStorage.setItem(LOCAL_AI_SETTINGS_KEY, JSON.stringify({url, model}));
-    setStatus(`Local AI set to ${model} at ${url}.`, 'good');
   }
 
   function scopedTradeData(){
@@ -7024,47 +7003,27 @@ document.querySelectorAll('.nav button').forEach(btn=>{
     return lines.join('\n');
   }
 
-  async function callLocalOllama(prompt, mode='chat'){
-    const settings = getLocalAISettings();
-    const systemPrompt =
-      "You are a trading psychology and discipline coach embedded in Journall. " +
-      "You analyze past trades, mind-check answers, checklist behavior, risk discipline, and mistake patterns only. " +
-      "Never suggest specific future trades, entries, price targets, market predictions, or financial advice. " +
-      "If asked to call a trade, decline and redirect to reviewing process and psychology. " +
-      "Be direct, specific, and practical. Keep normal chat answers to 3-5 sentences.";
-
-    const response = await fetch(`${settings.url}/api/chat`, {
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({
-        model: settings.model,
-        stream: false,
-        messages: [
-          {role:'system', content: systemPrompt},
-          {role:'user', content: `${buildTradeContext()}\n\nTrader request:\n${prompt}`}
-        ],
-        options: {temperature: mode === 'generation' ? 0.35 : 0.25}
-      })
-    });
-
-    if(!response.ok){
-      let detail = '';
-      try{ detail = await response.text(); }catch(_){}
-      throw new Error(`Ollama returned ${response.status}. ${detail}`.trim());
+  async function callCloudAI(prompt, mode='chat'){
+    if(!window.journallAiCoachCallable){
+      throw new Error('AI backend is still loading. Sign in, wait a moment, then try again.');
     }
-    const data = await response.json();
-    const text = data?.message?.content || data?.response || '';
-    if(!text.trim()) throw new Error('Ollama returned no text.');
+    const result = await window.journallAiCoachCallable({
+      prompt,
+      mode,
+      context: buildTradeContext()
+    });
+    const text = result?.data?.text || '';
+    if(!text.trim()) throw new Error('AI backend returned no text.');
     return text.trim();
   }
 
   function localFallback(prompt){
     if(typeof aiAnswer === 'function') return aiAnswer(prompt).replace(/^<strong>AI Coach:<\/strong>\s*/,'');
-    return 'Local Ollama is not reachable yet. Start Ollama, pull a model, then try again.';
+    return 'Cloud AI is temporarily unavailable. Try again after a moment.';
   }
 
   window.generateAIJournalReport = async function(prompt){
-    return callLocalOllama(prompt, 'generation');
+    return callCloudAI(prompt, 'generation');
   };
 
   window.askBuiltInAI = async function(preset){
@@ -7072,74 +7031,70 @@ document.querySelectorAll('.nav button').forEach(btn=>{
     const prompt = preset || (input ? input.value.trim() : '');
     if(!prompt) return;
     addMessage('user', `<strong>You:</strong> ${textOnly(prompt)}`);
-    const loading = addMessage('bot', '<strong>AI Coach:</strong> Asking local Ollama on this device...', 'loading');
+    const loading = addMessage('bot', '<strong>AI Coach:</strong> Reviewing your journal with cloud AI...', 'loading');
     try{
-      const text = await callLocalOllama(prompt, 'chat');
+      const text = await callCloudAI(prompt, 'chat');
       if(loading) loading.remove();
-      addMessage('bot', `<strong>Local AI Coach:</strong> ${textOnly(text).replace(/\n/g,'<br>')}`);
-      setStatus('Local AI answered through Ollama on this device.', 'good');
+      addMessage('bot', `<strong>AI Coach:</strong> ${textOnly(text).replace(/\n/g,'<br>')}`);
+      setStatus('Cloud AI answered. No local download needed.', 'good');
     }catch(err){
       if(loading) loading.remove();
       const fallback = localFallback(prompt);
-      addMessage('bot', `<strong>Local AI Coach:</strong> Ollama is not connected yet. Start Ollama and run <code>ollama pull ${textOnly(getLocalAISettings().model)}</code>.<br><br><strong>Rule-based fallback:</strong> ${fallback}`);
-      setStatus(`Local Ollama offline: ${err?.message || err}`, 'bad');
-      console.error('Local Ollama coach failed:', err);
+      addMessage('bot', `<strong>AI Coach:</strong> Cloud AI is not ready yet.<br><br><strong>Rule-based fallback:</strong> ${fallback}`);
+      setStatus(`Cloud AI unavailable: ${err?.message || err}`, 'bad');
+      console.error('Cloud AI coach failed:', err);
     }
     if(input) input.value = '';
     if(typeof renderAISnapshot === 'function') renderAISnapshot();
   };
 
-  window.testLocalAIConnection = async function(){
-    saveLocalAISettings();
-    setStatus('Testing local Ollama...', 'warn');
+  window.testCloudAIConnection = async function(){
+    setStatus('Testing cloud AI...', 'warn');
     try{
-      const text = await callLocalOllama('Reply with one short sentence confirming local AI is connected.', 'chat');
-      setStatus(`Local AI connected: ${text.slice(0,120)}`, 'good');
+      const text = await callCloudAI('Reply with one short sentence confirming the website AI is connected.', 'chat');
+      setStatus(`Cloud AI connected: ${text.slice(0,120)}`, 'good');
     }catch(err){
-      setStatus(`Local AI not connected. Start Ollama and check URL/model. ${err?.message || err}`, 'bad');
+      setStatus(`Cloud AI not connected yet. Deploy Firebase Functions and set GROQ_API_KEY. ${err?.message || err}`, 'bad');
     }
   };
 
-  function installLocalAIControls(){
+  function installCloudAIControls(){
     const card = document.querySelector('#ailab .card');
     if(!card || document.getElementById('realAiStatus')) return;
     const title = card.querySelector('.panel-title span');
-    if(title) title.textContent = 'local Ollama coach';
-    const settings = getLocalAISettings();
+    if(title) title.textContent = 'secure cloud AI coach';
     const panel = document.createElement('div');
-    panel.className = 'local-ai-settings';
+    panel.className = 'cloud-ai-settings';
     panel.innerHTML = `
-      <div id="realAiStatus" class="real-ai-status warn">Local AI uses Ollama on this device. Start Ollama, then test the connection.</div>
-      <div class="local-ai-grid">
-        <label>Ollama URL<input id="localAiUrl" value="${textOnly(settings.url)}" oninput="localStorage.setItem('${LOCAL_AI_SETTINGS_KEY}', JSON.stringify({url:this.value, model:document.getElementById('localAiModel')?.value || 'llama3.2'}))"></label>
-        <label>Model<input id="localAiModel" value="${textOnly(settings.model)}" oninput="localStorage.setItem('${LOCAL_AI_SETTINGS_KEY}', JSON.stringify({url:document.getElementById('localAiUrl')?.value || 'http://127.0.0.1:11434', model:this.value}))"></label>
-        <button class="btn" type="button" onclick="testLocalAIConnection()">Test Local AI</button>
+      <div id="realAiStatus" class="real-ai-status warn">Website AI uses a secure Firebase backend. Users do not need Ollama or local installs.</div>
+      <div class="cloud-ai-grid">
+        <span class="cloud-ai-chip">Groq llama-3.1-8b-instant</span>
+        <button class="btn" type="button" onclick="testCloudAIConnection()">Test Website AI</button>
       </div>
     `;
     const chipRow = card.querySelector('.ai-chip-row');
     card.insertBefore(panel, chipRow || card.children[1]);
   }
 
-  function installLocalAIStyles(){
-    if(document.getElementById('local-ai-style')) return;
+  function installCloudAIStyles(){
+    if(document.getElementById('cloud-ai-style')) return;
     const style = document.createElement('style');
-    style.id = 'local-ai-style';
+    style.id = 'cloud-ai-style';
     style.textContent = `
-      .local-ai-settings{background:#0d0e11;border:1px solid #23252a;border-radius:14px;padding:14px;margin:14px 0 18px}
-      .local-ai-grid{display:grid;grid-template-columns:minmax(180px,1fr) minmax(140px,220px) auto;gap:10px;align-items:end;margin-top:10px}
-      .local-ai-grid label{font-size:12px;color:rgba(255,255,255,.55);display:grid;gap:6px}
-      .local-ai-grid input{background:#16181a!important;border:1px solid rgba(255,255,255,.12)!important;border-radius:10px!important;color:#fff!important;padding:10px 12px!important}
-      @media (max-width:700px){.local-ai-grid{grid-template-columns:1fr}.local-ai-grid .btn{width:100%}}
+      .cloud-ai-settings{background:#0d0e11;border:1px solid #23252a;border-radius:14px;padding:14px;margin:14px 0 18px}
+      .cloud-ai-grid{display:flex;gap:10px;align-items:center;justify-content:space-between;margin-top:10px;flex-wrap:wrap}
+      .cloud-ai-chip{background:#16181a;border:1px solid rgba(255,255,255,.12);border-radius:999px;color:rgba(255,255,255,.72);padding:8px 12px;font-size:12px}
+      @media (max-width:700px){.cloud-ai-grid .btn{width:100%}.cloud-ai-chip{width:100%;text-align:center}}
     `;
     document.head.appendChild(style);
   }
 
   document.addEventListener('DOMContentLoaded', ()=>{
-    installLocalAIStyles();
-    installLocalAIControls();
+    installCloudAIStyles();
+    installCloudAIControls();
   });
-  installLocalAIStyles();
-  installLocalAIControls();
+  installCloudAIStyles();
+  installCloudAIControls();
 })();
 </script>
 <!-- REAL_AI_UPGRADE_END -->
@@ -7360,10 +7315,13 @@ async function initFirebaseAuth(){
   const appModule = await import(`https://www.gstatic.com/firebasejs/${firebaseSdkVersion}/firebase-app.js`);
   const authModule = await import(`https://www.gstatic.com/firebasejs/${firebaseSdkVersion}/firebase-auth.js`);
   const firestoreModule = await import(`https://www.gstatic.com/firebasejs/${firebaseSdkVersion}/firebase-firestore.js`);
+  const functionsModule = await import(`https://www.gstatic.com/firebasejs/${firebaseSdkVersion}/firebase-functions.js`);
   const app = appModule.initializeApp(firebaseConfig);
   const auth = authModule.getAuth(app);
   firestoreDb = firestoreModule.getFirestore(app);
-const provider = new authModule.GoogleAuthProvider();
+  const cloudFunctions = functionsModule.getFunctions(app);
+  window.journallAiCoachCallable = functionsModule.httpsCallable(cloudFunctions, 'aiCoach');
+  const provider = new authModule.GoogleAuthProvider();
   provider.setCustomParameters({ prompt: 'select_account' });
   try{
     await authModule.setPersistence(auth, authModule.browserLocalPersistence);

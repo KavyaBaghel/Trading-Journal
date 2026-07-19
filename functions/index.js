@@ -5,14 +5,14 @@ const OpenAI = require("openai");
 
 admin.initializeApp();
 const db = admin.firestore();
-const openaiKey = defineSecret("OPENAI_API_KEY");
+const groqKey = defineSecret("GROQ_API_KEY");
 const DAILY_LIMIT = 20;
 
 function todayKey() {
   return new Date().toISOString().slice(0, 10);
 }
 
-exports.aiCoach = onCall({ secrets: [openaiKey], cors: true }, async (request) => {
+exports.aiCoach = onCall({ secrets: [groqKey], cors: true }, async (request) => {
   if (!request.auth) {
     throw new HttpsError("unauthenticated", "Sign in required.");
   }
@@ -32,18 +32,23 @@ exports.aiCoach = onCall({ secrets: [openaiKey], cors: true }, async (request) =
     throw new HttpsError("resource-exhausted", "Daily AI coach limit reached, resets tomorrow.");
   }
 
-  const client = new OpenAI({ apiKey: openaiKey.value() });
+  const client = new OpenAI({
+    apiKey: groqKey.value(),
+    baseURL: "https://api.groq.com/openai/v1"
+  });
+
   const completion = await client.chat.completions.create({
-    model: "gpt-4o-mini",
+    model: "llama-3.1-8b-instant",
     max_tokens: mode === "generation" ? 650 : 450,
+    temperature: mode === "generation" ? 0.35 : 0.25,
     messages: [
       {
         role: "system",
         content:
-          "You are a trading psychology and discipline coach. " +
-          "You analyze past trades and behavior patterns only. " +
-          "You never suggest specific future trades, entries, or price targets. " +
-          "If asked to predict or suggest a trade, decline and redirect to reviewing past behavior instead. " +
+          "You are a trading psychology and discipline coach embedded in Journall. " +
+          "You analyze past trades, mind-check answers, checklist behavior, risk discipline, and mistake patterns only. " +
+          "You never suggest specific future trades, entries, price targets, market predictions, or financial advice. " +
+          "If asked to call a trade, decline and redirect to reviewing process and psychology instead. " +
           "If total logged trades is fewer than 5, begin with: Not enough trade history yet for a reliable pattern. " +
           "Answer in 3-5 sentences max. Be direct, specific, and avoid generic motivational filler."
       },
