@@ -2346,6 +2346,13 @@ tr:hover {
       </div>
     </div>
 
+    <div class="setup-section setup-criteria-section">
+      <div class="setup-section-label">My Setup Criteria</div>
+      <p class="setup-section-help">Write the exact conditions your Setup Scan should check. These are yours, so Journall will not show fixed rules or personal numbers here.</p>
+      <div id="setupCriteriaRows" class="setup-criteria-rows"></div>
+      <button class="btn" type="button" onclick="addSetupCriteriaRow()">+ Add condition</button>
+    </div>
+
     <div id="accountSetupPreview" class="setup-preview" aria-live="polite"></div>
 
     <div class="account-onboarding-actions">
@@ -2618,13 +2625,14 @@ tr:hover {
       <div class="card psychology-hero">
         <div class="panel-title">
           <h3>Psychology Command Room</h3>
-          <span>mind -> setup -> live trade -> journal</span>
+          <span>mind -> setup -> checklist -> live trade -> journal</span>
         </div>
         <div class="psych-progress">
           <button class="psych-step active" type="button" data-psych-page="mind" onclick="showPsychologyPage('mind')">1 Mind Check</button>
           <button class="psych-step locked" type="button" data-psych-page="setup" onclick="showPsychologyPage('setup')">2 Setup Scan</button>
-          <button class="psych-step locked" type="button" data-psych-page="live" onclick="showPsychologyPage('live')">3 Live Trade</button>
-          <button class="psych-step" type="button" data-psych-page="journal" onclick="showPsychologyPage('journal')">4 Debrief</button>
+          <button class="psych-step locked" type="button" data-psych-page="checklist" onclick="showPsychologyPage('checklist')">3 Checklist</button>
+          <button class="psych-step locked" type="button" data-psych-page="live" onclick="showPsychologyPage('live')">4 Live Trade</button>
+          <button class="psych-step" type="button" data-psych-page="journal" onclick="showPsychologyPage('journal')">5 Debrief</button>
         </div>
         <div id="psychGateStatus" class="psych-status">Complete all 9 mind checks before setup scan.</div>
       </div>
@@ -2651,12 +2659,31 @@ tr:hover {
       </div>
 
       <div class="psych-page" id="psychPageSetup">
-        <div class="grid two">
+        <div class="psych-flow-card">
+          <div class="card">
+            <div class="panel-title"><h3>Setup Scan</h3><span>formation check</span></div><div class="sub psych-intro">Confirm a valid setup is actually forming before you plan an entry.</div><div id="psychSetupCriteria" class="insight empty"></div>
+            <div class="psych-rule-list user-setup-criteria-list" id="psychSetupCriteriaList"></div>
+            <div class="journal-form-actions">
+              <button class="btn" onclick="showPsychologyPage('mind')">Back</button>
+              <button class="btn primary" id="psychSetupCompleteBtn" onclick="completePsychologySetupScan()">Continue to Checklist</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="psych-page" id="psychPageChecklist">
+        <div class="psych-flow-card">
           <div class="card pretrade-card">
-            <div class="panel-title"><h3>Pre-Trade Checklist</h3><span>moved from dashboard</span></div>
+            <div class="panel-title"><h3>Pre-Trade Checklist</h3><span>final gate</span></div>
+            <div class="checklist-progress">
+              <div class="progress-track">
+                <div class="progress-fill" id="preTradeChecklistProgressFill" style="width:0%"></div>
+              </div>
+              <span id="preTradeChecklistProgressText">0/6 confirmed</span>
+            </div>
             <div class="checklist" id="preTradeChecklist">
               <div class="checklist-item" data-check="setup">
-                <div class="checklist-icon pending">?</div>
+                <div class="check-icon pending" aria-hidden="true"></div>
                 <div class="checklist-text">
                   <span>Setup</span>
                   <select id="preTradeSetup" onchange="updateChecklist()">
@@ -2666,41 +2693,30 @@ tr:hover {
                   </select>
                 </div>
               </div>
-              <button class="checklist-item" type="button" data-check="news" onclick="toggleChecklistCheck('news')"><div class="checklist-icon pending">?</div><div class="checklist-text">News Checked</div></button>
-              <button class="checklist-item" type="button" data-check="emotion" onclick="toggleChecklistCheck('emotion')"><div class="checklist-icon pending">?</div><div class="checklist-text">Emotion Calm</div></button>
-              <button class="checklist-item" type="button" data-check="risk" onclick="toggleChecklistCheck('risk')"><div class="checklist-icon pending">?</div><div class="checklist-text">Risk Under Limit</div></button>
-              <button class="checklist-item" type="button" data-check="obFvg" onclick="toggleChecklistCheck('obFvg')"><div class="checklist-icon pending">?</div><div class="checklist-text">Entry Confirmed</div></button>
-              <button class="checklist-item" type="button" data-check="liquiditySweep" onclick="toggleChecklistCheck('liquiditySweep')"><div class="checklist-icon pending">?</div><div class="checklist-text">Confirmation Signal</div></button>
-              <button class="checklist-item" type="button" data-check="rrExit" onclick="toggleChecklistCheck('rrExit')"><div class="checklist-icon pending">?</div><div class="checklist-text">Exit Plan Set</div></button>
+              <button class="checklist-item" type="button" data-check="news" onclick="toggleChecklistCheck('news')"><div class="check-icon pending" aria-hidden="true"></div><div class="checklist-text">News Checked</div></button>
+              <button class="checklist-item" type="button" data-check="emotion" onclick="toggleChecklistCheck('emotion')"><div class="check-icon pending" aria-hidden="true"></div><div class="checklist-text">Emotion Calm</div></button>
+              <button class="checklist-item" type="button" data-check="risk" onclick="toggleChecklistCheck('risk')"><div class="check-icon pending" aria-hidden="true"></div><div class="checklist-text">Risk Under Limit</div></button>
+              <button class="checklist-item" type="button" data-check="obFvg" onclick="toggleChecklistCheck('obFvg')"><div class="check-icon pending" aria-hidden="true"></div><div class="checklist-text">Entry Confirmed</div></button>
+              <button class="checklist-item" type="button" data-check="liquiditySweep" onclick="toggleChecklistCheck('liquiditySweep')"><div class="check-icon pending" aria-hidden="true"></div><div class="checklist-text">Confirmation Signal</div></button>
+              <button class="checklist-item" type="button" data-check="rrExit" onclick="toggleChecklistCheck('rrExit')"><div class="check-icon pending" aria-hidden="true"></div><div class="checklist-text">Exit Plan Set</div></button>
             </div>
-            <div class="checklist-result">
-              <div class="checklist-result-icon" id="checklistResultIcon">?</div>
+            <div class="checklist-result pending">
+              <div class="checklist-result-icon" id="checklistResultIcon" aria-hidden="true"></div>
               <div>
                 <div class="checklist-result-title" id="checklistResultTitle">Complete Checklist</div>
                 <div class="checklist-result-sub" id="checklistResultSub">All checks must pass before entry.</div>
               </div>
             </div>
-          </div>
-
-          <div class="card">
-            <div class="panel-title"><h3>Setup Scan</h3><span>formation check</span></div><div class="sub psych-intro">Confirm a valid setup is actually forming before you plan an entry.</div><div id="psychSetupCriteria" class="insight empty"></div>
-            <div class="psych-rule-list">
-              <button class="psych-check" type="button" data-psych-check="buySellZone" onclick="togglePsychCheck('buySellZone')"><span></span><strong>Buy or sell zone exists</strong><em>No zone means no trade.</em></button>
-              <button class="psych-check" type="button" data-psych-check="zoneActivated" onclick="togglePsychCheck('zoneActivated')"><span></span><strong>Zone activated</strong><em>Wick into zone, then candle closes from the zone.</em></button>
-              <button class="psych-check" type="button" data-psych-check="notBothZones" onclick="togglePsychCheck('notBothZones')"><span></span><strong>Not both zones</strong><em>No entry if buy and sell zones both activate.</em></button>
-              <button class="psych-check" type="button" data-psych-check="slSeven" onclick="togglePsychCheck('slSeven')"><span></span><strong>SL cost under $7</strong><em>No entry if the stop loss is more than $7 risk.</em></button>
-              <button class="psych-check" type="button" data-psych-check="candleClose" onclick="togglePsychCheck('candleClose')"><span></span><strong>5-minute close confirmed</strong><em>Wait for the 5-minute candle close before action.</em></button>
-            </div>
             <div class="journal-form-actions">
-              <button class="btn" onclick="showPsychologyPage('mind')">Back</button>
-              <button class="btn primary" id="psychSetupCompleteBtn" onclick="completePsychologySetupScan()">Complete Setup Scan</button>
+              <button class="btn" onclick="showPsychologyPage('setup')">Back</button>
+              <button class="btn primary proceed-btn" id="psychChecklistCompleteBtn" onclick="completePreTradeChecklist()">Proceed to Live Trade -&gt;</button>
             </div>
           </div>
         </div>
       </div>
 
       <div class="psych-page" id="psychPageLive">
-        <div class="grid two">
+        <div class="psych-flow-card">
           <div class="card">
             <div class="panel-title"><h3>Live Trade Rules</h3><span>during execution</span></div><div class="sub psych-intro">Log your entry, stop loss, and target as the trade is active.</div>
             <div class="psych-rule-list">
@@ -2711,8 +2727,16 @@ tr:hover {
               <div class="psych-rule"><strong>Follow the written exit plan.</strong><span>Scale or exit only according to the planned management rules.</span></div>
               <div class="psych-rule"><strong>No emotional target changes.</strong><span>Manage the trade according to the plan.</span></div>
             </div>
+            <div class="journal-form-actions">
+              <button class="btn" onclick="showPsychologyPage('checklist')">Back</button>
+              <button class="btn primary" id="psychLiveRulesCompleteBtn" onclick="completeLiveTradeRules()">Continue to After Trade</button>
+            </div>
           </div>
-          <div class="card">
+        </div>
+      </div>
+      <div class="psych-page" id="psychPageJournal">
+        <div class="psych-flow-card">
+          <div class="card after-trade-card">
             <div class="panel-title"><h3>After Trade</h3><span>mandatory pause</span></div>
             <div class="psych-rule-list">
               <div class="psych-rule"><strong>Screenshot the trade.</strong><span>Save the chart before emotion edits the memory.</span></div>
@@ -2721,16 +2745,13 @@ tr:hover {
               <div class="psych-rule"><strong>Write violated rule for tomorrow.</strong><span>Tomorrow dashboard will remind you what not to repeat.</span></div>
             </div>
             <textarea id="psychTomorrowRule" placeholder="Rule violated / tomorrow reminder..."></textarea>
-            <div class="journal-form-actions">
-              <button class="btn" onclick="showPsychologyPage('setup')">Back</button>
+            <div class="journal-form-actions after-trade-actions">
               <button class="btn primary" id="psychLiveCompleteBtn" onclick="savePsychologyLivePlan()">Complete Live Trade</button>
+              <button class="btn" onclick="showPsychologyPage('live')">Back</button>
               <button class="btn" onclick="document.querySelector('[data-tab=&quot;journalpage&quot;]')?.click()">Open Journal</button>
             </div>
           </div>
         </div>
-      </div>
-
-      <div class="psych-page" id="psychPageJournal">
         <div class="card">
           <div class="panel-title"><h3>Debrief</h3><span>journal close loop</span></div>
           <div class="sub psych-intro">Record the outcome and lessons - this closes the loop and saves to your Journal.</div>
@@ -2844,12 +2865,12 @@ tr:hover {
                 <textarea id="journalMistake" placeholder="Mistake, if any"></textarea>
               </div>
               <div>
-                <label class="journal-field-label" for="journalEmotionBefore">Emotion Before</label>
-                <textarea id="journalEmotionBefore" placeholder="Before entry"></textarea>
+                <label class="journal-field-label" for="journalEmotionBefore">Emotion Before Entry</label>
+                <textarea id="journalEmotionBefore" placeholder="What emotions did you feel before entry?"></textarea>
               </div>
               <div>
-                <label class="journal-field-label" for="journalEmotionAfter">Emotion After</label>
-                <textarea id="journalEmotionAfter" placeholder="After exit"></textarea>
+                <label class="journal-field-label" for="journalEmotionAfter">Emotion After Exit</label>
+                <textarea id="journalEmotionAfter" placeholder="What emotions did you feel after exit?"></textarea>
               </div>
               <div class="wide">
                 <label class="journal-field-label" for="journalImprovement">Improvement</label>
@@ -4588,6 +4609,45 @@ function stepAccountNumber(id, delta){
   el.value = next;
   renderAccountSetupPreview();
 }
+function addSetupCriteriaRow(value=''){
+  const box = document.getElementById('setupCriteriaRows');
+  if(!box) return;
+  const empty = box.querySelector('.setup-criteria-empty');
+  if(empty) empty.remove();
+  const row = document.createElement('div');
+  row.className = 'setup-criteria-row';
+  row.innerHTML = `<input data-setup-criteria-input type="text" placeholder="e.g. Liquidity zone swept" value="${escapeHtml(String(value || ''))}"><button class="stepper-btn" type="button" aria-label="Remove condition" onclick="removeSetupCriteriaRow(this)">-</button>`;
+  box.appendChild(row);
+}
+function removeSetupCriteriaRow(button){
+  button?.closest('.setup-criteria-row')?.remove();
+  const box = document.getElementById('setupCriteriaRows');
+  if(box && !box.querySelector('[data-setup-criteria-input]')){
+    box.innerHTML = '<div class="setup-criteria-empty">No setup criteria added yet.</div>';
+  }
+}
+function renderSetupCriteriaRows(criteria=[]){
+  const box = document.getElementById('setupCriteriaRows');
+  if(!box) return;
+  box.innerHTML = '';
+  const clean = Array.isArray(criteria) ? criteria.map(item=>String(item || '').trim()).filter(Boolean) : [];
+  if(!clean.length){
+    box.innerHTML = '<div class="setup-criteria-empty">No setup criteria added yet.</div>';
+    return;
+  }
+  clean.forEach(item=>addSetupCriteriaRow(item));
+}
+function readSetupCriteriaRows(){
+  return [...document.querySelectorAll('[data-setup-criteria-input]')]
+    .map(input=>String(input.value || '').trim())
+    .filter(Boolean);
+}
+function getUserSetupCriteria(){
+  const config = getAccountConfig() || {};
+  return Array.isArray(config.userSetupCriteria)
+    ? config.userSetupCriteria.map(item=>String(item || '').trim()).filter(Boolean)
+    : [];
+}
 function renderAccountSetupPreview(){
   const box = document.getElementById('accountSetupPreview'); if(!box) return;
   const accountSize = toNumber(document.getElementById('accountSizeInput')?.value, 0);
@@ -4607,9 +4667,9 @@ function renderAccountSetupPreview(){
   const money = value => `$${(Number.isFinite(value) ? value : 0).toFixed(2)}`;
   box.innerHTML = `<div class="setup-preview-row"><span>$ risk per trade</span><strong>${money(riskAmount)}</strong></div><div class="setup-preview-row"><span>Profit target</span><strong>${money(targetAmount)} (${money(targetBalance)} target balance)</strong></div><div class="setup-preview-row"><span>Daily loss limit</span><strong>${dailyLossAmount == null ? 'Skipped for this phase' : money(dailyLossAmount)}</strong></div><div class="setup-preview-row"><span>Trade limit / Minimum RR</span><strong>${maxTrades || '-'} trades / ${minRr || '-'}R</strong></div>`;
 }
-function openAccountSetup(){
+function openAccountSetup(blocking=false){
   const gate = document.getElementById('accountOnboardingGate');
-  const config = getAccountConfig() || {accountSize:'',phase:'Phase 1',profitTarget:'',profitTargetType:'percent',maxDailyLoss:'',maxDailyLossType:'percent',maxDrawdown:'',maxDrawdownType:'percent',currentBalance:'',riskPercent:'',maxTradesPerDay:'',minRr:'',phaseDeadline:''};
+  const config = getAccountConfig() || {accountSize:'',phase:'Phase 1',profitTarget:'',profitTargetType:'percent',maxDailyLoss:'',maxDailyLossType:'percent',maxDrawdown:'',maxDrawdownType:'percent',currentBalance:'',riskPercent:'',maxTradesPerDay:'',minRr:'',phaseDeadline:'',userSetupCriteria:[]};
   const set = (id,value)=>{ const el=document.getElementById(id); if(el) el.value = value ?? ''; };
   set('accountSizeInput', config.accountSize ?? ''); set('currentBalanceInput', config.currentBalance ?? '');
   set('accountPhaseInput', config.phase || 'Phase 1'); set('profitTargetInput', config.profitTarget);
@@ -4617,18 +4677,31 @@ function openAccountSetup(){
   set('phaseDeadlineInput', config.phaseDeadline || ''); set('maxTradesInput', config.maxTradesPerDay ?? ''); set('minRrInput', config.minRr ?? '');
   set('maxDailyLossInput', config.maxDailyLoss ?? ''); set('maxDailyLossType', config.maxDailyLossType || 'percent');
   set('maxDrawdownInput', config.maxDrawdown ?? ''); set('maxDrawdownType', config.maxDrawdownType || 'percent');
+  renderSetupCriteriaRows(config.userSetupCriteria || []);
   toggleFundedFields(); renderAccountSetupPreview();
-  if(gate){ gate.hidden = false; gate.classList.add('show'); }
+  window.__journallBlockingAccountSetup = !!blocking;
+  if(blocking){
+    const app = document.getElementById('journallApp');
+    const authGate = document.getElementById('firebaseAuthGate');
+    const authBar = document.getElementById('firebaseAuthBar');
+    const mobileBar = document.querySelector('.mobile-appbar');
+    if(app){ app.hidden = true; app.style.display = 'none'; }
+    if(authGate){ authGate.hidden = true; authGate.style.display = 'none'; }
+    if(authBar){ authBar.hidden = true; authBar.style.display = 'none'; }
+    if(mobileBar){ mobileBar.hidden = true; mobileBar.style.display = 'none'; }
+  }
+  if(gate){ gate.hidden = false; gate.classList.add('show'); gate.classList.toggle('blocking', !!blocking); }
 }
 function hideAccountSetupAfterSave(){
   const gate = document.getElementById('accountOnboardingGate');
-  if(gate){ gate.hidden = true; gate.classList.remove('show'); }
+  window.__journallBlockingAccountSetup = false;
+  if(gate){ gate.hidden = true; gate.classList.remove('show','blocking'); }
 }
 function ensureAccountOnboarding(){
   if(document.documentElement.classList.contains('firebase-auth-required')) return;
   if(!getAccountConfig()) openAccountSetup();
 }
-function saveAccountSetup(){
+async function saveAccountSetup(){
   const msg = document.getElementById('accountSetupMessage');
   const phase = document.getElementById('accountPhaseInput')?.value || 'Phase 1';
   const readRequiredNumber = (id,label,min=0)=>{
@@ -4653,10 +4726,22 @@ function saveAccountSetup(){
     if(msg) msg.textContent = error.message;
     return;
   }
-  const config = {accountSize,phase,profitTarget,profitTargetType:document.getElementById('profitTargetType')?.value || 'percent',maxDailyLoss:isFundedPhase(phase)?maxDailyLoss:null,maxDailyLossType:document.getElementById('maxDailyLossType')?.value || 'percent',maxDrawdown:isFundedPhase(phase)?maxDrawdown:null,maxDrawdownType:document.getElementById('maxDrawdownType')?.value || 'percent',currentBalance,riskPercent,maxTradesPerDay,minRr,phaseDeadline:document.getElementById('phaseDeadlineInput')?.value || '',startDate:getAccountConfig()?.startDate || new Date().toISOString().slice(0,10)};
+  const config = {accountSize,phase,profitTarget,profitTargetType:document.getElementById('profitTargetType')?.value || 'percent',maxDailyLoss:isFundedPhase(phase)?maxDailyLoss:null,maxDailyLossType:document.getElementById('maxDailyLossType')?.value || 'percent',maxDrawdown:isFundedPhase(phase)?maxDrawdown:null,maxDrawdownType:document.getElementById('maxDrawdownType')?.value || 'percent',currentBalance,riskPercent,maxTradesPerDay,minRr,phaseDeadline:document.getElementById('phaseDeadlineInput')?.value || '',userSetupCriteria:readSetupCriteriaRows(),startDate:getAccountConfig()?.startDate || new Date().toISOString().slice(0,10)};
   localStorage.setItem(ACCOUNT_CONFIG_KEY, JSON.stringify(config));
+  if(typeof window.journallSaveAccountSetupDoc === 'function'){
+    try{
+      if(msg) msg.textContent = 'Saving account setup...';
+      await window.journallSaveAccountSetupDoc(config);
+    }catch(error){
+      console.error('Account setup cloud save failed:', error);
+      if(msg) msg.textContent = 'Could not save setup online. Check connection and try again.';
+      return;
+    }
+  }
   if(msg) msg.textContent = 'Saved. Journall will recalculate goals and risk from this account.';
-  hideAccountSetupAfterSave(); renderAll();
+  hideAccountSetupAfterSave();
+  if(typeof window.setGateVisible === 'function') window.setGateVisible(false);
+  renderAll();
 }
 function riskCalculatorMarkup(metrics){
   const config = metrics?.config; if(!config) return '';
@@ -5259,7 +5344,6 @@ const preTradeChecklistState = {
 };
 
 const PSYCH_MIND_KEYS = ['sleep','calm','patience','lossAccept','noNeed','rules','risk','time','journal'];
-const PSYCH_SETUP_KEYS = ['buySellZone','zoneActivated','notBothZones','slSeven','candleClose'];
 const PSYCH_STORAGE_KEY = 'journall_psychology_checks';
 const PSYCH_FLOW_STORAGE_KEY = 'journall_psychology_flow_state';
 const PSYCH_TOMORROW_RULE_KEY = 'journall_psychology_tomorrow_rule';
@@ -5275,7 +5359,23 @@ function getPsychologyFlowState(){
 }
 function savePsychologyFlowState(state){ localStorage.setItem(PSYCH_FLOW_STORAGE_KEY, JSON.stringify(state || {})); }
 function isMindCheckComplete(){ const state = getPsychologyChecks(); return PSYCH_MIND_KEYS.every(key=>!!state[key]); }
-function isSetupScanComplete(){ const state = getPsychologyChecks(); return PSYCH_SETUP_KEYS.every(key=>!!state[key]); }
+function setupCriterionKey(index){ return `setupCriterion${index}`; }
+function getPsychSetupKeys(){ return getUserSetupCriteria().map((_, index)=>setupCriterionKey(index)); }
+function isSetupScanComplete(){
+  const keys = getPsychSetupKeys();
+  const state = getPsychologyChecks();
+  return keys.length > 0 && keys.every(key=>!!state[key]);
+}
+function isPreTradeChecklistComplete(){
+  const setup = document.getElementById('preTradeSetup')?.value || '';
+  return Boolean(setup) &&
+    !!preTradeChecklistState.news &&
+    !!preTradeChecklistState.emotion &&
+    !!preTradeChecklistState.risk &&
+    !!preTradeChecklistState.obFvg &&
+    !!preTradeChecklistState.liquiditySweep &&
+    !!preTradeChecklistState.rrExit;
+}
 function isLiveTradeComplete(){ return !!getPsychologyFlowState().liveComplete; }
 
 function togglePsychCheck(id){
@@ -5292,9 +5392,14 @@ function resetPsychologyChecks(){
 }
 
 function showPsychologyPage(page){
-  if(page === 'setup' && !isMindCheckComplete()) page = 'mind';
-  if(page === 'live' && (!isMindCheckComplete() || !isSetupScanComplete())) page = isMindCheckComplete() ? 'setup' : 'mind';
-  if(page === 'journal' && (!isMindCheckComplete() || !isSetupScanComplete() || !isLiveTradeComplete())) page = !isMindCheckComplete() ? 'mind' : (!isSetupScanComplete() ? 'setup' : 'live');
+  const flow = getPsychologyFlowState();
+  const mindComplete = isMindCheckComplete();
+  const setupComplete = isSetupScanComplete() && !!flow.setupComplete;
+  const checklistComplete = isPreTradeChecklistComplete() && !!flow.checklistComplete;
+  if(page === 'setup' && !mindComplete) page = 'mind';
+  if(page === 'checklist' && (!mindComplete || !setupComplete)) page = mindComplete ? 'setup' : 'mind';
+  if(page === 'live' && (!mindComplete || !setupComplete || !checklistComplete)) page = !mindComplete ? 'mind' : (!setupComplete ? 'setup' : 'checklist');
+  if(page === 'journal' && (!mindComplete || !setupComplete || !checklistComplete || !flow.liveRulesComplete)) page = !mindComplete ? 'mind' : (!setupComplete ? 'setup' : (!checklistComplete ? 'checklist' : 'live'));
   document.querySelectorAll('.psych-page').forEach(el=>el.classList.remove('active'));
   const pageEl = document.getElementById(`psychPage${page.charAt(0).toUpperCase()}${page.slice(1)}`);
   if(pageEl) pageEl.classList.add('active');
@@ -5308,7 +5413,28 @@ function completePsychologySetupScan(){
   const flow = getPsychologyFlowState();
   flow.setupComplete = true;
   savePsychologyFlowState(flow);
+  renderPsychology();
+  showPsychologyPage('checklist');
+}
+
+function completePreTradeChecklist(){
+  updateChecklist();
+  const flow = getPsychologyFlowState();
+  if(!flow.setupComplete || !isSetupScanComplete()){ showPsychologyPage('setup'); return; }
+  if(!isPreTradeChecklistComplete()){ alert('Finish every pre-trade checklist item before going live.'); return; }
+  flow.checklistComplete = true;
+  flow.checklistCompletedAt = new Date().toISOString();
+  savePsychologyFlowState(flow);
   showPsychologyPage('live');
+}
+
+function completeLiveTradeRules(){
+  const flow = getPsychologyFlowState();
+  if(!flow.checklistComplete || !isPreTradeChecklistComplete()){ showPsychologyPage('checklist'); return; }
+  flow.liveRulesComplete = true;
+  flow.liveRulesCompletedAt = new Date().toISOString();
+  savePsychologyFlowState(flow);
+  showPsychologyPage('journal');
 }
 
 function savePsychologyTomorrowRule(){
@@ -5382,9 +5508,28 @@ function getTodayPsychologyReminder(){
   }catch{ return ''; }
 }
 
+function renderSetupScanCriteria(){
+  const notice = document.getElementById('psychSetupCriteria');
+  const list = document.getElementById('psychSetupCriteriaList');
+  if(!notice || !list) return;
+  const criteria = getUserSetupCriteria();
+  if(!criteria.length){
+    notice.hidden = false;
+    notice.className = 'insight empty setup-criteria-notice';
+    notice.innerHTML = `You haven't defined your setup criteria yet. Go to Settings -> My Setup Criteria to add them. <button class="btn" type="button" onclick="openAccountSetup()">Open Account Setup</button>`;
+    list.innerHTML = '';
+    return;
+  }
+  notice.hidden = true;
+  notice.className = 'insight setup-criteria-notice';
+  notice.innerHTML = '';
+  list.innerHTML = criteria.map((text,index)=>`<button class="psych-check setup-criterion-check" type="button" data-psych-check="${setupCriterionKey(index)}" onclick="togglePsychCheck('${setupCriterionKey(index)}')"><span></span><strong>${escapeHtml(text)}</strong></button>`).join('');
+}
+
 function renderPsychology(){
   const state = getPsychologyChecks();
   const flow = getPsychologyFlowState();
+  renderSetupScanCriteria();
   document.querySelectorAll('[data-psych-check]').forEach(el=>{
     const checked = !!state[el.dataset.psychCheck];
     el.classList.toggle('checked', checked);
@@ -5393,28 +5538,29 @@ function renderPsychology(){
   });
   const mindComplete = isMindCheckComplete();
   const setupComplete = isSetupScanComplete() && !!flow.setupComplete;
+  const checklistComplete = isPreTradeChecklistComplete() && !!flow.checklistComplete;
+  const liveRulesComplete = !!flow.liveRulesComplete;
   const liveComplete = !!flow.liveComplete;
   document.querySelectorAll('[data-psych-page]').forEach(btn=>{
     const page = btn.dataset.psychPage;
-    const locked = (page === 'setup' && !mindComplete) || (page === 'live' && !setupComplete) || (page === 'journal' && !liveComplete);
-    const completed = (page === 'mind' && mindComplete) || (page === 'setup' && setupComplete) || (page === 'live' && liveComplete) || (page === 'journal' && !!flow.debriefComplete);
+    const locked = (page === 'setup' && !mindComplete) || (page === 'checklist' && !setupComplete) || (page === 'live' && !checklistComplete) || (page === 'journal' && !liveRulesComplete);
+    const completed = (page === 'mind' && mindComplete) || (page === 'setup' && setupComplete) || (page === 'checklist' && checklistComplete) || (page === 'live' && liveRulesComplete) || (page === 'journal' && (liveComplete || !!flow.debriefComplete));
     btn.classList.toggle('locked', locked);
     btn.classList.toggle('completed', completed);
     btn.disabled = locked && !btn.classList.contains('active');
   });
   const status = document.getElementById('psychGateStatus');
-  if(status) status.textContent = mindComplete ? 'Mind check complete. Setup scan unlocked.' : 'Complete all 9 mind checks before setup scan.';
+  if(status) status.textContent = !mindComplete ? 'Complete all 9 mind checks before setup scan.' : (!setupComplete ? 'Mind check complete. Setup scan unlocked.' : (!checklistComplete ? 'Setup scan complete. Pre-trade checklist unlocked.' : 'Checklist complete. Live trade rules unlocked.'));
   const nextBtn = document.getElementById('psychNextSetupBtn');
   if(nextBtn) nextBtn.disabled = !mindComplete;
   const setupBtn = document.getElementById('psychSetupCompleteBtn');
   if(setupBtn) setupBtn.disabled = !mindComplete || !isSetupScanComplete();
+  const checklistBtn = document.getElementById('psychChecklistCompleteBtn');
+  if(checklistBtn) checklistBtn.disabled = !setupComplete || !isPreTradeChecklistComplete();
+  const liveRulesBtn = document.getElementById('psychLiveRulesCompleteBtn');
+  if(liveRulesBtn) liveRulesBtn.disabled = !checklistComplete;
   const liveBtn = document.getElementById('psychLiveCompleteBtn');
-  if(liveBtn) liveBtn.disabled = !setupComplete;
-  const criteria = document.getElementById('psychSetupCriteria');
-  if(criteria){
-    const cfg = getAccountConfig();
-    criteria.innerHTML = `<strong>Your setup criteria:</strong> Minimum RR ${Number(cfg.minRr || 3).toFixed(1)}:1, daily loss limit ${cfg.maxDailyLoss ? cfg.maxDailyLoss + '%' : 'set in account'}, max trades ${cfg.maxTrades || 'set in account'}.`;
-  }
+  if(liveBtn) liveBtn.disabled = !liveRulesComplete;
   const input = document.getElementById('psychTomorrowRule');
   if(input && !input.value){
     try{ input.value = JSON.parse(localStorage.getItem(PSYCH_TOMORROW_RULE_KEY) || '{}')?.text || ''; }catch{}
@@ -5483,22 +5629,33 @@ function updateChecklist(){
     const id = btn.dataset.check;
     const state = id === 'setup' ? !!setup : !!preTradeChecklistState[id];
     btn.classList.toggle('checked', state);
-    const icon = btn.querySelector('.checklist-icon');
+    const icon = btn.querySelector('.check-icon, .checklist-icon');
     if(icon){
-      icon.className = 'checklist-icon ' + (state ? 'done' : 'pending');
-      icon.textContent = state ? '\u2713' : '?';
+      icon.className = 'check-icon ' + (state ? 'done' : 'pending');
+      icon.textContent = '';
     }
   });
+  const confirmedChecks = checks.filter(c=>c.id !== 'setup');
+  const checkedCount = confirmedChecks.filter(c=>c.pass).length;
+  const totalCount = confirmedChecks.length;
+  const pct = totalCount ? Math.round((checkedCount / totalCount) * 100) : 0;
+  const progressFill = document.getElementById('preTradeChecklistProgressFill');
+  const progressText = document.getElementById('preTradeChecklistProgressText');
+  if(progressFill) progressFill.style.width = `${pct}%`;
+  if(progressText) progressText.textContent = `${checkedCount}/${totalCount} confirmed`;
   const pass = checks.every(c=>c.pass);
+  const result = document.querySelector('#psychPageChecklist .checklist-result');
+  if(result) result.className = 'checklist-result ' + (pass ? 'cleared' : 'pending');
   const icon = document.getElementById('checklistResultIcon');
   const title = document.getElementById('checklistResultTitle');
   const sub = document.getElementById('checklistResultSub');
   const minRr = accountMinRr() || 3;
-  if(icon){ icon.className = 'checklist-result-icon ' + (pass?'pass':'warn'); icon.textContent = pass ? '\u2713' : '!'; }
+  if(icon){ icon.className = 'checklist-result-icon ' + (pass?'pass':'warn'); icon.textContent = ''; }
   if(title) title.textContent = pass ? 'Cleared for planned execution' : 'Not ready yet';
   if(sub) sub.textContent = pass ? `Entry meets your saved risk limit and minimum ${minRr}:1 RR plan.` : 'News, emotion, risk, entry criteria, confirmation signal, and exit plan must all pass.';
+  const checklistBtn = document.getElementById('psychChecklistCompleteBtn');
+  if(checklistBtn) checklistBtn.disabled = !pass || !(isSetupScanComplete() && !!getPsychologyFlowState().setupComplete);
 }
-
 function postSessionSignature(data){
   const s = stats(data || []);
   return [
@@ -5984,7 +6141,9 @@ function parseJournalBody(body=''){
     'Entry With Confirmation':'entryConfirmation',
     'Exit With Confirmation':'exitConfirmation',
     'Emotion Before':'emotionBefore',
+    'Emotion Before Entry':'emotionBefore',
     'Emotion After':'emotionAfter',
+    'Emotion After Exit':'emotionAfter',
     'Mistake':'mistake',
     'Improvement':'improvement'
   };
@@ -6151,8 +6310,8 @@ function journalFieldsToBody(fields){
     ['Entry At Good Point', fields.goodEntryPoint],
     ['Entry With Confirmation', fields.entryConfirmation],
     ['Exit With Confirmation', fields.exitConfirmation],
-    ['Emotion Before', fields.emotionBefore],
-    ['Emotion After', fields.emotionAfter],
+    ['Emotion Before Entry', fields.emotionBefore],
+    ['Emotion After Exit', fields.emotionAfter],
     ['Mistake', fields.mistake],
     ['Improvement', fields.improvement]
   ].map(([label,value])=>`${label}:\n${value || '-'}`).join('\n\n');
@@ -9676,6 +9835,180 @@ html.firebase-auth-required body{
 .account-onboarding-gate{position:fixed;inset:0;z-index:10000;display:none;place-items:center;background:rgba(0,0,0,.85);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);padding:24px;color:#f7f8f8}.account-onboarding-gate.show{display:grid}.account-onboarding-card{width:min(980px,96vw);max-height:92vh;overflow:auto;background:#16181d;border:1px solid #2e3038;border-radius:18px;padding:32px}.account-onboarding-head{display:flex;justify-content:space-between;gap:18px;align-items:flex-start;margin-bottom:22px}.account-kicker{display:block;color:#8a8f98;font-size:12px;letter-spacing:.4px;text-transform:uppercase;margin-bottom:8px}.account-onboarding-card h2{margin:0;color:#f7f8f8;font-size:32px;letter-spacing:-.8px}.account-onboarding-card p{color:#d0d6e0;margin:8px 0 0}.setup-section{background:#0d0e10;border:1px solid rgba(255,255,255,.06);border-radius:14px;padding:20px;margin-bottom:16px}.setup-section-label{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.4);margin-bottom:12px}.account-form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}.setup-section:first-of-type .account-form-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.account-form-grid label{display:flex;flex-direction:column;gap:8px;color:#8a8f98;font-size:12px;text-transform:uppercase;letter-spacing:.4px}.account-onboarding-card input,.account-onboarding-card select{background:#16181a!important;border:1px solid rgba(255,255,255,.08)!important;border-radius:10px!important;color:#fff!important;padding:12px 14px!important;font-size:15px!important;font-family:'Inter',sans-serif!important;transition:border-color .15s ease,box-shadow .15s ease}.account-onboarding-card input:focus,.account-onboarding-card select:focus{border-color:#494fdf!important;outline:none!important;box-shadow:0 0 0 3px rgba(73,79,223,.15)!important}.account-onboarding-card input[type=number]{-moz-appearance:textfield;appearance:textfield}.account-onboarding-card input[type=number]::-webkit-outer-spin-button,.account-onboarding-card input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}.number-stepper,.stepper-group{display:flex;align-items:center;gap:6px;width:100%}.number-stepper input{min-width:48px;flex:1;color:#fff!important;-webkit-text-fill-color:#fff!important;opacity:1!important}.account-inline-field{display:flex;gap:10px;align-items:center}.account-inline-field .number-stepper{flex:1}.account-inline-field select{width:92px}.account-inline-field span{color:#d0d6e0}.stepper-btn{background:#16181a!important;border:1px solid rgba(255,255,255,.08)!important;color:rgba(255,255,255,.5)!important;flex-shrink:0!important;width:32px!important;height:32px!important;border-radius:6px!important;display:flex!important;align-items:center!important;justify-content:center!important;padding:0!important;font-size:16px!important;line-height:1!important;cursor:pointer!important}.stepper-btn:hover{background:#1f2124!important;color:#fff!important}.setup-preview{background:rgba(73,79,223,.08);border:1px solid rgba(73,79,223,.25);border-radius:12px;padding:16px 20px;margin-top:4px}.setup-preview-row{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.08)}.setup-preview-row:last-child{border-bottom:0}.setup-preview-row span{color:rgba(255,255,255,.58);font-size:13px}.setup-preview-row strong{color:#fff;font-size:15px;font-weight:700;text-align:right}.account-onboarding-actions{display:flex;align-items:center;gap:14px;margin-top:22px}.account-onboarding-actions p{margin:0;color:#8a8f98}.save-setup-btn{background:#494fdf!important;color:#fff!important;border:none!important;font-weight:600!important}.save-setup-btn:hover{background:#5a5ff0!important}.risk-calc-card{grid-column:span 2}.risk-calc-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:12px 0}.risk-calc-grid label{display:flex;flex-direction:column;gap:6px;color:#8a8f98;font-size:12px;text-transform:uppercase;letter-spacing:.4px}.risk-calc-grid input{background:#010102!important;border:1px solid #23252a!important;color:#f7f8f8!important;border-radius:8px!important;padding:9px 10px!important}@media(max-width:760px){.account-form-grid,.setup-section:first-of-type .account-form-grid,.risk-calc-grid{grid-template-columns:1fr}.risk-calc-card{grid-column:auto}.account-onboarding-head{flex-direction:column}.account-onboarding-card{padding:20px}.account-inline-field{align-items:stretch;flex-direction:column}.account-inline-field select{width:100%}.setup-preview-row{align-items:flex-start;flex-direction:column}.setup-preview-row strong{text-align:left}}
 
 
+</style>
+<style id="journall-setup-scan-user-criteria">
+.setup-section-help{color:rgba(255,255,255,.56)!important;font-size:13px!important;line-height:1.5!important;margin:0 0 14px!important}.setup-criteria-rows{display:grid;gap:10px;margin-bottom:12px}.setup-criteria-row{display:flex;align-items:center;gap:8px}.setup-criteria-row input{flex:1;min-width:0}.setup-criteria-empty{background:#010102;border:1px dashed rgba(255,255,255,.12);border-radius:10px;color:rgba(255,255,255,.45);font-size:13px;padding:12px 14px}
+#journallApp #preTradeChecklist,
+#journallApp .checklist-grid{display:grid!important;grid-template-columns:repeat(auto-fit,minmax(160px,1fr))!important;gap:12px!important;align-items:stretch!important}
+#journallApp #preTradeChecklist .checklist-item,
+#journallApp .checklist-grid .checklist-item{min-height:56px!important;display:flex!important;align-items:center!important;gap:12px!important;white-space:normal!important;text-align:left!important}
+#journallApp #preTradeChecklist .checklist-text{min-width:0!important;line-height:1.25!important;word-break:normal!important;overflow-wrap:anywhere!important}
+#journallApp .user-setup-criteria-list{display:grid!important;grid-template-columns:1fr!important;gap:12px!important}
+#journallApp .setup-criterion-check{min-height:56px!important;display:flex!important;align-items:center!important;gap:12px!important}
+#journallApp .setup-criterion-check strong{line-height:1.35!important;overflow-wrap:anywhere!important}
+#journallApp .setup-criteria-notice{margin-bottom:16px!important}
+#journallApp .setup-criteria-notice .btn{margin-top:10px!important}
+@media(max-width:500px){#journallApp #preTradeChecklist,#journallApp .checklist-grid{grid-template-columns:1fr!important}}
+</style>
+
+<style id="journall-psychology-flow-final-polish">
+textarea::placeholder,
+input::placeholder{
+  color:rgba(255,255,255,.35)!important;
+  font-weight:400!important;
+}
+textarea,
+input{
+  color:#fff!important;
+  font-weight:500!important;
+}
+#journallApp .psych-flow-card{
+  width:100%!important;
+  max-width:700px!important;
+  margin:0 auto!important;
+}
+#journallApp #psychPageSetup .card,
+#journallApp #psychPageChecklist .card,
+#journallApp #psychPageLive .card,
+#journallApp #psychPageJournal .psych-flow-card .card{
+  width:100%!important;
+}
+#journallApp .setup-criteria-notice[hidden]{
+  display:none!important;
+}
+#journallApp .checklist-progress{
+  margin:0 0 24px!important;
+}
+#journallApp .progress-track{
+  height:6px!important;
+  background:rgba(255,255,255,.06)!important;
+  border-radius:999px!important;
+  overflow:hidden!important;
+}
+#journallApp .progress-fill{
+  height:100%!important;
+  width:0;
+  background:#27a644!important;
+  border-radius:999px!important;
+  transition:width .25s ease!important;
+}
+#journallApp .checklist-progress span{
+  color:rgba(255,255,255,.5)!important;
+  display:block!important;
+  font-size:12px!important;
+  margin-top:6px!important;
+}
+#journallApp #preTradeChecklist{
+  display:grid!important;
+  grid-template-columns:repeat(auto-fit,minmax(160px,1fr))!important;
+  gap:12px!important;
+  margin-bottom:16px!important;
+}
+#journallApp #preTradeChecklist .checklist-item{
+  min-height:56px!important;
+  display:flex!important;
+  align-items:center!important;
+  gap:12px!important;
+  background:#16181a!important;
+  border:1px solid rgba(255,255,255,.08)!important;
+  border-radius:12px!important;
+  padding:16px 18px!important;
+  transition:transform .12s ease,background .15s ease,border-color .15s ease!important;
+}
+#journallApp #preTradeChecklist .checklist-item:hover{
+  background:#1f2124!important;
+}
+#journallApp #preTradeChecklist .checklist-item:active{
+  transform:scale(.98)!important;
+}
+#journallApp #preTradeChecklist .checklist-item.checked{
+  background:rgba(39,166,68,.08)!important;
+  border-color:rgba(39,166,68,.35)!important;
+}
+#journallApp .check-icon,
+#journallApp .checklist-result-icon{
+  width:22px!important;
+  height:22px!important;
+  border-radius:50%!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  flex-shrink:0!important;
+  border:1.5px solid rgba(255,255,255,.2)!important;
+  color:transparent!important;
+  background:transparent!important;
+  position:relative!important;
+  transition:all .2s ease!important;
+  transform:scale(.96)!important;
+}
+#journallApp .check-icon.done,
+#journallApp .checklist-result-icon.pass{
+  background:#27a644!important;
+  border-color:#27a644!important;
+  transform:scale(1)!important;
+}
+#journallApp .check-icon.done::after,
+#journallApp .checklist-result-icon.pass::after{
+  content:""!important;
+  width:6px!important;
+  height:10px!important;
+  border:2px solid #fff!important;
+  border-top:0!important;
+  border-left:0!important;
+  transform:rotate(45deg)!important;
+}
+#journallApp .checklist-result{
+  display:flex!important;
+  align-items:center!important;
+  gap:12px!important;
+  margin-top:16px!important;
+  border-radius:14px!important;
+  padding:18px 20px!important;
+}
+#journallApp .checklist-result.cleared{
+  background:rgba(39,166,68,.1)!important;
+  border:1px solid rgba(39,166,68,.3)!important;
+}
+#journallApp .checklist-result.pending{
+  background:rgba(255,255,255,.03)!important;
+  border:1px solid rgba(255,255,255,.08)!important;
+}
+#journallApp .checklist-result-title{
+  color:#fff!important;
+  font-size:16px!important;
+  font-weight:700!important;
+}
+#journallApp .checklist-result-sub{
+  color:rgba(255,255,255,.62)!important;
+  font-size:13px!important;
+  line-height:1.45!important;
+}
+#journallApp .proceed-btn,
+#journallApp #psychLiveRulesCompleteBtn{
+  width:100%!important;
+}
+#journallApp .proceed-btn:disabled{
+  background:rgba(255,255,255,.06)!important;
+  color:rgba(255,255,255,.3)!important;
+  cursor:not-allowed!important;
+}
+#journallApp .after-trade-actions{
+  display:grid!important;
+  grid-template-columns:1fr 1fr!important;
+  gap:12px!important;
+}
+#journallApp .after-trade-actions #psychLiveCompleteBtn{
+  grid-column:1 / -1!important;
+  width:100%!important;
+}
+@media(max-width:500px){
+  #journallApp #preTradeChecklist{
+    grid-template-columns:1fr!important;
+  }
+  #journallApp .after-trade-actions{
+    grid-template-columns:1fr!important;
+  }
+}
 </style>
 </body>
 </html>
