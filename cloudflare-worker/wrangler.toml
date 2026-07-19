@@ -1,4 +1,4 @@
-name = "journall-ai"
+name = "journall"
 main = "src/worker.js"
 compatibility_date = "2026-07-19"
 
