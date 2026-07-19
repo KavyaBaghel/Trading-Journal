@@ -7054,8 +7054,9 @@ document.querySelectorAll('.nav button').forEach(btn=>{
     }catch(err){
       if(loading) loading.remove();
       const fallback = localFallback(prompt);
-      addMessage('bot', `<strong>AI Coach:</strong> Cloud AI is not ready yet.<br><br><strong>Rule-based fallback:</strong> ${fallback}`);
-      setStatus(`Cloud AI unavailable: ${err?.message || err}`, 'bad');
+      const reason = textOnly(String(err?.message || err || 'Unknown cloud AI error.'));
+      addMessage('bot', `<strong>AI Coach:</strong> Cloud AI needs one configuration fix.<br><br><strong>Connection detail:</strong> ${reason}<br><br><strong>Rule-based fallback:</strong> ${fallback}`);
+      setStatus(`Cloud AI unavailable: ${reason}`, 'bad');
       console.error('Cloud AI coach failed:', err);
     }
     if(input) input.value = '';
