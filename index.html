@@ -4560,6 +4560,9 @@ function getAccountConfig(){
       maxTradesPerDay:raw.maxTradesPerDay === '' || raw.maxTradesPerDay == null ? null : Number(raw.maxTradesPerDay),
       minRr:raw.minRr === '' || raw.minRr == null ? null : Number(raw.minRr),
       phaseDeadline:raw.phaseDeadline || '',
+      userSetupCriteria:Array.isArray(raw.userSetupCriteria)
+        ? raw.userSetupCriteria.map(item=>String(item || '').trim()).filter(Boolean)
+        : [],
       startDate:raw.startDate || new Date().toISOString().slice(0,10)
     };
   }catch{ return null; }
