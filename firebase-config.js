@@ -10,3 +10,9 @@ export const firebaseConfig = {
   appId: "1:528928704139:web:ed4a6e3123b32df843368e",
   measurementId: "G-LR3FZQB94Z"
 };
+
+// Free website AI backend. Deploy cloudflare-worker, then paste its workers.dev
+// URL here. Keep this public-safe: the Groq key stays only in Cloudflare secrets.
+export const aiProxyConfig = {
+  url: "https://journall-ai.YOUR_WORKERS_SUBDOMAIN.workers.dev"
+};

@@ -7004,15 +7004,29 @@ document.querySelectorAll('.nav button').forEach(btn=>{
   }
 
   async function callCloudAI(prompt, mode='chat'){
-    if(!window.journallAiCoachCallable){
-      throw new Error('AI backend is still loading. Sign in, wait a moment, then try again.');
+    const endpoint = String(window.journallAiProxyUrl || '').trim();
+    if(!endpoint || endpoint.includes('YOUR_WORKERS_SUBDOMAIN')){
+      throw new Error('AI backend is not configured yet. Deploy the free Cloudflare Worker and paste its URL in firebase-config.js.');
     }
-    const result = await window.journallAiCoachCallable({
-      prompt,
-      mode,
-      context: buildTradeContext()
+    const token = await window.journallGetFirebaseIdToken?.();
+    if(!token) throw new Error('Sign in again before using AI Coach.');
+    const response = await fetch(endpoint.replace(/\/+$/,'') + '/aiCoach', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({
+        prompt,
+        mode,
+        context: buildTradeContext()
+      })
     });
-    const text = result?.data?.text || '';
+    const result = await response.json().catch(()=>({}));
+    if(!response.ok){
+      throw new Error(result?.error || `AI backend returned ${response.status}.`);
+    }
+    const text = result?.text || '';
     if(!text.trim()) throw new Error('AI backend returned no text.');
     return text.trim();
   }
@@ -7054,7 +7068,7 @@ document.querySelectorAll('.nav button').forEach(btn=>{
       const text = await callCloudAI('Reply with one short sentence confirming the website AI is connected.', 'chat');
       setStatus(`Cloud AI connected: ${text.slice(0,120)}`, 'good');
     }catch(err){
-      setStatus(`Cloud AI not connected yet. Deploy Firebase Functions and set GROQ_API_KEY. ${err?.message || err}`, 'bad');
+      setStatus(`Cloud AI not connected yet. Deploy Cloudflare Worker and set GROQ_API_KEY. ${err?.message || err}`, 'bad');
     }
   };
 
@@ -7066,7 +7080,7 @@ document.querySelectorAll('.nav button').forEach(btn=>{
     const panel = document.createElement('div');
     panel.className = 'cloud-ai-settings';
     panel.innerHTML = `
-      <div id="realAiStatus" class="real-ai-status warn">Website AI uses a secure Firebase backend. Users do not need Ollama or local installs.</div>
+      <div id="realAiStatus" class="real-ai-status warn">Website AI uses a free Cloudflare Worker backend. Users do not need Ollama or local installs.</div>
       <div class="cloud-ai-grid">
         <span class="cloud-ai-chip">Groq llama-3.1-8b-instant</span>
         <button class="btn" type="button" onclick="testCloudAIConnection()">Test Website AI</button>
@@ -7132,7 +7146,7 @@ document.querySelectorAll('.nav button').forEach(btn=>{
 })();
 </script>
 <script type="module">
-import { firebaseConfig } from './firebase-config.js?v=20260717-valid-api-key';
+import { firebaseConfig, aiProxyConfig } from './firebase-config.js?v=20260719-cloudflare-ai';
 
 const authBar = document.getElementById('firebaseAuthBar');
 const authGate = document.getElementById('firebaseAuthGate');
@@ -7155,6 +7169,8 @@ let firestoreDb = null;
 let currentUser = null;
 let cloudReady = false;
 let syncTimer = null;
+window.journallGetFirebaseIdToken = async () => currentUser?.getIdToken ? currentUser.getIdToken() : null;
+window.journallAiProxyUrl = aiProxyConfig?.url || '';
 if(authRetryBtn) authRetryBtn.addEventListener('click', () => location.reload());
 
 function setAuthStatus(text){
@@ -7315,12 +7331,9 @@ async function initFirebaseAuth(){
   const appModule = await import(`https://www.gstatic.com/firebasejs/${firebaseSdkVersion}/firebase-app.js`);
   const authModule = await import(`https://www.gstatic.com/firebasejs/${firebaseSdkVersion}/firebase-auth.js`);
   const firestoreModule = await import(`https://www.gstatic.com/firebasejs/${firebaseSdkVersion}/firebase-firestore.js`);
-  const functionsModule = await import(`https://www.gstatic.com/firebasejs/${firebaseSdkVersion}/firebase-functions.js`);
   const app = appModule.initializeApp(firebaseConfig);
   const auth = authModule.getAuth(app);
   firestoreDb = firestoreModule.getFirestore(app);
-  const cloudFunctions = functionsModule.getFunctions(app);
-  window.journallAiCoachCallable = functionsModule.httpsCallable(cloudFunctions, 'aiCoach');
   const provider = new authModule.GoogleAuthProvider();
   provider.setCustomParameters({ prompt: 'select_account' });
   try{

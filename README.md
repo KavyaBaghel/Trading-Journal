@@ -86,7 +86,7 @@ https://kavyabaghel.github.io/Trading-Journal/
 
 Import the GitHub repository and use the project root as the publish directory. No build command is required.
 
-The public website works for dashboard, journal, analytics, calendar, goals, and Google sign-in cloud sync. AI coaching requires Firebase Functions with the GROQ_API_KEY secret configured.
+The public website works for dashboard, journal, analytics, calendar, goals, and Google sign-in cloud sync. AI coaching uses the free Cloudflare Worker in `cloudflare-worker/` with the GROQ_API_KEY secret configured.
 
 ## Firebase Sign-In Setup
 
@@ -122,27 +122,39 @@ kavyabaghel.github.io
 
 The public Journall website requires Google sign-in before opening the dashboard.
 
-## Website AI Setup
+## Free Website AI Setup
 
-1. Install the Firebase CLI and configure the Groq secret
-2. Set your Groq API key as a Firebase Functions secret:
+This path avoids Firebase Blaze. Website users do not need Ollama or any local model installed.
 
-```powershell
-firebase functions:secrets:set GROQ_API_KEY
-```
-
-3. Deploy the secure backend function:
+1. Open the Cloudflare Worker folder:
 
 ```powershell
-firebase deploy --only functions
+cd "C:\Users\cnjac\Documents\Codex\2026-05-16\files-mentioned-by-the-user-krishnas\KrishnasTradingJournalApp\cloudflare-worker"
 ```
 
-4. Open the public Journall website
-5. Go to AI Coach and ask a question
+2. Login to Cloudflare:
 
-The website AI Coach sends scoped trade context to the secure Firebase aiCoach function backed by Groq for specific feedback.
+```powershell
+npx wrangler login
+```
 
-The app still opens without AI, but coaching features require the deployed Firebase function. Website users do not need Ollama or any local model installed.
+3. Store your Groq key as a Cloudflare secret:
+
+```powershell
+npx wrangler secret put GROQ_API_KEY
+```
+
+4. Deploy:
+
+```powershell
+npx wrangler deploy
+```
+
+5. Copy the deployed Worker URL into `firebase-config.js` under `aiProxyConfig.url`, then commit and push.
+
+The website AI Coach sends scoped trade context to the secure Cloudflare Worker backed by Groq for specific feedback.
+
+The app still opens without AI, but coaching features require the deployed Worker URL in `firebase-config.js`.
 
 ## Privacy
 
