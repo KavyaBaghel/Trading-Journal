@@ -1,6 +1,24 @@
-﻿async function verifyFirebaseIdToken(token, env) {
-  // Firebase web API keys identify a project, but do not grant access to its data.
-  // The ID token itself remains required, verified by Firebase, and never stored.
+﻿function corsHeaders(origin, env) {
+  const localOrigins = ["http://127.0.0.1:8787", "http://localhost:8787"];
+  const allowed = origin === env.ALLOWED_ORIGIN || localOrigins.includes(origin);
+  return {
+    "Access-Control-Allow-Origin": allowed ? origin : env.ALLOWED_ORIGIN,
+    "Access-Control-Allow-Methods": "POST, OPTIONS",
+    "Access-Control-Allow-Headers": "Content-Type, Authorization",
+    "Vary": "Origin"
+  };
+}
+
+function json(data, status, headers) {
+  return new Response(JSON.stringify(data), {
+    status,
+    headers: { "Content-Type": "application/json", ...headers }
+  });
+}
+
+async function verifyFirebaseIdToken(token, env) {
+  // Firebase web API keys only identify a Firebase project. The caller must
+  // still present a valid, signed Firebase ID token to access this Worker.
   if (!env.FIREBASE_WEB_API_KEY) {
     throw new Error("Worker config is missing FIREBASE_WEB_API_KEY.");
   }
@@ -15,12 +33,12 @@
   );
   const data = await response.json().catch(() => ({}));
   const user = data?.users?.[0];
-
   if (!response.ok || !user?.localId) {
     throw new Error(data?.error?.message || "Invalid or expired sign-in token.");
   }
   return user;
 }
+
 async function handleAiCoach(request, env, cors) {
   const authHeader = request.headers.get("authorization") || "";
   const token = authHeader.startsWith("Bearer ") ? authHeader.slice(7) : "";
@@ -62,7 +80,9 @@ async function handleAiCoach(request, env, cors) {
   if (!completion.ok) {
     return json({ error: data?.error?.message || `Groq returned ${completion.status}.` }, 502, cors);
   }
-  return json({ text: data?.choices?.[0]?.message?.content || "" }, 200, cors);
+  const text = data?.choices?.[0]?.message?.content || "";
+  if (!text.trim()) return json({ error: "Groq returned no response text." }, 502, cors);
+  return json({ text: text.trim() }, 200, cors);
 }
 
 export default {
@@ -79,8 +99,6 @@ export default {
         return json({ error: error.message || "AI backend failed." }, 500, cors);
       }
     }
-
     return json({ ok: true, service: "Journall AI Worker" }, 200, cors);
   }
 };
-
