@@ -51,6 +51,18 @@ async function handleAiCoach(request, env, cors) {
   if (!String(prompt).trim()) return json({ error: "Prompt is required." }, 400, cors);
   if (!env.GROQ_API_KEY) return json({ error: "GROQ_API_KEY secret is not configured." }, 500, cors);
 
+  // Groq's free tier rejects oversized requests before the model can answer.
+  // Keep enough room for the system prompt and completion while preserving
+  // the newest, most relevant journal text.
+  const limitText = (value, maxChars) => {
+    const text = String(value || "");
+    return text.length > maxChars
+      ? `${text.slice(0, maxChars)}\n[older context omitted]`
+      : text;
+  };
+  const safePrompt = limitText(prompt, mode === "generation" ? 12000 : 5000);
+  const safeContext = mode === "generation" ? "" : limitText(context, 10000);
+
   const completion = await fetch("https://api.groq.com/openai/v1/chat/completions", {
     method: "POST",
     headers: {
@@ -59,7 +71,7 @@ async function handleAiCoach(request, env, cors) {
     },
     body: JSON.stringify({
       model: env.GROQ_MODEL || "llama-3.1-8b-instant",
-      max_tokens: mode === "generation" ? 650 : 450,
+      max_tokens: mode === "generation" ? 500 : 450,
       temperature: mode === "generation" ? 0.35 : 0.25,
       messages: [
         {
@@ -72,7 +84,7 @@ async function handleAiCoach(request, env, cors) {
             "Only when the user asks for a trade-history analysis and fewer than 5 trades are logged, begin with: Not enough trade history yet for a reliable pattern. " +
             "Keep casual replies to 1-3 sentences and trade reviews to 3-5 direct sentences. Avoid generic motivational filler."
         },
-        { role: "user", content: `Journal context:\n${context}\n\nTrader request:\n${prompt}` }
+        { role: "user", content: `Journal context:\n${safeContext}\n\nTrader request:\n${safePrompt}` }
       ]
     })
   });

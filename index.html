@@ -4150,17 +4150,33 @@ function aiReportStorageKey(kind='main'){
 function aiReportPayload(){
   const data = filtered || [];
   const s = stats(data);
+  // stats() also contains the wins/losses trade arrays for chart rendering.
+  // Never serialize those arrays into an AI report request.
+  const summary = {
+    total: data.length,
+    wins: Array.isArray(s.wins) ? s.wins.length : 0,
+    losses: Array.isArray(s.losses) ? s.losses.length : 0,
+    breakeven: Array.isArray(s.breakEvens) ? s.breakEvens.length : 0,
+    winRate: Number(Number(s.wr || 0).toFixed(1)),
+    pnl: Number(Number(s.pnl || 0).toFixed(2)),
+    profitFactor: Number(Number(s.pf || 0).toFixed(2)),
+    maxDrawdown: Number(Number(s.maxDD || 0).toFixed(2))
+  };
   const sessions = by(t=>t.session,['Asia','London','New York']);
   const sides = by(t=>t.side,['BUY','SELL']);
   const weekdays = by(t=>t.weekday,['Mon','Tue','Wed','Thu','Fri']);
   const mistakeLabels = ['Revenge Trade','Increased Lot Size','Moved Stop Loss','No Confirmation Entry','Overtrading','No Patience'];
   const mistakeCounts = Object.fromEntries(mistakeLabels.map(label=>[label, data.filter(t=>mistakes(t).includes(label)).length]));
-  const recent = sorted(data).slice(-40).map(t=>({
-    date:t.date,time:t.time,symbol:t.symbol,side:t.side,session:t.session,
-    entry:t.entry,exit:t.exit,sl:t.sl,tp:t.tp,lot:t.volume,duration:t.duration,
-    pnl:t.pnl,reason:t.reason,mistakes:mistakes(t)
+  // Keep report prompts small enough for the free model's TPM limit. The
+  // detailed journal context is sent separately for chat, so report cards
+  // only need compact evidence from the most recent trades.
+  const recent = sorted(data).slice(-20).map(t=>({
+    date:t.date,time:t.time,side:t.side,session:t.session,
+    pnl:Number(t.pnl)||0,setup:t.setup || t.reason || 'unknown',
+    rr:typeof tradePlannedRr === 'function' && tradePlannedRr(t) != null ? Number(tradePlannedRr(t).toFixed(2)) : null,
+    mistakes:mistakes(t)
   }));
-  return {summary:s, sessions, sides, weekdays, mistakeCounts, recentTrades:recent};
+  return {summary, sessions, sides, weekdays, mistakeCounts, recentTrades:recent};
 }
 
 function isBadAIReport(text){
@@ -7028,7 +7044,9 @@ document.querySelectorAll('.nav button').forEach(btn=>{
         body: JSON.stringify({
           prompt,
           mode,
-          context: buildTradeContext()
+          // Generation prompts already contain their own compact report data;
+          // sending the full journal context again nearly doubles token use.
+          context: mode === 'generation' ? '' : buildTradeContext()
         }),
         signal: controller.signal
       });
