@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
@@ -74,7 +74,7 @@ function renderAISnapshot(){
     </div>
     <div class="ai-score-card">
       <div class="ai-score-label">Win Rate</div>
-      <div class="ai-score-value ${s.wr>=50?'green':'amber'}">${s.wr}%</div>
+      <div class="ai-score-value ${s.wr>=50?'green':'amber'}">${Math.round(Number(s.wr) || 0)}%</div>
     </div>
     <div class="ai-score-card">
       <div class="ai-score-label">Net P&L</div>
@@ -126,10 +126,10 @@ function aiCoachResponse(topic, s, userPrompt){
     weak: `Your main weakness is ${leak}. It appeared ${leakCount} times, and your weakest session is ${s.worstSession[0]} at ${signedMoney(s.worstSession[1])}.`,
     psychology: `Your psychology risk is impulse after losses. I see ${s.b2b} back-to-back re-entry clusters, so the danger is chasing instead of waiting.`,
     best: `Your cleanest area is ${s.bestSession[0]} session at ${signedMoney(s.bestSession[1])}, with ${s.bestSymbol[0]} as the strongest symbol/pair by P&L.`,
-    today: `Today should be a damage-control session: net P&L is ${signedMoney(s.pnl)}, win rate is ${s.wr}%, and ${pressure}.`,
-    performance: `Performance snapshot: ${s.total} trades, ${s.wr}% win rate, ${s.wins.length} wins, ${s.losses.length} losses, net ${signedMoney(s.pnl)}.`
+    today: `Today should be a damage-control session: net P&L is ${signedMoney(s.pnl)}, win rate is ${Math.round(Number(s.wr) || 0)}%, and ${pressure}.`,
+    performance: `Performance snapshot: ${s.total} trades, ${Math.round(Number(s.wr) || 0)}% win rate, ${s.wins.length} wins, ${s.losses.length} losses, net ${signedMoney(s.pnl)}.`
   };
-  const diagnosis = diagnosisMap[topic] || `I read your journal as a process problem first: ${s.total} trades, net ${signedMoney(s.pnl)}, win rate ${s.wr}%, main leak ${leak}.`;
+  const diagnosis = diagnosisMap[topic] || `I read your journal as a process problem first: ${s.total} trades, net ${signedMoney(s.pnl)}, win rate ${Math.round(Number(s.wr) || 0)}%, main leak ${leak}.`;
   return `
     <strong>Trading Coach:</strong>
     <div><strong>Diagnosis:</strong> ${diagnosis}</div>
@@ -173,10 +173,10 @@ function renderCoachCard(topic, s, userPrompt){
     weak: `Your main weakness is <strong>${leak}</strong>. It appeared ${leakCount} times, and your weakest session is <strong>${worstSession}</strong> at ${signedMoney(s.worstSession[1])}.`,
     psychology: `Your psychology risk is impulse after losses. I see <strong>${s.b2b}</strong> back-to-back re-entry clusters, so the danger is chasing instead of waiting.`,
     best: `Your cleanest area is <strong>${bestSession}</strong> session at ${signedMoney(s.bestSession[1])}, with <strong>${bestSymbol}</strong> as the strongest symbol/pair by P&L.`,
-    today: `Today should be a damage-control session: net P&L is ${signedMoney(s.pnl)}, win rate is <strong>${s.wr}%</strong>, and ${pressure}.`,
-    performance: `Performance snapshot: <strong>${s.total}</strong> trades, <strong>${s.wr}%</strong> win rate, ${s.wins.length} wins, ${s.losses.length} losses, net ${signedMoney(s.pnl)}.`
+    today: `Today should be a damage-control session: net P&L is ${signedMoney(s.pnl)}, win rate is <strong>${Math.round(Number(s.wr) || 0)}%</strong>, and ${pressure}.`,
+    performance: `Performance snapshot: <strong>${s.total}</strong> trades, <strong>${Math.round(Number(s.wr) || 0)}%</strong> win rate, ${s.wins.length} wins, ${s.losses.length} losses, net ${signedMoney(s.pnl)}.`
   };
-  const diagnosis = diagnosisMap[topic] || `I read your journal as a process problem first: ${s.total} trades, net ${signedMoney(s.pnl)}, win rate ${s.wr}%, main leak <strong>${leak}</strong>.`;
+  const diagnosis = diagnosisMap[topic] || `I read your journal as a process problem first: ${s.total} trades, net ${signedMoney(s.pnl)}, win rate ${Math.round(Number(s.wr) || 0)}%, main leak <strong>${leak}</strong>.`;
 
   return `
     <div class="coach-card">
@@ -2323,8 +2323,8 @@ tr:hover {
     <div class="setup-section">
       <div class="setup-section-label">Account</div>
       <div class="account-form-grid">
-        <label>Account size ($)<div class="number-stepper"><button class="stepper-btn" type="button" onclick="stepAccountNumber('accountSizeInput',-100)">-</button><input id="accountSizeInput" type="number" min="1" step="100" placeholder="Enter a value" oninput="renderAccountSetupPreview()"><button class="stepper-btn" type="button" onclick="stepAccountNumber('accountSizeInput',100)">+</button></div></label>
-        <label>Current balance ($)<div class="number-stepper"><button class="stepper-btn" type="button" onclick="stepAccountNumber('currentBalanceInput',-100)">-</button><input id="currentBalanceInput" type="number" min="0" step="100" placeholder="Enter a value" oninput="renderAccountSetupPreview()"><button class="stepper-btn" type="button" onclick="stepAccountNumber('currentBalanceInput',100)">+</button></div></label>
+        <label>Initial account balance ($)<div class="number-input"><input id="accountSizeInput" type="number" min="1" step="100" placeholder="Enter a value" oninput="renderAccountSetupPreview()"></div></label>
+        <label>Current balance ($)<div class="number-input"><input id="currentBalanceInput" type="number" min="0" step="100" placeholder="Enter a value" oninput="renderAccountSetupPreview()"></div></label>
         <label>Account phase<select id="accountPhaseInput" onchange="toggleFundedFields()"><option>Phase 1</option><option>Phase 2</option><option>Funded</option><option>Personal</option></select></label>
       </div>
     </div>
@@ -2332,17 +2332,17 @@ tr:hover {
     <div class="setup-section">
       <div class="setup-section-label">Targets</div>
       <div class="account-form-grid">
-        <label>Profit target<div class="account-inline-field"><div class="number-stepper"><button class="stepper-btn" type="button" onclick="stepAccountNumber('profitTargetInput',-1)">-</button><input id="profitTargetInput" type="number" min="0" step="1" placeholder="Enter a value" oninput="renderAccountSetupPreview()"><button class="stepper-btn" type="button" onclick="stepAccountNumber('profitTargetInput',1)">+</button></div><select id="profitTargetType" onchange="renderAccountSetupPreview()"><option value="percent">%</option><option value="amount">$</option></select></div></label>
-        <label>Phase deadline (optional)<input id="phaseDeadlineInput" type="date"></label><label>Max trades per day<div class="number-stepper"><button class="stepper-btn" type="button" onclick="stepAccountNumber('maxTradesInput',-1)">-</button><input id="maxTradesInput" type="number" min="1" step="1" placeholder="Enter a value" oninput="renderAccountSetupPreview()"><button class="stepper-btn" type="button" onclick="stepAccountNumber('maxTradesInput',1)">+</button></div></label>
+        <label>Profit target<div class="account-inline-field"><div class="number-input"><input id="profitTargetInput" type="number" min="0" step="1" placeholder="Enter a value" oninput="renderAccountSetupPreview()"></div><select id="profitTargetType" onchange="renderAccountSetupPreview()"><option value="percent">%</option><option value="amount">$</option></select></div></label>
+        <label>Phase deadline (optional)<input id="phaseDeadlineInput" type="date"></label><label>Max trades per day<div class="number-input"><input id="maxTradesInput" type="number" min="1" step="1" placeholder="Enter a value" oninput="renderAccountSetupPreview()"></div></label>
       </div>
     </div>
 
     <div class="setup-section">
       <div class="setup-section-label">Risk limits</div>
       <div class="account-form-grid">
-        <label>Risk per trade<div class="account-inline-field"><div class="number-stepper"><button class="stepper-btn" type="button" onclick="stepAccountNumber('riskPercentInput',-0.1)">-</button><input id="riskPercentInput" type="number" min="0.5" max="2" step="0.1" placeholder="Enter a value" oninput="renderAccountSetupPreview()"><button class="stepper-btn" type="button" onclick="stepAccountNumber('riskPercentInput',0.1)">+</button></div><span>%</span></div></label><label>Minimum RR<div class="number-stepper"><button class="stepper-btn" type="button" onclick="stepAccountNumber('minRrInput',-0.5)">-</button><input id="minRrInput" type="number" min="1" step="0.5" placeholder="Enter a value" oninput="renderAccountSetupPreview()"><button class="stepper-btn" type="button" onclick="stepAccountNumber('minRrInput',0.5)">+</button></div></label>
-        <label class="funded-only">Max daily loss<div class="account-inline-field"><div class="number-stepper"><button class="stepper-btn" type="button" onclick="stepAccountNumber('maxDailyLossInput',-1)">-</button><input id="maxDailyLossInput" type="number" min="0" step="1" placeholder="Enter a value" oninput="renderAccountSetupPreview()"><button class="stepper-btn" type="button" onclick="stepAccountNumber('maxDailyLossInput',1)">+</button></div><select id="maxDailyLossType" onchange="renderAccountSetupPreview()"><option value="percent">%</option><option value="amount">$</option></select></div></label>
-        <label class="funded-only">Max overall drawdown<div class="account-inline-field"><div class="number-stepper"><button class="stepper-btn" type="button" onclick="stepAccountNumber('maxDrawdownInput',-1)">-</button><input id="maxDrawdownInput" type="number" min="0" step="1" placeholder="Enter a value" oninput="renderAccountSetupPreview()"><button class="stepper-btn" type="button" onclick="stepAccountNumber('maxDrawdownInput',1)">+</button></div><select id="maxDrawdownType" onchange="renderAccountSetupPreview()"><option value="percent">%</option><option value="amount">$</option></select></div></label>
+        <label>Risk per trade<div class="account-inline-field"><div class="number-input"><input id="riskPercentInput" type="number" min="0.5" max="2" step="0.1" placeholder="Enter a value" oninput="renderAccountSetupPreview()"></div><span>%</span></div></label><label>Minimum RR<div class="number-input"><input id="minRrInput" type="number" min="1" step="0.5" placeholder="Enter a value" oninput="renderAccountSetupPreview()"></div></label>
+        <label class="funded-only">Max daily loss<div class="account-inline-field"><div class="number-input"><input id="maxDailyLossInput" type="number" min="0" step="1" placeholder="Enter a value" oninput="renderAccountSetupPreview()"></div><select id="maxDailyLossType" onchange="renderAccountSetupPreview()"><option value="percent">%</option><option value="amount">$</option></select></div></label>
+        <label class="funded-only">Max overall drawdown<div class="account-inline-field"><div class="number-input"><input id="maxDrawdownInput" type="number" min="0" step="1" placeholder="Enter a value" oninput="renderAccountSetupPreview()"></div><select id="maxDrawdownType" onchange="renderAccountSetupPreview()"><option value="percent">%</option><option value="amount">$</option></select></div></label>
       </div>
     </div>
 
@@ -2442,7 +2442,7 @@ tr:hover {
         <div class="card"><div class="panel-title"><h3>Direction Split</h3><span>BUY vs SELL</span></div><div class="chart"><canvas id="directionChart"></canvas></div><div id="directionHelper" class="chart-helper">Shows whether BUY or SELL performs better.</div></div>
       </div>
       <div class="grid two" style="margin-top:16px">
-        <div class="card"><div class="panel-title"><h3>Trade Heatmap</h3><span>weekday x hour</span></div><div id="heatmap" class="heatmap"></div></div>
+        <div class="card"><div class="panel-title"><h3>Trade Heatmap</h3><span>weekday x hour</span></div><div class="heatmap-scroll" tabindex="0" aria-label="Trade heatmap. Scroll horizontally to view all 24 hours."><div id="heatmap" class="heatmap"></div></div></div>
         <div class="card"><div class="panel-title"><h3>Back-to-back Re-entry Map</h3><span>revenge clusters</span></div><div class="chart tall"><canvas id="b2bChart"></canvas></div></div>
       </div>
     </section>
@@ -4576,8 +4576,9 @@ function accountMetrics(data=trades){
   const todayTrades = sorted(allTrades).filter(t=>t.date === today);
   const todayPnl = todayTrades.reduce((a,t)=>a+(Number(t.pnl)||0),0);
   const accountSize = Number(config.accountSize) || 0;
-  const startBalance = Number(config.currentBalance) || accountSize;
-  const currentBalance = startBalance + s.pnl;
+  const startBalance = accountSize;
+  // Account Setup stores the current balance as the live balance. Imported P&L is historical context and must not be applied twice.
+  const currentBalance = Number(config.currentBalance) || accountSize;
   const profitTargetAmount = limitAmount(config.profitTarget, config.profitTargetType, accountSize) || 0;
   const targetBalance = startBalance + profitTargetAmount;
   const profitProgress = profitTargetAmount ? clampNumber(Math.max(0,currentBalance-startBalance)/profitTargetAmount*100,0,100) : 0;
@@ -4586,7 +4587,7 @@ function accountMetrics(data=trades){
   const maxDailyLossAmount = (funded || config.maxDailyLoss != null) ? limitAmount(config.maxDailyLoss, config.maxDailyLossType, accountSize) : null;
   const maxDrawdownAmount = (funded || config.maxDrawdown != null) ? limitAmount(config.maxDrawdown, config.maxDrawdownType, accountSize) : null;
   const dailyLossUsed = Math.abs(Math.min(0, todayPnl));
-  const maxDrawdownUsed = Math.abs(Math.min(0, s.maxDD));
+  const maxDrawdownUsed = Math.max(0, startBalance - currentBalance);
   const maxDailyLossRemaining = maxDailyLossAmount == null ? null : Math.max(0, maxDailyLossAmount - dailyLossUsed);
   const maxDrawdownRemaining = maxDrawdownAmount == null ? null : Math.max(0, maxDrawdownAmount - maxDrawdownUsed);
   let daysRemaining = null;
@@ -4654,8 +4655,7 @@ function getUserSetupCriteria(){
 function renderAccountSetupPreview(){
   const box = document.getElementById('accountSetupPreview'); if(!box) return;
   const accountSize = toNumber(document.getElementById('accountSizeInput')?.value, 0);
-  const currentBalance = toNumber(document.getElementById('currentBalanceInput')?.value, accountSize);
-  const phase = document.getElementById('accountPhaseInput')?.value || 'Phase 1';
+const phase = document.getElementById('accountPhaseInput')?.value || 'Phase 1';
   const riskPercent = clampNumber(document.getElementById('riskPercentInput')?.value || DEFAULT_RISK_PERCENT, 0.5, 2);
   const profitTarget = toNumber(document.getElementById('profitTargetInput')?.value, 0);
   const profitTargetType = document.getElementById('profitTargetType')?.value || 'percent';
@@ -4665,7 +4665,7 @@ function renderAccountSetupPreview(){
   const minRr = toNumber(document.getElementById('minRrInput')?.value, 0);
   const riskAmount = accountSize * riskPercent / 100;
   const targetAmount = limitAmount(profitTarget, profitTargetType, accountSize);
-  const targetBalance = currentBalance + targetAmount;
+  const targetBalance = accountSize + (targetAmount || 0);
   const dailyLossAmount = isFundedPhase(phase) ? limitAmount(maxDailyLoss, maxDailyLossType, accountSize) : null;
   const money = value => `$${(Number.isFinite(value) ? value : 0).toFixed(2)}`;
   box.innerHTML = `<div class="setup-preview-row"><span>$ risk per trade</span><strong>${money(riskAmount)}</strong></div><div class="setup-preview-row"><span>Profit target</span><strong>${money(targetAmount)} (${money(targetBalance)} target balance)</strong></div><div class="setup-preview-row"><span>Daily loss limit</span><strong>${dailyLossAmount == null ? 'Skipped for this phase' : money(dailyLossAmount)}</strong></div><div class="setup-preview-row"><span>Trade limit / Minimum RR</span><strong>${maxTrades || '-'} trades / ${minRr || '-'}R</strong></div>`;
@@ -4766,11 +4766,16 @@ function propGoalSignature(){
   return [cfg ? JSON.stringify(cfg) : 'no-account', data.length, data[0]?.date || '', data[data.length-1]?.date || '', Number(s.pnl||0).toFixed(2), Number(s.maxDD||0).toFixed(2), Number(todayPnl||0).toFixed(2)].join('|');
 }
 function propGoalStorageKey(){ return `krishna_ai_prop_goals_${simpleHash(propGoalSignature())}`; }
+function formatAIInsightBlock(part){
+  return String(part || '')
+    .replace(/^\s*\*\*([^*<\n]+)\*\*(?:\s*:?<br>)?/, '<h4>$1</h4>')
+    .replace(/\*\*([^*<\n]+)\*\*/g, '<strong>$1</strong>');
+}
 function renderPropGoalText(text){
   const clean = escapeHtml(text || '').replace(/\r?\n/g,'<br>');
   const chunks = clean.split(/<br>\s*<br>/).filter(Boolean).slice(0,7);
   if(!chunks.length) return '<div class="insight empty"><strong>No AI goals yet.</strong><br>Click Update AI Goals.</div>';
-  return chunks.map((part,i)=>`<div class="insight ${i===0?'good':i===1?'warn':''}">${part}</div>`).join('');
+  return chunks.map((part,i)=>`<div class="insight ${i===0?'good':i===1?'warn':''}">${formatAIInsightBlock(part)}</div>`).join('');
 }
 function propChallengePayload(){
   const metrics = accountMetrics(trades || []), data = trades || [], s = stats(data);
@@ -6840,7 +6845,7 @@ function renderAISnapshot(){
     </div>
     <div class="ai-score-card">
       <div class="ai-score-label">Win Rate</div>
-      <div class="ai-score-value ${s.wr>=50?'green':'amber'}">${s.wr}%</div>
+      <div class="ai-score-value ${s.wr>=50?'green':'amber'}">${Math.round(Number(s.wr) || 0)}%</div>
     </div>
     <div class="ai-score-card">
       <div class="ai-score-label">Net P&L</div>
@@ -9072,8 +9077,7 @@ main,
 }
 
 #journallApp .trade-heatmap,
-#journallApp .heatmap,
-#journallApp [class*="heatmap"] {
+#journallApp .heatmap {
   width: 100% !important;
   overflow: hidden !important;
   min-height: unset !important;
@@ -10087,7 +10091,19 @@ input{
   }
 }
 </style>
-</body>
+<style id="journall-balance-heatmap-ai-repair">
+/* Journall balance, heatmap, and AI output repair v1 */
+#accountOnboardingGate .number-input{width:100%;min-width:0}
+#accountOnboardingGate .number-input input{width:100%!important}
+input[type="number"]{-moz-appearance:textfield;appearance:textfield}
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
+#journallApp .heatmap-scroll{display:block!important;width:100%!important;max-width:100%!important;overflow-x:auto!important;overflow-y:hidden!important;padding-bottom:8px!important;-webkit-overflow-scrolling:touch;scrollbar-width:thin}
+#journallApp .heatmap-scroll .heatmap{display:grid!important;grid-template-columns:112px repeat(24,42px)!important;width:max-content!important;min-width:max-content!important;overflow:visible!important}
+#journallApp .heatmap-scroll .heatcell{min-width:42px!important}
+#journallApp .heatmap-scroll .heatlabel{min-width:112px!important}
+#journallApp .insight h4{margin:0 0 8px!important;color:#f7f8f8!important;font-size:15px!important;font-weight:700!important;line-height:1.35!important}
+</style></body>
 </html>
 
 
