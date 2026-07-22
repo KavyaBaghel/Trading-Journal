@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
@@ -7044,6 +7044,7 @@ document.querySelectorAll('.nav button').forEach(btn=>{
     const input = document.getElementById('aiPromptInput');
     const prompt = preset || (input ? input.value.trim() : '');
     if(!prompt) return;
+    if(input) input.value = '';
     addMessage('user', `<strong>You:</strong> ${textOnly(prompt)}`);
     const loading = addMessage('bot', '<strong>AI Coach:</strong> Reviewing your journal with cloud AI...', 'loading');
     try{
@@ -7592,7 +7593,7 @@ textarea{border-radius:24px!important}input::placeholder,textarea::placeholder{c
 .cmd-status.safe{background:var(--ink)!important;color:var(--on-primary)!important;border-radius:9999px!important}.cmd-status.caution{background:var(--soft-cloud)!important;color:var(--ink)!important;border:1px solid var(--hairline)!important;border-radius:9999px!important}.cmd-status.stop{background:transparent!important;color:var(--sale)!important;border:1px solid var(--sale)!important;border-radius:9999px!important}
 .psych-check.checked{background:var(--ink)!important;color:var(--on-primary)!important;border-color:var(--ink)!important}.psych-check.checked strong,.psych-check.checked em{color:var(--on-primary)!important}.psych-check.checked>span{background:var(--on-primary)!important;border-color:var(--on-primary)!important;color:var(--ink)!important}.psych-status{background:var(--soft-cloud)!important;color:var(--ink)!important;border:1px solid var(--hairline)!important;border-radius:0!important}
 .calendar-day,.calendar-day.profit,.calendar-day.lossday,.calendar-day.flatday{background:var(--canvas)!important;border:1px solid var(--hairline)!important;border-radius:0!important}.calendar-day:hover{border-color:var(--ink)!important}.calendar-pnl{font-weight:500!important}
-.ai-msg.user{background:var(--ink)!important;color:var(--on-primary)!important;border-color:var(--ink)!important}.ai-msg.user strong{color:var(--on-primary)!important}.ai-msg.bot{background:var(--soft-cloud)!important;color:var(--ink)!important}.coach-avatar{background:var(--ink)!important;color:var(--on-primary)!important}.coach-confidence{background:var(--soft-cloud)!important;color:var(--ink)!important;border:1px solid var(--hairline)!important;border-radius:9999px!important}.coach-confidence.low{color:var(--sale)!important;border-color:var(--sale)!important}.coach-confidence.high{color:var(--success)!important;border-color:var(--success)!important}
+.ai-msg.user{background:#1e2027!important;color:#f7f8f8!important;border-color:#2e3038!important}.ai-msg.user strong{color:#f7f8f8!important}.ai-msg.bot{background:var(--soft-cloud)!important;color:var(--ink)!important}.coach-avatar{background:var(--ink)!important;color:var(--on-primary)!important}.coach-confidence{background:var(--soft-cloud)!important;color:var(--ink)!important;border:1px solid var(--hairline)!important;border-radius:9999px!important}.coach-confidence.low{color:var(--sale)!important;border-color:var(--sale)!important}.coach-confidence.high{color:var(--success)!important;border-color:var(--success)!important}
 .modal-backdrop{background:rgba(0,0,0,.85)!important;backdrop-filter:blur(8px)!important;-webkit-backdrop-filter:blur(8px)!important;z-index:1000!important}.mistake-modal,.day-trades-modal,.firebase-auth-gate .firebase-auth-card{background:var(--surface-2)!important;border:1px solid var(--hairline-strong)!important;border-radius:var(--rounded-xl)!important;color:var(--ink)!important}.firebase-auth-gate{display:none!important;min-height:100vh!important;place-items:center!important;background:var(--canvas)!important;padding:var(--space-xl)!important}.firebase-auth-gate.show{display:grid!important}.firebase-auth-gate[hidden],#journallApp[hidden],.mobile-appbar[hidden],.firebase-auth-bar[hidden]{display:none!important}html.firebase-auth-required body{overflow:hidden!important}html.firebase-auth-required #journallApp,html.firebase-auth-required .mobile-appbar{display:none!important}html:not(.firebase-auth-required) #firebaseAuthGate,html:not(.firebase-auth-required) #firebaseAuthBar{display:none!important}.firebase-auth-bar,.mobile-appbar{background:var(--canvas)!important;color:var(--ink)!important;border-color:var(--hairline)!important}.firebase-auth-bar .btn,.firebase-auth-bar .btn.primary{background:var(--primary)!important;color:var(--ink)!important;border-color:var(--primary)!important}
 /* Emil Kowalski motion layer: fast, subtle, purposeful. */
 .card,.hero,.sidebox,.goal-card,.widget,.saved-journal-card,.analytics-bar-card,.cmd-card,.ai-score-card,.calendar-summary-card,.journal-main-card,.coach-card,.mistake-box,.mistake-modal-section,.mistake-row,.day-trade-card{transition:transform var(--dur-base) var(--ease-out),border-color var(--dur-base) var(--ease-out),opacity var(--dur-fast) var(--ease-out)!important}
@@ -10070,3 +10071,4 @@ input{
 </style>
 </body>
 </html>
+

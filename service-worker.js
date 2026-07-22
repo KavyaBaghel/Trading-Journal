@@ -1,4 +1,4 @@
-const CACHE_NAME = 'journall-android-pwa-v19';
+﻿const CACHE_NAME = 'journall-android-pwa-v20';
 const APP_SHELL = [
   './',
   './index.html',
@@ -77,3 +77,4 @@ self.addEventListener('fetch', event => {
     })
   );
 });
+
