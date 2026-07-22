@@ -7621,8 +7621,9 @@ p,span,div,td,label,em{color:inherit}.psych-check em,.psych-rule span,.journal-r
 .btn:hover,.ai-chip:hover,.journal-status-btn:hover,.pill:hover,.psych-step:hover,.nav button:hover{background:#242426!important;border-color:var(--ash)!important;color:var(--ink)!important;transform:none!important;opacity:1!important}
 .btn:active,.ai-chip:active,.journal-status-btn:active,.pill:active,.psych-step:active,.widget-icon-btn:active{transform:scale(.97)!important}
 .btn.primary,.file-picker-btn,.mobile-upload-btn,.pill.active,.psych-step.active,.journal-result-tabs .btn.active{background:var(--ink)!important;background-image:none!important;color:var(--on-primary)!important;border:1px solid var(--ink)!important}
-.nav button{min-height:40px!important;border-radius:var(--rounded-md)!important;padding:10px 16px!important;border:1px solid transparent!important;border-left:2px solid transparent!important;background:transparent!important;color:var(--ink-subtle)!important;font-size:14px!important;font-weight:400!important;letter-spacing:0!important;text-align:left!important;transition:background-color var(--dur-instant) var(--ease-out),color var(--dur-instant) var(--ease-out),border-color var(--dur-base) var(--ease-snappy)!important}
+.nav button{min-height:40px!important;border-radius:var(--rounded-md)!important;padding:10px 16px!important;border:1px solid transparent!important;border-left:2px solid transparent!important;background:transparent!important;color:var(--ink-subtle)!important;font-size:14px!important;font-weight:400!important;letter-spacing:0!important;text-align:left!important;transition:background-color var(--dur-instant) var(--ease-out),color var(--dur-instant) var(--ease-out),border-color var(--dur-base) var(--ease-snappy),transform var(--dur-fast) var(--ease-out)!important;transform-origin:center!important}
 .nav button:hover{background:var(--surface-2)!important;color:var(--ink)!important;border-color:var(--surface-2)!important;border-left-color:transparent!important}
+.nav button:active{transform:scale(0.97)!important}
 .nav button.active{background:var(--surface-2)!important;color:var(--ink)!important;border-color:var(--hairline-strong)!important;border-left-color:var(--primary)!important;font-weight:500!important}
 input,select,textarea,.search input,.filters input,.filters select,.editor textarea,.editor input,.journal-entry-form input,.journal-entry-form select,.journal-entry-form textarea,.journal-search-row input,.journal-search-row select,.journal-trade-select-row select,.real-ai-settings input,.real-ai-settings select{background:var(--soft-cloud)!important;border:1px solid var(--hairline)!important;border-radius:24px!important;color:var(--ink)!important;font-family:var(--sans)!important;letter-spacing:0!important}
 textarea{border-radius:24px!important}input::placeholder,textarea::placeholder{color:var(--stone)!important}input:focus,select:focus,textarea:focus{background:#101012!important;border-color:var(--ink)!important;outline:2px solid var(--ink)!important;outline-offset:2px!important}
@@ -9178,11 +9179,21 @@ main,
   border-radius: 10px !important;
   margin-bottom: 8px !important;
   cursor: pointer !important;
-  transition: border-color 150ms !important;
+  transition: border-color 150ms ease, transform 150ms ease !important;
+  transform-origin: center !important;
 }
 #journallApp .psych-check:hover,
-#journallApp .checklist-item:hover {
+#journallApp .checklist-item:hover,
+#journallApp [class*="checklist-item"]:hover,
+#journallApp [class*="pretrade-item"]:hover {
   border-color: rgba(255,255,255,0.16) !important;
+  transform: translateY(-2px) !important;
+}
+#journallApp .psych-check:active,
+#journallApp .checklist-item:active,
+#journallApp [class*="checklist-item"]:active,
+#journallApp [class*="pretrade-item"]:active {
+  transform: translateY(-1px) scale(0.98) !important;
 }
 #journallApp .psych-check input[type="checkbox"],
 #journallApp [class*="checklist-item"] input[type="checkbox"] {
