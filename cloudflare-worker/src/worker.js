@@ -19,12 +19,10 @@ function json(data, status, headers) {
 async function verifyFirebaseIdToken(token, env) {
   // Firebase web API keys only identify a Firebase project. The caller must
   // still present a valid, signed Firebase ID token to access this Worker.
-  if (!env.FIREBASE_WEB_API_KEY) {
-    throw new Error("Worker config is missing FIREBASE_WEB_API_KEY.");
-  }
+  const firebaseApiKey = env.FIREBASE_WEB_API_KEY || "AIzaSyDmnTyCBVnjha1gSurY2zbpocvSCjm6dY4";
 
   const response = await fetch(
-    `https://identitytoolkit.googleapis.com/v1/accounts:lookup?key=${encodeURIComponent(env.FIREBASE_WEB_API_KEY)}`,
+    `https://identitytoolkit.googleapis.com/v1/accounts:lookup?key=${encodeURIComponent(firebaseApiKey)}`,
     {
       method: "POST",
       headers: { "Content-Type": "application/json" },
