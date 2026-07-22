@@ -1,6 +1,9 @@
 ﻿function corsHeaders(origin, env) {
   const localOrigins = ["http://127.0.0.1:8787", "http://localhost:8787"];
-  const allowed = origin === env.ALLOWED_ORIGIN || localOrigins.includes(origin);
+  // Electron and installed file-based apps send Origin: null. The Firebase ID
+  // token is still verified for every request, so this only enables the same
+  // signed-in Journall user to use the desktop build.
+  const allowed = origin === "null" || origin === env.ALLOWED_ORIGIN || localOrigins.includes(origin);
   return {
     "Access-Control-Allow-Origin": allowed ? origin : env.ALLOWED_ORIGIN,
     "Access-Control-Allow-Methods": "POST, OPTIONS",
