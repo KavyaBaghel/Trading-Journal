@@ -2254,7 +2254,10 @@ tr:hover {
 .signin-feature-grid {
   grid-template-columns:repeat(2,minmax(0,1fr)) !important;
 }</style>
-</head>
+<style id="journall-trading-dashboard-sync">
+.account-sync-note{margin:0 0 14px!important;color:rgba(255,255,255,.56)!important;font-size:13px!important;line-height:1.5!important}
+.account-source-input[readonly],.account-source-input:disabled{opacity:.72!important;cursor:not-allowed!important;border-color:rgba(255,255,255,.05)!important}
+</style></head>
 <body>
 <button id="androidInstallBtn" class="android-install-btn" type="button" hidden>Install Journall</button>
 <div id="firebaseAuthBar" class="firebase-auth-bar">
@@ -2321,11 +2324,11 @@ tr:hover {
     </div>
 
     <div class="setup-section">
-      <div class="setup-section-label">Account</div>
+      <div class="setup-section-label">Synced account</div><p id="accountSyncNote" class="account-sync-note">Account size, current balance, and phase are loaded from your Trading Dashboard.</p>
       <div class="account-form-grid">
-        <label>Initial account balance ($)<div class="number-input"><input id="accountSizeInput" type="number" min="1" step="100" placeholder="Enter a value" oninput="renderAccountSetupPreview()"></div></label>
-        <label>Current balance ($)<div class="number-input"><input id="currentBalanceInput" type="number" min="0" step="100" placeholder="Enter a value" oninput="renderAccountSetupPreview()"></div></label>
-        <label>Account phase<select id="accountPhaseInput" onchange="toggleFundedFields()"><option>Phase 1</option><option>Phase 2</option><option>Funded</option><option>Personal</option></select></label>
+        <label>Initial account balance ($)<div class="number-input"><input id="accountSizeInput" class="account-source-input" type="number" min="1" step="100" placeholder="Enter a value" oninput="renderAccountSetupPreview()"></div></label>
+        <label>Current balance ($)<div class="number-input"><input id="currentBalanceInput" class="account-source-input" type="number" min="0" step="100" placeholder="Enter a value" oninput="renderAccountSetupPreview()"></div></label>
+        <label>Account phase<select id="accountPhaseInput" class="account-source-input" onchange="toggleFundedFields()"><option>Phase 1</option><option>Phase 2</option><option>Funded</option><option>Personal</option></select></label>
       </div>
     </div>
 
@@ -2341,8 +2344,8 @@ tr:hover {
       <div class="setup-section-label">Risk limits</div>
       <div class="account-form-grid">
         <label>Risk per trade<div class="account-inline-field"><div class="number-input"><input id="riskPercentInput" type="number" min="0.5" max="2" step="0.1" placeholder="Enter a value" oninput="renderAccountSetupPreview()"></div><span>%</span></div></label><label>Minimum RR<div class="number-input"><input id="minRrInput" type="number" min="1" step="0.5" placeholder="Enter a value" oninput="renderAccountSetupPreview()"></div></label>
-        <label class="funded-only">Max daily loss<div class="account-inline-field"><div class="number-input"><input id="maxDailyLossInput" type="number" min="0" step="1" placeholder="Enter a value" oninput="renderAccountSetupPreview()"></div><select id="maxDailyLossType" onchange="renderAccountSetupPreview()"><option value="percent">%</option><option value="amount">$</option></select></div></label>
-        <label class="funded-only">Max overall drawdown<div class="account-inline-field"><div class="number-input"><input id="maxDrawdownInput" type="number" min="0" step="1" placeholder="Enter a value" oninput="renderAccountSetupPreview()"></div><select id="maxDrawdownType" onchange="renderAccountSetupPreview()"><option value="percent">%</option><option value="amount">$</option></select></div></label>
+        <label>Max daily loss<div class="account-inline-field"><div class="number-input"><input id="maxDailyLossInput" type="number" min="0" step="1" placeholder="Enter a value" oninput="renderAccountSetupPreview()"></div><select id="maxDailyLossType" onchange="renderAccountSetupPreview()"><option value="percent">%</option><option value="amount">$</option></select></div></label>
+        <label>Max overall drawdown<div class="account-inline-field"><div class="number-input"><input id="maxDrawdownInput" type="number" min="0" step="1" placeholder="Enter a value" oninput="renderAccountSetupPreview()"></div><select id="maxDrawdownType" onchange="renderAccountSetupPreview()"><option value="percent">%</option><option value="amount">$</option></select></div></label>
       </div>
     </div>
 
@@ -2422,7 +2425,7 @@ tr:hover {
 
     <section id="dashboard" class="section">
       <div class="card" style="margin-bottom:16px">
-        <div class="panel-title"><h3>Prop Challenge Dashboard</h3><span>account setup</span></div>
+        <div class="panel-title"><h3>Trading Dashboard</h3><span>account setup</span></div>
         <div id="propChallengeDashboard"></div>
       </div>
       <div id="analyticsBars" class="analytics-bars"></div>
@@ -4688,10 +4691,22 @@ const phase = document.getElementById('accountPhaseInput')?.value || 'Phase 1';
 }
 function openAccountSetup(blocking=false){
   const gate = document.getElementById('accountOnboardingGate');
-  const config = getAccountConfig() || {accountSize:'',phase:'Phase 1',profitTarget:'',profitTargetType:'percent',maxDailyLoss:'',maxDailyLossType:'percent',maxDrawdown:'',maxDrawdownType:'percent',currentBalance:'',riskPercent:'',maxTradesPerDay:'',minRr:'',phaseDeadline:'',userSetupCriteria:[]};
+  const existingAccount = getAccountConfig();
+  const hasSyncedAccount = !!existingAccount;
+  const config = existingAccount || {accountSize:'',phase:'Phase 1',profitTarget:'',profitTargetType:'percent',maxDailyLoss:'',maxDailyLossType:'percent',maxDrawdown:'',maxDrawdownType:'percent',currentBalance:'',riskPercent:'',maxTradesPerDay:'',minRr:'',phaseDeadline:'',userSetupCriteria:[]};
   const set = (id,value)=>{ const el=document.getElementById(id); if(el) el.value = value ?? ''; };
   set('accountSizeInput', config.accountSize ?? ''); set('currentBalanceInput', config.currentBalance ?? '');
   set('accountPhaseInput', config.phase || 'Phase 1'); set('profitTargetInput', config.profitTarget);
+  const syncNote = document.getElementById('accountSyncNote');
+  if(syncNote) syncNote.textContent = hasSyncedAccount
+    ? 'Account size, current balance, and phase are synced from your Trading Dashboard. Only the rules below are editable here.'
+    : 'Enter your account details once. They will be reused automatically by the Trading Dashboard.';
+  ['accountSizeInput','currentBalanceInput'].forEach(id=>{
+    const el = document.getElementById(id);
+    if(el){ el.readOnly = hasSyncedAccount; el.setAttribute('aria-readonly', String(hasSyncedAccount)); }
+  });
+  const phaseInput = document.getElementById('accountPhaseInput');
+  if(phaseInput) phaseInput.disabled = hasSyncedAccount;
   set('profitTargetType', config.profitTargetType || 'percent'); set('riskPercentInput', config.riskPercent ?? '');
   set('phaseDeadlineInput', config.phaseDeadline || ''); set('maxTradesInput', config.maxTradesPerDay ?? ''); set('minRrInput', config.minRr ?? '');
   set('maxDailyLossInput', config.maxDailyLoss ?? ''); set('maxDailyLossType', config.maxDailyLossType || 'percent');
@@ -4722,7 +4737,8 @@ function ensureAccountOnboarding(){
 }
 async function saveAccountSetup(){
   const msg = document.getElementById('accountSetupMessage');
-  const phase = document.getElementById('accountPhaseInput')?.value || 'Phase 1';
+  const existingAccount = getAccountConfig();
+  const phase = existingAccount?.phase || document.getElementById('accountPhaseInput')?.value || 'Phase 1';
   const readRequiredNumber = (id,label,min=0)=>{
     const raw = String(document.getElementById(id)?.value ?? '').trim();
     const value = Number(raw);
@@ -4731,21 +4747,19 @@ async function saveAccountSetup(){
   };
   let accountSize, currentBalance, riskPercent, profitTarget, maxTradesPerDay, minRr, maxDailyLoss = null, maxDrawdown = null;
   try{
-    accountSize = readRequiredNumber('accountSizeInput','Account size');
-    currentBalance = readRequiredNumber('currentBalanceInput','Current balance');
+    accountSize = existingAccount?.accountSize || readRequiredNumber('accountSizeInput','Account size');
+    currentBalance = existingAccount?.currentBalance ?? readRequiredNumber('currentBalanceInput','Current balance');
     profitTarget = readRequiredNumber('profitTargetInput','Profit target');
     riskPercent = clampNumber(readRequiredNumber('riskPercentInput','Risk per trade'), 0.5, 2);
     maxTradesPerDay = readRequiredNumber('maxTradesInput','Max trades per day');
     minRr = readRequiredNumber('minRrInput','Minimum RR');
-    if(isFundedPhase(phase)){
-      maxDailyLoss = readRequiredNumber('maxDailyLossInput','Max daily loss');
-      maxDrawdown = readRequiredNumber('maxDrawdownInput','Max overall drawdown');
-    }
+    maxDailyLoss = readRequiredNumber('maxDailyLossInput','Max daily loss');
+    maxDrawdown = readRequiredNumber('maxDrawdownInput','Max overall drawdown');
   }catch(error){
     if(msg) msg.textContent = error.message;
     return;
   }
-  const config = {accountSize,phase,profitTarget,profitTargetType:document.getElementById('profitTargetType')?.value || 'percent',maxDailyLoss:isFundedPhase(phase)?maxDailyLoss:null,maxDailyLossType:document.getElementById('maxDailyLossType')?.value || 'percent',maxDrawdown:isFundedPhase(phase)?maxDrawdown:null,maxDrawdownType:document.getElementById('maxDrawdownType')?.value || 'percent',currentBalance,riskPercent,maxTradesPerDay,minRr,phaseDeadline:document.getElementById('phaseDeadlineInput')?.value || '',userSetupCriteria:readSetupCriteriaRows(),startDate:getAccountConfig()?.startDate || new Date().toISOString().slice(0,10)};
+  const config = {accountSize,phase,profitTarget,profitTargetType:document.getElementById('profitTargetType')?.value || 'percent',maxDailyLoss,maxDailyLossType:document.getElementById('maxDailyLossType')?.value || 'percent',maxDrawdown,maxDrawdownType:document.getElementById('maxDrawdownType')?.value || 'percent',currentBalance,riskPercent,maxTradesPerDay,minRr,phaseDeadline:document.getElementById('phaseDeadlineInput')?.value || '',userSetupCriteria:readSetupCriteriaRows(),startDate:getAccountConfig()?.startDate || new Date().toISOString().slice(0,10)};
   localStorage.setItem(ACCOUNT_CONFIG_KEY, JSON.stringify(config));
   if(typeof window.journallSaveAccountSetupDoc === 'function'){
     try{
