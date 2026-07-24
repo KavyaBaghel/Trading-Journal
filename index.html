@@ -4586,18 +4586,42 @@ function getAccountConfig(){
     };
   }catch{ return null; }
 }
+function uploadedTradePnl(data=trades){
+  return (Array.isArray(data) ? data : []).reduce((sum,t)=>sum+(Number(t.pnl)||0),0);
+}
+function syncedCurrentBalance(config, data=trades){
+  if(!config) return 0;
+  const accountSize = Number(config.accountSize) || 0;
+  const list = Array.isArray(data) ? data : [];
+  if(list.length) return accountSize + uploadedTradePnl(list);
+  const manualBalance = Number(config.currentBalance);
+  return Number.isFinite(manualBalance) && manualBalance > 0 ? manualBalance : accountSize;
+}
+function syncStoredAccountBalanceWithTrades(data=trades){
+  const list = Array.isArray(data) ? data : [];
+  if(!list.length) return;
+  try{
+    const raw = JSON.parse(localStorage.getItem(ACCOUNT_CONFIG_KEY) || 'null');
+    if(!raw || !Number(raw.accountSize)) return;
+    const nextBalance = Number((Number(raw.accountSize) + uploadedTradePnl(list)).toFixed(2));
+    if(Math.abs((Number(raw.currentBalance) || 0) - nextBalance) >= 0.01){
+      raw.currentBalance = nextBalance;
+      localStorage.setItem(ACCOUNT_CONFIG_KEY, JSON.stringify(raw));
+    }
+  }catch{}
+}
 function accountMetrics(data=trades){
   const config = getAccountConfig();
   if(!config) return null;
   const allTrades = Array.isArray(data) ? data : [];
+  if(allTrades === trades) syncStoredAccountBalanceWithTrades(allTrades);
   const s = stats(allTrades);
   const today = todayDateKey();
   const todayTrades = sorted(allTrades).filter(t=>t.date === today);
   const todayPnl = todayTrades.reduce((a,t)=>a+(Number(t.pnl)||0),0);
   const accountSize = Number(config.accountSize) || 0;
   const startBalance = accountSize;
-  // Account Setup stores the current balance as the live balance. Imported P&L is historical context and must not be applied twice.
-  const currentBalance = Number(config.currentBalance) || accountSize;
+  const currentBalance = syncedCurrentBalance(config, allTrades);
   const profitTargetAmount = limitAmount(config.profitTarget, config.profitTargetType, accountSize) || 0;
   const targetBalance = startBalance + profitTargetAmount;
   const profitProgress = profitTargetAmount ? clampNumber(Math.max(0,currentBalance-startBalance)/profitTargetAmount*100,0,100) : 0;
@@ -4694,12 +4718,13 @@ function openAccountSetup(blocking=false){
   const existingAccount = getAccountConfig();
   const hasSyncedAccount = !!existingAccount;
   const config = existingAccount || {accountSize:'',phase:'Phase 1',profitTarget:'',profitTargetType:'percent',maxDailyLoss:'',maxDailyLossType:'percent',maxDrawdown:'',maxDrawdownType:'percent',currentBalance:'',riskPercent:'',maxTradesPerDay:'',minRr:'',phaseDeadline:'',userSetupCriteria:[]};
+  const liveBalance = existingAccount ? syncedCurrentBalance(existingAccount, trades || []) : config.currentBalance;
   const set = (id,value)=>{ const el=document.getElementById(id); if(el) el.value = value ?? ''; };
-  set('accountSizeInput', config.accountSize ?? ''); set('currentBalanceInput', config.currentBalance ?? '');
+  set('accountSizeInput', config.accountSize ?? ''); set('currentBalanceInput', liveBalance ?? '');
   set('accountPhaseInput', config.phase || 'Phase 1'); set('profitTargetInput', config.profitTarget);
   const syncNote = document.getElementById('accountSyncNote');
   if(syncNote) syncNote.textContent = hasSyncedAccount
-    ? 'Account size, current balance, and phase are synced from your Trading Dashboard. Only the rules below are editable here.'
+    ? 'Account size, current balance, and phase are synced with your uploaded trades. Only the rules below are editable here.'
     : 'Enter your account details once. They will be reused automatically by the Trading Dashboard.';
   ['accountSizeInput','currentBalanceInput'].forEach(id=>{
     const el = document.getElementById(id);
@@ -4748,7 +4773,7 @@ async function saveAccountSetup(){
   let accountSize, currentBalance, riskPercent, profitTarget, maxTradesPerDay, minRr, maxDailyLoss = null, maxDrawdown = null;
   try{
     accountSize = existingAccount?.accountSize || readRequiredNumber('accountSizeInput','Account size');
-    currentBalance = existingAccount?.currentBalance ?? readRequiredNumber('currentBalanceInput','Current balance');
+    currentBalance = existingAccount ? syncedCurrentBalance({...existingAccount, accountSize}, trades || []) : readRequiredNumber('currentBalanceInput','Current balance');
     profitTarget = readRequiredNumber('profitTargetInput','Profit target');
     riskPercent = clampNumber(readRequiredNumber('riskPercentInput','Risk per trade'), 0.5, 2);
     maxTradesPerDay = readRequiredNumber('maxTradesInput','Max trades per day');
@@ -4799,7 +4824,8 @@ function propGoalStorageKey(){ return `krishna_ai_prop_goals_${simpleHash(propGo
 function formatAIInsightBlock(part){
   return String(part || '')
     .replace(/^\s*\*\*([^*<\n]+)\*\*(?:\s*:?<br>)?/, '<h4>$1</h4>')
-    .replace(/\*\*([^*<\n]+)\*\*/g, '<strong>$1</strong>');
+    .replace(/\*\*([^*<\n]+)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*\*/g,'');
 }
 function renderPropGoalText(text){
   const clean = escapeHtml(text || '').replace(/\r?\n/g,'<br>');
@@ -4817,7 +4843,7 @@ function renderPropChallengeDashboard(){
   const box = document.getElementById('propChallengeDashboard'); if(!box) return;
   const m = accountMetrics(trades || []); if(!m){ box.innerHTML = accountSetupEmptyMarkup(); return; }
   const statusClass = (m.maxDailyLossAmount && m.dailyLossUsed >= m.maxDailyLossAmount) || (m.maxDrawdownAmount && m.maxDrawdownUsed >= m.maxDrawdownAmount) ? 'red' : m.currentBalance >= m.targetBalance && m.profitTargetAmount ? 'green' : 'neutral';
-  box.innerHTML = `<div class="goal-card-grid"><div class="goal-card"><div class="goal-card-label">Account Phase</div><div class="goal-card-value ${statusClass}">${escapeHtml(m.config.phase)}</div><div class="goal-card-sub">${m.s.total} trades tracked &bull; ${m.s.wr.toFixed(0)}% win rate &bull; ${fmt(m.s.pnl)} net. <button class="btn" type="button" onclick="openAccountSetup()">Edit setup</button></div></div><div class="goal-card"><div class="goal-card-label">Current Balance</div><div class="goal-card-value ${pnlClass(m.currentBalance-m.startBalance)}">$${m.currentBalance.toFixed(2)}</div><div class="goal-card-sub">Start balance $${m.startBalance.toFixed(2)} &bull; today ${fmt(m.todayPnl)}.</div></div><div class="goal-card"><div class="goal-card-label">Profit Target</div><div class="goal-card-value ${m.remainingToTarget<=0&&m.profitTargetAmount?'green':'neutral'}">$${m.remainingToTarget.toFixed(2)} left</div><div class="bar" style="margin-top:12px"><div style="width:${m.profitProgress}%"></div></div><div class="goal-card-sub">Target $${m.targetBalance.toFixed(2)} &bull; ${m.profitProgress.toFixed(0)}% complete.</div></div><div class="goal-card"><div class="goal-card-label">Days Remaining</div><div class="goal-card-value neutral">${m.daysRemaining==null?'No deadline':m.daysRemaining+' days'}</div><div class="goal-card-sub">Phase deadline ${m.config.phaseDeadline || 'not set'}.</div></div><div class="goal-card"><div class="goal-card-label">Daily Loss Remaining</div><div class="goal-card-value ${m.maxDailyLossRemaining!=null&&m.maxDailyLossRemaining<=0?'red':'green'}">${m.maxDailyLossRemaining==null?'Skipped':'$'+m.maxDailyLossRemaining.toFixed(2)}</div><div class="goal-card-sub">${m.maxDailyLossAmount==null?'Daily loss limit applies only to funded account setup.':'$'+m.dailyLossUsed.toFixed(2)+' used today of $'+m.maxDailyLossAmount.toFixed(2)}.</div></div><div class="goal-card"><div class="goal-card-label">Drawdown Buffer</div><div class="goal-card-value ${m.maxDrawdownRemaining!=null&&m.maxDrawdownRemaining<=0?'red':'green'}">${m.maxDrawdownRemaining==null?'Skipped':'$'+m.maxDrawdownRemaining.toFixed(2)}</div><div class="goal-card-sub">${m.maxDrawdownAmount==null?'Overall drawdown applies only to funded account setup.':'$'+m.maxDrawdownUsed.toFixed(2)+' max DD used of $'+m.maxDrawdownAmount.toFixed(2)}.</div></div>${riskCalculatorMarkup(m)}</div>`;
+  box.innerHTML = `<div class="goal-card-grid"><div class="goal-card"><div class="goal-card-label">Account Phase</div><div class="goal-card-value ${statusClass}">${escapeHtml(m.config.phase)}</div><div class="goal-card-sub">${m.s.total} trades tracked &bull; ${m.s.wr.toFixed(0)}% win rate &bull; ${fmt(m.s.pnl)} net. <button class="btn" type="button" onclick="openAccountSetup()">Edit setup</button></div></div><div class="goal-card"><div class="goal-card-label">Current Balance</div><div class="goal-card-value ${pnlClass(m.currentBalance-m.startBalance)}">$${m.currentBalance.toFixed(2)}</div><div class="goal-card-sub">Initial deposit $${m.startBalance.toFixed(2)} &bull; today ${fmt(m.todayPnl)}.</div></div><div class="goal-card"><div class="goal-card-label">Profit Target</div><div class="goal-card-value ${m.remainingToTarget<=0&&m.profitTargetAmount?'green':'neutral'}">$${m.remainingToTarget.toFixed(2)} left</div><div class="bar" style="margin-top:12px"><div style="width:${m.profitProgress}%"></div></div><div class="goal-card-sub">Target $${m.targetBalance.toFixed(2)} &bull; ${m.profitProgress.toFixed(0)}% complete.</div></div><div class="goal-card"><div class="goal-card-label">Days Remaining</div><div class="goal-card-value neutral">${m.daysRemaining==null?'No deadline':m.daysRemaining+' days'}</div><div class="goal-card-sub">Phase deadline ${m.config.phaseDeadline || 'not set'}.</div></div><div class="goal-card"><div class="goal-card-label">Daily Loss Remaining</div><div class="goal-card-value ${m.maxDailyLossRemaining!=null&&m.maxDailyLossRemaining<=0?'red':'green'}">${m.maxDailyLossRemaining==null?'Skipped':'$'+m.maxDailyLossRemaining.toFixed(2)}</div><div class="goal-card-sub">${m.maxDailyLossAmount==null?'Daily loss limit applies only to funded account setup.':'$'+m.dailyLossUsed.toFixed(2)+' used today of $'+m.maxDailyLossAmount.toFixed(2)}.</div></div><div class="goal-card"><div class="goal-card-label">Drawdown Buffer</div><div class="goal-card-value ${m.maxDrawdownRemaining!=null&&m.maxDrawdownRemaining<=0?'red':'green'}">${m.maxDrawdownRemaining==null?'Skipped':'$'+m.maxDrawdownRemaining.toFixed(2)}</div><div class="goal-card-sub">${m.maxDrawdownAmount==null?'Overall drawdown applies only to funded account setup.':'$'+m.maxDrawdownUsed.toFixed(2)+' max DD used of $'+m.maxDrawdownAmount.toFixed(2)}.</div></div>${riskCalculatorMarkup(m)}</div>`;
 }
 async function generateAIPropGoals(force=false){
   if(!(trades || []).length){ const propBox=document.getElementById('propBox'); if(propBox) propBox.innerHTML='<div class="insight empty"><strong>No trades yet.</strong><br>Upload trades first.</div>'; return; }
@@ -4836,7 +4862,7 @@ function clearAIPropGoals(){ Object.keys(localStorage).filter(k=>k.startsWith('k
 function renderGoals(){
   const goalsBox=document.getElementById('goalsBox'), propBox=document.getElementById('propBox'); if(!goalsBox || !propBox) return;
   const m=accountMetrics(trades || []); if(!m){ goalsBox.innerHTML=accountSetupEmptyMarkup(); propBox.innerHTML='<div class="insight warn"><strong>Account setup needed.</strong><br>Complete onboarding before AI creates phase goals.</div>'; return; }
-  goalsBox.innerHTML = `<div class="goal-card-grid"><div class="goal-card"><div class="goal-card-label">Current Balance</div><div class="goal-card-value ${pnlClass(m.currentBalance-m.startBalance)}">$${m.currentBalance.toFixed(2)}</div><div class="goal-card-sub">${escapeHtml(m.config.phase)} &bull; start $${m.startBalance.toFixed(2)}.</div></div><div class="goal-card"><div class="goal-card-label">Target Remaining</div><div class="goal-card-value ${m.remainingToTarget<=0?'green':'neutral'}">$${m.remainingToTarget.toFixed(2)}</div><div class="bar" style="margin-top:12px"><div style="width:${m.profitProgress}%"></div></div><div class="goal-card-sub">Target balance $${m.targetBalance.toFixed(2)}.</div></div><div class="goal-card"><div class="goal-card-label">Daily Loss Room</div><div class="goal-card-value ${m.maxDailyLossRemaining!=null&&m.maxDailyLossRemaining<=0?'red':'neutral'}">${m.maxDailyLossRemaining==null?'Skipped':'$'+m.maxDailyLossRemaining.toFixed(2)}</div><div class="goal-card-sub">${m.maxDailyLossAmount==null?'Only shown for funded accounts.':'$'+m.dailyLossUsed.toFixed(2)+' used today of $'+m.maxDailyLossAmount.toFixed(2)}.</div></div><div class="goal-card"><div class="goal-card-label">Drawdown Buffer</div><div class="goal-card-value ${m.maxDrawdownRemaining!=null&&m.maxDrawdownRemaining<=0?'red':'neutral'}">${m.maxDrawdownRemaining==null?'Skipped':'$'+m.maxDrawdownRemaining.toFixed(2)}</div><div class="goal-card-sub">${m.maxDrawdownAmount==null?'Only shown for funded accounts.':'$'+m.maxDrawdownUsed.toFixed(2)+' used of $'+m.maxDrawdownAmount.toFixed(2)}.</div></div><div class="goal-card"><div class="goal-card-label">Days Remaining</div><div class="goal-card-value neutral">${m.daysRemaining==null?'No deadline':m.daysRemaining+' days'}</div><div class="goal-card-sub">Deadline ${m.config.phaseDeadline || 'not set'}.</div></div>${riskCalculatorMarkup(m)}</div><div class="goal"><div style="width:190px;color:var(--muted)">Today P&L</div><div class="bar"><div style="width:${Math.min(100,Math.max(0,m.todayPnl)/Math.max(1,(m.profitTargetAmount || 50))*100)}%"></div></div><strong class="${pnlClass(m.todayPnl)}">${fmt(m.todayPnl)}</strong></div><div class="goal"><div style="width:190px;color:var(--muted)">Trades today</div><div class="bar"><div style="width:${Math.min(100,m.config.maxTradesPerDay ? m.todayTrades.length/m.config.maxTradesPerDay*100 : 0)}%;background:linear-gradient(90deg,var(--amber),var(--blue))"></div></div><strong class="neutral">${m.todayTrades.length}/${m.config.maxTradesPerDay || 'not set'}</strong></div>`;
+  goalsBox.innerHTML = `<div class="goal-card-grid"><div class="goal-card"><div class="goal-card-label">Current Balance</div><div class="goal-card-value ${pnlClass(m.currentBalance-m.startBalance)}">$${m.currentBalance.toFixed(2)}</div><div class="goal-card-sub">${escapeHtml(m.config.phase)} &bull; initial $${m.startBalance.toFixed(2)}.</div></div><div class="goal-card"><div class="goal-card-label">Target Remaining</div><div class="goal-card-value ${m.remainingToTarget<=0?'green':'neutral'}">$${m.remainingToTarget.toFixed(2)}</div><div class="bar" style="margin-top:12px"><div style="width:${m.profitProgress}%"></div></div><div class="goal-card-sub">Target balance $${m.targetBalance.toFixed(2)}.</div></div><div class="goal-card"><div class="goal-card-label">Daily Loss Room</div><div class="goal-card-value ${m.maxDailyLossRemaining!=null&&m.maxDailyLossRemaining<=0?'red':'neutral'}">${m.maxDailyLossRemaining==null?'Skipped':'$'+m.maxDailyLossRemaining.toFixed(2)}</div><div class="goal-card-sub">${m.maxDailyLossAmount==null?'Only shown for funded accounts.':'$'+m.dailyLossUsed.toFixed(2)+' used today of $'+m.maxDailyLossAmount.toFixed(2)}.</div></div><div class="goal-card"><div class="goal-card-label">Drawdown Buffer</div><div class="goal-card-value ${m.maxDrawdownRemaining!=null&&m.maxDrawdownRemaining<=0?'red':'neutral'}">${m.maxDrawdownRemaining==null?'Skipped':'$'+m.maxDrawdownRemaining.toFixed(2)}</div><div class="goal-card-sub">${m.maxDrawdownAmount==null?'Only shown for funded accounts.':'$'+m.maxDrawdownUsed.toFixed(2)+' used of $'+m.maxDrawdownAmount.toFixed(2)}.</div></div><div class="goal-card"><div class="goal-card-label">Days Remaining</div><div class="goal-card-value neutral">${m.daysRemaining==null?'No deadline':m.daysRemaining+' days'}</div><div class="goal-card-sub">Deadline ${m.config.phaseDeadline || 'not set'}.</div></div>${riskCalculatorMarkup(m)}</div><div class="goal"><div style="width:190px;color:var(--muted)">Today P&L</div><div class="bar"><div style="width:${Math.min(100,Math.max(0,m.todayPnl)/Math.max(1,(m.profitTargetAmount || 50))*100)}%"></div></div><strong class="${pnlClass(m.todayPnl)}">${fmt(m.todayPnl)}</strong></div><div class="goal"><div style="width:190px;color:var(--muted)">Trades today</div><div class="bar"><div style="width:${Math.min(100,m.config.maxTradesPerDay ? m.todayTrades.length/m.config.maxTradesPerDay*100 : 0)}%;background:linear-gradient(90deg,var(--amber),var(--blue))"></div></div><strong class="neutral">${m.todayTrades.length}/${m.config.maxTradesPerDay || 'not set'}</strong></div>`;
   const cached=localStorage.getItem(propGoalStorageKey());
   if(cached){ propBox.innerHTML=renderPropGoalText(cached); const status=document.getElementById('propGoalStatus'); if(status) status.textContent='AI goals are current for this account and trade data.'; }
   else{ propBox.innerHTML='<div class="insight warn"><strong>AI goals pending.</strong><br>AI will create goals and rules from your account setup.</div>'; generateAIPropGoals(false); }
@@ -10148,5 +10174,3 @@ input[type="number"]::-webkit-outer-spin-button{-webkit-appearance:none;margin:0
 #journallApp .insight h4{margin:0 0 8px!important;color:#f7f8f8!important;font-size:15px!important;font-weight:700!important;line-height:1.35!important}
 </style></body>
 </html>
-
-
