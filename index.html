@@ -9195,9 +9195,29 @@ body:not(.firebase-auth-required) #journallApp > .sidebar .nav [data-tab].active
 
 /* Mobile nav override */
 @media (max-width: 820px) {
-  body:not(.firebase-auth-required) #journallApp > .sidebar .nav button {
+  body:not(.firebase-auth-required) #journallApp > .sidebar .nav {
+    flex-direction: row !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    flex-wrap: nowrap !important;
+    padding: 0 4px !important;
+    gap: 8px !important;
+    width: 100% !important;
+    -webkit-overflow-scrolling: touch !important;
+    scrollbar-width: none !important;
+  }
+  body:not(.firebase-auth-required) #journallApp > .sidebar .nav::-webkit-scrollbar {
+    display: none !important;
+  }
+  body:not(.firebase-auth-required) #journallApp > .sidebar .nav button,
+  body:not(.firebase-auth-required) #journallApp > .sidebar .nav [data-tab] {
     width: auto !important;
     min-width: 88px !important;
+    display: inline-block !important;
+    flex: 0 0 auto !important;
+    text-align: center !important;
+    margin: 0 !important;
+    padding: 10px 14px !important;
   }
 }
 
