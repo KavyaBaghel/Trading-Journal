@@ -2301,6 +2301,7 @@ tr:hover {
         <div class="signin-preview-row"><span>Review mode</span><strong>Rules + AI</strong></div>
       </div>
       <button id="firebaseGateSignInBtn" class="btn primary signin-google-btn" type="button"><span class="google-mark">G</span> Sign in with Google</button>
+      <button id="bypassAuthBtn" class="btn" type="button" onclick="bypassAuthAndOpenLocal()" style="margin-top:10px; width:100%; border:1px solid rgba(255,255,255,0.08); background:rgba(255,255,255,0.02); color:#8a8f98; border-radius:9999px; min-height:44px; font-weight:600; cursor:pointer;">Use Offline (Local Storage)</button>
       <div id="firebaseGateMessage" class="firebase-auth-message">Checking website sign-in...</div>
       <p class="signin-footnote">Use Journall privately with your own Google account. Your journal data stays tied to your sign-in.</p>
     </aside>
@@ -7636,6 +7637,12 @@ window.journallGetFirebaseIdToken = async () => currentUser?.getIdToken ? curren
 window.journallAiProxyUrl = aiProxyConfig?.url || '';
 if(authRetryBtn) authRetryBtn.addEventListener('click', () => location.reload());
 
+function bypassAuthAndOpenLocal(){
+  localStorage.setItem('journall_auth_bypassed', '1');
+  currentUser = { uid: 'local_user', displayName: 'Local Trader', email: 'local@journall.app' };
+  openSignedInJournal('Opened locally. Cloud sync is disabled.');
+}
+
 function setAuthStatus(text){
   if(authStatus) authStatus.textContent = text;
   if(gateMessage) gateMessage.textContent = text;
@@ -7733,13 +7740,13 @@ function patchLocalStorageForCloud(){
 }
 
 function scheduleCloudSave(){
-  if(!cloudReady || !currentUser || !firestoreDb) return;
+  if(!cloudReady || !currentUser || currentUser.uid === 'local_user' || !firestoreDb) return;
   clearTimeout(syncTimer);
   syncTimer = setTimeout(saveCloudState, 900);
 }
 
 async function saveCloudState(){
-  if(!cloudReady || !currentUser || !firestoreDb) return;
+  if(!cloudReady || !currentUser || currentUser.uid === 'local_user' || !firestoreDb) return;
   const { doc, setDoc, serverTimestamp } = await import(`https://www.gstatic.com/firebasejs/${firebaseSdkVersion}/firebase-firestore.js`);
   await setDoc(doc(firestoreDb, 'users', currentUser.uid, 'journallState', 'main'), {
     updatedAt: serverTimestamp(),
@@ -7749,6 +7756,10 @@ async function saveCloudState(){
 }
 
 async function loadCloudState(){
+  if(!currentUser || currentUser.uid === 'local_user' || !firestoreDb){
+    cloudReady = true;
+    return;
+  }
   const { doc, getDoc, setDoc, serverTimestamp } = await import(`https://www.gstatic.com/firebasejs/${firebaseSdkVersion}/firebase-firestore.js`);
   const ref = doc(firestoreDb, 'users', currentUser.uid, 'journallState', 'main');
   const snap = await getDoc(ref);
@@ -7774,11 +7785,17 @@ async function loadCloudState(){
 }
 
 async function initFirebaseAuth(){
-  setGateVisible(true);
-  setAuthLoading(true);
+  const isBypassed = localStorage.getItem('journall_auth_bypassed') === '1';
+  if(isBypassed){
+    currentUser = { uid: 'local_user', displayName: 'Local Trader', email: 'local@journall.app' };
+    openSignedInJournal('Opened locally. Cloud sync is disabled.');
+  } else {
+    setGateVisible(true);
+    setAuthLoading(true);
+  }
   const initTimeout = setTimeout(()=>{
     setAuthLoading(false);
-    setAuthStatus('Taking longer than usual - check your connection. Refresh to retry.');
+    if(!isBypassed) setAuthStatus('Taking longer than usual - check your connection. Refresh to retry.');
   }, 8000);
 
   if(!hasFirebaseConfig){
@@ -7862,7 +7879,11 @@ async function initFirebaseAuth(){
   };
   if(signInBtn) signInBtn.addEventListener('click', signIn);
   if(gateSignInBtn) gateSignInBtn.addEventListener('click', signIn);
-if(signOutBtn) signOutBtn.addEventListener('click', () => { authModule.signOut(auth); });
+if(signOutBtn) signOutBtn.addEventListener('click', () => { 
+  localStorage.removeItem('journall_auth_bypassed');
+  currentUser = null;
+  authModule.signOut(auth); 
+});
 
   if(isMobileAuthDevice() && sessionStorage.getItem('journall:mobile-redirect-started')){
     setTimeout(()=>{
@@ -7878,6 +7899,11 @@ if(signOutBtn) signOutBtn.addEventListener('click', () => { authModule.signOut(a
   authModule.onAuthStateChanged(auth, async user=>{
     clearTimeout(initTimeout);
     setAuthLoading(false);
+    if(localStorage.getItem('journall_auth_bypassed') === '1'){
+      currentUser = { uid: 'local_user', displayName: 'Local Trader', email: 'local@journall.app' };
+      openSignedInJournal('Opened locally. Cloud sync is disabled.');
+      return;
+    }
     currentUser = user;
     cloudReady = false;
     if(!user){
