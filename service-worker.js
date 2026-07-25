@@ -1,9 +1,6 @@
-const CACHE_NAME = 'journall-android-pwa-v24';
+const CACHE_NAME = 'journall-android-pwa-v25';
 const APP_SHELL = [
-  './',
-  './index.html',
   './manifest.webmanifest',
-  './service-worker.js',
   './assets/icon-192.png',
   './assets/icon-512.png'
 ];
@@ -49,15 +46,15 @@ self.addEventListener('fetch', event => {
 
   if (isHtmlRequest) {
     event.respondWith(
-      fetch(event.request)
+      fetch(event.request, { cache: 'no-store' })
         .then(response => {
           if (response.ok) {
             const copy = response.clone();
-            caches.open(CACHE_NAME).then(cache => cache.put('./index.html', copy));
+            caches.open(CACHE_NAME).then(cache => cache.put(event.request, copy));
           }
           return response;
         })
-        .catch(() => caches.match('./index.html'))
+        .catch(() => caches.match(event.request).then(cached => cached || caches.match('./index.html')))
     );
     return;
   }
