@@ -7844,17 +7844,13 @@ async function initFirebaseAuth(){
   const signIn = async () => {
     window.setAuthStatus('Opening Google sign-in...');
     try{
-      if(isMobileAuthDevice()){
-        sessionStorage.setItem('journall:mobile-redirect-started', '1');
-        await authModule.signInWithRedirect(auth, provider);
-        return;
-      }
       const result = await authModule.signInWithPopup(auth, provider);
       handleAuthResult(result);
     }catch(error){
       const code = error?.code || '';
-      if(!isMobileAuthDevice() && (code === 'auth/popup-blocked' || code === 'auth/popup-closed-by-user' || code === 'auth/cancelled-popup-request')){
-        window.setAuthStatus('Popup blocked. Switching to redirect sign-in...');
+      if(code === 'auth/popup-blocked' || code === 'auth/popup-closed-by-user' || code === 'auth/cancelled-popup-request' || isMobileAuthDevice()){
+        window.setAuthStatus('Switching to redirect sign-in...');
+        sessionStorage.setItem('journall:mobile-redirect-started', '1');
         await authModule.signInWithRedirect(auth, provider);
         return;
       }
@@ -9208,6 +9204,32 @@ body:not(.firebase-auth-required) #journallApp > .sidebar .nav [data-tab].active
 
 /* Mobile nav override */
 @media (max-width: 820px) {
+  body:not(.firebase-auth-required) #journallApp > .sidebar {
+    display: flex !important;
+    position: fixed !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    top: auto !important;
+    z-index: 9999 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 100% !important;
+    height: 60px !important;
+    background: #0d0e11 !important;
+    border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
+    border-right: none !important;
+    padding: 6px 8px calc(6px + env(safe-area-inset-bottom)) !important;
+    overflow: hidden !important;
+    flex-direction: row !important;
+    align-items: center !important;
+  }
+  body:not(.firebase-auth-required) #journallApp > .sidebar .brand {
+    display: none !important;
+  }
+  body:not(.firebase-auth-required) #journallApp > .main {
+    padding-bottom: 80px !important;
+  }
   body:not(.firebase-auth-required) #journallApp > .sidebar .nav {
     flex-direction: row !important;
     overflow-x: auto !important;
