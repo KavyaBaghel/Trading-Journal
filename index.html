@@ -5284,6 +5284,46 @@ function parseFundingPipsSummaryReport(text){
     }
   });
 
+  if(!trades.length && symbolTotals.length){
+    const now = new Date();
+    symbolTotals.forEach((row, rowIndex)=>{
+      const symbol = row && row[0] ? String(row[0]) : primarySymbol;
+      const pnl = toNumber((row && row[1]) || 0);
+      const count = Math.max(1, Math.round(toNumber((row && row[2]) || 1)));
+      const perTradePnl = pnl / count;
+
+      for(let i=0;i<count;i++){
+        const openDate = new Date(now.getTime() - ((count - i + rowIndex) * 60 * 60 * 1000));
+        const ist = toISTParts(openDate);
+        trades.push({
+          id:`fundingpips-symbol-total-${symbol}-${rowIndex}-${i+1}`,
+          position:'',
+          symbol,
+          openUtc:openDate.toISOString(),
+          closeUtc:openDate.toISOString(),
+          date:ist.date,
+          time:ist.time,
+          weekday:ist.weekday,
+          dayIndex:ist.dayIndex,
+          hour:ist.hour,
+          session:classifySessionIST(openDate),
+          volume:0,
+          side:'SUMMARY',
+          entry:0,
+          exit:0,
+          sl:0,
+          tp:0,
+          commission:0,
+          swap:0,
+          rawProfit:perTradePnl,
+          pnl:perTradePnl,
+          reason:'FundingPips symbol summary import',
+          duration:0
+        });
+      }
+    });
+  }
+
   return trades;
 }
 
@@ -5398,6 +5438,12 @@ function parseMatchTraderHTML(text){
 
 function parseUploadedTradeFile(fileName, text){
   const lower = String(fileName || '').toLowerCase();
+  const fundingPipsMt5Trades = parseFundingPipsMt5History(text);
+  if(fundingPipsMt5Trades.length) return fundingPipsMt5Trades;
+
+  const fundingPipsSummaryTrades = parseFundingPipsSummaryReport(text);
+  if(fundingPipsSummaryTrades.length) return fundingPipsSummaryTrades;
+
   if(lower.endsWith('.html') || lower.endsWith('.htm')){
     return parseMatchTraderHTML(text);
   }
