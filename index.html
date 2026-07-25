@@ -2411,8 +2411,8 @@ tr:hover {
 
         <div class="csv-only-box">
           <input id="mainCsvUpload" type="file" accept=".csv,.html,.htm" style="display:none" onchange="handleCSVUpload(event)">
-          <button class="btn primary" onclick="openMainTradeUpload()">Upload Trading Data</button>
-          <button class="btn" style="border-color:rgba(255,119,136,.25);color:#ff7788" onclick="resetAllData()">Reset All Data</button>
+          <label class="btn primary" for="mainCsvUpload" onclick="document.getElementById('mainCsvUpload').value=''" style="cursor: pointer; display: inline-flex; align-items: center; justify-content: center; margin: 0;">Upload Trading Data</label>
+          <button class="btn" style="border-color:rgba(255,119,136,.25);color:#ff7788; margin: 0;" onclick="resetAllData()">Reset All Data</button>
         </div>
 
         <div class="sync-status" id="mainUploadStatus">
@@ -2816,7 +2816,7 @@ tr:hover {
               </div>
               <div class="journal-video-actions">
                 <input id="journalVideoUpload" class="sr-only file-picker-input" type="file" accept="video/*" onchange="handleJournalVideoUpload(event);updateFilePickerLabel(this,'journalVideoFileName','Recording selected')">
-                <button class="btn file-picker-btn" type="button" onclick="document.getElementById('journalVideoUpload').click()">Attach Recording</button>
+                <label class="btn file-picker-btn" for="journalVideoUpload" onclick="document.getElementById('journalVideoUpload').value=''" style="cursor: pointer; display: inline-flex; align-items: center; justify-content: center; margin: 0;">Attach Recording</label>
                 <span id="journalVideoFileName" class="file-picker-name">No recording</span>
                 <button id="journalVideoRemoveBtn" class="btn" onclick="removeJournalVideo()">Remove</button>
               </div>
@@ -2883,7 +2883,7 @@ tr:hover {
 
             <div class="journal-upload-strip">
               <input id="journalScreenshot" class="sr-only file-picker-input" type="file" accept="image/*" onchange="handleJournalScreenshot(event);updateFilePickerLabel(this,'journalScreenshotFileName','Screenshot selected')">
-              <button class="btn file-picker-btn" type="button" onclick="document.getElementById('journalScreenshot').click()">Attach Screenshot</button>
+              <label class="btn file-picker-btn" for="journalScreenshot" onclick="document.getElementById('journalScreenshot').value=''" style="cursor: pointer; display: inline-flex; align-items: center; justify-content: center; margin: 0;">Attach Screenshot</label>
               <span id="journalScreenshotFileName" class="file-picker-name">No screenshot attached</span>
             </div>
             <div id="journalScreenshotPreview" class="screenshot-preview"></div>
@@ -2917,7 +2917,7 @@ tr:hover {
             <div class="sub">Import older JSON or CSV journal exports. Matching entries sync to imported trades and mark the trade as journal done.</div>
             <div class="journal-import-actions">
               <input id="oldJournalImportFile" class="sr-only file-picker-input" type="file" accept=".json,.csv,.txt,application/json,text/csv" onchange="handleOldJournalImport(event);updateFilePickerLabel(this,'oldJournalImportFileName','Import file selected')">
-              <button class="btn file-picker-btn" type="button" onclick="document.getElementById('oldJournalImportFile').click()">Choose Import File</button>
+              <label class="btn file-picker-btn" for="oldJournalImportFile" onclick="document.getElementById('oldJournalImportFile').value=''" style="cursor: pointer; display: inline-flex; align-items: center; justify-content: center; margin: 0;">Choose Import File</label>
               <span id="oldJournalImportFileName" class="file-picker-name">No file selected</span>
             </div>
             <div id="journalImportStatus" class="journal-sync-status">Ready to import older journal files.</div>
@@ -2925,7 +2925,7 @@ tr:hover {
 
           <div class="journal-search-row">
             <input id="journalSearch" placeholder="Search journals, symbol, date..." oninput="renderJournalPage()">
-            <button class="btn primary" onclick="document.getElementById('oldJournalImportFile').click()">Import Old</button>
+            <label class="btn primary" for="oldJournalImportFile" onclick="document.getElementById('oldJournalImportFile').value=''" style="cursor: pointer; display: inline-flex; align-items: center; justify-content: center; margin: 0;">Import Old</label>
             <button class="btn" onclick="exportJournalPageEntries()">Export</button>
             <button class="btn" style="border-color:rgba(255,119,136,.25);color:var(--red)" onclick="clearAllJournalPageEntries()">Clear All</button>
           </div>
@@ -5141,7 +5141,7 @@ function extractEmbeddedFundingPipsReport(text){
   if(start < 0) return null;
 
   const eq = source.indexOf('=', start);
-  const end = source.indexOf('</script>', eq);
+  const end = source.indexOf('<' + '/script>', eq);
   if(eq < 0 || end < 0) return null;
 
   const raw = source.slice(eq + 1, end).replace(/;\s*$/, '').trim();

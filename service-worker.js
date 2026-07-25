@@ -1,10 +1,9 @@
-﻿const CACHE_NAME = 'journall-android-pwa-v29';
+const CACHE_NAME = 'journall-android-pwa-v31';
 const APP_SHELL = [
   './manifest.webmanifest',
   './assets/icon-192.png',
   './assets/icon-512.png'
 ];
-
 self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE_NAME)
@@ -74,4 +73,5 @@ self.addEventListener('fetch', event => {
     })
   );
 });
+
 
