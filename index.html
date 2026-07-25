@@ -5211,7 +5211,10 @@ function parseFundingPipsSummaryReport(text){
   lossMoney.forEach(point => bucket(point).loss = toNumber(point && point.y && point.y[0]));
 
   const symbolTotals = Array.isArray(report.symbolsTotal && report.symbolsTotal.total) ? report.symbolsTotal.total : [];
-  const primarySymbol = symbolTotals[0] && symbolTotals[0][0] ? String(symbolTotals[0][0]) : 'FundingPips';
+  const primarySymbolRow = symbolTotals
+    .slice()
+    .sort((a,b)=> Math.abs(toNumber((b && b[1]) || 0)) - Math.abs(toNumber((a && a[1]) || 0)))[0];
+  const primarySymbol = primarySymbolRow && primarySymbolRow[0] ? String(primarySymbolRow[0]) : 'FundingPips';
   const trades = [];
 
   [...byTime.values()].sort((a,b)=> Number(a.x || 0) - Number(b.x || 0)).forEach(day=>{
@@ -5493,16 +5496,39 @@ function handleTradingPageUpload(event){
       parsed = parseTradingHTML(text);
     }
 
+    const status = document.getElementById('syncStatus');
+    if(!parsed.length){
+      if(status){
+        status.innerHTML = `<strong>No valid trades found.</strong><br>Upload a Match-Trader CSV/HTML export or a FundingPips MT5 HTML report.`;
+      }
+      alert('No valid trades found. Upload a Match-Trader CSV/HTML export or a FundingPips MT5 HTML report.');
+      return;
+    }
+
     tradingPageTrades = parsed;
     localStorage.setItem('viztrade_trading_page_trades', JSON.stringify(tradingPageTrades));
+
+    // Keep the dashboard, analytics, journal page, and trading page in sync.
+    trades = parsed;
+    filtered = [...trades];
+    saveTrades();
+
+    ['q','session','side','mistake','result'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
 
     const today = todayISTDate();
     const todayCount = tradingPageTrades.filter(t => t.date === today).length;
 
-    document.getElementById('syncStatus').innerHTML =
-      `<strong>Uploaded:</strong> ${file.name}<br><strong>Total parsed:</strong> ${parsed.length} trades<br><strong>Today:</strong> ${todayCount} trades`;
+    if(status){
+      status.innerHTML =
+        `<strong>Uploaded:</strong> ${file.name}<br><strong>Total parsed:</strong> ${parsed.length} trades<br><strong>Today:</strong> ${todayCount} trades<br><strong>Main journal:</strong> synced`;
+    }
 
-    renderTradingPage();renderJournalPage();
+    const ys=document.getElementById('calendarYearSelect'); if(ys) ys.dataset.ready='';
+    renderAll();
+    renderCalendar();
+    renderTradingPage();
+    renderJournalPage();
+    resizeChartsSoon();
   };
 
   reader.readAsText(file);
