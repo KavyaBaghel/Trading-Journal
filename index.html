@@ -2411,7 +2411,7 @@ tr:hover {
 
         <div class="csv-only-box">
           <input id="mainCsvUpload" type="file" accept=".csv,.html,.htm" style="display:none" onchange="handleCSVUpload(event)">
-          <button class="btn primary" onclick="document.getElementById('mainCsvUpload').click()">Upload Trading Data</button>
+          <button class="btn primary" onclick="openMainTradeUpload()">Upload Trading Data</button>
           <button class="btn" style="border-color:rgba(255,119,136,.25);color:#ff7788" onclick="resetAllData()">Reset All Data</button>
         </div>
 
@@ -4898,6 +4898,61 @@ function saveTrades(){
   localStorage.setItem('viztrade_trades', JSON.stringify(trades));
 }
 
+function tradeImportKey(trade){
+  if(!trade) return '';
+  return String(
+    trade.id ||
+    trade.position ||
+    [
+      trade.date || '',
+      trade.time || '',
+      trade.openUtc || '',
+      trade.symbol || 'Unknown',
+      trade.side || '',
+      Number(trade.pnl || 0).toFixed(2),
+      trade.entry || '',
+      trade.exit || ''
+    ].join('|')
+  );
+}
+
+function mergeImportedTrades(existingTrades, incomingTrades){
+  const merged = new Map();
+  (Array.isArray(existingTrades) ? existingTrades : []).forEach(trade => {
+    const key = tradeImportKey(trade);
+    if(key) merged.set(key, trade);
+  });
+  (Array.isArray(incomingTrades) ? incomingTrades : []).forEach(trade => {
+    const key = tradeImportKey(trade);
+    if(key) merged.set(key, trade);
+  });
+  return [...merged.values()].sort((a,b) => {
+    const aDate = `${a.date || ''} ${a.time || ''}`;
+    const bDate = `${b.date || ''} ${b.time || ''}`;
+    return aDate.localeCompare(bDate);
+  });
+}
+
+function restoreTradesFromStorageIfNeeded(){
+  if(Array.isArray(trades) && trades.length) return;
+  try{
+    const saved = JSON.parse(localStorage.getItem('viztrade_trades') || '[]');
+    if(Array.isArray(saved) && saved.length){
+      trades = saved;
+      filtered = [...trades];
+    }
+  }catch(err){
+    console.warn('Could not restore saved trades', err);
+  }
+}
+
+function openMainTradeUpload(){
+  const input = document.getElementById('mainCsvUpload');
+  if(!input) return;
+  input.value = '';
+  input.click();
+}
+
 function parseCSVLine(line){
   const out = [];
   let cur = '';
@@ -5454,27 +5509,39 @@ function handleCSVUpload(event){
   const file = event.target.files[0];
   if(!file) return;
 
+  const status=document.getElementById('mainUploadStatus');
+  if(status) status.innerHTML = `<strong>Reading:</strong> ${file.name}...`;
+
   const reader = new FileReader();
   reader.onload = () => {
     const parsed = parseUploadedTradeFile(file.name, reader.result);
+    const upload = document.getElementById('mainCsvUpload');
+    if(upload) upload.value = '';
 
     if(!parsed.length){
-      alert('No valid trades found. Upload a Match-Trader CSV/HTML export or a FundingPips MT5 HTML history report.');
+      restoreTradesFromStorageIfNeeded();
+      if(status){
+        status.innerHTML = `<strong>Import failed.</strong><br>No valid trades found in ${file.name}. Your existing ${trades.length} saved trades were kept.`;
+      }
+      alert('No valid trades found. Your old journal trades were kept. Upload a Match-Trader CSV/HTML export or a FundingPips MT5 HTML history report.');
+      renderAll();
+      renderCalendar();
+      resizeChartsSoon();
       return;
     }
 
-    trades = parsed;
+    const previousCount = Array.isArray(trades) ? trades.length : 0;
+    trades = mergeImportedTrades(trades, parsed);
     filtered = [...trades];
     saveTrades();
 
-    const status=document.getElementById('mainUploadStatus');
     if(status){
       const missingDates = parsed.filter(t=>!t.date).length;
       const missingSymbols = parsed.filter(t=>!t.symbol || t.symbol === 'Unknown').length;
-      status.innerHTML=`<strong>File uploaded successfully.</strong><br>Total trades: ${parsed.length}<br>Missing dates: ${missingDates}<br>Missing symbols: ${missingSymbols}`;
+      status.innerHTML=`<strong>File uploaded successfully.</strong><br>Imported: ${parsed.length}<br>Journal total: ${trades.length}<br>Existing trades kept: ${previousCount}<br>Missing dates: ${missingDates}<br>Missing symbols: ${missingSymbols}`;
     }
 
-    tradingPageTrades = parsed;
+    tradingPageTrades = mergeImportedTrades(tradingPageTrades, parsed);
     localStorage.setItem('viztrade_trading_page_trades', JSON.stringify(tradingPageTrades));
 
     ['q','session','side','mistake','result'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
@@ -5482,7 +5549,15 @@ function handleCSVUpload(event){
     const ys=document.getElementById('calendarYearSelect'); if(ys) ys.dataset.ready='';
     renderAll();
     renderCalendar();
+    renderTradingPage();
+    renderJournalPage();
     resizeChartsSoon();
+  };
+
+  reader.onerror = () => {
+    const upload = document.getElementById('mainCsvUpload');
+    if(upload) upload.value = '';
+    if(status) status.innerHTML = `<strong>Could not read file.</strong><br>Your existing trades were kept.`;
   };
 
   reader.readAsText(file);
@@ -5531,10 +5606,15 @@ function handleTradingPageUpload(event){
   const file = event.target.files[0];
   if(!file) return;
 
+  const status = document.getElementById('syncStatus');
+  if(status) status.innerHTML = `<strong>Reading:</strong> ${file.name}...`;
+
   const reader = new FileReader();
   reader.onload = () => {
     const text = reader.result;
     let parsed = [];
+    const upload = document.getElementById('tradingPageUpload');
+    if(upload) upload.value = '';
 
     if(file.name.toLowerCase().endsWith('.csv')){
       parsed = parseTradingCSV(text);
@@ -5542,20 +5622,26 @@ function handleTradingPageUpload(event){
       parsed = parseTradingHTML(text);
     }
 
-    const status = document.getElementById('syncStatus');
     if(!parsed.length){
+      restoreTradesFromStorageIfNeeded();
       if(status){
-        status.innerHTML = `<strong>No valid trades found.</strong><br>Upload a Match-Trader CSV/HTML export or a FundingPips MT5 HTML report.`;
+        status.innerHTML = `<strong>No valid trades found.</strong><br>Your existing ${trades.length} saved trades were kept. Upload a Match-Trader CSV/HTML export or a FundingPips MT5 HTML report.`;
       }
-      alert('No valid trades found. Upload a Match-Trader CSV/HTML export or a FundingPips MT5 HTML report.');
+      alert('No valid trades found. Your old journal trades were kept. Upload a Match-Trader CSV/HTML export or a FundingPips MT5 HTML report.');
+      renderAll();
+      renderCalendar();
+      renderTradingPage();
+      renderJournalPage();
+      resizeChartsSoon();
       return;
     }
 
-    tradingPageTrades = parsed;
+    const previousCount = Array.isArray(trades) ? trades.length : 0;
+    tradingPageTrades = mergeImportedTrades(tradingPageTrades, parsed);
     localStorage.setItem('viztrade_trading_page_trades', JSON.stringify(tradingPageTrades));
 
-    // Keep the dashboard, analytics, journal page, and trading page in sync.
-    trades = parsed;
+    // Keep the dashboard, analytics, journal page, and trading page in sync without deleting older saved trades.
+    trades = mergeImportedTrades(trades, parsed);
     filtered = [...trades];
     saveTrades();
 
@@ -5566,7 +5652,7 @@ function handleTradingPageUpload(event){
 
     if(status){
       status.innerHTML =
-        `<strong>Uploaded:</strong> ${file.name}<br><strong>Total parsed:</strong> ${parsed.length} trades<br><strong>Today:</strong> ${todayCount} trades<br><strong>Main journal:</strong> synced`;
+        `<strong>Uploaded:</strong> ${file.name}<br><strong>Imported:</strong> ${parsed.length} trades<br><strong>Journal total:</strong> ${trades.length} trades<br><strong>Existing trades kept:</strong> ${previousCount}<br><strong>Today:</strong> ${todayCount} trades`;
     }
 
     const ys=document.getElementById('calendarYearSelect'); if(ys) ys.dataset.ready='';
@@ -5575,6 +5661,12 @@ function handleTradingPageUpload(event){
     renderTradingPage();
     renderJournalPage();
     resizeChartsSoon();
+  };
+
+  reader.onerror = () => {
+    const upload = document.getElementById('tradingPageUpload');
+    if(upload) upload.value = '';
+    if(status) status.innerHTML = `<strong>Could not read file.</strong><br>Your existing trades were kept.`;
   };
 
   reader.readAsText(file);
@@ -10462,3 +10554,4 @@ input[type="number"]::-webkit-outer-spin-button{-webkit-appearance:none;margin:0
 #journallApp .insight h4{margin:0 0 8px!important;color:#f7f8f8!important;font-size:15px!important;font-weight:700!important;line-height:1.35!important}
 </style></body>
 </html>
+
