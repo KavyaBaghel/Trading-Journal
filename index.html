@@ -5080,9 +5080,134 @@ function parseMatchTraderCSV(text){
   return parsed;
 }
 
+function extractEmbeddedFundingPipsReport(text){
+  const source = String(text || '');
+  const start = source.indexOf('window.__report');
+  if(start < 0) return null;
+
+  const eq = source.indexOf('=', start);
+  const end = source.indexOf('</script>', eq);
+  if(eq < 0 || end < 0) return null;
+
+  const raw = source.slice(eq + 1, end).replace(/;\s*$/, '').trim();
+  try{
+    return JSON.parse(raw);
+  }catch(err){
+    console.warn('FundingPips report JSON could not be parsed', err);
+    return null;
+  }
+}
+
+function reportTimestampToDate(value, hourOffset=0){
+  const n = Number(value);
+  if(!Number.isFinite(n)) return parseDateUTC(value);
+  const ms = n < 100000000000 ? n * 1000 : n;
+  return new Date(ms + (hourOffset * 60 * 60 * 1000));
+}
+
+function parseFundingPipsSummaryReport(text){
+  const report = extractEmbeddedFundingPipsReport(text);
+  if(!report || !report.profitDeals || !report.profitMoney) return [];
+
+  const profitDeals = Array.isArray(report.profitDeals.profit) ? report.profitDeals.profit : [];
+  const lossDeals = Array.isArray(report.profitDeals.loss) ? report.profitDeals.loss : [];
+  const profitMoney = Array.isArray(report.profitMoney.profit) ? report.profitMoney.profit : [];
+  const lossMoney = Array.isArray(report.profitMoney.loss) ? report.profitMoney.loss : [];
+
+  const byTime = new Map();
+  function bucket(point){
+    const key = String(point && point.x);
+    if(!byTime.has(key)){
+      byTime.set(key, { x: point && point.x, wins:0, losses:0, profit:0, loss:0 });
+    }
+    return byTime.get(key);
+  }
+
+  profitDeals.forEach(point => bucket(point).wins = toNumber(point && point.y && point.y[0]));
+  lossDeals.forEach(point => bucket(point).losses = toNumber(point && point.y && point.y[0]));
+  profitMoney.forEach(point => bucket(point).profit = toNumber(point && point.y && point.y[0]));
+  lossMoney.forEach(point => bucket(point).loss = toNumber(point && point.y && point.y[0]));
+
+  const symbolTotals = Array.isArray(report.symbolsTotal && report.symbolsTotal.total) ? report.symbolsTotal.total : [];
+  const primarySymbol = symbolTotals[0] && symbolTotals[0][0] ? String(symbolTotals[0][0]) : 'FundingPips';
+  const trades = [];
+
+  [...byTime.values()].sort((a,b)=> Number(a.x || 0) - Number(b.x || 0)).forEach(day=>{
+    const winCount = Math.max(0, Math.round(day.wins || 0));
+    const lossCount = Math.max(0, Math.round(day.losses || 0));
+    const winPnl = winCount ? day.profit / winCount : 0;
+    const lossPnl = lossCount ? day.loss / lossCount : 0;
+
+    for(let i=0;i<winCount;i++){
+      const openDate = reportTimestampToDate(day.x, i % 8);
+      const ist = toISTParts(openDate);
+      trades.push({
+        id:`fundingpips-summary-${day.x}-win-${i+1}`,
+        position:'',
+        symbol:primarySymbol,
+        openUtc:openDate ? openDate.toISOString() : '',
+        closeUtc:openDate ? openDate.toISOString() : '',
+        date:ist.date,
+        time:ist.time,
+        weekday:ist.weekday,
+        dayIndex:ist.dayIndex,
+        hour:ist.hour,
+        session:classifySessionIST(openDate),
+        volume:0,
+        side:'SUMMARY',
+        entry:0,
+        exit:0,
+        sl:0,
+        tp:0,
+        commission:0,
+        swap:0,
+        rawProfit:winPnl,
+        pnl:winPnl,
+        reason:'FundingPips summary import',
+        duration:0
+      });
+    }
+
+    for(let i=0;i<lossCount;i++){
+      const openDate = reportTimestampToDate(day.x, (i % 8) + 8);
+      const ist = toISTParts(openDate);
+      trades.push({
+        id:`fundingpips-summary-${day.x}-loss-${i+1}`,
+        position:'',
+        symbol:primarySymbol,
+        openUtc:openDate ? openDate.toISOString() : '',
+        closeUtc:openDate ? openDate.toISOString() : '',
+        date:ist.date,
+        time:ist.time,
+        weekday:ist.weekday,
+        dayIndex:ist.dayIndex,
+        hour:ist.hour,
+        session:classifySessionIST(openDate),
+        volume:0,
+        side:'SUMMARY',
+        entry:0,
+        exit:0,
+        sl:0,
+        tp:0,
+        commission:0,
+        swap:0,
+        rawProfit:lossPnl,
+        pnl:lossPnl,
+        reason:'FundingPips summary import',
+        duration:0
+      });
+    }
+  });
+
+  return trades;
+}
+
 
 
 function parseMatchTraderHTML(text){
+  const fundingPipsTrades = parseFundingPipsSummaryReport(text);
+  if(fundingPipsTrades.length) return fundingPipsTrades;
+
   const parser = new DOMParser();
   const doc = parser.parseFromString(text, 'text/html');
   const tables = [...doc.querySelectorAll('table')];
@@ -5303,6 +5428,9 @@ function parseTradingCSV(text){
 }
 
 function parseTradingHTML(text){
+  const fundingPipsTrades = parseFundingPipsSummaryReport(text);
+  if(fundingPipsTrades.length) return fundingPipsTrades;
+
   const parser = new DOMParser();
   const doc = parser.parseFromString(text, 'text/html');
   const rows = [...doc.querySelectorAll('tr')];
