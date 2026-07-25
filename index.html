@@ -7789,13 +7789,19 @@ async function initFirebaseAuth(){
   if(isBypassed){
     currentUser = { uid: 'local_user', displayName: 'Local Trader', email: 'local@journall.app' };
     openSignedInJournal('Opened locally. Cloud sync is disabled.');
-  } else {
-    setGateVisible(true);
-    setAuthLoading(true);
+    if(signOutBtn){
+      signOutBtn.addEventListener('click', () => { 
+        localStorage.removeItem('journall_auth_bypassed');
+        location.reload();
+      });
+    }
+    return;
   }
+  setGateVisible(true);
+  setAuthLoading(true);
   const initTimeout = setTimeout(()=>{
     setAuthLoading(false);
-    if(!isBypassed) setAuthStatus('Taking longer than usual - check your connection. Refresh to retry.');
+    setAuthStatus('Taking longer than usual - check your connection. Refresh to retry.');
   }, 8000);
 
   if(!hasFirebaseConfig){
@@ -7925,6 +7931,10 @@ if(signOutBtn) signOutBtn.addEventListener('click', () => {
 
 initFirebaseAuth().catch(err=>{
   console.error('Firebase failed to start:', err);
+  if(localStorage.getItem('journall_auth_bypassed') === '1'){
+    setGateVisible(false);
+    return;
+  }
   setGateVisible(true);
   setAuthLoading(false);
   setAuthStatus('Network error - try again.');
