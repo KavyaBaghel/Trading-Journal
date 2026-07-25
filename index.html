@@ -7536,43 +7536,6 @@ document.querySelectorAll('.nav button').forEach(btn=>{
     }
   };
 
-  function installCloudAIControls(){
-    const card = document.querySelector('#ailab .card');
-    if(!card || document.getElementById('realAiStatus')) return;
-    const title = card.querySelector('.panel-title span');
-    if(title) title.textContent = 'secure cloud AI coach';
-    const panel = document.createElement('div');
-    panel.className = 'cloud-ai-settings';
-    panel.innerHTML = `
-      <div id="realAiStatus" class="real-ai-status warn">Website AI uses a free Cloudflare Worker backend. Users do not need Ollama or local installs.</div>
-      <div class="cloud-ai-grid">
-        <span class="cloud-ai-chip">Groq llama-3.1-8b-instant</span>
-        <button class="btn" type="button" onclick="testCloudAIConnection()">Test Website AI</button>
-      </div>
-    `;
-    const chipRow = card.querySelector('.ai-chip-row');
-    card.insertBefore(panel, chipRow || card.children[1]);
-  }
-
-  function installCloudAIStyles(){
-    if(document.getElementById('cloud-ai-style')) return;
-    const style = document.createElement('style');
-    style.id = 'cloud-ai-style';
-    style.textContent = `
-      .cloud-ai-settings{background:#0d0e11;border:1px solid #23252a;border-radius:14px;padding:14px;margin:14px 0 18px}
-      .cloud-ai-grid{display:flex;gap:10px;align-items:center;justify-content:space-between;margin-top:10px;flex-wrap:wrap}
-      .cloud-ai-chip{background:#16181a;border:1px solid rgba(255,255,255,.12);border-radius:999px;color:rgba(255,255,255,.72);padding:8px 12px;font-size:12px}
-      @media (max-width:700px){.cloud-ai-grid .btn{width:100%}.cloud-ai-chip{width:100%;text-align:center}}
-    `;
-    document.head.appendChild(style);
-  }
-
-  document.addEventListener('DOMContentLoaded', ()=>{
-    installCloudAIStyles();
-    installCloudAIControls();
-  });
-  installCloudAIStyles();
-  installCloudAIControls();
 })();
 </script>
 <!-- REAL_AI_UPGRADE_END -->
@@ -9185,18 +9148,15 @@ body:not(.firebase-auth-required) #journallApp > .sidebar .nav [data-tab].active
 }
 
 /* 7. CALENDAR DOTS */
-#journallApp .calendar-dot.red,
-#journallApp .calendar-day.lossday .calendar-dot {
+#journallApp .calendar-dot.red {
   background: #e23b4a !important;
 }
 
-#journallApp .calendar-dot.green,
-#journallApp .calendar-day.profit .calendar-dot {
+#journallApp .calendar-dot.green {
   background: #428619 !important;
 }
 
-#journallApp .calendar-dot.neutral,
-#journallApp .calendar-day.flatday .calendar-dot {
+#journallApp .calendar-dot.neutral {
   background: rgba(255,255,255,0.35) !important;
 }
 
