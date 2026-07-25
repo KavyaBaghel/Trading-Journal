@@ -7608,69 +7608,28 @@ document.querySelectorAll('.nav button').forEach(btn=>{
     if (installBtn) installBtn.hidden = true;
   });
 })();
-</script>
-<script type="module">
-import { firebaseConfig, aiProxyConfig } from './firebase-config.js?v=20260719-cloudflare-ai';
 
-const authBar = document.getElementById('firebaseAuthBar');
-const authGate = document.getElementById('firebaseAuthGate');
-const journallApp = document.getElementById('journallApp');
-const mobileAppbar = document.querySelector('.mobile-appbar');
-const authStatus = document.getElementById('firebaseAuthStatus');
-const gateMessage = document.getElementById('firebaseGateMessage');
-const signInBtn = document.getElementById('firebaseSignInBtn');
-const gateSignInBtn = document.getElementById('firebaseGateSignInBtn');
-const authLoading = document.getElementById('firebaseAuthLoading');
-const authLoadingText = document.getElementById('firebaseAuthLoadingText');
-const authRetryBtn = document.getElementById('firebaseAuthRetryBtn');
-const signInCard = document.querySelector('.journall-signin-card');
-const signOutBtn = document.getElementById('firebaseSignOutBtn');
-const bypassAuthBtn = document.getElementById('bypassAuthBtn');
-const hasFirebaseConfig = Boolean(firebaseConfig?.apiKey && firebaseConfig?.authDomain && firebaseConfig?.projectId);
-const firebaseSdkVersion = '10.12.5';
-const syncPrefixes = ['viz', 'viztrade', 'krishna', 'journall'];
-const syncExactKeys = ['theme', 'selectedDate'];
-let firestoreDb = null;
-let currentUser = null;
-let cloudReady = false;
-let syncTimer = null;
-window.journallGetFirebaseIdToken = async () => currentUser?.getIdToken ? currentUser.getIdToken() : null;
-window.journallAiProxyUrl = aiProxyConfig?.url || '';
-if(authRetryBtn) authRetryBtn.addEventListener('click', () => location.reload());
+window.currentUser = null;
 
-function bypassAuthAndOpenLocal(){
+window.bypassAuthAndOpenLocal = function(){
   localStorage.setItem('journall_auth_bypassed', '1');
-  currentUser = { uid: 'local_user', displayName: 'Local Trader', email: 'local@journall.app' };
-  openSignedInJournal('Opened locally. Cloud sync is disabled.');
-}
-window.bypassAuthAndOpenLocal = bypassAuthAndOpenLocal;
+  window.currentUser = { uid: 'local_user', displayName: 'Local Trader', email: 'local@journall.app' };
+  window.openSignedInJournal('Opened locally. Cloud sync is disabled.');
+};
 
-function setAuthStatus(text){
-  if(authStatus) authStatus.textContent = text;
-  if(gateMessage) gateMessage.textContent = text;
-}
-
-
-function setAuthLoading(loading){
-  const isLoading = Boolean(loading);
-  if(authLoading){
-    authLoading.hidden = !isLoading;
-    authLoading.style.display = isLoading ? 'flex' : 'none';
-  }
-  if(signInCard){
-    signInCard.hidden = isLoading;
-    signInCard.style.display = isLoading ? 'none' : 'grid';
-  }
-}
-function openSignedInJournal(message){
-  setGateVisible(false);
-  setAuthStatus(message || 'Journal opened on this device.');
+window.openSignedInJournal = function(message){
+  window.setGateVisible(false);
+  window.setAuthStatus(message || 'Journal opened on this device.');
   if(typeof window.renderAll === 'function') window.renderAll();
   ensureAccountOnboarding();
-}
+};
 
-function setGateVisible(visible){
+window.setGateVisible = function(visible){
   const showGate = Boolean(visible);
+  const authGate = document.getElementById('firebaseAuthGate');
+  const authBar = document.getElementById('firebaseAuthBar');
+  const journallApp = document.getElementById('journallApp');
+  const mobileAppbar = document.querySelector('.mobile-appbar');
   if(authGate){
     authGate.classList.toggle('show', showGate);
     authGate.hidden = !showGate;
@@ -7694,7 +7653,62 @@ function setGateVisible(visible){
   }
   document.documentElement.classList.toggle('firebase-auth-required', showGate);
   document.body.classList.toggle('firebase-auth-required', showGate);
+};
+
+window.setAuthStatus = function(text){
+  const authStatus = document.getElementById('firebaseAuthStatus');
+  const gateMessage = document.getElementById('firebaseGateMessage');
+  if(authStatus) authStatus.textContent = text;
+  if(gateMessage) gateMessage.textContent = text;
+};
+
+window.setAuthLoading = function(loading){
+  const isLoading = Boolean(loading);
+  const authLoading = document.getElementById('firebaseAuthLoading');
+  const signInCard = document.querySelector('.journall-signin-card');
+  if(authLoading){
+    authLoading.hidden = !isLoading;
+    authLoading.style.display = isLoading ? 'flex' : 'none';
+  }
+  if(signInCard){
+    signInCard.hidden = isLoading;
+    signInCard.style.display = isLoading ? 'none' : 'grid';
+  }
+};
+
+// Run early bypass check right away!
+if(localStorage.getItem('journall_auth_bypassed') === '1'){
+  window.currentUser = { uid: 'local_user', displayName: 'Local Trader', email: 'local@journall.app' };
+  window.openSignedInJournal('Opened locally. Cloud sync is disabled.');
 }
+</script>
+<script type="module">
+import { firebaseConfig, aiProxyConfig } from './firebase-config.js?v=20260719-cloudflare-ai';
+
+const authBar = document.getElementById('firebaseAuthBar');
+const authGate = document.getElementById('firebaseAuthGate');
+const journallApp = document.getElementById('journallApp');
+const mobileAppbar = document.querySelector('.mobile-appbar');
+const authStatus = document.getElementById('firebaseAuthStatus');
+const gateMessage = document.getElementById('firebaseGateMessage');
+const signInBtn = document.getElementById('firebaseSignInBtn');
+const gateSignInBtn = document.getElementById('firebaseGateSignInBtn');
+const authLoading = document.getElementById('firebaseAuthLoading');
+const authLoadingText = document.getElementById('firebaseAuthLoadingText');
+const authRetryBtn = document.getElementById('firebaseAuthRetryBtn');
+const signInCard = document.querySelector('.journall-signin-card');
+const signOutBtn = document.getElementById('firebaseSignOutBtn');
+const bypassAuthBtn = document.getElementById('bypassAuthBtn');
+const hasFirebaseConfig = Boolean(firebaseConfig?.apiKey && firebaseConfig?.authDomain && firebaseConfig?.projectId);
+const firebaseSdkVersion = '10.12.5';
+const syncPrefixes = ['viz', 'viztrade', 'krishna', 'journall'];
+const syncExactKeys = ['theme', 'selectedDate'];
+let firestoreDb = null;
+let cloudReady = false;
+let syncTimer = null;
+window.journallGetFirebaseIdToken = async () => window.currentUser?.getIdToken ? window.currentUser.getIdToken() : null;
+window.journallAiProxyUrl = aiProxyConfig?.url || '';
+if(authRetryBtn) authRetryBtn.addEventListener('click', () => location.reload());
 
 function shouldSyncKey(key){
   return syncExactKeys.includes(key) || syncPrefixes.some(prefix=>key === prefix || key.startsWith(prefix));
@@ -7781,16 +7795,16 @@ async function loadCloudState(){
   }
   cloudReady = true;
   patchLocalStorageForCloud();
-  setGateVisible(false);
-  setAuthStatus(`Signed in as ${currentUser.displayName || currentUser.email || 'trader'}`);
+  window.setGateVisible(false);
+  window.setAuthStatus(`Signed in as ${window.currentUser.displayName || window.currentUser.email || 'trader'}`);
   if(typeof window.renderAll === 'function') window.renderAll();
 }
 
 async function initFirebaseAuth(){
   const isBypassed = localStorage.getItem('journall_auth_bypassed') === '1';
   if(isBypassed){
-    currentUser = { uid: 'local_user', displayName: 'Local Trader', email: 'local@journall.app' };
-    openSignedInJournal('Opened locally. Cloud sync is disabled.');
+    window.currentUser = { uid: 'local_user', displayName: 'Local Trader', email: 'local@journall.app' };
+    window.openSignedInJournal('Opened locally. Cloud sync is disabled.');
     if(signOutBtn){
       signOutBtn.addEventListener('click', () => { 
         localStorage.removeItem('journall_auth_bypassed');
@@ -7799,11 +7813,11 @@ async function initFirebaseAuth(){
     }
     return;
   }
-  setGateVisible(true);
-  setAuthLoading(true);
+  window.setGateVisible(true);
+  window.setAuthLoading(true);
   const initTimeout = setTimeout(()=>{
-    setAuthLoading(false);
-    setAuthStatus('Taking longer than usual - check your connection. Refresh to retry.');
+    window.setAuthLoading(false);
+    window.setAuthStatus('Taking longer than usual - check your connection. Refresh to retry.');
   }, 8000);
 
   if(!hasFirebaseConfig){
@@ -7835,24 +7849,24 @@ async function initFirebaseAuth(){
   const handleAuthError = error => {
     const code = error?.code || '';
     if(code === 'auth/unauthorized-domain'){
-      setAuthStatus(`Google sign-in blocked. Add ${location.hostname} in Firebase Authentication > Settings > Authorized domains.`);
+      window.setAuthStatus(`Google sign-in blocked. Add ${location.hostname} in Firebase Authentication > Settings > Authorized domains.`);
       return;
     }
     if(code === 'auth/api-key-not-valid'){
-      setAuthStatus('Firebase API key is not valid. Recheck firebase-config.js from Firebase Project settings > Web app.');
+      window.setAuthStatus('Firebase API key is not valid. Recheck firebase-config.js from Firebase Project settings > Web app.');
       return;
     }
     if(code === 'auth/configuration-not-found'){
-      setAuthStatus('Firebase Authentication is not enabled yet. In Firebase, open Authentication > Sign-in method, enable Google, then add kavyabaghel.github.io in Authorized domains.');
+      window.setAuthStatus('Firebase Authentication is not enabled yet. In Firebase, open Authentication > Sign-in method, enable Google, then add kavyabaghel.github.io in Authorized domains.');
       return;
     }
-    setAuthStatus(`Sign-in failed: ${error?.message || error}`);
+    window.setAuthStatus(`Sign-in failed: ${error?.message || error}`);
   };
 
   const handleAuthResult = result => {
     if(result?.user){
-      currentUser = result.user;
-      openSignedInJournal('Google sign-in complete. Opening your journal...');
+      window.currentUser = result.user;
+      window.openSignedInJournal('Google sign-in complete. Opening your journal...');
     }
   };
 
@@ -7865,7 +7879,7 @@ async function initFirebaseAuth(){
   }
 
   const signIn = async () => {
-    setAuthStatus('Opening Google sign-in...');
+    window.setAuthStatus('Opening Google sign-in...');
     try{
       if(isMobileAuthDevice()){
         sessionStorage.setItem('journall:mobile-redirect-started', '1');
@@ -7877,7 +7891,7 @@ async function initFirebaseAuth(){
     }catch(error){
       const code = error?.code || '';
       if(!isMobileAuthDevice() && (code === 'auth/popup-blocked' || code === 'auth/popup-closed-by-user' || code === 'auth/cancelled-popup-request')){
-        setAuthStatus('Popup blocked. Switching to redirect sign-in...');
+        window.setAuthStatus('Popup blocked. Switching to redirect sign-in...');
         await authModule.signInWithRedirect(auth, provider);
         return;
       }
@@ -7887,47 +7901,47 @@ async function initFirebaseAuth(){
   };
   if(signInBtn) signInBtn.addEventListener('click', signIn);
   if(gateSignInBtn) gateSignInBtn.addEventListener('click', signIn);
-  if(bypassAuthBtn) bypassAuthBtn.addEventListener('click', bypassAuthAndOpenLocal);
+  if(bypassAuthBtn) bypassAuthBtn.addEventListener('click', window.bypassAuthAndOpenLocal);
   if(signOutBtn) signOutBtn.addEventListener('click', () => { 
     localStorage.removeItem('journall_auth_bypassed');
-    currentUser = null;
+    window.currentUser = null;
     authModule.signOut(auth); 
   });
 
   if(isMobileAuthDevice() && sessionStorage.getItem('journall:mobile-redirect-started')){
     setTimeout(()=>{
       if(auth.currentUser){
-        currentUser = auth.currentUser;
-        openSignedInJournal('Mobile sign-in complete. Opening your journal...');
+        window.currentUser = auth.currentUser;
+        window.openSignedInJournal('Mobile sign-in complete. Opening your journal...');
       }else{
-        setAuthStatus('If Google returned here but it is stuck, tap Open journal on this device.');
+        window.setAuthStatus('If Google returned here but it is stuck, tap Open journal on this device.');
       }
     }, 2500);
   }
 
   authModule.onAuthStateChanged(auth, async user=>{
     clearTimeout(initTimeout);
-    setAuthLoading(false);
+    window.setAuthLoading(false);
     if(localStorage.getItem('journall_auth_bypassed') === '1'){
-      currentUser = { uid: 'local_user', displayName: 'Local Trader', email: 'local@journall.app' };
-      openSignedInJournal('Opened locally. Cloud sync is disabled.');
+      window.currentUser = { uid: 'local_user', displayName: 'Local Trader', email: 'local@journall.app' };
+      window.openSignedInJournal('Opened locally. Cloud sync is disabled.');
       return;
     }
-    currentUser = user;
+    window.currentUser = user;
     cloudReady = false;
     if(!user){
       sessionStorage.removeItem('journall:cloud-loaded');
-      setGateVisible(true);
-      setAuthStatus('Sign in to use the website version.');
+      window.setGateVisible(true);
+      window.setAuthStatus('Sign in to use the website version.');
       return;
     }
-    openSignedInJournal('Signed in. Opening your journal...');
+    window.openSignedInJournal('Signed in. Opening your journal...');
     try{
       await loadCloudState();
     }catch(err){
       console.error('Cloud load failed:', err);
-      setGateVisible(false);
-      setAuthStatus(`Signed in. Journal opened locally; cloud sync needs Firebase setup: ${err?.message || err}`);
+      window.setGateVisible(false);
+      window.setAuthStatus(`Signed in. Journal opened locally; cloud sync needs Firebase setup: ${err?.message || err}`);
     }
   });
 }
