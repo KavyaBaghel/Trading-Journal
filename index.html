@@ -7625,6 +7625,7 @@ const authLoadingText = document.getElementById('firebaseAuthLoadingText');
 const authRetryBtn = document.getElementById('firebaseAuthRetryBtn');
 const signInCard = document.querySelector('.journall-signin-card');
 const signOutBtn = document.getElementById('firebaseSignOutBtn');
+const bypassAuthBtn = document.getElementById('bypassAuthBtn');
 const hasFirebaseConfig = Boolean(firebaseConfig?.apiKey && firebaseConfig?.authDomain && firebaseConfig?.projectId);
 const firebaseSdkVersion = '10.12.5';
 const syncPrefixes = ['viz', 'viztrade', 'krishna', 'journall'];
@@ -7642,6 +7643,7 @@ function bypassAuthAndOpenLocal(){
   currentUser = { uid: 'local_user', displayName: 'Local Trader', email: 'local@journall.app' };
   openSignedInJournal('Opened locally. Cloud sync is disabled.');
 }
+window.bypassAuthAndOpenLocal = bypassAuthAndOpenLocal;
 
 function setAuthStatus(text){
   if(authStatus) authStatus.textContent = text;
@@ -7885,11 +7887,12 @@ async function initFirebaseAuth(){
   };
   if(signInBtn) signInBtn.addEventListener('click', signIn);
   if(gateSignInBtn) gateSignInBtn.addEventListener('click', signIn);
-if(signOutBtn) signOutBtn.addEventListener('click', () => { 
-  localStorage.removeItem('journall_auth_bypassed');
-  currentUser = null;
-  authModule.signOut(auth); 
-});
+  if(bypassAuthBtn) bypassAuthBtn.addEventListener('click', bypassAuthAndOpenLocal);
+  if(signOutBtn) signOutBtn.addEventListener('click', () => { 
+    localStorage.removeItem('journall_auth_bypassed');
+    currentUser = null;
+    authModule.signOut(auth); 
+  });
 
   if(isMobileAuthDevice() && sessionStorage.getItem('journall:mobile-redirect-started')){
     setTimeout(()=>{
