@@ -5105,6 +5105,88 @@ function reportTimestampToDate(value, hourOffset=0){
   return new Date(ms + (hourOffset * 60 * 60 * 1000));
 }
 
+function parseFundingPipsMt5History(text){
+  if(typeof DOMParser === 'undefined') return [];
+  const source = String(text || '');
+  if(!/deal|direction|balance|profit/i.test(source)) return [];
+
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(source, 'text/html');
+  const tables = [...doc.querySelectorAll('table')];
+  const parsed = [];
+
+  tables.forEach(table=>{
+    const rows = [...table.querySelectorAll('tr')]
+      .map(tr => [...tr.querySelectorAll('th,td')].map(td => td.textContent.replace(/\s+/g,' ').trim()))
+      .filter(row => row.some(Boolean));
+
+    for(let headerIndex=0; headerIndex<rows.length; headerIndex++){
+      const headers = rows[headerIndex].map(h => String(h || '').replace(/^\uFEFF/,'').trim());
+      const headerMap = buildHeaderMap(headers);
+      const hasMt5Shape =
+        headerMap[normalizeHeaderName('Time')] !== undefined &&
+        headerMap[normalizeHeaderName('Symbol')] !== undefined &&
+        headerMap[normalizeHeaderName('Profit')] !== undefined &&
+        (
+          headerMap[normalizeHeaderName('Deal')] !== undefined ||
+          headerMap[normalizeHeaderName('Direction')] !== undefined ||
+          headerMap[normalizeHeaderName('Balance')] !== undefined
+        );
+
+      if(!hasMt5Shape) continue;
+
+      rows.slice(headerIndex + 1).forEach((row, i)=>{
+        const timeRaw = getColumn(row, headerMap, ['Time'], '');
+        const symbol = getColumn(row, headerMap, ['Symbol'], '').trim();
+        const typeRaw = getColumn(row, headerMap, ['Type'], '').trim().toUpperCase();
+        const directionRaw = getColumn(row, headerMap, ['Direction'], '').trim().toUpperCase();
+        const profit = toNumber(getColumn(row, headerMap, ['Profit'], '0'));
+        const commission = toNumber(getColumn(row, headerMap, ['Commission'], '0'));
+        const fee = toNumber(getColumn(row, headerMap, ['Fee'], '0'));
+        const swap = toNumber(getColumn(row, headerMap, ['Swap'], '0'));
+
+        if(!symbol || !timeRaw) return;
+        if(!typeRaw.includes('BUY') && !typeRaw.includes('SELL')) return;
+        if(profit === 0 && commission === 0 && fee === 0 && swap === 0 && !directionRaw.includes('OUT')) return;
+
+        const openDate = parseDateUTC(timeRaw);
+        const ist = toISTParts(openDate);
+        const price = toNumber(getColumn(row, headerMap, ['Price'], '0'));
+        const pnl = profit + commission + fee + swap;
+
+        parsed.push({
+          id:getColumn(row, headerMap, ['Deal','Ticket','Order'], `fundingpips-mt5-${Date.now()}-${parsed.length}-${i}`),
+          position:getColumn(row, headerMap, ['Order'], ''),
+          symbol:symbol || 'Unknown',
+          openUtc:openDate ? openDate.toISOString() : '',
+          closeUtc:openDate ? openDate.toISOString() : '',
+          date:ist.date,
+          time:ist.time,
+          weekday:ist.weekday,
+          dayIndex:ist.dayIndex,
+          hour:ist.hour,
+          session:classifySessionIST(openDate),
+          volume:toNumber(getColumn(row, headerMap, ['Volume'], '0')),
+          side:typeRaw.includes('SELL') ? 'SELL' : 'BUY',
+          entry:price,
+          exit:price,
+          sl:0,
+          tp:0,
+          commission:commission + fee,
+          swap,
+          rawProfit:profit,
+          pnl,
+          reason:getColumn(row, headerMap, ['Comment'], 'FundingPips MT5 history import'),
+          duration:0
+        });
+      });
+    }
+  });
+
+  return parsed;
+}
+
+
 function parseFundingPipsSummaryReport(text){
   const report = extractEmbeddedFundingPipsReport(text);
   if(!report || !report.profitDeals || !report.profitMoney) return [];
@@ -5205,6 +5287,9 @@ function parseFundingPipsSummaryReport(text){
 
 
 function parseMatchTraderHTML(text){
+  const fundingPipsMt5Trades = parseFundingPipsMt5History(text);
+  if(fundingPipsMt5Trades.length) return fundingPipsMt5Trades;
+
   const fundingPipsTrades = parseFundingPipsSummaryReport(text);
   if(fundingPipsTrades.length) return fundingPipsTrades;
 
@@ -5325,7 +5410,7 @@ function handleCSVUpload(event){
     const parsed = parseUploadedTradeFile(file.name, reader.result);
 
     if(!parsed.length){
-      alert('No valid trades found. Check CSV headers: Symbol, Open Time, Profit, Side.');
+      alert('No valid trades found. Upload a Match-Trader CSV/HTML export or a FundingPips MT5 HTML history report.');
       return;
     }
 
@@ -5428,6 +5513,9 @@ function parseTradingCSV(text){
 }
 
 function parseTradingHTML(text){
+  const fundingPipsMt5Trades = parseFundingPipsMt5History(text);
+  if(fundingPipsMt5Trades.length) return fundingPipsMt5Trades;
+
   const fundingPipsTrades = parseFundingPipsSummaryReport(text);
   if(fundingPipsTrades.length) return fundingPipsTrades;
 
