@@ -11222,6 +11222,40 @@ body:not(.firebase-auth-required) #journallApp > .sidebar .nav button {
   }
 }
 
+/* 15. Sign-in Brand Header Clean-up (Remove container box and keep logo only) */
+#journallApp .signin-brand,
+.firebase-auth-card .signin-brand {
+  background: transparent !important;
+  border: none !important;
+  border-bottom: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  margin: 0 auto 32px !important;
+  width: 100% !important;
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+}
+
+#journallApp .signin-brand::before,
+#journallApp .signin-brand::after,
+.firebase-auth-card .signin-brand::before,
+.firebase-auth-card .signin-brand::after {
+  display: none !important;
+}
+
+#journallApp .signin-brand > div:not(.logo),
+.firebase-auth-card .signin-brand > div:not(.logo) {
+  display: none !important;
+}
+
+#journallApp .signin-brand .logo,
+.firebase-auth-card .signin-brand .logo {
+  margin: 0 auto !important;
+  width: 48px !important;
+  height: 48px !important;
+}
+
 </style></body>
 </html>
 
