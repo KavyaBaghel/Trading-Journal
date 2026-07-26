@@ -4808,8 +4808,21 @@ function riskCalculatorMarkup(metrics){
   const pipValue = toNumber(localStorage.getItem('journall_risk_pip_value'), 1);
   const riskAmount = metrics.accountSize * config.riskPercent / 100;
   const positionSize = slPips > 0 && pipValue > 0 ? riskAmount / (slPips * pipValue) : 0;
-  return `<div class="goal-card risk-calc-card"><div class="goal-card-label">Risk Calculator</div><div class="goal-card-value neutral">$${riskAmount.toFixed(2)} risk</div><div class="risk-calc-grid"><label>SL pips<input id="riskSlPipsInput" type="number" min="1" step="1" value="${slPips}" oninput="updateRiskCalculator()"></label><label>Pip value<input id="riskPipValueInput" type="number" min="0.01" step="0.01" value="${pipValue}" oninput="updateRiskCalculator()"></label></div><div class="goal-card-sub">Position size: <strong>${positionSize.toFixed(3)}</strong>. Formula: account size x ${config.riskPercent}% / (SL pips x pip value).</div></div>`;
+  return `<div class="goal-card risk-calc-card"><div class="goal-card-label">Risk Calculator</div><div class="goal-card-value neutral">$${riskAmount.toFixed(2)} risk</div><div class="risk-calc-grid"><label>SL pips<div class="stepper-control"><button type="button" class="stepper-btn minus" onclick="stepRiskInput('riskSlPipsInput', -1)">−</button><input id="riskSlPipsInput" type="number" min="1" step="1" value="${slPips}" oninput="updateRiskCalculator()"><button type="button" class="stepper-btn plus" onclick="stepRiskInput('riskSlPipsInput', 1)">+</button></div></label><label>Pip value<div class="stepper-control"><button type="button" class="stepper-btn minus" onclick="stepRiskInput('riskPipValueInput', -1)">−</button><input id="riskPipValueInput" type="number" min="0.01" step="0.01" value="${pipValue}" oninput="updateRiskCalculator()"><button type="button" class="stepper-btn plus" onclick="stepRiskInput('riskPipValueInput', 1)">+</button></div></label></div><div class="goal-card-sub">Position size: <strong>${positionSize.toFixed(3)}</strong>. Formula: account size x ${config.riskPercent}% / (SL pips x pip value).</div></div>`;
 }
+function stepRiskInput(id, delta){
+  const el = document.getElementById(id);
+  if(!el) return;
+  const current = parseFloat(el.value) || 0;
+  const min = parseFloat(el.getAttribute('min')) || 0;
+  const step = parseFloat(el.getAttribute('step')) || 1;
+  const updated = Math.max(min, current + (delta * step));
+  const decimals = (String(step).split('.')[1] || '').length;
+  el.value = updated.toFixed(decimals);
+  updateRiskCalculator();
+}
+window.stepRiskInput = stepRiskInput;
+
 function updateRiskCalculator(){
   localStorage.setItem('journall_risk_sl_pips', document.getElementById('riskSlPipsInput')?.value || 50);
   localStorage.setItem('journall_risk_pip_value', document.getElementById('riskPipValueInput')?.value || 1);
@@ -10837,6 +10850,90 @@ body:not(.firebase-auth-required) #journallApp > .sidebar .brand {
     justify-content: center !important;
     align-items: center !important;
   }
+}
+
+/* 10. Custom Input Stepper Controls */
+.risk-calc-grid {
+  display: grid !important;
+  grid-template-columns: 1fr 1fr !important;
+  gap: 16px !important;
+  margin-top: 14px !important;
+  margin-bottom: 14px !important;
+}
+
+.risk-calc-grid label {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 6px !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.08em !important;
+  color: #8a8f98 !important;
+}
+
+.stepper-control {
+  display: flex !important;
+  align-items: center !important;
+  background: #16181d !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-radius: 12px !important;
+  overflow: hidden !important;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease !important;
+}
+
+.stepper-control:focus-within {
+  border-color: rgba(94, 106, 210, 0.4) !important;
+  box-shadow: 0 0 10px rgba(94, 106, 210, 0.15) !important;
+}
+
+.stepper-control input {
+  flex: 1 1 auto !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  text-align: center !important;
+  border: none !important;
+  background: transparent !important;
+  color: #ffffff !important;
+  font-size: 15px !important;
+  font-weight: 600 !important;
+  padding: 8px 4px !important;
+  outline: none !important;
+}
+
+.stepper-control input::-webkit-inner-spin-button,
+.stepper-control input::-webkit-outer-spin-button {
+  -webkit-appearance: none !important;
+  margin: 0 !important;
+}
+.stepper-control input[type="number"] {
+  -moz-appearance: textfield !important;
+  appearance: textfield !important;
+}
+
+.stepper-btn {
+  width: 38px !important;
+  height: 38px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  background: rgba(255, 255, 255, 0.03) !important;
+  border: none !important;
+  color: #8a8f98 !important;
+  font-size: 18px !important;
+  font-weight: 600 !important;
+  cursor: pointer !important;
+  user-select: none !important;
+  transition: all 0.2s ease !important;
+}
+
+.stepper-btn:hover {
+  background: rgba(94, 106, 210, 0.16) !important;
+  color: #ffffff !important;
+}
+
+.stepper-btn:active {
+  transform: scale(0.9) !important;
 }
 
 </style></body>
