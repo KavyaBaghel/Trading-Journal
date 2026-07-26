@@ -2381,7 +2381,7 @@ tr:hover {
       <button data-tab="goals">Goals</button>
       <button data-tab="ailab">AI Coach</button>
       <button data-tab="uploadcsv">Upload Data</button>
-
+      <button class="nav-signout-btn" type="button" onclick="triggerJournalSignOut()">Sign Out</button>
     </div>
 
     <div class="sidebox">
@@ -7639,6 +7639,19 @@ window.setAuthLoading = function(loading){
   }
 };
 
+window.triggerJournalSignOut = function(){
+  localStorage.removeItem('journall_auth_bypassed');
+  window.currentUser = null;
+  const btn = document.getElementById('firebaseSignOutBtn');
+  if(btn) {
+    try {
+      btn.click();
+    } catch(e) {}
+  }
+  // Reload to completely purge all memory, states and show login gate
+  location.reload();
+};
+
 // Run early bypass check right away!
 if(localStorage.getItem('journall_auth_bypassed') === '1'){
   window.currentUser = { uid: 'local_user', displayName: 'Local Trader', email: 'local@journall.app' };
@@ -10750,6 +10763,35 @@ body:not(.firebase-auth-required) #journallApp > .sidebar .nav button.active {
 }
 .checklist-item:hover, .widget:hover {
   border-color: rgba(255,255,255,0.1) !important;
+}
+
+/* 8. Sign Out Sidebar / Mobile Nav styling */
+@media (min-width: 821px) {
+  body:not(.firebase-auth-required) #journallApp > .sidebar .nav {
+    height: calc(100vh - 100px) !important;
+    display: flex !important;
+    flex-direction: column !important;
+  }
+  .nav-signout-btn {
+    margin-top: auto !important;
+    color: #f87171 !important;
+    border: 1px dashed rgba(248, 113, 113, 0.2) !important;
+    background: rgba(248, 113, 113, 0.02) !important;
+    transition: all 0.25s cubic-bezier(0.25, 0.8, 0.25, 1) !important;
+  }
+  .nav-signout-btn:hover {
+    background: rgba(248, 113, 113, 0.1) !important;
+    border-color: rgba(248, 113, 113, 0.45) !important;
+    color: #ff9999 !important;
+    box-shadow: 0 4px 15px rgba(248, 113, 113, 0.15) !important;
+  }
+}
+@media (max-width: 820px) {
+  .nav-signout-btn {
+    color: #f87171 !important;
+    border: 1px solid rgba(248, 113, 113, 0.15) !important;
+    background: rgba(248, 113, 113, 0.04) !important;
+  }
 }
 
 </style></body>
