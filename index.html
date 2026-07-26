@@ -7640,16 +7640,24 @@ window.setAuthLoading = function(loading){
 };
 
 window.triggerJournalSignOut = function(){
+  // Show "Logging out..." spinner immediately
+  window.setGateVisible(true);
+  window.setAuthLoading(true);
+  window.setAuthStatus('Logging out securely...');
+
   localStorage.removeItem('journall_auth_bypassed');
   window.currentUser = null;
   const btn = document.getElementById('firebaseSignOutBtn');
   if(btn) {
     try {
       btn.click();
+      return; // Hand over to the async signout handler
     } catch(e) {}
   }
-  // Reload to completely purge all memory, states and show login gate
-  location.reload();
+  // Fallback reload
+  setTimeout(() => {
+    location.reload();
+  }, 500);
 };
 
 // Run early bypass check right away!
@@ -7874,11 +7882,29 @@ async function initFirebaseAuth(){
   if(signInBtn) signInBtn.addEventListener('click', signIn);
   if(gateSignInBtn) gateSignInBtn.addEventListener('click', signIn);
   if(bypassAuthBtn) bypassAuthBtn.addEventListener('click', window.bypassAuthAndOpenLocal);
-  if(signOutBtn) signOutBtn.addEventListener('click', () => { 
-    localStorage.removeItem('journall_auth_bypassed');
-    window.currentUser = null;
-    authModule.signOut(auth); 
-  });
+  if(signOutBtn) {
+    signOutBtn.addEventListener('click', async () => { 
+      // Show "Logging out..." spinner immediately
+      window.setGateVisible(true);
+      window.setAuthLoading(true);
+      window.setAuthStatus('Logging out securely...');
+
+      localStorage.removeItem('journall_auth_bypassed');
+      window.currentUser = null;
+      try {
+        await authModule.signOut(auth);
+      } catch (err) {
+        console.error('Firebase signOut error:', err);
+      }
+
+      sessionStorage.clear();
+      
+      // Delay slightly for smooth transition, then reload
+      setTimeout(() => {
+        location.reload();
+      }, 800);
+    });
+  }
 
   if(isMobileAuthDevice() && sessionStorage.getItem('journall:mobile-redirect-started')){
     setTimeout(()=>{
