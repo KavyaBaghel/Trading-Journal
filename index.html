@@ -693,7 +693,7 @@ canvas{display:block;width:100%!important;height:100%!important}
 }
 .psych-progress{
   display:grid;
-  grid-template-columns:repeat(4,minmax(0,1fr));
+  grid-template-columns:repeat(5,minmax(0,1fr));
   gap:10px;
   margin-top:16px;
 }
@@ -9642,10 +9642,19 @@ main,
   border-radius: 9999px !important;
 }
 
+#journallApp .heatmap-scroll {
+  width: 100% !important;
+  overflow-x: auto !important;
+  -webkit-overflow-scrolling: touch !important;
+  margin-top: 10px !important;
+  padding-bottom: 8px !important;
+}
+
 #journallApp .trade-heatmap,
 #journallApp .heatmap {
-  width: 100% !important;
-  overflow: hidden !important;
+  width: max-content !important;
+  min-width: 858px !important;
+  overflow: visible !important;
   min-height: unset !important;
   height: auto !important;
 }
@@ -10993,6 +11002,63 @@ body:not(.firebase-auth-required) #journallApp > .sidebar .brand {
 
 .account-inline-field .stepper-control {
   flex: 1 !important;
+}
+
+/* 11. Mobile Spacing & Layout Alignment Upgrades */
+@media (max-width: 600px) {
+  /* Stack Risk Calculator columns vertically */
+  #journallApp .risk-calc-grid {
+    grid-template-columns: 1fr !important;
+    gap: 12px !important;
+  }
+  
+  /* Stack Psychology & Journal Action buttons vertically */
+  #journallApp .journal-form-actions {
+    flex-direction: column !important;
+    width: 100% !important;
+  }
+  #journallApp .journal-form-actions button,
+  #journallApp .journal-form-actions .btn {
+    width: 100% !important;
+    text-align: center !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+  }
+}
+
+/* Align Mind Check card contents using CSS Grid */
+#journallApp .psych-check {
+  display: grid !important;
+  grid-template-columns: 20px 1fr !important;
+  align-items: center !important;
+  gap: 2px 12px !important;
+  padding: 14px !important;
+  text-align: left !important;
+}
+#journallApp .psych-check > span {
+  grid-column: 1 !important;
+  grid-row: 1 / span 2 !important;
+  align-self: center !important;
+  margin: 0 !important;
+}
+#journallApp .psych-check strong {
+  grid-column: 2 !important;
+  grid-row: 1 !important;
+  align-self: end !important;
+  line-height: 1.25 !important;
+  margin: 0 !important;
+}
+#journallApp .psych-check em {
+  grid-column: 2 !important;
+  grid-row: 2 !important;
+  align-self: start !important;
+  line-height: 1.35 !important;
+  margin: 0 !important;
+}
+#journallApp .psych-check:not(:has(em)) strong {
+  grid-row: 1 / span 2 !important;
+  align-self: center !important;
 }
 
 </style></body>
