@@ -11154,23 +11154,21 @@ body:not(.firebase-auth-required) #journallApp > .sidebar .nav button {
   white-space: normal !important;
 }
 
-/* Hide navigation text on tablet sidebar views to prevent horizontal layout break */
+/* Enable text wrapping on tablet sidebar views to fit text within the 92px width */
 @media (min-width: 821px) and (max-width: 1050px) {
   body:not(.firebase-auth-required) #journallApp > .sidebar .nav button {
     text-align: center !important;
-    font-size: 0 !important;
-    padding: 12px 0 !important;
+    font-size: 11px !important;
+    padding: 10px 4px !important;
     margin: 4px auto !important;
-    width: 48px !important;
-    height: 48px !important;
+    width: calc(100% - 8px) !important;
+    min-height: 44px !important;
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
-    border-radius: 50% !important;
-  }
-  body:not(.firebase-auth-required) #journallApp > .sidebar .nav button::before {
-    font-size: 18px !important;
-    margin: 0 !important;
+    white-space: normal !important;
+    line-height: 1.2 !important;
+    border-radius: 8px !important;
   }
 }
 
