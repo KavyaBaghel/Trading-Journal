@@ -11030,35 +11030,42 @@ body:not(.firebase-auth-required) #journallApp > .sidebar .brand {
 }
 
 /* Align Mind Check card contents using CSS Grid */
-#journallApp .psych-check {
+#journallApp .psych-check,
+#journallApp [data-psych-check] {
   display: grid !important;
   grid-template-columns: 20px 1fr !important;
   align-items: center !important;
   gap: 2px 12px !important;
   padding: 14px !important;
   text-align: left !important;
+  min-height: unset !important;
+  height: auto !important;
 }
-#journallApp .psych-check > span {
+#journallApp .psych-check > span,
+#journallApp [data-psych-check] > span {
   grid-column: 1 !important;
   grid-row: 1 / span 2 !important;
   align-self: center !important;
   margin: 0 !important;
 }
-#journallApp .psych-check strong {
+#journallApp .psych-check strong,
+#journallApp [data-psych-check] strong {
   grid-column: 2 !important;
   grid-row: 1 !important;
   align-self: end !important;
   line-height: 1.25 !important;
   margin: 0 !important;
 }
-#journallApp .psych-check em {
+#journallApp .psych-check em,
+#journallApp [data-psych-check] em {
   grid-column: 2 !important;
   grid-row: 2 !important;
   align-self: start !important;
   line-height: 1.35 !important;
   margin: 0 !important;
 }
-#journallApp .psych-check:not(:has(em)) strong {
+#journallApp .psych-check:not(:has(em)) strong,
+#journallApp [data-psych-check]:not(:has(em)) strong {
   grid-row: 1 / span 2 !important;
   align-self: center !important;
 }
@@ -11206,8 +11213,12 @@ body:not(.firebase-auth-required) #journallApp > .sidebar .nav button {
 @media (max-width: 680px) {
   #journallApp .grid.two,
   #journallApp .grid.three,
-  #journallApp .grid.four {
+  #journallApp .grid.four,
+  #journallApp .today-metrics,
+  #journallApp .goal-card-grid,
+  #journallApp .ai-score {
     grid-template-columns: 1fr !important;
+    gap: 12px !important;
   }
 }
 
