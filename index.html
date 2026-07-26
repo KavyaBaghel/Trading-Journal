@@ -2756,33 +2756,35 @@ tr:hover {
               <button class="btn" onclick="document.querySelector('[data-tab=&quot;journalpage&quot;]')?.click()">Open Journal</button>
             </div>
           </div>
-        </div>
-        <div class="card">
-          <div class="panel-title"><h3>Debrief</h3><span>journal close loop</span></div>
-          <div class="sub psych-intro">Record the outcome and lessons - this closes the loop and saves to your Journal.</div>
-          <div class="journal-entry-form psych-debrief-form">
-            <label>Trade outcome
-              <select id="psychDebriefResult">
-                <option value="note">No trade / note</option>
-                <option value="profit">Win</option>
-                <option value="loss">Loss</option>
-                <option value="breakeven">Breakeven</option>
-              </select>
-            </label>
-            <label>Rules or mistakes flagged
-              <textarea id="psychDebriefMistakes" placeholder="Example: entered early, moved SL, revenge feeling, no patience..."></textarea>
-            </label>
-            <label>Lesson / next action
-              <textarea id="psychDebriefNotes" placeholder="What happened, what did you learn, and what rule must carry into tomorrow?"></textarea>
-            </label>
-            <div class="journal-form-actions">
-              <button class="btn" onclick="showPsychologyPage('live')">Back</button>
-              <button class="btn primary" id="psychDebriefSubmitBtn" onclick="savePsychologyDebriefToJournal()">Save Debrief to Journal</button>
+        
+          <div class="card" style="margin-top: 24px;">
+            <div class="panel-title"><h3>Debrief</h3><span>journal close loop</span></div>
+            <div class="sub psych-intro">Record the outcome and lessons - this closes the loop and saves to your Journal.</div>
+            <div class="journal-entry-form psych-debrief-form">
+              <label>Trade outcome
+                <select id="psychDebriefResult">
+                  <option value="note">No trade / note</option>
+                  <option value="profit">Win</option>
+                  <option value="loss">Loss</option>
+                  <option value="breakeven">Breakeven</option>
+                </select>
+              </label>
+              <label>Rules or mistakes flagged
+                <textarea id="psychDebriefMistakes" placeholder="Example: entered early, moved SL, revenge feeling, no patience..."></textarea>
+              </label>
+              <label>Lesson / next action
+                <textarea id="psychDebriefNotes" placeholder="What happened, what did you learn, and what rule must carry into tomorrow?"></textarea>
+              </label>
+              <div class="journal-form-actions">
+                <button class="btn" onclick="showPsychologyPage('live')">Back</button>
+                <button class="btn primary" id="psychDebriefSubmitBtn" onclick="savePsychologyDebriefToJournal()">Save Debrief to Journal</button>
+              </div>
             </div>
+            <div class="insight" style="margin-top: 16px;">No-trade days still require a journal: bias, why no valid setup, emotional state, discipline score, and tomorrow intention.</div>
           </div>
-          <div class="insight">No-trade days still require a journal: bias, why no valid setup, emotional state, discipline score, and tomorrow intention.</div>
         </div>
-      </div>    </section>
+      </div>
+    </section>
 
     <section id="journalpage" class="section">
       <div class="journal-page-layout">
@@ -11134,6 +11136,42 @@ body:not(.firebase-auth-required) #journallApp > .sidebar .nav button {
 /* Fix spacing in today summary and kpi grids */
 #journallApp .graph-kpi-row {
   gap: 16px !important;
+}
+
+/* Prevent text overflow in cards, goals, widgets, and checklists */
+#journallApp,
+#journallApp * {
+  box-sizing: border-box !important;
+}
+#journallApp .card,
+#journallApp .goal-card,
+#journallApp .widget,
+#journallApp .psych-check,
+#journallApp .checklist-item,
+#journallApp .insight {
+  word-wrap: break-word !important;
+  overflow-wrap: break-word !important;
+  white-space: normal !important;
+}
+
+/* Hide navigation text on tablet sidebar views to prevent horizontal layout break */
+@media (min-width: 821px) and (max-width: 1050px) {
+  body:not(.firebase-auth-required) #journallApp > .sidebar .nav button {
+    text-align: center !important;
+    font-size: 0 !important;
+    padding: 12px 0 !important;
+    margin: 4px auto !important;
+    width: 48px !important;
+    height: 48px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border-radius: 50% !important;
+  }
+  body:not(.firebase-auth-required) #journallApp > .sidebar .nav button::before {
+    font-size: 18px !important;
+    margin: 0 !important;
+  }
 }
 
 </style></body>
