@@ -11061,6 +11061,81 @@ body:not(.firebase-auth-required) #journallApp > .sidebar .brand {
   align-self: center !important;
 }
 
+/* 12. App De-congestion & Relaxed Spacing Layout */
+/* Spacing and breathing room inside cards */
+#journallApp .card,
+.firebase-auth-card,
+.account-onboarding-card {
+  padding: 24px !important;
+}
+
+@media (max-width: 820px) {
+  #journallApp .card,
+  .firebase-auth-card,
+  .account-onboarding-card {
+    padding: 18px 20px !important;
+  }
+}
+
+/* Relaxed layout grids and gaps */
+#journallApp .grid,
+#journallApp .grid.two,
+#journallApp .grid.three,
+#journallApp .grid.four,
+#journallApp .builder-grid,
+#journallApp .widget-grid {
+  gap: 24px !important;
+}
+
+@media (max-width: 820px) {
+  #journallApp .grid,
+  #journallApp .grid.two,
+  #journallApp .grid.three,
+  #journallApp .grid.four,
+  #journallApp .builder-grid,
+  #journallApp .widget-grid {
+    gap: 18px !important;
+  }
+}
+
+/* Auto-adapting, non-cramped metrics row */
+#journallApp .metrics {
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)) !important;
+  gap: 16px !important;
+  margin: 24px 0 !important;
+}
+
+/* Relaxed Sidebar navigation items */
+body:not(.firebase-auth-required) #journallApp > .sidebar .nav {
+  gap: 8px !important;
+}
+
+body:not(.firebase-auth-required) #journallApp > .sidebar .nav button {
+  padding: 12px 18px !important;
+  margin: 0 8px !important;
+}
+
+/* Let sections and page rows have slightly more margin */
+#journallApp .section {
+  padding-bottom: 40px !important;
+}
+
+#journallApp .panel-title {
+  margin-bottom: 18px !important;
+}
+
+/* Relaxed inputs and text areas */
+#journallApp input,
+#journallApp select,
+#journallApp textarea {
+  padding: 12px 16px !important;
+}
+
+/* Fix spacing in today summary and kpi grids */
+#journallApp .graph-kpi-row {
+  gap: 16px !important;
+}
+
 </style></body>
 </html>
 
