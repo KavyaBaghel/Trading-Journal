@@ -2192,20 +2192,21 @@ tr:hover {
   padding:12px 14px !important;
 }
 #journallApp .bar {
-  height:8px !important;
-  background:rgba(255,255,255,.08) !important;
+  height:12px !important;
+  background:rgba(255,255,255,.05) !important;
+  border:1px solid rgba(255,255,255,.08) !important;
   border-radius:999px !important;
   overflow:hidden !important;
 }
 #journallApp .bar > div {
   height:100% !important;
   min-width:0 !important;
-  background:#5e6ad2 !important;
+  background:linear-gradient(90deg, #5e6ad2, #828fff) !important;
   border-radius:999px !important;
   transition:width 180ms ease !important;
 }
-#journallApp .bar.loss > div { background:#e5484d !important; }
-#journallApp .bar.trades > div { background:#5e6ad2 !important; }
+#journallApp .bar.loss > div { background:linear-gradient(90deg, #e5484d, #f87171) !important; }
+#journallApp .bar.trades > div { background:linear-gradient(90deg, #5e6ad2, #828fff) !important; }
 #journallApp .bar.is-empty > div { background:transparent !important; }
 #journallApp .psych-step.locked {
   opacity:.45 !important;
@@ -9479,8 +9480,9 @@ body:not(.firebase-auth-required) #journallApp > .sidebar .nav [data-tab].active
 }
 #journallApp #propChallengeDashboard .bar,
 #journallApp #goalsBox .bar {
-  height: 8px !important;
-  background: rgba(255,255,255,0.08) !important;
+  height: 12px !important;
+  background: rgba(255,255,255,0.05) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
   border-radius: 9999px !important;
   overflow: hidden !important;
 }
