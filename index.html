@@ -2327,8 +2327,8 @@ tr:hover {
     <div class="setup-section">
       <div class="setup-section-label">Synced account</div><p id="accountSyncNote" class="account-sync-note">Account size, current balance, and phase are loaded from your Trading Dashboard.</p>
       <div class="account-form-grid">
-        <label>Initial account balance ($)<div class="number-input"><input id="accountSizeInput" class="account-source-input" type="number" min="1" step="100" placeholder="Enter a value" oninput="renderAccountSetupPreview()"></div></label>
-        <label>Current balance ($)<div class="number-input"><input id="currentBalanceInput" class="account-source-input" type="number" min="0" step="100" placeholder="Enter a value" oninput="renderAccountSetupPreview()"></div></label>
+        <label>Initial account balance ($)<div class="stepper-control"><button type="button" class="stepper-btn minus" onclick="stepInput('accountSizeInput', -1, 'renderAccountSetupPreview')">−</button><input id="accountSizeInput" class="account-source-input" type="number" min="1" step="100" placeholder="Enter a value" oninput="renderAccountSetupPreview()"><button type="button" class="stepper-btn plus" onclick="stepInput('accountSizeInput', 1, 'renderAccountSetupPreview')">+</button></div></label>
+        <label>Current balance ($)<div class="stepper-control"><button type="button" class="stepper-btn minus" onclick="stepInput('currentBalanceInput', -1, 'renderAccountSetupPreview')">−</button><input id="currentBalanceInput" class="account-source-input" type="number" min="0" step="100" placeholder="Enter a value" oninput="renderAccountSetupPreview()"><button type="button" class="stepper-btn plus" onclick="stepInput('currentBalanceInput', 1, 'renderAccountSetupPreview')">+</button></div></label>
         <label>Account phase<select id="accountPhaseInput" class="account-source-input" onchange="toggleFundedFields()"><option>Phase 1</option><option>Phase 2</option><option>Funded</option><option>Personal</option></select></label>
       </div>
     </div>
@@ -2336,17 +2336,17 @@ tr:hover {
     <div class="setup-section">
       <div class="setup-section-label">Targets</div>
       <div class="account-form-grid">
-        <label>Profit target<div class="account-inline-field"><div class="number-input"><input id="profitTargetInput" type="number" min="0" step="1" placeholder="Enter a value" oninput="renderAccountSetupPreview()"></div><select id="profitTargetType" onchange="renderAccountSetupPreview()"><option value="percent">%</option><option value="amount">$</option></select></div></label>
-        <label>Phase deadline (optional)<input id="phaseDeadlineInput" type="date"></label><label>Max trades per day<div class="number-input"><input id="maxTradesInput" type="number" min="1" step="1" placeholder="Enter a value" oninput="renderAccountSetupPreview()"></div></label>
+        <label>Profit target<div class="account-inline-field"><div class="stepper-control"><button type="button" class="stepper-btn minus" onclick="stepInput('profitTargetInput', -1, 'renderAccountSetupPreview')">−</button><input id="profitTargetInput" type="number" min="0" step="1" placeholder="Enter a value" oninput="renderAccountSetupPreview()"><button type="button" class="stepper-btn plus" onclick="stepInput('profitTargetInput', 1, 'renderAccountSetupPreview')">+</button></div><select id="profitTargetType" onchange="renderAccountSetupPreview()"><option value="percent">%</option><option value="amount">$</option></select></div></label>
+        <label>Phase deadline (optional)<input id="phaseDeadlineInput" type="date"></label><label>Max trades per day<div class="stepper-control"><button type="button" class="stepper-btn minus" onclick="stepInput('maxTradesInput', -1, 'renderAccountSetupPreview')">−</button><input id="maxTradesInput" type="number" min="1" step="1" placeholder="Enter a value" oninput="renderAccountSetupPreview()"><button type="button" class="stepper-btn plus" onclick="stepInput('maxTradesInput', 1, 'renderAccountSetupPreview')">+</button></div></label>
       </div>
     </div>
 
     <div class="setup-section">
       <div class="setup-section-label">Risk limits</div>
       <div class="account-form-grid">
-        <label>Risk per trade<div class="account-inline-field"><div class="number-input"><input id="riskPercentInput" type="number" min="0.5" max="2" step="0.1" placeholder="Enter a value" oninput="renderAccountSetupPreview()"></div><span>%</span></div></label><label>Minimum RR<div class="number-input"><input id="minRrInput" type="number" min="1" step="0.5" placeholder="Enter a value" oninput="renderAccountSetupPreview()"></div></label>
-        <label>Max daily loss<div class="account-inline-field"><div class="number-input"><input id="maxDailyLossInput" type="number" min="0" step="1" placeholder="Enter a value" oninput="renderAccountSetupPreview()"></div><select id="maxDailyLossType" onchange="renderAccountSetupPreview()"><option value="percent">%</option><option value="amount">$</option></select></div></label>
-        <label>Max overall drawdown<div class="account-inline-field"><div class="number-input"><input id="maxDrawdownInput" type="number" min="0" step="1" placeholder="Enter a value" oninput="renderAccountSetupPreview()"></div><select id="maxDrawdownType" onchange="renderAccountSetupPreview()"><option value="percent">%</option><option value="amount">$</option></select></div></label>
+        <label>Risk per trade<div class="account-inline-field"><div class="stepper-control"><button type="button" class="stepper-btn minus" onclick="stepInput('riskPercentInput', -1, 'renderAccountSetupPreview')">−</button><input id="riskPercentInput" type="number" min="0.5" max="2" step="0.1" placeholder="Enter a value" oninput="renderAccountSetupPreview()"><button type="button" class="stepper-btn plus" onclick="stepInput('riskPercentInput', 1, 'renderAccountSetupPreview')">+</button></div><span>%</span></div></label><label>Minimum RR<div class="stepper-control"><button type="button" class="stepper-btn minus" onclick="stepInput('minRrInput', -1, 'renderAccountSetupPreview')">−</button><input id="minRrInput" type="number" min="1" step="0.5" placeholder="Enter a value" oninput="renderAccountSetupPreview()"><button type="button" class="stepper-btn plus" onclick="stepInput('minRrInput', 1, 'renderAccountSetupPreview')">+</button></div></label>
+        <label>Max daily loss<div class="account-inline-field"><div class="stepper-control"><button type="button" class="stepper-btn minus" onclick="stepInput('maxDailyLossInput', -1, 'renderAccountSetupPreview')">−</button><input id="maxDailyLossInput" type="number" min="0" step="1" placeholder="Enter a value" oninput="renderAccountSetupPreview()"><button type="button" class="stepper-btn plus" onclick="stepInput('maxDailyLossInput', 1, 'renderAccountSetupPreview')">+</button></div><select id="maxDailyLossType" onchange="renderAccountSetupPreview()"><option value="percent">%</option><option value="amount">$</option></select></div></label>
+        <label>Max overall drawdown<div class="account-inline-field"><div class="stepper-control"><button type="button" class="stepper-btn minus" onclick="stepInput('maxDrawdownInput', -1, 'renderAccountSetupPreview')">−</button><input id="maxDrawdownInput" type="number" min="0" step="1" placeholder="Enter a value" oninput="renderAccountSetupPreview()"><button type="button" class="stepper-btn plus" onclick="stepInput('maxDrawdownInput', 1, 'renderAccountSetupPreview')">+</button></div><select id="maxDrawdownType" onchange="renderAccountSetupPreview()"><option value="percent">%</option><option value="amount">$</option></select></div></label>
       </div>
     </div>
 
@@ -4808,20 +4808,28 @@ function riskCalculatorMarkup(metrics){
   const pipValue = toNumber(localStorage.getItem('journall_risk_pip_value'), 1);
   const riskAmount = metrics.accountSize * config.riskPercent / 100;
   const positionSize = slPips > 0 && pipValue > 0 ? riskAmount / (slPips * pipValue) : 0;
-  return `<div class="goal-card risk-calc-card"><div class="goal-card-label">Risk Calculator</div><div class="goal-card-value neutral">$${riskAmount.toFixed(2)} risk</div><div class="risk-calc-grid"><label>SL pips<div class="stepper-control"><button type="button" class="stepper-btn minus" onclick="stepRiskInput('riskSlPipsInput', -1)">−</button><input id="riskSlPipsInput" type="number" min="1" step="1" value="${slPips}" oninput="updateRiskCalculator()"><button type="button" class="stepper-btn plus" onclick="stepRiskInput('riskSlPipsInput', 1)">+</button></div></label><label>Pip value<div class="stepper-control"><button type="button" class="stepper-btn minus" onclick="stepRiskInput('riskPipValueInput', -1)">−</button><input id="riskPipValueInput" type="number" min="0.01" step="0.01" value="${pipValue}" oninput="updateRiskCalculator()"><button type="button" class="stepper-btn plus" onclick="stepRiskInput('riskPipValueInput', 1)">+</button></div></label></div><div class="goal-card-sub">Position size: <strong>${positionSize.toFixed(3)}</strong>. Formula: account size x ${config.riskPercent}% / (SL pips x pip value).</div></div>`;
+  return `<div class="goal-card risk-calc-card"><div class="goal-card-label">Risk Calculator</div><div class="goal-card-value neutral">$${riskAmount.toFixed(2)} risk</div><div class="risk-calc-grid"><label>SL pips<div class="stepper-control"><button type="button" class="stepper-btn minus" onclick="stepInput('riskSlPipsInput', -1, 'updateRiskCalculator')">−</button><input id="riskSlPipsInput" type="number" min="1" step="1" value="${slPips}" oninput="updateRiskCalculator()"><button type="button" class="stepper-btn plus" onclick="stepInput('riskSlPipsInput', 1, 'updateRiskCalculator')">+</button></div></label><label>Pip value<div class="stepper-control"><button type="button" class="stepper-btn minus" onclick="stepInput('riskPipValueInput', -1, 'updateRiskCalculator')">−</button><input id="riskPipValueInput" type="number" min="0.01" step="0.01" value="${pipValue}" oninput="updateRiskCalculator()"><button type="button" class="stepper-btn plus" onclick="stepInput('riskPipValueInput', 1, 'updateRiskCalculator')">+</button></div></label></div><div class="goal-card-sub">Position size: <strong>${positionSize.toFixed(3)}</strong>. Formula: account size x ${config.riskPercent}% / (SL pips x pip value).</div></div>`;
 }
-function stepRiskInput(id, delta){
+function stepInput(id, delta, callbackName){
   const el = document.getElementById(id);
   if(!el) return;
   const current = parseFloat(el.value) || 0;
   const min = parseFloat(el.getAttribute('min')) || 0;
+  const max = parseFloat(el.getAttribute('max'));
   const step = parseFloat(el.getAttribute('step')) || 1;
-  const updated = Math.max(min, current + (delta * step));
+  let updated = current + (delta * step);
+  updated = Math.max(min, updated);
+  if(!isNaN(max)){
+    updated = Math.min(max, updated);
+  }
   const decimals = (String(step).split('.')[1] || '').length;
   el.value = updated.toFixed(decimals);
-  updateRiskCalculator();
+  
+  if(callbackName && typeof window[callbackName] === 'function'){
+    window[callbackName]();
+  }
 }
-window.stepRiskInput = stepRiskInput;
+window.stepInput = stepInput;
 
 function updateRiskCalculator(){
   localStorage.setItem('journall_risk_sl_pips', document.getElementById('riskSlPipsInput')?.value || 50);
@@ -10933,6 +10941,10 @@ body:not(.firebase-auth-required) #journallApp > .sidebar .brand {
 
 .stepper-btn:active {
   transform: scale(0.9) !important;
+}
+
+.account-inline-field .stepper-control {
+  flex: 1 !important;
 }
 
 </style></body>
