@@ -10820,6 +10820,25 @@ body:not(.firebase-auth-required) #journallApp > .sidebar .nav button.active {
   }
 }
 
+/* 9. Brand & Logo Sharp Box Removal */
+.logo,
+.signin-brand .logo {
+  border-radius: 50% !important;
+}
+body:not(.firebase-auth-required) #journallApp > .sidebar .brand {
+  border-bottom: none !important;
+  margin-bottom: 12px !important;
+}
+@media (min-width: 821px) and (max-width: 1050px) {
+  body:not(.firebase-auth-required) #journallApp > .sidebar .brand {
+    border-bottom: none !important;
+    padding: 0 !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+  }
+}
+
 </style></body>
 </html>
 
