@@ -2301,7 +2301,7 @@ tr:hover {
         <div class="signin-preview-row"><span>Psychology</span><strong>Pre-trade check</strong></div>
         <div class="signin-preview-row"><span>Review mode</span><strong>Rules + AI</strong></div>
       </div>
-      <button id="firebaseGateSignInBtn" class="btn primary signin-google-btn" type="button"><span class="google-mark">G</span> Sign in with Google</button>
+      <button id="firebaseGateSignInBtn" class="btn primary signin-google-btn" type="button" style="display:flex; align-items:center; justify-content:center; gap:10px; width:100%;"><span id="googleBtnContent" style="display:inline-flex; align-items:center; justify-content:center; gap:10px;"><svg class="google-logo-svg" viewBox="0 0 24 24" width="18" height="18" style="display:inline-block; vertical-align:middle;"><path fill="#EA4335" d="M12 5.04c1.7 0 3.2.6 4.4 1.8l3.3-3.3C17.7 1.6 15 1 12 1 7.3 1 3.4 3.7 1.5 7.7l3.9 3C6.3 7.7 8.9 5.04 12 5.04z"/><path fill="#4285F4" d="M23.5 12.3c0-.8-.1-1.7-.2-2.5H12v4.8h6.5c-.3 1.5-1.1 2.8-2.4 3.7l3.7 2.9c2.2-2 3.7-5 3.7-8.9z"/><path fill="#FBBC05" d="M5.4 14.7c-.3-.8-.4-1.7-.4-2.7s.1-1.9.4-2.7L1.5 6.3C.5 8.2 0 10.3 0 12.5s.5 4.3 1.5 6.2l3.9-3z"/><path fill="#34A853" d="M12 23c3.2 0 6-1.1 7.9-2.9l-3.7-2.9c-1.1.7-2.5 1.2-4.2 1.2-3.1 0-5.7-2.7-6.6-5.7L1.5 15.7C3.4 19.7 7.3 23 12 23z"/></svg><span>Sign in with Google</span></span></button>
       <button id="bypassAuthBtn" class="btn" type="button" onclick="bypassAuthAndOpenLocal()" style="margin-top:10px; width:100%; border:1px solid rgba(255,255,255,0.08); background:rgba(255,255,255,0.02); color:#8a8f98; border-radius:9999px; min-height:44px; font-weight:600; cursor:pointer;">Use Offline (Local Storage)</button>
       <div id="firebaseGateMessage" class="firebase-auth-message">Checking website sign-in...</div>
       <p class="signin-footnote">Use Journall privately with your own Google account. Your journal data stays tied to your sign-in.</p>
@@ -7885,11 +7885,21 @@ async function initFirebaseAuth(){
   }
 
   const signIn = async () => {
+    const btn = document.getElementById('firebaseGateSignInBtn');
+    const content = document.getElementById('googleBtnContent');
+    if(btn && content){
+      btn.disabled = true;
+      content.innerHTML = `<div class="spinner-mini" style="margin-right:10px;"></div><span>Signing in...</span>`;
+    }
     window.setAuthStatus('Opening Google sign-in...');
     try{
       const result = await authModule.signInWithPopup(auth, provider);
       handleAuthResult(result);
     }catch(error){
+      if(btn && content){
+        btn.disabled = false;
+        content.innerHTML = `<svg class="google-logo-svg" viewBox="0 0 24 24" width="18" height="18" style="display:inline-block; vertical-align:middle;"><path fill="#EA4335" d="M12 5.04c1.7 0 3.2.6 4.4 1.8l3.3-3.3C17.7 1.6 15 1 12 1 7.3 1 3.4 3.7 1.5 7.7l3.9 3C6.3 7.7 8.9 5.04 12 5.04z"/><path fill="#4285F4" d="M23.5 12.3c0-.8-.1-1.7-.2-2.5H12v4.8h6.5c-.3 1.5-1.1 2.8-2.4 3.7l3.7 2.9c2.2-2 3.7-5 3.7-8.9z"/><path fill="#FBBC05" d="M5.4 14.7c-.3-.8-.4-1.7-.4-2.7s.1-1.9.4-2.7L1.5 6.3C.5 8.2 0 10.3 0 12.5s.5 4.3 1.5 6.2l3.9-3z"/><path fill="#34A853" d="M12 23c3.2 0 6-1.1 7.9-2.9l-3.7-2.9c-1.1.7-2.5 1.2-4.2 1.2-3.1 0-5.7-2.7-6.6-5.7L1.5 15.7C3.4 19.7 7.3 23 12 23z"/></svg><span>Sign in with Google</span>`;
+      }
       const code = error?.code || '';
       if(code === 'auth/popup-blocked' || code === 'auth/popup-closed-by-user' || code === 'auth/cancelled-popup-request' || isMobileAuthDevice()){
         window.setAuthStatus('Switching to redirect sign-in...');
@@ -10842,11 +10852,47 @@ body:not(.firebase-auth-required) #journallApp > .sidebar .nav button.active {
   }
 }
 
-/* 9. Brand & Logo Sharp Box Removal */
+/* 9. Brand & Logo Sharp Box Removal & Glowing Logo Upgrade */
 .logo,
 .signin-brand .logo {
-  border-radius: 50% !important;
+  border-radius: 14px !important;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  display: grid !important;
+  place-items: center !important;
+  overflow: visible !important;
 }
+
+.logo::before {
+  color: #5e6ad2 !important;
+  text-shadow: 0 0 10px rgba(94, 106, 210, 0.8), 
+               0 0 20px rgba(94, 106, 210, 0.4), 
+               0 0 30px rgba(94, 106, 210, 0.2) !important;
+}
+
+.logo::after {
+  background: #34d399 !important;
+  box-shadow: 0 0 12px rgba(52, 211, 153, 0.9), 
+              0 0 24px rgba(52, 211, 153, 0.5), 
+              0 0 36px rgba(52, 211, 153, 0.3) !important;
+}
+
+/* Mini Spinner for Google Sign In Button */
+.spinner-mini {
+  width: 16px !important;
+  height: 16px !important;
+  border: 2px solid rgba(255, 255, 255, 0.2) !important;
+  border-top-color: #ffffff !important;
+  border-radius: 50% !important;
+  animation: spin-mini 0.8s linear infinite !important;
+  display: inline-block !important;
+  vertical-align: middle !important;
+}
+@keyframes spin-mini {
+  to { transform: rotate(360deg); }
+}
+
 body:not(.firebase-auth-required) #journallApp > .sidebar .brand {
   border-bottom: none !important;
   margin-bottom: 12px !important;
