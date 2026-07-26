@@ -11172,6 +11172,45 @@ body:not(.firebase-auth-required) #journallApp > .sidebar .nav button {
   }
 }
 
+/* 13. Chart Width Constraints (Prevent over-stretching on wide screens) */
+#journallApp .chart {
+  max-width: 640px !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  width: 100% !important;
+}
+#journallApp .chart.tall {
+  max-width: 760px !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  width: 100% !important;
+}
+#journallApp .chart-helper {
+  max-width: 640px !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+
+/* 14. Responsive Auto-Fitting Grid Overrides (Prevent early single-column stacking) */
+@media (max-width: 1200px) {
+  #journallApp .grid.two {
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)) !important;
+  }
+  #journallApp .grid.three {
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)) !important;
+  }
+  #journallApp .grid.four {
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)) !important;
+  }
+}
+@media (max-width: 680px) {
+  #journallApp .grid.two,
+  #journallApp .grid.three,
+  #journallApp .grid.four {
+    grid-template-columns: 1fr !important;
+  }
+}
+
 </style></body>
 </html>
 
