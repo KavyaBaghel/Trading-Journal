@@ -11271,8 +11271,10 @@ body:not(.firebase-auth-required) #journallApp > .sidebar .nav button {
   margin: 0 auto 32px !important;
   width: auto !important;
   display: flex !important;
+  flex-direction: column !important;
   justify-content: center !important;
   align-items: center !important;
+  gap: 16px !important;
 }
 
 .signin-brand::before,
@@ -11281,41 +11283,69 @@ body:not(.firebase-auth-required) #journallApp > .sidebar .nav button {
   content: none !important;
 }
 
-.signin-brand > div:not(.logo) {
+.signin-brand > div {
+  display: block !important;
+}
+
+.signin-brand .brand-title {
+  display: block !important;
+  font-size: 26px !important;
+  font-weight: 700 !important;
+  color: #ffffff !important;
+  letter-spacing: 0.03em !important;
+  margin-top: 8px !important;
+  font-family: var(--sans) !important;
+  text-shadow: 0 0 10px rgba(99, 102, 241, 0.25) !important;
+  text-align: center !important;
+}
+
+.signin-brand .brand-sub {
   display: none !important;
 }
 
 .signin-brand .logo {
   margin: 0 auto !important;
-  width: 48px !important;
-  height: 48px !important;
-  min-width: 48px !important;
-  min-height: 48px !important;
+  transform: scale(1.35) !important;
+  transform-origin: center !important;
 }
 
 /* 16. Minimalist, Clean & Calm Sign-In overlay */
 .firebase-auth-gate {
-  background: radial-gradient(circle at 50% 50%, rgba(99, 102, 241, 0.12), transparent 60%), #07080a !important;
+  background: radial-gradient(circle at 50% 50%, rgba(99, 102, 241, 0.14), transparent 60%), #07080a !important;
   display: grid !important;
   place-items: center !important;
   min-height: 100vh !important;
 }
 
 #firebaseAuthGate .firebase-auth-card {
+  position: relative !important;
   display: flex !important;
   flex-direction: column !important;
   align-items: center !important;
   justify-content: center !important;
   max-width: 400px !important;
   width: calc(100% - 32px) !important;
-  padding: 48px 36px !important;
+  padding: 52px 38px !important;
   border-radius: 24px !important;
-  background: #111318 !important;
-  border: 1px solid rgba(255, 255, 255, 0.09) !important;
-  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.8), 
-              0 0 30px rgba(99, 102, 241, 0.05) !important;
+  background: linear-gradient(180deg, #12141a, #0e1014) !important;
+  backdrop-filter: blur(16px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.65), 
+              0 0 40px rgba(99, 102, 241, 0.04) !important;
   margin: auto !important;
   overflow: visible !important;
+}
+
+/* Sleek decorative top glowing border */
+#firebaseAuthGate .firebase-auth-card::before {
+  content: "" !important;
+  position: absolute !important;
+  top: 0 !important;
+  left: 10% !important;
+  right: 10% !important;
+  height: 1px !important;
+  background: linear-gradient(90deg, transparent, rgba(99, 102, 241, 0.45), rgba(52, 211, 153, 0.45), transparent) !important;
+  display: block !important;
 }
 
 .firebase-auth-card .signin-copy {
@@ -11344,7 +11374,7 @@ body:not(.firebase-auth-required) #journallApp > .sidebar .nav button {
 .firebase-auth-card .signin-panel {
   width: 100% !important;
   padding: 0 !important;
-  margin-top: 16px !important;
+  margin-top: 12px !important;
   background: transparent !important;
   border: none !important;
 }
@@ -11358,34 +11388,42 @@ body:not(.firebase-auth-required) #journallApp > .sidebar .nav button {
 #firebaseGateSignInBtn {
   background: #ffffff !important;
   color: #0c0d0f !important;
-  border-radius: 12px !important;
+  border-radius: 14px !important;
   font-weight: 600 !important;
-  min-height: 48px !important;
-  box-shadow: 0 4px 12px rgba(255, 255, 255, 0.1) !important;
-  transition: all 0.2s ease !important;
+  min-height: 52px !important;
+  box-shadow: 0 4px 20px rgba(255, 255, 255, 0.12), 
+              0 1px 2px rgba(0, 0, 0, 0.05) !important;
+  transition: all 0.25s cubic-bezier(0.2, 0.8, 0.2, 1) !important;
   border: none !important;
+  font-size: 15px !important;
+  letter-spacing: -0.01em !important;
 }
 
 #firebaseGateSignInBtn:hover {
-  background: #f0f0f0 !important;
-  transform: translateY(-1px) !important;
+  background: #f8f9fa !important;
+  transform: translateY(-1.5px) !important;
+  box-shadow: 0 6px 24px rgba(255, 255, 255, 0.18), 
+              0 2px 4px rgba(0, 0, 0, 0.08) !important;
 }
 
 #bypassAuthBtn {
-  margin-top: 12px !important;
-  border-radius: 12px !important;
-  min-height: 48px !important;
-  background: rgba(255, 255, 255, 0.02) !important;
-  border: 1px solid rgba(255, 255, 255, 0.08) !important;
-  color: #8a8f98 !important;
-  font-weight: 500 !important;
-  transition: all 0.2s ease !important;
+  margin-top: 14px !important;
+  border-radius: 14px !important;
+  min-height: 52px !important;
+  background: rgba(255, 255, 255, 0.03) !important;
+  border: 1px solid rgba(255, 255, 255, 0.06) !important;
+  color: #a3a8b4 !important;
+  font-weight: 600 !important;
+  font-size: 15px !important;
+  letter-spacing: -0.01em !important;
+  transition: all 0.25s cubic-bezier(0.2, 0.8, 0.2, 1) !important;
 }
 
 #bypassAuthBtn:hover {
-  background: rgba(255, 255, 255, 0.06) !important;
+  background: rgba(255, 255, 255, 0.08) !important;
   color: #ffffff !important;
-  border-color: rgba(255, 255, 255, 0.15) !important;
+  border-color: rgba(255, 255, 255, 0.12) !important;
+  transform: translateY(-1.5px) !important;
 }
 
 .firebase-auth-message {
