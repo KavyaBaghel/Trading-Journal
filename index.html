@@ -5218,7 +5218,7 @@ function parseFundingPipsMt5History(text){
   const parser = new DOMParser();
   const doc = parser.parseFromString(source, 'text/html');
   const tables = [...doc.querySelectorAll('table')];
-  const parsed = [];
+  const parsedDeals = [];
 
   tables.forEach(table=>{
     const rows = [...table.querySelectorAll('tr')]
@@ -5250,10 +5250,14 @@ function parseFundingPipsMt5History(text){
         const commission = toNumber(getColumn(row, headerMap, ['Commission'], '0'));
         const fee = toNumber(getColumn(row, headerMap, ['Fee'], '0'));
         const swap = toNumber(getColumn(row, headerMap, ['Swap'], '0'));
+        const volume = toNumber(getColumn(row, headerMap, ['Volume'], '0'));
+        const price = toNumber(getColumn(row, headerMap, ['Price'], '0'));
+        const dealId = getColumn(row, headerMap, ['Deal','Ticket','Order'], `mt5-deal-${Date.now()}-${parsedDeals.length}-${i}`);
+        const orderId = getColumn(row, headerMap, ['Order'], '').trim();
 
         if(!symbol || !timeRaw) return;
 
-        // Ignore non-trade entries (commissions, swaps, fees, balance adjustments, credit, correction)
+        // Ignore non-trade entries
         const isNonTrade = 
           /commission|fee|swap|interest|balance|deposit|withdrawal|credit|correction|bonus|tax/i.test(symbol) ||
           /commission|fee|swap|interest|balance|deposit|withdrawal|credit|correction|bonus|tax/i.test(typeRaw) ||
@@ -5262,43 +5266,124 @@ function parseFundingPipsMt5History(text){
         if(isNonTrade) return;
 
         if(!typeRaw.includes('BUY') && !typeRaw.includes('SELL')) return;
-        if(profit === 0 && commission === 0 && fee === 0 && swap === 0 && !directionRaw.includes('OUT')) return;
 
-        const openDate = parseDateUTC(timeRaw);
-        const ist = toISTParts(openDate);
-        const price = toNumber(getColumn(row, headerMap, ['Price'], '0'));
-        const pnl = profit + commission + fee + swap;
-
-        parsed.push({
-          id:getColumn(row, headerMap, ['Deal','Ticket','Order'], `fundingpips-mt5-${Date.now()}-${parsed.length}-${i}`),
-          position:getColumn(row, headerMap, ['Order'], ''),
-          symbol:symbol || 'Unknown',
-          openUtc:openDate ? openDate.toISOString() : '',
-          closeUtc:openDate ? openDate.toISOString() : '',
-          date:ist.date,
-          time:ist.time,
-          weekday:ist.weekday,
-          dayIndex:ist.dayIndex,
-          hour:ist.hour,
-          session:classifySessionIST(openDate),
-          volume:toNumber(getColumn(row, headerMap, ['Volume'], '0')),
-          side:typeRaw.includes('SELL') ? 'SELL' : 'BUY',
-          entry:price,
-          exit:price,
-          sl:0,
-          tp:0,
-          commission:commission + fee,
+        parsedDeals.push({
+          time: parseDateUTC(timeRaw),
+          symbol,
+          type: typeRaw,
+          direction: directionRaw,
+          volume,
+          price,
+          commission: commission + fee,
           swap,
-          rawProfit:profit,
-          pnl,
-          reason:getColumn(row, headerMap, ['Comment'], 'FundingPips MT5 history import'),
-          duration:0
+          profit,
+          dealId,
+          orderId,
+          comment: commentRaw
         });
       });
     }
   });
 
-  return parsed;
+  if (!parsedDeals.length) return [];
+
+  // Sort deals chronologically
+  parsedDeals.sort((a, b) => (a.time ? a.time.getTime() : 0) - (b.time ? b.time.getTime() : 0));
+
+  const openDeals = [];
+  const finalTrades = [];
+
+  parsedDeals.forEach(deal => {
+    // If it's an entry deal
+    if (deal.direction.includes('IN') && !deal.direction.includes('OUT')) {
+      openDeals.push(deal);
+    } 
+    // If it's an exit deal
+    else if (deal.direction.includes('OUT')) {
+      let matchIdx = -1;
+      // 1. Try to match by symbol and exact volume
+      for (let j = openDeals.length - 1; j >= 0; j--) {
+        if (openDeals[j].symbol === deal.symbol && Math.abs(openDeals[j].volume - deal.volume) < 0.0001) {
+          matchIdx = j;
+          break;
+        }
+      }
+      // 2. Fall back to matching by symbol only
+      if (matchIdx === -1) {
+        for (let j = openDeals.length - 1; j >= 0; j--) {
+          if (openDeals[j].symbol === deal.symbol) {
+            matchIdx = j;
+            break;
+          }
+        }
+      }
+
+      if (matchIdx !== -1) {
+        const entryDeal = openDeals.splice(matchIdx, 1)[0];
+        const openDate = entryDeal.time;
+        const closeDate = deal.time;
+        const ist = toISTParts(closeDate || openDate);
+        const pnl = deal.profit + entryDeal.commission + deal.commission + entryDeal.swap + deal.swap;
+
+        finalTrades.push({
+          id: `fundingpips-mt5-${entryDeal.dealId}-${deal.dealId}`,
+          position: entryDeal.orderId || deal.orderId || `pos-${entryDeal.dealId}`,
+          symbol: deal.symbol,
+          openUtc: openDate ? openDate.toISOString() : '',
+          closeUtc: closeDate ? closeDate.toISOString() : '',
+          date: ist.date,
+          time: ist.time,
+          weekday: ist.weekday,
+          dayIndex: ist.dayIndex,
+          hour: ist.hour,
+          session: classifySessionIST(closeDate || openDate),
+          volume: deal.volume,
+          side: entryDeal.type.includes('SELL') ? 'SELL' : 'BUY',
+          entry: entryDeal.price,
+          exit: deal.price,
+          sl: 0,
+          tp: 0,
+          commission: entryDeal.commission + deal.commission,
+          swap: entryDeal.swap + deal.swap,
+          rawProfit: deal.profit,
+          pnl: pnl,
+          reason: deal.comment || 'FundingPips MT5 history import',
+          duration: openDate && closeDate ? (closeDate - openDate) / 60000 : 0
+        });
+      } else {
+        // Unmatched exit deal (fallback to preserve data)
+        const openDate = deal.time;
+        const ist = toISTParts(openDate);
+        finalTrades.push({
+          id: `fundingpips-mt5-unmatched-${deal.dealId}`,
+          position: deal.orderId || `pos-${deal.dealId}`,
+          symbol: deal.symbol,
+          openUtc: openDate ? openDate.toISOString() : '',
+          closeUtc: openDate ? openDate.toISOString() : '',
+          date: ist.date,
+          time: ist.time,
+          weekday: ist.weekday,
+          dayIndex: ist.dayIndex,
+          hour: ist.hour,
+          session: classifySessionIST(openDate),
+          volume: deal.volume,
+          side: deal.type.includes('BUY') ? 'SELL' : 'BUY',
+          entry: deal.price,
+          exit: deal.price,
+          sl: 0,
+          tp: 0,
+          commission: deal.commission,
+          swap: deal.swap,
+          rawProfit: deal.profit,
+          pnl: deal.profit + deal.commission + deal.swap,
+          reason: deal.comment || 'FundingPips MT5 history import (unmatched exit)',
+          duration: 0
+        });
+      }
+    }
+  });
+
+  return finalTrades;
 }
 
 
