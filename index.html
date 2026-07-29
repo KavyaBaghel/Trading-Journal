@@ -7570,7 +7570,20 @@ document.querySelectorAll('.nav button').forEach(btn=>{
 
   if ('serviceWorker' in navigator && location.protocol !== 'file:') {
     window.addEventListener('load', () => {
-      navigator.serviceWorker.register('./service-worker.js').catch(() => {});
+      navigator.serviceWorker.register('./service-worker.js')
+        .then(reg => {
+          // Force check for service worker updates on load
+          reg.update().catch(() => {});
+        })
+        .catch(() => {});
+    });
+    // Force page reload when the new service worker activates and takes control
+    let refreshing = false;
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+      if (!refreshing) {
+        refreshing = true;
+        window.location.reload();
+      }
     });
   }
 
