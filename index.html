@@ -5134,7 +5134,15 @@ function parseMatchTraderCSV(text){
     const tp = toNumber(getColumn(row, headerMap, ['Take Profit','TakeProfit','TP'], '0'));
     const volume = toNumber(getColumn(row, headerMap, ['Volume','Lots','Lot','Size'], '0'));
 
-    if(!symbol && !openRaw && !closeRaw && profit === 0) continue;
+    if(!symbol && !openRaw && !closeRaw) continue;
+
+    // Ignore non-trade entries (commissions, swaps, fees, balance adjustments, credit, correction)
+    const isNonTrade = 
+      !symbol ||
+      /commission|fee|swap|interest|balance|deposit|withdrawal|credit|correction|bonus|tax/i.test(symbol) ||
+      /commission|fee|swap|interest|balance|deposit|withdrawal|credit|correction|bonus|tax/i.test(sideRaw) ||
+      /commission|fee|swap|interest|balance|deposit|withdrawal|credit|correction|bonus|tax/i.test(getColumn(row, headerMap, ['Comment','Reason','Close Reason','Status'], '').trim());
+    if(isNonTrade) continue;
 
     parsed.push({
       id:getColumn(row, headerMap, ['ID','Order ID','OrderID','Deal ID','Ticket'], String(Date.now()+Math.random())),
@@ -5220,12 +5228,22 @@ function parseFundingPipsMt5History(text){
         const symbol = getColumn(row, headerMap, ['Symbol'], '').trim();
         const typeRaw = getColumn(row, headerMap, ['Type'], '').trim().toUpperCase();
         const directionRaw = getColumn(row, headerMap, ['Direction'], '').trim().toUpperCase();
+        const commentRaw = getColumn(row, headerMap, ['Comment'], '').trim().toUpperCase();
         const profit = toNumber(getColumn(row, headerMap, ['Profit'], '0'));
         const commission = toNumber(getColumn(row, headerMap, ['Commission'], '0'));
         const fee = toNumber(getColumn(row, headerMap, ['Fee'], '0'));
         const swap = toNumber(getColumn(row, headerMap, ['Swap'], '0'));
 
         if(!symbol || !timeRaw) return;
+
+        // Ignore non-trade entries (commissions, swaps, fees, balance adjustments, credit, correction)
+        const isNonTrade = 
+          /commission|fee|swap|interest|balance|deposit|withdrawal|credit|correction|bonus|tax/i.test(symbol) ||
+          /commission|fee|swap|interest|balance|deposit|withdrawal|credit|correction|bonus|tax/i.test(typeRaw) ||
+          /commission|fee|swap|interest|balance|deposit|withdrawal|credit|correction|bonus|tax/i.test(directionRaw) ||
+          /commission|fee|swap|interest|balance|deposit|withdrawal|credit|correction|bonus|tax/i.test(commentRaw);
+        if(isNonTrade) return;
+
         if(!typeRaw.includes('BUY') && !typeRaw.includes('SELL')) return;
         if(profit === 0 && commission === 0 && fee === 0 && swap === 0 && !directionRaw.includes('OUT')) return;
 
@@ -5489,7 +5507,15 @@ function parseMatchTraderHTML(text){
     const tp = toNumber(getColumn(row, headerMap, ['Take Profit','TakeProfit','TP'], '0'));
     const volume = toNumber(getColumn(row, headerMap, ['Volume','Lots','Lot','Size'], '0'));
 
-    if(!symbol && !openRaw && !closeRaw && profit === 0) return;
+    if(!symbol && !openRaw && !closeRaw) return;
+
+    // Ignore non-trade entries (commissions, swaps, fees, balance adjustments, credit, correction)
+    const isNonTrade = 
+      !symbol ||
+      /commission|fee|swap|interest|balance|deposit|withdrawal|credit|correction|bonus|tax/i.test(symbol) ||
+      /commission|fee|swap|interest|balance|deposit|withdrawal|credit|correction|bonus|tax/i.test(sideRaw) ||
+      /commission|fee|swap|interest|balance|deposit|withdrawal|credit|correction|bonus|tax/i.test(getColumn(row, headerMap, ['Comment','Reason','Close Reason','Status'], '').trim());
+    if(isNonTrade) return;
 
     parsed.push({
       id:getColumn(row, headerMap, ['ID','Order ID','OrderID','Deal ID','Ticket'], String(Date.now()+Math.random()+i)),
