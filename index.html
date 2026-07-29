@@ -11694,5 +11694,24 @@ body:not(.firebase-auth-required) #journallApp > .sidebar .nav button {
 .dock-btn.active {
   color: #ffffff !important;
 }
+
+/* Luxury Slow-Mo Fade In Transition Animation */
+@keyframes luxury-fade-in {
+  0% {
+    opacity: 0;
+    filter: blur(10px);
+    transform: scale(0.98);
+  }
+  100% {
+    opacity: 1;
+    filter: blur(0);
+    transform: scale(1);
+  }
+}
+
+.firebase-auth-gate.show,
+#journallApp {
+  animation: luxury-fade-in 1.5s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+}
 </style></body>
 </html>
