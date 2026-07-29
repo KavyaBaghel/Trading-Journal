@@ -11223,37 +11223,35 @@ body:not(.firebase-auth-required) #journallApp > .sidebar .nav button {
 }
 
 /* 15. Sign-in Brand Header Clean-up (Remove container box and keep logo only) */
-#journallApp .signin-brand,
-.firebase-auth-card .signin-brand {
+.signin-brand {
   background: transparent !important;
   border: none !important;
   border-bottom: none !important;
   box-shadow: none !important;
   padding: 0 !important;
   margin: 0 auto 32px !important;
-  width: 100% !important;
+  width: auto !important;
   display: flex !important;
   justify-content: center !important;
   align-items: center !important;
 }
 
-#journallApp .signin-brand::before,
-#journallApp .signin-brand::after,
-.firebase-auth-card .signin-brand::before,
-.firebase-auth-card .signin-brand::after {
+.signin-brand::before,
+.signin-brand::after {
+  display: none !important;
+  content: none !important;
+}
+
+.signin-brand > div:not(.logo) {
   display: none !important;
 }
 
-#journallApp .signin-brand > div:not(.logo),
-.firebase-auth-card .signin-brand > div:not(.logo) {
-  display: none !important;
-}
-
-#journallApp .signin-brand .logo,
-.firebase-auth-card .signin-brand .logo {
+.signin-brand .logo {
   margin: 0 auto !important;
   width: 48px !important;
   height: 48px !important;
+  min-width: 48px !important;
+  min-height: 48px !important;
 }
 
 /* 16. Minimalist, Clean & Calm Sign-In overlay */
@@ -11293,17 +11291,23 @@ body:not(.firebase-auth-required) #journallApp > .sidebar .nav button {
   box-shadow: none !important;
 }
 
-.firebase-auth-card .signin-copy > *:not(.signin-brand) {
+/* Explicitly hide busy copy elements on sign-in page (Fix horizontal pill box) */
+.firebase-auth-card .signin-kicker,
+.firebase-auth-card .signin-copy h1,
+.firebase-auth-card .signin-copy .signin-lede,
+.firebase-auth-card .signin-copy .signin-feature-grid,
+.signin-kicker,
+.signin-lede,
+.signin-feature-grid {
   display: none !important;
 }
 
 .firebase-auth-card .signin-panel {
   width: 100% !important;
   padding: 0 !important;
-  margin-top: 12px !important;
+  margin-top: 16px !important;
   background: transparent !important;
   border: none !important;
-  box-shadow: none !important;
 }
 
 .firebase-auth-card .signin-panel-top,
@@ -11397,12 +11401,15 @@ body:not(.firebase-auth-required) #journallApp > .sidebar .nav button {
   --card2: #f3f4f6 !important;
   --card3: #e8eaef !important;
   --border: #e2e5eb !important;
+</style>
 <style>
 /* 17. Premium Geometric SVG Brand Logo (Floating Line Art) */
-#journallApp .logo,
-.firebase-auth-card .logo,
 .logo {
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%236366f1'/%3E%3Cstop offset='50%25' stop-color='%234f46e5'/%3E%3Cstop offset='100%25' stop-color='%2310b981'/%3E%3C/linearGradient%3E%3C/defs%3E%3Cpath d='M10 8h8v10a4 4 0 0 1-8 0' stroke='url(%23g)' stroke-width='3' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3Cpath d='M18 8l6-6m0 0h-5m5 0v5' stroke='%2310b981' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3C/svg%3E") !important;
+  width: 48px !important;
+  height: 48px !important;
+  min-width: 48px !important;
+  min-height: 48px !important;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22%3E%3Cdefs%3E%3ClinearGradient id=%22g%22 x1=%220%25%22 y1=%220%25%22 x2=%22100%25%22 y2=%22100%25%22%3E%3Cstop offset=%220%25%22 stop-color=%22%236366f1%22/%3E%3Cstop offset=%2250%25%22 stop-color=%22%234f46e5%22/%3E%3Cstop offset=%22100%25%22 stop-color=%22%2310b981%22/%3E%3C/linearGradient%3E%3C/defs%3E%3Cpath d=%22M10 8h8v10a4 4 0 0 1-8 0%22 stroke=%22url(%23g)%22 stroke-width=%223%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22 fill=%22none%22/%3E%3Cpath d=%22M18 8l6-6m0 0h-5m5 0v5%22 stroke=%22%2310b981%22 stroke-width=%222.5%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22 fill=%22none%22/%3E%3C/svg%3E") !important;
   background-size: contain !important;
   background-repeat: no-repeat !important;
   background-position: center !important;
@@ -11413,24 +11420,28 @@ body:not(.firebase-auth-required) #journallApp > .sidebar .nav button {
   filter: drop-shadow(0 0 8px rgba(79, 70, 229, 0.45)) !important;
   transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1) !important;
   animation: logo-live-glow 3s ease-in-out infinite !important;
+  display: block !important;
 }
 
-#journallApp .logo::before,
-#journallApp .logo::after,
-.firebase-auth-card .logo::before,
-.firebase-auth-card .logo::after,
 .logo::before,
 .logo::after {
   display: none !important;
   content: none !important;
 }
 
-#journallApp .logo:hover,
 .logo:hover {
   animation-play-state: paused !important;
   transform: scale(1.08) !important;
   filter: drop-shadow(0 0 18px rgba(99, 102, 241, 0.9)) 
           drop-shadow(0 0 8px rgba(16, 185, 129, 0.5)) !important;
+}
+
+/* Sidebar Logo Size Adjustment */
+#journallApp > .sidebar .logo {
+  width: 36px !important;
+  height: 36px !important;
+  min-width: 36px !important;
+  min-height: 36px !important;
 }
 
 @keyframes logo-live-glow {
