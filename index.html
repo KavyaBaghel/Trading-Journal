@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<meta name="theme-color" content="#0b0b0c"/>
+<meta name="theme-color" content="#f8f9fb"/>
 <meta name="mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-title" content="Journall"/>
@@ -11256,6 +11256,585 @@ body:not(.firebase-auth-required) #journallApp > .sidebar .nav button {
   height: 48px !important;
 }
 
+/* 16. Minimalist, Clean & Calm Sign-In overlay */
+#firebaseAuthGate .firebase-auth-card {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  max-width: 400px !important;
+  width: calc(100% - 32px) !important;
+  padding: 48px 36px !important;
+  border-radius: 24px !important;
+  background: rgba(13, 14, 17, 0.75) !important;
+  backdrop-filter: blur(32px) !important;
+  -webkit-backdrop-filter: blur(32px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.05) !important;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6) !important;
+  margin: auto !important;
+  overflow: visible !important;
+}
+
+.firebase-auth-card .signin-copy {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  width: 100% !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+.firebase-auth-card .signin-copy > *:not(.signin-brand) {
+  display: none !important;
+}
+
+.firebase-auth-card .signin-panel {
+  width: 100% !important;
+  padding: 0 !important;
+  margin-top: 12px !important;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+.firebase-auth-card .signin-panel-top,
+.firebase-auth-card .signin-preview-card,
+.firebase-auth-card .signin-footnote {
+  display: none !important;
+}
+
+#firebaseGateSignInBtn {
+  background: #ffffff !important;
+  color: #0c0d0f !important;
+  border-radius: 12px !important;
+  font-weight: 600 !important;
+  min-height: 48px !important;
+  box-shadow: 0 4px 12px rgba(255, 255, 255, 0.1) !important;
+  transition: all 0.2s ease !important;
+  border: none !important;
+}
+
+#firebaseGateSignInBtn:hover {
+  background: #f0f0f0 !important;
+  transform: translateY(-1px) !important;
+}
+
+#bypassAuthBtn {
+  margin-top: 12px !important;
+  border-radius: 12px !important;
+  min-height: 48px !important;
+  background: rgba(255, 255, 255, 0.02) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  color: #8a8f98 !important;
+  font-weight: 500 !important;
+  transition: all 0.2s ease !important;
+}
+
+#bypassAuthBtn:hover {
+  background: rgba(255, 255, 255, 0.06) !important;
+  color: #ffffff !important;
+  border-color: rgba(255, 255, 255, 0.15) !important;
+}
+
+.firebase-auth-message {
+  font-size: 13px !important;
+  color: #8a8f98 !important;
+  text-align: center !important;
+  margin-top: 16px !important;
+  background: transparent !important;
+  border: none !important;
+}
+
+</style>
+<style id="journall-light-theme">
+:root {
+  --canvas: #f8f9fb !important;
+  --surface-1: #ffffff !important;
+  --surface-2: #f3f4f6 !important;
+  --surface-3: #e8eaef !important;
+  --surface-4: #dfe2e8 !important;
+  --surface-deep: #f3f4f6 !important;
+  --surface-elevated: #ffffff !important;
+  --surface-soft: #f3f4f6 !important;
+  --soft-cloud: #f3f4f6 !important;
+  --hairline: #e2e5eb !important;
+  --hairline-strong: #d0d4dc !important;
+  --hairline-dark: rgba(0, 0, 0, 0.08) !important;
+  --primary: #494fdf !important;
+  --primary-hover: #3a40c4 !important;
+  --primary-bright: #4f55f1 !important;
+  --primary-deep: #3a40c4 !important;
+  --primary-focus: #494fdf !important;
+  --on-primary: #ffffff !important;
+  --on-dark: #111827 !important;
+  --on-dark-mute: rgba(17, 24, 39, 0.72) !important;
+  --ink: #111827 !important;
+  --ink-muted: #374151 !important;
+  --ink-subtle: #6b7280 !important;
+  --ink-tertiary: #9ca3af !important;
+  --mute: #6b7280 !important;
+  --stone: #9ca3af !important;
+  --ash: #6b7280 !important;
+  --success: #16a34a !important;
+  --danger: #dc2626 !important;
+  --sale: #dc2626 !important;
+  --warning: #d97706 !important;
+  --info: #2563eb !important;
+  --accent-teal: #0d9488 !important;
+  --accent-purple-soft: #6366f1 !important;
+  --bg: #f8f9fb !important;
+  --bg2: #f3f4f6 !important;
+  --card: #ffffff !important;
+  --card2: #f3f4f6 !important;
+  --card3: #e8eaef !important;
+  --border: #e2e5eb !important;
+  --border2: #d0d4dc !important;
+  --text: #111827 !important;
+  --muted: #6b7280 !important;
+  --faint: #9ca3af !important;
+  --profit: #16a34a !important;
+  --loss: #dc2626 !important;
+  --green: #16a34a !important;
+  --red: #dc2626 !important;
+  --blue: #494fdf !important;
+  --purple: #6366f1 !important;
+  --cyan: #0d9488 !important;
+  --accent: #494fdf !important;
+  --shadow: 0 1px 3px rgba(0, 0, 0, 0.06), 0 4px 12px rgba(0, 0, 0, 0.04) !important;
+}
+
+html,
+body {
+  background: #f8f9fb !important;
+  color: #111827 !important;
+}
+
+body {
+  background-image: none !important;
+}
+
+#journallApp.app,
+#journallApp > .main,
+body:not(.firebase-auth-required) #journallApp.app,
+body:not(.firebase-auth-required) #journallApp > .main {
+  background: #f8f9fb !important;
+  color: #111827 !important;
+}
+
+body:not(.firebase-auth-required) #journallApp > .sidebar {
+  background: #ffffff !important;
+  border-right: 1px solid #e2e5eb !important;
+}
+
+body:not(.firebase-auth-required) #journallApp > .sidebar .brand {
+  border-bottom: 1px solid #e2e5eb !important;
+}
+
+body:not(.firebase-auth-required) #journallApp > .sidebar .brand-title {
+  color: #111827 !important;
+}
+
+body:not(.firebase-auth-required) #journallApp > .sidebar .brand-sub {
+  color: #6b7280 !important;
+}
+
+body:not(.firebase-auth-required) #journallApp > .sidebar .nav button {
+  color: #6b7280 !important;
+}
+
+body:not(.firebase-auth-required) #journallApp > .sidebar .nav button:hover {
+  background: #f3f4f6 !important;
+  color: #111827 !important;
+}
+
+body:not(.firebase-auth-required) #journallApp > .sidebar .nav button.active {
+  background: #494fdf !important;
+  color: #ffffff !important;
+}
+
+.sidebar,
+.brand,
+.nav button.active {
+  background: #ffffff !important;
+  border-color: #e2e5eb !important;
+}
+
+.nav button {
+  color: #6b7280 !important;
+}
+
+.nav button:hover {
+  background: #f3f4f6 !important;
+  color: #111827 !important;
+}
+
+.nav button.active {
+  background: #eef0ff !important;
+  color: #494fdf !important;
+  border-color: #494fdf !important;
+}
+
+.logo {
+  background: #eef0ff !important;
+  border: 1px solid #d8dcff !important;
+}
+
+.logo::before {
+  color: #494fdf !important;
+}
+
+.hero,
+.card,
+.sidebox,
+.goal-card,
+.widget,
+.saved-journal-card,
+.analytics-bar-card,
+.cmd-card,
+.ai-score-card,
+.calendar-summary-card,
+.journal-main-card,
+.coach-card,
+.mistake-box,
+.mistake-modal-section,
+.mistake-row,
+.day-trade-card,
+.top .hero {
+  background: #ffffff !important;
+  border: 1px solid #e2e5eb !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04) !important;
+  color: #111827 !important;
+}
+
+.card.soft,
+.metric,
+.mini-stat,
+.ai-msg,
+.insight,
+.graph-kpi,
+.chart-helper,
+.psych-rule,
+.psych-check,
+.checklist-item,
+.checklist-result,
+.journal-import-box,
+.sync-status,
+.journal-sync-status,
+.account-balance-box,
+.trade-journal-tag,
+.journal-video-box {
+  background: #f3f4f6 !important;
+  border: 1px solid #e2e5eb !important;
+  color: #111827 !important;
+}
+
+.brand-title,
+.hero h1,
+.panel-title h3,
+h1, h2, h3,
+.calendar-hero h2,
+.value,
+.goal-card-value,
+.metric-value,
+.ai-score-value,
+.widget-value,
+.cmd-value,
+strong {
+  color: #111827 !important;
+}
+
+.brand-sub,
+.sub,
+.muted,
+.panel-title span,
+.label,
+.sidebox-title,
+.cmd-label,
+.ai-score-label,
+th,
+small,
+.kicker {
+  color: #6b7280 !important;
+}
+
+.btn,
+.ai-chip,
+.journal-status-btn,
+.pill,
+.filter-chip,
+.psych-step,
+.widget-icon-btn {
+  background: #ffffff !important;
+  border: 1px solid #e2e5eb !important;
+  color: #111827 !important;
+}
+
+.btn:hover,
+.ai-chip:hover,
+.journal-status-btn:hover,
+.pill:hover,
+.psych-step:hover {
+  background: #f3f4f6 !important;
+  border-color: #d0d4dc !important;
+  color: #111827 !important;
+}
+
+.btn.primary,
+.file-picker-btn,
+.mobile-upload-btn,
+.pill.active,
+.psych-step.active,
+.journal-result-tabs .btn.active {
+  background: #494fdf !important;
+  color: #ffffff !important;
+  border: 1px solid #494fdf !important;
+}
+
+input,
+select,
+textarea,
+.search input,
+.filters input,
+.filters select,
+.editor textarea,
+.editor input,
+.journal-entry-form input,
+.journal-entry-form select,
+.journal-entry-form textarea {
+  background: #ffffff !important;
+  border: 1px solid #e2e5eb !important;
+  color: #111827 !important;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: #9ca3af !important;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  background: #ffffff !important;
+  border-color: #494fdf !important;
+  outline: 2px solid rgba(73, 79, 223, 0.2) !important;
+}
+
+.table-wrap {
+  background: #ffffff !important;
+  border: 1px solid #e2e5eb !important;
+}
+
+table, thead, tbody, tr, td, th {
+  background: #ffffff !important;
+}
+
+th {
+  background: #f3f4f6 !important;
+  color: #6b7280 !important;
+  border-bottom: 1px solid #e2e5eb !important;
+}
+
+td {
+  color: #111827 !important;
+  border-bottom: 1px solid #f3f4f6 !important;
+}
+
+tr:hover td {
+  background: #f8f9fb !important;
+}
+
+.chart,
+.ai-chat-box {
+  background: #f3f4f6 !important;
+  border: 1px solid #e2e5eb !important;
+}
+
+.bar,
+.drawdown-bar,
+.analytics-track,
+.balance-scale {
+  background: #e8eaef !important;
+}
+
+.bar div,
+.analytics-fill,
+.drawdown-bar span,
+.balance-marker {
+  background: #494fdf !important;
+}
+
+.ai-msg.user {
+  background: #494fdf !important;
+  color: #ffffff !important;
+  border-color: #494fdf !important;
+}
+
+.ai-msg.user strong {
+  color: #ffffff !important;
+}
+
+.ai-msg.bot {
+  background: #f3f4f6 !important;
+  color: #111827 !important;
+}
+
+.calendar-day,
+.calendar-day.profit,
+.calendar-day.lossday,
+.calendar-day.flatday {
+  background: #ffffff !important;
+  border: 1px solid #e2e5eb !important;
+}
+
+.calendar-day:hover {
+  border-color: #494fdf !important;
+}
+
+.modal-backdrop {
+  background: rgba(17, 24, 39, 0.4) !important;
+}
+
+.mistake-modal,
+.day-trades-modal,
+.firebase-auth-gate .firebase-auth-card {
+  background: #ffffff !important;
+  border: 1px solid #e2e5eb !important;
+  color: #111827 !important;
+}
+
+.firebase-auth-gate {
+  background: #f8f9fb !important;
+}
+
+#firebaseAuthGate .firebase-auth-card {
+  background: rgba(255, 255, 255, 0.95) !important;
+  border: 1px solid #e2e5eb !important;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.08) !important;
+}
+
+#firebaseGateSignInBtn {
+  background: #494fdf !important;
+  color: #ffffff !important;
+  box-shadow: 0 4px 12px rgba(73, 79, 223, 0.25) !important;
+}
+
+#firebaseGateSignInBtn:hover {
+  background: #3a40c4 !important;
+}
+
+#bypassAuthBtn {
+  background: #ffffff !important;
+  border: 1px solid #e2e5eb !important;
+  color: #6b7280 !important;
+}
+
+#bypassAuthBtn:hover {
+  background: #f3f4f6 !important;
+  color: #111827 !important;
+  border-color: #d0d4dc !important;
+}
+
+.firebase-auth-message {
+  color: #6b7280 !important;
+}
+
+.mobile-appbar,
+.firebase-auth-bar {
+  background: #ffffff !important;
+  color: #111827 !important;
+  border-color: #e2e5eb !important;
+}
+
+::-webkit-scrollbar-track {
+  background: #f8f9fb !important;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #d0d4dc !important;
+  border: 2px solid #f8f9fb !important;
+}
+
+* {
+  scrollbar-color: #d0d4dc #f8f9fb !important;
+}
+
+#tradingpage > .grid.two:first-of-type > .card:first-child {
+  background: #ffffff !important;
+  border: 1px solid #e2e5eb !important;
+}
+
+#tradingpage > .grid.two:first-of-type > .card:first-child .panel-title h3 {
+  color: #111827 !important;
+}
+
+#tradingpage > .grid.two:first-of-type > .card:first-child .panel-title span {
+  background: #f3f4f6 !important;
+  border: 1px solid #e2e5eb !important;
+  color: #6b7280 !important;
+}
+
+.win {
+  background: rgba(22, 163, 74, 0.1) !important;
+}
+
+.loss {
+  background: rgba(220, 38, 38, 0.1) !important;
+}
+
+.insight {
+  border-left: 4px solid #d0d4dc !important;
+}
+
+.coach-avatar {
+  background: #494fdf !important;
+  color: #ffffff !important;
+}
+
+.psych-check.checked {
+  background: #494fdf !important;
+  color: #ffffff !important;
+  border-color: #494fdf !important;
+}
+
+.psych-check.checked strong,
+.psych-check.checked em {
+  color: #ffffff !important;
+}
+
+/* 17. Premium Geometric SVG Brand Logo (Floating Line Art) */
+#journallApp .logo,
+.firebase-auth-card .logo,
+.logo {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%236366f1'/%3E%3Cstop offset='50%25' stop-color='%234f46e5'/%3E%3Cstop offset='100%25' stop-color='%2310b981'/%3E%3C/linearGradient%3E%3C/defs%3E%3Cpath d='M10 8h8v10a4 4 0 0 1-8 0' stroke='url(%23g)' stroke-width='3' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3Cpath d='M18 8l6-6m0 0h-5m5 0v5' stroke='%2310b981' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3C/svg%3E") !important;
+  background-size: contain !important;
+  background-repeat: no-repeat !important;
+  background-position: center !important;
+  background-color: transparent !important;
+  border: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  filter: drop-shadow(0 0 8px rgba(79, 70, 229, 0.45)) !important;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1) !important;
+}
+
+#journallApp .logo::before,
+#journallApp .logo::after,
+.firebase-auth-card .logo::before,
+.firebase-auth-card .logo::after,
+.logo::before,
+.logo::after {
+  display: none !important;
+  content: none !important;
+}
+
+#journallApp .logo:hover,
+.logo:hover {
+  transform: scale(1.08) !important;
+  filter: drop-shadow(0 0 12px rgba(79, 70, 229, 0.65)) !important;
+}
 </style></body>
 </html>
 
