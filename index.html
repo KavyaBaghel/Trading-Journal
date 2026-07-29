@@ -3049,6 +3049,23 @@ tr:hover {
       </div>
       <div id="mistakeDashboardList" class="mistake-list"></div>
     </div>
+    <!-- Floating Glass Navigation Dock (iPhone iOS style) -->
+    <div class="floating-dock-container">
+      <div class="floating-dock-scroll">
+        <div class="floating-dock-indicator"></div>
+        <button class="dock-btn active" data-tab="tradingpage">Summary</button>
+        <button class="dock-btn" data-tab="dashboard">Analytics</button>
+        <button class="dock-btn" data-tab="grid">Trades</button>
+        <button class="dock-btn" data-tab="journalpage">Journal</button>
+        <button class="dock-btn" data-tab="psychology">Psychology</button>
+        <button class="dock-btn" data-tab="calendar">Calendar</button>
+        <button class="dock-btn" data-tab="reports">Reports</button>
+        <button class="dock-btn" data-tab="widgets">Widgets</button>
+        <button class="dock-btn" data-tab="goals">Goals</button>
+        <button class="dock-btn" data-tab="ailab">AI Coach</button>
+        <button class="dock-btn" data-tab="uploadcsv">Upload</button>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -10186,18 +10203,52 @@ main,
 </style>
 <script>
 (function(){
+  window.updateDockIndicator = function(activeButton) {
+    var indicator = document.querySelector('.floating-dock-indicator');
+    if (!activeButton || !indicator) return;
+
+    var left = activeButton.offsetLeft;
+    var width = activeButton.offsetWidth;
+    var height = activeButton.offsetHeight;
+    var top = activeButton.offsetTop;
+
+    indicator.style.left = left + 'px';
+    indicator.style.width = width + 'px';
+    indicator.style.height = height + 'px';
+    indicator.style.top = top + 'px';
+
+    // Smoothly scroll tab button into view in the horizontal dock container
+    activeButton.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+  };
+
   function showJournallTab(tab){
     if(!tab) return;
     var root = document.getElementById('journallApp') || document;
     var target = document.getElementById(tab);
     if(!target) return;
-    root.querySelectorAll('.nav button[data-tab], [data-tab]').forEach(function(btn){
-      if(btn.closest('.journal-result-tabs')) return;
-      btn.classList.toggle('active', btn.dataset.tab === tab);
+
+    // Toggle active state on all buttons targeting this tab (sidebar AND floating dock)
+    document.querySelectorAll('[data-tab="' + tab + '"]').forEach(function(btn){
+      if(btn.closest('.journal-result-tabs') || btn.closest('.account-onboarding-actions') || btn.classList.contains('mobile-upload-btn')) return;
+      btn.classList.add('active');
     });
+    document.querySelectorAll('[data-tab]').forEach(function(btn){
+      if(btn.closest('.journal-result-tabs') || btn.closest('.account-onboarding-actions') || btn.classList.contains('mobile-upload-btn') || btn.dataset.tab === tab) return;
+      btn.classList.remove('active');
+    });
+
     root.querySelectorAll('.section').forEach(function(section){
       section.classList.toggle('active', section.id === tab);
     });
+
+    // Update floating dock sliding indicator position
+    var activeDockBtn = document.querySelector('.floating-dock-scroll [data-tab="' + tab + '"]');
+    if (activeDockBtn) {
+      setTimeout(function() {
+        window.updateDockIndicator(activeDockBtn);
+      }, 50);
+    }
+
     if(typeof updateHeroTitle === 'function'){
       var activeBtn = root.querySelector('.nav button[data-tab="' + tab + '"]');
       updateHeroTitle(activeBtn ? activeBtn.textContent.trim() : 'Journall');
@@ -10214,16 +10265,35 @@ main,
     }, 80);
   }
   window.showJournallTab = showJournallTab;
+
   document.addEventListener('click', function(event){
-    var btn = event.target.closest('#journallApp .nav button[data-tab]');
-    if(!btn) return;
+    var btn = event.target.closest('[data-tab]');
+    if(!btn || btn.closest('.journal-result-tabs') || btn.closest('.account-onboarding-actions') || btn.classList.contains('mobile-upload-btn')) return;
+    
+    var tab = btn.dataset.tab;
+    var isMainTab = ['tradingpage', 'dashboard', 'grid', 'journalpage', 'psychology', 'calendar', 'reports', 'widgets', 'goals', 'ailab', 'uploadcsv'].includes(tab);
+    if(!isMainTab) return;
+
     event.preventDefault();
     event.stopImmediatePropagation();
-    showJournallTab(btn.dataset.tab);
+    showJournallTab(tab);
   }, true);
+
   document.addEventListener('DOMContentLoaded', function(){
-    var active = document.querySelector('#journallApp .nav button.active[data-tab]') || document.querySelector('#journallApp .nav button[data-tab]');
-    if(active) showJournallTab(active.dataset.tab);
+    var active = document.querySelector('#journallApp .nav button.active[data-tab]') || document.querySelector('.floating-dock-scroll button.active') || document.querySelector('.floating-dock-scroll button');
+    if(active) {
+      showJournallTab(active.dataset.tab);
+      setTimeout(function() {
+        window.updateDockIndicator(active);
+      }, 400);
+    }
+  });
+
+  window.addEventListener('resize', function() {
+    var active = document.querySelector('.floating-dock-scroll button.active');
+    if(active) {
+      window.updateDockIndicator(active);
+    }
   });
 })();
 </script>
@@ -11517,6 +11587,97 @@ body:not(.firebase-auth-required) #journallApp > .sidebar .nav button {
   100% {
     filter: brightness(0.9) drop-shadow(0 0 2px rgba(94, 106, 210, 0.3));
   }
+}
+
+/* Floating Glass Navigation Dock (iOS style) */
+.floating-dock-container {
+  position: fixed !important;
+  bottom: 24px !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  width: min(540px, calc(100% - 32px)) !important;
+  background: rgba(18, 20, 26, 0.72) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-radius: 24px !important;
+  padding: 6px !important;
+  box-shadow: 
+    0 20px 40px rgba(0, 0, 0, 0.6), 
+    0 0 0 1px rgba(255, 255, 255, 0.02),
+    inset 0 1px 1px rgba(255, 255, 255, 0.1) !important;
+  z-index: 9999 !important;
+  overflow: hidden !important;
+  display: none !important;
+}
+
+@media (max-width: 1024px) {
+  .floating-dock-container {
+    display: block !important;
+  }
+  #journallApp > .sidebar,
+  .mobile-appbar {
+    display: none !important;
+  }
+  #journallApp.app {
+    grid-template-columns: 1fr !important;
+  }
+  #journallApp > .main {
+    padding-bottom: 100px !important;
+  }
+}
+
+.floating-dock-scroll {
+  position: relative !important;
+  display: flex !important;
+  gap: 4px !important;
+  overflow-x: auto !important;
+  overflow-y: hidden !important;
+  scrollbar-width: none !important;
+  padding: 2px !important;
+  border-radius: 18px !important;
+  -webkit-overflow-scrolling: touch !important;
+}
+
+.floating-dock-scroll::-webkit-scrollbar {
+  display: none !important;
+}
+
+.floating-dock-indicator {
+  position: absolute !important;
+  background: rgba(255, 255, 255, 0.1) !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  border-radius: 16px !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25) !important;
+  transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1) !important;
+  pointer-events: none !important;
+  z-index: 1 !important;
+}
+
+.dock-btn {
+  position: relative !important;
+  flex: 0 0 auto !important;
+  background: transparent !important;
+  border: none !important;
+  color: #a3a8b4 !important;
+  font-family: var(--sans) !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  padding: 10px 18px !important;
+  border-radius: 16px !important;
+  cursor: pointer !important;
+  transition: color 0.3s ease !important;
+  z-index: 2 !important;
+  user-select: none !important;
+  outline: none !important;
+}
+
+.dock-btn:hover {
+  color: #ffffff !important;
+}
+
+.dock-btn.active {
+  color: #ffffff !important;
 }
 </style></body>
 </html>
