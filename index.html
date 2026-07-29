@@ -3071,10 +3071,26 @@ tr:hover {
 
 <script>
 const baseTrades = [];
-let trades = JSON.parse(localStorage.getItem('viztrade_trades') || '[]');
+
+function cleanDuplicateDeals(arr) {
+  if (!Array.isArray(arr)) return [];
+  return arr.filter(t => {
+    // Skip raw entry deal rows which are mapped as trades with no duration and matching price
+    const isEntryDeal = 
+      t.entry === t.exit && 
+      (t.duration === 0 || !t.duration) && 
+      (t.rawProfit === 0 || !t.rawProfit);
+    return !isEntryDeal;
+  });
+}
+
+let trades = cleanDuplicateDeals(JSON.parse(localStorage.getItem('viztrade_trades') || '[]'));
+localStorage.setItem('viztrade_trades', JSON.stringify(trades));
+
 let filtered = [...trades];
 let charts = {};
-let tradingPageTrades = JSON.parse(localStorage.getItem('viztrade_trading_page_trades') || '[]');
+let tradingPageTrades = cleanDuplicateDeals(JSON.parse(localStorage.getItem('viztrade_trading_page_trades') || '[]'));
+localStorage.setItem('viztrade_trading_page_trades', JSON.stringify(tradingPageTrades));
 let journalPageEntries = JSON.parse(localStorage.getItem('krishna_journal_page_entries') || '[]');
 
 const fmt = n => signedMoney(n);
@@ -4978,7 +4994,7 @@ function mergeImportedTrades(existingTrades, incomingTrades){
 function restoreTradesFromStorageIfNeeded(){
   if(Array.isArray(trades) && trades.length) return;
   try{
-    const saved = JSON.parse(localStorage.getItem('viztrade_trades') || '[]');
+    const saved = cleanDuplicateDeals(JSON.parse(localStorage.getItem('viztrade_trades') || '[]'));
     if(Array.isArray(saved) && saved.length){
       trades = saved;
       filtered = [...trades];
