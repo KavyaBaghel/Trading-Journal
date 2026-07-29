@@ -7653,6 +7653,19 @@ document.querySelectorAll('.nav button').forEach(btn=>{
 })();
 
 window.currentUser = null;
+window.splashHoldActive = true;
+window.journalAlreadyOpened = false;
+
+// Artificial delay of 2 seconds for a premium cinematic splash intro
+setTimeout(function() {
+  window.splashHoldActive = false;
+  if (window.currentUser && window.setGateVisible && !window.journalAlreadyOpened) {
+    window.journalAlreadyOpened = true;
+    window.setGateVisible(false);
+    if(typeof window.renderAll === 'function') window.renderAll();
+    if(typeof ensureAccountOnboarding === 'function') ensureAccountOnboarding();
+  }
+}, 2000);
 
 window.bypassAuthAndOpenLocal = function(){
   localStorage.setItem('journall_auth_bypassed', '1');
@@ -7661,10 +7674,15 @@ window.bypassAuthAndOpenLocal = function(){
 };
 
 window.openSignedInJournal = function(message){
-  window.setGateVisible(false);
   window.setAuthStatus(message || 'Journal opened on this device.');
+  if (window.splashHoldActive) {
+    if(typeof window.renderAll === 'function') window.renderAll();
+    return;
+  }
+  window.journalAlreadyOpened = true;
+  window.setGateVisible(false);
   if(typeof window.renderAll === 'function') window.renderAll();
-  ensureAccountOnboarding();
+  if(typeof ensureAccountOnboarding === 'function') ensureAccountOnboarding();
 };
 
 window.setGateVisible = function(visible){
@@ -7859,6 +7877,12 @@ async function loadCloudState(){
   }
   cloudReady = true;
   patchLocalStorageForCloud();
+  if (window.splashHoldActive) {
+    window.setAuthStatus(`Signed in as ${window.currentUser.displayName || window.currentUser.email || 'trader'}`);
+    if(typeof window.renderAll === 'function') window.renderAll();
+    return;
+  }
+  window.journalAlreadyOpened = true;
   window.setGateVisible(false);
   window.setAuthStatus(`Signed in as ${window.currentUser.displayName || window.currentUser.email || 'trader'}`);
   if(typeof window.renderAll === 'function') window.renderAll();
