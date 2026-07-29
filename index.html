@@ -7723,8 +7723,9 @@ document.querySelectorAll('.nav button').forEach(btn=>{
     });
     // Force page reload when the new service worker activates and takes control
     let refreshing = false;
+    const hasController = !!navigator.serviceWorker.controller;
     navigator.serviceWorker.addEventListener('controllerchange', () => {
-      if (!refreshing) {
+      if (hasController && !refreshing) {
         refreshing = true;
         window.location.reload();
       }
@@ -7757,7 +7758,7 @@ window.currentUser = null;
 window.splashHoldActive = true;
 window.journalAlreadyOpened = false;
 
-// Artificial delay of 2 seconds for a premium cinematic splash intro
+// Artificial delay of 1 second for a premium cinematic splash intro
 setTimeout(function() {
   window.splashHoldActive = false;
   if (window.currentUser && window.setGateVisible && !window.journalAlreadyOpened) {
@@ -7766,7 +7767,7 @@ setTimeout(function() {
     if(typeof window.renderAll === 'function') window.renderAll();
     if(typeof ensureAccountOnboarding === 'function') ensureAccountOnboarding();
   }
-}, 2000);
+}, 1000);
 
 window.bypassAuthAndOpenLocal = function(){
   localStorage.setItem('journall_auth_bypassed', '1');
@@ -7906,11 +7907,35 @@ function collectLocalState(){
   return storage;
 }
 
+window.journallReloadDataFromStorage = function() {
+  if (typeof cleanDuplicateDeals === 'function') {
+    trades = cleanDuplicateDeals(JSON.parse(localStorage.getItem('viztrade_trades') || '[]'));
+    tradingPageTrades = cleanDuplicateDeals(JSON.parse(localStorage.getItem('viztrade_trading_page_trades') || '[]'));
+  } else {
+    trades = JSON.parse(localStorage.getItem('viztrade_trades') || '[]');
+    tradingPageTrades = JSON.parse(localStorage.getItem('viztrade_trading_page_trades') || '[]');
+  }
+  filtered = [...trades];
+  journalPageEntries = JSON.parse(localStorage.getItem('krishna_journal_page_entries') || '[]');
+  
+  if (typeof renderAll === 'function') renderAll();
+  if (typeof renderCalendar === 'function') renderCalendar();
+  if (typeof renderTradingPage === 'function') renderTradingPage();
+  if (typeof renderJournalPage === 'function') renderJournalPage();
+};
+
 function applyCloudState(storage){
-  if(!storage || typeof storage !== 'object') return;
+  if(!storage || typeof storage !== 'object') return false;
+  let changed = false;
   Object.entries(storage).forEach(([key,value])=>{
-    if(shouldSyncKey(key) && typeof value === 'string') localStorage.setItem(key, value);
+    if(shouldSyncKey(key) && typeof value === 'string'){
+      if(localStorage.getItem(key) !== value){
+        localStorage.setItem(key, value);
+        changed = true;
+      }
+    }
   });
+  return changed;
 }
 
 function hasMeaningfulLocalState(){
@@ -7963,11 +7988,9 @@ async function loadCloudState(){
   const ref = doc(firestoreDb, 'users', currentUser.uid, 'journallState', 'main');
   const snap = await getDoc(ref);
   if(snap.exists() && snap.data()?.storage){
-    applyCloudState(snap.data().storage);
-    if(sessionStorage.getItem('journall:cloud-loaded') !== currentUser.uid){
-      sessionStorage.setItem('journall:cloud-loaded', currentUser.uid);
-      location.reload();
-      return;
+    const changed = applyCloudState(snap.data().storage);
+    if(changed && typeof window.journallReloadDataFromStorage === 'function') {
+      window.journallReloadDataFromStorage();
     }
   }else if(hasMeaningfulLocalState()){
     await setDoc(ref, {
@@ -11836,7 +11859,7 @@ body:not(.firebase-auth-required) #journallApp > .sidebar .nav button {
 
 .firebase-auth-gate.show,
 #journallApp {
-  animation: luxury-fade-in 1.5s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+  animation: luxury-fade-in 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
 }
 </style></body>
 </html>
