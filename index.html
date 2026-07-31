@@ -3387,8 +3387,12 @@ function renderSide(){
   const maxTrades = Number(state.maxTrades) || 0;
   const tradeProgress = maxTrades ? Math.min(100, todayTrades.length / maxTrades * 100) : null;
   const lossProgress = dailyLimit ? Math.min(100, lossUsed / dailyLimit * 100) : null;
-  const maxLossProgress = lossProgress;
   const pnlProgress = dailyLimit && todayPnl > 0 ? Math.min(100, todayPnl / dailyLimit * 100) : 0;
+  
+  const todayWins = todayTrades.filter(t => (Number(t.pnl) || 0) > 0).length;
+  const winRateVal = todayTrades.length ? (todayWins / todayTrades.length * 100) : 0;
+  const winRateText = todayTrades.length ? `${Math.round(winRateVal)}% (${todayWins}/${todayTrades.length})` : '0% (0/0)';
+
   const todayJournalEntries = journalPageEntries.filter(e=>{
     const t = e.trade || (e.tradeKey ? findTradeByKey(e.tradeKey) : null);
     return (t?.date || e.date) === today && (!isJournalEntryDone || isJournalEntryDone(e));
@@ -3414,8 +3418,8 @@ function renderSide(){
       ${progressBar(tradeProgress, 'trades')}
       <div class="mini-stat"><span>Today P&L</span><strong class="${pnlClass(todayPnl)}">${fmt(todayPnl)}</strong></div>
       ${progressBar(pnlProgress, 'pnl')}
-      <div class="mini-stat"><span>Max Loss</span><strong class="${dailyLimit && lossUsed >= dailyLimit ? 'red' : 'neutral'}">$${lossUsed.toFixed(2)}${dailyLimit ? ' / $'+dailyLimit.toFixed(2) : ' / not set'}</strong></div>
-      ${progressBar(maxLossProgress, 'loss')}`;
+      <div class="mini-stat"><span>Win Rate</span><strong class="neutral">${winRateText}</strong></div>
+      ${progressBar(winRateVal, 'pnl')}`;
   }
 
   const sideRuleBreaks=document.getElementById('sideRuleBreaks');
