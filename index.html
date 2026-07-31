@@ -2931,7 +2931,6 @@ tr:hover {
             <input id="journalSearch" placeholder="Search journals, symbol, date..." oninput="renderJournalPage()">
             <label class="btn primary" for="oldJournalImportFile" onclick="document.getElementById('oldJournalImportFile').value=''" style="cursor: pointer; display: inline-flex; align-items: center; justify-content: center; margin: 0;">Import Old</label>
             <button class="btn" onclick="exportJournalPageEntries()">Export</button>
-            <button class="btn" style="border-color:rgba(255,119,136,.25);color:var(--red)" onclick="clearAllJournalPageEntries()">Clear All</button>
           </div>
           <div class="journal-result-tabs">
             <button class="btn active" data-journal-result-tab="" onclick="setJournalSavedFilter('')">All</button>
@@ -5747,7 +5746,7 @@ function handleCSVUpload(event){
 
 
 function resetAllData(){
-  const confirmReset = confirm('Reset ALL journal data? This will clear notes, plans, AI widgets, filters, and imported trade modifications.');
+  const confirmReset = confirm('Reset all trade metrics and filters? This will clear imported trades, trading plans, stats charts, and metrics filters.\n\nNote: Your written journal notes/entries will NOT be touched or deleted.');
   if(!confirmReset) return;
 
   localStorage.removeItem('viztrade_widgets');
@@ -7114,11 +7113,7 @@ function deleteJournalPageEntry(id){
 }
 
 function clearAllJournalPageEntries(){
-  if(!confirm('Delete all saved journal entries?')) return;
-  journalPageEntries = [];
-  localStorage.removeItem('krishna_journal_page_entries');
-  renderJournalPage();
-  renderGrid();
+  alert('Bulk deletion of journals is disabled to protect your data. Written journals can only be deleted individually.');
 }
 
 function exportJournalPageEntries(){
