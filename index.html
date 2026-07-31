@@ -5700,7 +5700,20 @@ function handleCSVUpload(event){
     }
 
     const previousCount = Array.isArray(trades) ? trades.length : 0;
-    trades = mergeImportedTrades(trades, parsed);
+    let shouldReplace = false;
+    if (previousCount > 0) {
+      shouldReplace = confirm("Would you like to clear your existing journal data and replace it with this new file?\n\nClick 'OK' to replace (overwrite) your journal.\nClick 'Cancel' to merge the new trades with your existing ones.");
+    }
+    
+    if (shouldReplace) {
+      trades = parsed;
+      if (typeof cleanDuplicateDeals === 'function') {
+        trades = cleanDuplicateDeals(trades);
+      }
+    } else {
+      trades = mergeImportedTrades(trades, parsed);
+    }
+    
     filtered = [...trades];
     saveTrades();
 
@@ -11860,6 +11873,39 @@ body:not(.firebase-auth-required) #journallApp > .sidebar .nav button {
 .firebase-auth-gate.show,
 #journallApp {
   animation: luxury-fade-in 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+}
+
+/* Explicit Select Option & Alignment Fix inside Account Setup overlay (Desktop support) */
+.account-onboarding-card select,
+#accountOnboardingGate select {
+  height: 38px !important;
+  padding: 0 28px 0 12px !important;
+  background-color: #16181d !important;
+  color: #ffffff !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-radius: 10px !important;
+  box-sizing: border-box !important;
+  vertical-align: middle !important;
+  cursor: pointer !important;
+}
+
+.account-onboarding-card select option,
+#accountOnboardingGate select option {
+  background-color: #16181d !important;
+  color: #ffffff !important;
+}
+
+/* Flex layout wrap protection for inline fields */
+.account-inline-field {
+  display: flex !important;
+  gap: 10px !important;
+  align-items: center !important;
+  flex-wrap: nowrap !important;
+}
+
+.account-inline-field select {
+  width: 92px !important;
+  flex-shrink: 0 !important;
 }
 </style></body>
 </html>
