@@ -2207,6 +2207,7 @@ tr:hover {
 }
 #journallApp .bar.loss > div { background:linear-gradient(90deg, #e5484d, #f87171) !important; }
 #journallApp .bar.trades > div { background:linear-gradient(90deg, #5e6ad2, #828fff) !important; }
+#journallApp .bar.pnl > div { background:linear-gradient(90deg, #22c55e, #4ade80) !important; }
 #journallApp .bar.is-empty > div { background:transparent !important; }
 #journallApp .psych-step.locked {
   opacity:.45 !important;
@@ -3386,6 +3387,7 @@ function renderSide(){
   const tradeProgress = maxTrades ? Math.min(100, todayTrades.length / maxTrades * 100) : null;
   const lossProgress = dailyLimit ? Math.min(100, lossUsed / dailyLimit * 100) : null;
   const maxLossProgress = lossProgress;
+  const pnlProgress = dailyLimit && todayPnl > 0 ? Math.min(100, todayPnl / dailyLimit * 100) : 0;
   const todayJournalEntries = journalPageEntries.filter(e=>{
     const t = e.trade || (e.tradeKey ? findTradeByKey(e.tradeKey) : null);
     return (t?.date || e.date) === today && (!isJournalEntryDone || isJournalEntryDone(e));
@@ -3410,6 +3412,7 @@ function renderSide(){
       <div class="mini-stat"><span>Trade Limit</span><strong class="${maxTrades && todayTrades.length >= maxTrades ? 'red' : 'neutral'}">${maxTrades ? todayTrades.length+'/'+maxTrades : 'Set in account'}</strong></div>
       ${progressBar(tradeProgress, 'trades')}
       <div class="mini-stat"><span>Today P&L</span><strong class="${pnlClass(todayPnl)}">${fmt(todayPnl)}</strong></div>
+      ${progressBar(pnlProgress, 'pnl')}
       <div class="mini-stat"><span>Max Loss</span><strong class="${dailyLimit && lossUsed >= dailyLimit ? 'red' : 'neutral'}">$${lossUsed.toFixed(2)}${dailyLimit ? ' / $'+dailyLimit.toFixed(2) : ' / not set'}</strong></div>
       ${progressBar(maxLossProgress, 'loss')}`;
   }
@@ -4255,10 +4258,61 @@ function renderRuleBasedDashboardInsights(){
 function renderAIReportText(text){
   const cleaned = cleanAIReportText(text);
   if(!cleaned) return renderRuleBasedDashboardInsights();
-  const clean = escapeHtml(cleaned).replace(/\r?\n/g,'<br>');
-  const chunks = clean.split(/<br>\s*<br>/).filter(Boolean).slice(0,6);
-  if(!chunks.length) return renderRuleBasedDashboardInsights();
-  return chunks.map((part,i)=>`<div class="insight ${i===0?'good':i===1?'warn':''}">${part}</div>`).join('');
+  
+  // Find all matches for Report Card sections
+  const cards = [];
+  const matches = [...cleaned.matchAll(/(?:Report Card\s*\d+|Card\s*\d+|\b\d+\b\s*:\s*Diagnosis)/gi)];
+  
+  if (matches.length > 1) {
+    for (let i = 0; i < matches.length; i++) {
+      const start = matches[i].index;
+      const end = (i + 1 < matches.length) ? matches[i+1].index : cleaned.length;
+      cards.push(cleaned.slice(start, end).trim());
+    }
+  } else {
+    // Fallback: split by newlines
+    cards.push(...cleaned.split(/\n\s*\n/).map(c => c.trim()).filter(Boolean));
+  }
+  
+  if(!cards.length) return renderRuleBasedDashboardInsights();
+  
+  return cards.map((card, i) => {
+    let title = `Report Card ${i+1}`;
+    let diagnosis = '';
+    let action = '';
+    
+    const lines = card.split('\n').map(l => l.trim()).filter(Boolean);
+    if (lines.length > 0) {
+      if (lines[0].toLowerCase().includes('card') || /^\d+$/.test(lines[0]) || lines[0].toLowerCase().startsWith('report')) {
+        title = lines[0];
+        lines.shift();
+      }
+    }
+    
+    const rest = lines.join(' ');
+    const diagMatch = rest.match(/Diagnosis:\s*(.*?)(?=Action:|$)/i);
+    const actMatch = rest.match(/Action:\s*(.*)/i);
+    
+    if (diagMatch) diagnosis = diagMatch[1].trim();
+    if (actMatch) action = actMatch[1].trim();
+    
+    if (!diagnosis && !action) {
+      diagnosis = rest;
+    }
+    
+    const tones = ['verdict', 'mistake', 'decision', 'strength', 'reminder', 'setup'];
+    const tone = tones[i % tones.length];
+    
+    return `
+      <div class="insight" style="border-left: 4px solid var(--accent-${tone}, #494fdf) !important; margin-bottom: 14px !important; padding: 16px 20px !important; border-radius: 12px !important; background: rgba(255,255,255,0.02) !important; border-top: 1px solid rgba(255,255,255,0.03) !important; border-right: 1px solid rgba(255,255,255,0.03) !important; border-bottom: 1px solid rgba(255,255,255,0.03) !important;">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
+          <span style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--accent-${tone}, #494fdf); letter-spacing: 1px;">${escapeHtml(title)}</span>
+        </div>
+        ${diagnosis ? `<div style="font-size: 14px; line-height: 1.6; color: #ffffff; margin-bottom: 10px;"><strong>Diagnosis:</strong> ${escapeHtml(diagnosis)}</div>` : ''}
+        ${action ? `<div style="font-size: 13px; line-height: 1.6; color: rgba(255,255,255,0.7);"><strong>Action:</strong> ${escapeHtml(action)}</div>` : ''}
+      </div>
+    `;
+  }).join('');
 }
 
 function renderReports(){
@@ -4370,7 +4424,8 @@ async function generateAIReports(){
     renderInsights();
   }catch(err){
     if(status) status.textContent = 'Assistant unavailable right now - try again shortly.';
-    if(box) box.innerHTML = `<div class="insight danger"><strong>AI report failed.</strong><br>${escapeHtml(err?.message || err || 'AI connection failed')}</div>`;
+    console.error('AI report failed details:', err);
+    if(box) box.innerHTML = `<div class="insight danger"><strong>AI report failed.</strong><br>Cloud AI is temporarily busy. Please try again in a few moments.</div>`;
   }
 }
 
@@ -7878,8 +7933,9 @@ document.querySelectorAll('.nav button').forEach(btn=>{
       } catch (fallbackError) {
         console.error('Rule-based fallback failed:', fallbackError);
       }
-      addMessage('bot', `<strong>AI Coach:</strong> ${fallback}<br><br><span class="ai-connection-detail">Cloud connection: ${reason}</span>`);
-      setStatus(`Cloud AI unavailable: ${reason}`, 'bad');
+      addMessage('bot', `<strong>AI Coach:</strong> ${fallback}`);
+      setStatus(`Cloud AI unavailable`, 'bad');
+      console.warn('Cloud AI connection details:', reason);
       console.error('Cloud AI coach failed:', err);
     }
     if(input) input.value = '';
@@ -11304,9 +11360,9 @@ input{
 }
 
 #journallApp .psych-check.checked {
-  background: linear-gradient(135deg, rgba(39, 166, 68, 0.16), rgba(94, 106, 210, 0.04)) !important;
-  border-color: rgba(39, 166, 68, 0.45) !important;
-  box-shadow: 0 8px 24px rgba(39, 166, 68, 0.15), 0 0 10px rgba(39, 166, 68, 0.05) !important;
+  background: linear-gradient(135deg, rgba(73, 79, 223, 0.16), rgba(94, 106, 210, 0.04)) !important;
+  border-color: rgba(73, 79, 223, 0.45) !important;
+  box-shadow: 0 8px 24px rgba(73, 79, 223, 0.15), 0 0 10px rgba(73, 79, 223, 0.05) !important;
 }
 
 /* 6. Navigation items active transitions */
