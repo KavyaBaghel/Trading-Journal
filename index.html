@@ -4564,7 +4564,7 @@ function renderHeatmap(){
   if(!filtered.length){ document.getElementById('heatmap').innerHTML='<div class="insight">No trades yet. Upload CSV to build heatmap.</div>'; return; }
   const days=['Mon','Tue','Wed','Thu','Fri']; let h='<div class="heatcell heatlabel">Day / Hr</div>';
   for(let i=0;i<24;i++) h+=`<div class="heatcell">${i}</div>`;
-  days.forEach(day=>{h+=`<div class="heatcell heatlabel">${day}</div>`; for(let hr=0;hr<24;hr++){const arr=filtered.filter(t=>t.weekday===day&&t.hour===hr); const p=arr.reduce((a,b)=>a+b.pnl,0); h+=`<div class="heatcell" title="${day} ${hr}:00 | ${arr.length} trades | ${fmt(p)}" style="background:${arr.length?(p>0?'rgba(39,166,68,0.3)':p<0?'rgba(192,57,43,0.3)':'rgba(255,255,255,0.04)'):'rgba(255,255,255,.025)'};color:${p>0?'var(--green)':p<0?'var(--red)':'var(--muted)'}">${arr.length||''}</div>`;}});
+  days.forEach(day=>{h+=`<div class="heatcell heatlabel">${day}</div>`; for(let hr=0;hr<24;hr++){const arr=filtered.filter(t=>t.weekday===day&&t.hour===hr); const p=arr.reduce((a,b)=>a+b.pnl,0); h+=`<div class="heatcell ${arr.length?(p>0?'profit':p<0?'loss':''):''}" title="${day} ${hr}:00 | ${arr.length} trades | ${fmt(p)}">${arr.length||''}</div>`;}});
   document.getElementById('heatmap').innerHTML=h;
 }
 
@@ -9946,15 +9946,20 @@ main,
   background: rgba(255,255,255,0.03) !important;
   border: 1px solid rgba(255,255,255,0.04) !important;
 }
-#journallApp .heatcell[style*="39,166,68"],
-#journallApp .heatcell.profit,
-#journallApp [class*="heatcell"][class*="profit"] {
-  background: rgba(39,166,68,0.3) !important;
+#journallApp .heatmap {
+  padding-bottom: 16px !important;
 }
-#journallApp .heatcell[style*="192,57,43"],
-#journallApp .heatcell.loss,
-#journallApp [class*="heatcell"][class*="loss"] {
-  background: rgba(192,57,43,0.3) !important;
+
+#journallApp .heatcell.profit {
+  background: rgba(34, 197, 94, 0.18) !important;
+  color: #4ade80 !important;
+  border-color: rgba(34, 197, 94, 0.25) !important;
+}
+
+#journallApp .heatcell.loss {
+  background: rgba(239, 68, 68, 0.18) !important;
+  color: #f87171 !important;
+  border-color: rgba(239, 68, 68, 0.25) !important;
 }
 
 #journallApp .trade-select,
@@ -10922,8 +10927,8 @@ input{
   transform:scale(.98)!important;
 }
 #journallApp #preTradeChecklist .checklist-item.checked{
-  background:rgba(39,166,68,.08)!important;
-  border-color:rgba(39,166,68,.35)!important;
+  background:rgba(73,79,223,.08)!important;
+  border-color:rgba(73,79,223,.35)!important;
 }
 #journallApp .check-icon,
 #journallApp .checklist-result-icon{
@@ -10943,8 +10948,8 @@ input{
 }
 #journallApp .check-icon.done,
 #journallApp .checklist-result-icon.pass{
-  background:#27a644!important;
-  border-color:#27a644!important;
+  background:#494fdf!important;
+  border-color:#494fdf!important;
   transform:scale(1)!important;
 }
 #journallApp .check-icon.done::after,
@@ -11293,6 +11298,8 @@ body:not(.firebase-auth-required) #journallApp > .sidebar .brand {
   text-align: center !important;
   border: none !important;
   background: transparent !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
   color: #ffffff !important;
   font-size: 15px !important;
   font-weight: 600 !important;
