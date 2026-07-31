@@ -1965,7 +1965,7 @@ body.modal-open .sidebar{
 /* Top stat row (4 columns) */
 .psych-progress {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(5, 1fr);
   gap: 12px;
   margin-bottom: 24px;
 }
@@ -2214,8 +2214,9 @@ tr:hover {
   cursor:not-allowed !important;
 }
 #journallApp .psych-step.completed {
-  border-color:rgba(39,166,68,.45) !important;
-  color:#27a644 !important;
+  border-color: rgba(73, 79, 223, 0.45) !important;
+  color: #a3aeff !important;
+  background: rgba(73, 79, 223, 0.15) !important;
 }
 #journallApp .psych-intro {
   margin:0 0 16px !important;
@@ -11151,10 +11152,10 @@ html.firebase-auth-required body{
 .psych-step.completed,
 .psych-progress .psych-step.done,
 .psych-step.done {
-  background: rgba(39,166,68,0.15) !important;
-  background-color: rgba(39,166,68,0.15) !important;
-  border-color: rgba(39,166,68,0.3) !important;
-  color: #27a644 !important;
+  background: rgba(73, 79, 223, 0.15) !important;
+  background-color: rgba(73, 79, 223, 0.15) !important;
+  border-color: rgba(73, 79, 223, 0.3) !important;
+  color: #a3aeff !important;
 }
 .psych-check {
   background: #0a0a0a !important;
@@ -11356,6 +11357,15 @@ input{
 </style>
 <style id="journall-premium-ui-experience">
 /* Premium visual aesthetics, micro-animations, and dynamic motion engine */
+
+#reportCards {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)) !important;
+  gap: 16px !important;
+  width: 100% !important;
+  margin-top: 12px !important;
+}
+
 
 /* 1. Core Card Glassmorphism & Hover Lift */
 #journallApp .card,
