@@ -9778,7 +9778,7 @@ p{
   padding: 0 4px !important;
 }
 
-#journallApp #sideDailyRules > div,
+#journallApp #sideDailyRules > .mini-stat,
 #journallApp #sideDailyRules tr,
 #journallApp #sideDailyRules .rule-row {
   display: flex !important;
@@ -10179,12 +10179,12 @@ body:not(.firebase-auth-required) #journallApp > .sidebar .nav [data-tab].active
   text-transform: uppercase !important;
   animation: fadeInUp 300ms cubic-bezier(0.0,0,0.2,1) both !important;
 }
-#journallApp .sidebox > div,
-#journallApp #sideDailyRules > div {
+#journallApp .sidebox > .mini-stat,
+#journallApp #sideDailyRules > .mini-stat {
   transition: background 100ms cubic-bezier(0.0,0,0.2,1) !important;
 }
-#journallApp .sidebox > div:hover,
-#journallApp #sideDailyRules > div:hover {
+#journallApp .sidebox > .mini-stat:hover,
+#journallApp #sideDailyRules > .mini-stat:hover {
   background: rgba(255,255,255,0.04) !important;
   border-radius: 6px !important;
 }
@@ -11357,6 +11357,45 @@ input{
 </style>
 <style id="journall-premium-ui-experience">
 /* Premium visual aesthetics, micro-animations, and dynamic motion engine */
+
+#journallApp .bar {
+  display: block !important;
+  height: 10px !important;
+  background: rgba(255, 255, 255, 0.05) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-radius: 999px !important;
+  overflow: hidden !important;
+  margin: 4px 0 10px 0 !important;
+  padding: 0 !important;
+  width: 100% !important;
+  box-shadow: none !important;
+}
+#journallApp .bar > div {
+  display: block !important;
+  height: 100% !important;
+  min-width: 0 !important;
+  background: linear-gradient(90deg, #5e6ad2, #828fff) !important;
+  background-image: linear-gradient(90deg, #5e6ad2, #828fff) !important;
+  border-radius: 999px !important;
+  transition: width 180ms ease !important;
+}
+#journallApp .bar.loss > div {
+  background: linear-gradient(90deg, #e5484d, #f87171) !important;
+  background-image: linear-gradient(90deg, #e5484d, #f87171) !important;
+}
+#journallApp .bar.trades > div {
+  background: linear-gradient(90deg, #5e6ad2, #828fff) !important;
+  background-image: linear-gradient(90deg, #5e6ad2, #828fff) !important;
+}
+#journallApp .bar.pnl > div {
+  background: linear-gradient(90deg, #22c55e, #4ade80) !important;
+  background-image: linear-gradient(90deg, #22c55e, #4ade80) !important;
+}
+#journallApp .bar.is-empty > div {
+  background: transparent !important;
+  background-image: none !important;
+}
+
 
 #reportCards {
   display: grid !important;
