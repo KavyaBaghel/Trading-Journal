@@ -2374,7 +2374,7 @@ tr:hover {
       <button class="active" data-tab="tradingpage">Today's Summary</button>
       <button data-tab="dashboard">Analytics</button>
       <button data-tab="grid">Trades</button>
-      <button data-tab="journalpage">Old Trades</button>
+      <button data-tab="journalpage">Journal</button>
       <button data-tab="psychology">Psychology</button>
       <button data-tab="calendar">Calendar</button>
       <button data-tab="reports">Reports</button>
@@ -5959,14 +5959,7 @@ function renderTradingPage(){
   renderPostSessionReview(todayTrades);
 }
 
-const preTradeChecklistState = {
-  news:false,
-  emotion:false,
-  risk:false,
-  obFvg:false,
-  liquiditySweep:false,
-  rrExit:false
-};
+const preTradeChecklistState = JSON.parse(localStorage.getItem('krishna_pre_trade_checklist_state') || '{"news":false,"emotion":false,"risk":false,"obFvg":false,"liquiditySweep":false,"rrExit":false}');;
 
 const PSYCH_MIND_KEYS = ['sleep','calm','patience','lossAccept','noNeed','rules','risk','time','journal'];
 const PSYCH_STORAGE_KEY = 'journall_psychology_checks';
@@ -6059,6 +6052,7 @@ function completeLiveTradeRules(){
   flow.liveRulesComplete = true;
   flow.liveRulesCompletedAt = new Date().toISOString();
   savePsychologyFlowState(flow);
+  clearPsychologyDraft();
   showPsychologyPage('journal');
 }
 
@@ -6074,11 +6068,128 @@ function savePsychologyTomorrowRule(){
   return true;
 }
 
+function initDraftAutoSync() {
+  const journalInputs = [
+    'journalSetupCategory',
+    'journalGoodEntryPoint',
+    'journalEntryConfirmation',
+    'journalExitConfirmation',
+    'journalMistake',
+    'journalEmotionBefore',
+    'journalEmotionAfter',
+    'journalImprovement'
+  ];
+  
+  journalInputs.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) {
+      el.addEventListener('input', saveJournalDraft);
+      el.addEventListener('change', saveJournalDraft);
+    }
+  });
+  
+  const psychInputs = [
+    'psychTomorrowRule',
+    'psychDebriefMistakes',
+    'psychDebriefNotes'
+  ];
+  
+  psychInputs.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) {
+      el.addEventListener('input', savePsychologyDraft);
+    }
+  });
+}
+
+function saveJournalDraft() {
+  const draft = {
+    id: document.getElementById('journalId')?.value || '',
+    tradeKey: document.getElementById('journalTradeKey')?.value || '',
+    category: document.getElementById('journalSetupCategory')?.value || '',
+    goodEntry: document.getElementById('journalGoodEntryPoint')?.value || '',
+    entryConf: document.getElementById('journalEntryConfirmation')?.value || '',
+    exitConf: document.getElementById('journalExitConfirmation')?.value || '',
+    mistake: document.getElementById('journalMistake')?.value || '',
+    emotionBefore: document.getElementById('journalEmotionBefore')?.value || '',
+    emotionAfter: document.getElementById('journalEmotionAfter')?.value || '',
+    improvement: document.getElementById('journalImprovement')?.value || ''
+  };
+  localStorage.setItem('krishna_journal_form_draft', JSON.stringify(draft));
+}
+
+function loadJournalDraft() {
+  try {
+    const draftRaw = localStorage.getItem('krishna_journal_form_draft');
+    if (!draftRaw) return;
+    const draft = JSON.parse(draftRaw);
+    
+    const setVal = (id, val) => {
+      const el = document.getElementById(id);
+      if (el && el.value !== val) {
+        el.value = val || '';
+      }
+    };
+    
+    setVal('journalId', draft.id);
+    setVal('journalTradeKey', draft.tradeKey);
+    setVal('journalSetupCategory', draft.category);
+    setVal('journalGoodEntryPoint', draft.goodEntry);
+    setVal('journalEntryConfirmation', draft.entryConf);
+    setVal('journalExitConfirmation', draft.exitConf);
+    setVal('journalMistake', draft.mistake);
+    setVal('journalEmotionBefore', draft.emotionBefore);
+    setVal('journalEmotionAfter', draft.emotionAfter);
+    setVal('journalImprovement', draft.improvement);
+  } catch (e) {
+    console.warn("Could not load journal draft", e);
+  }
+}
+
+function clearJournalDraft() {
+  localStorage.removeItem('krishna_journal_form_draft');
+}
+
+function savePsychologyDraft() {
+  const draft = {
+    tomorrowRule: document.getElementById('psychTomorrowRule')?.value || '',
+    debriefMistakes: document.getElementById('psychDebriefMistakes')?.value || '',
+    debriefNotes: document.getElementById('psychDebriefNotes')?.value || ''
+  };
+  localStorage.setItem('krishna_psychology_form_draft', JSON.stringify(draft));
+}
+
+function loadPsychologyDraft() {
+  try {
+    const draftRaw = localStorage.getItem('krishna_psychology_form_draft');
+    if (!draftRaw) return;
+    const draft = JSON.parse(draftRaw);
+    
+    const setVal = (id, val) => {
+      const el = document.getElementById(id);
+      if (el && el.value !== val) {
+        el.value = val || '';
+      }
+    };
+    
+    setVal('psychTomorrowRule', draft.tomorrowRule);
+    setVal('psychDebriefMistakes', draft.debriefMistakes);
+    setVal('psychDebriefNotes', draft.debriefNotes);
+  } catch (e) {
+    console.warn("Could not load psychology draft", e);
+  }
+}
+
+function clearPsychologyDraft() {
+  localStorage.removeItem('krishna_psychology_form_draft');
+}
+
 function savePsychologyLivePlan(){
   const flow = getPsychologyFlowState();
   flow.liveComplete = true;
   flow.liveCompletedAt = new Date().toISOString();
   savePsychologyFlowState(flow);
+  clearPsychologyDraft();
   const input = document.getElementById('psychTomorrowRule');
   if(input && input.value.trim()) savePsychologyTomorrowRule();
   showPsychologyPage('journal');
@@ -6236,6 +6347,7 @@ function renderCommandCenter(todayTrades){
 function toggleChecklistCheck(id){
   if(!(id in preTradeChecklistState)) return;
   preTradeChecklistState[id] = !preTradeChecklistState[id];
+  localStorage.setItem('krishna_pre_trade_checklist_state', JSON.stringify(preTradeChecklistState));
   updateChecklist();
 }
 
@@ -7119,6 +7231,7 @@ function saveJournalPageEntry(){
   else journalPageEntries.unshift(entry);
 
   localStorage.setItem('krishna_journal_page_entries', JSON.stringify(journalPageEntries));
+  clearJournalDraft();
   alert('Trade journal saved.');
   renderJournalPage();
   renderCalendar();
@@ -7129,6 +7242,7 @@ function saveJournalPageEntry(){
 
 
 function clearJournalPageForm(){
+  clearJournalDraft();
   ['journalId','journalTradeKey','journalScreenshotData','journalSetupCategory','journalEmotionBefore','journalEmotionAfter','journalMistake','journalImprovement'].forEach(id=>{
     const el=document.getElementById(id);
     if(el) el.value='';
@@ -7176,6 +7290,7 @@ function editJournalPageEntry(id){
 function deleteJournalPageEntry(id){
   journalPageEntries = journalPageEntries.filter(x=>x.id!==id);
   localStorage.setItem('krishna_journal_page_entries', JSON.stringify(journalPageEntries));
+  clearJournalDraft();
   renderJournalPage();
   renderGrid();
 }
@@ -7343,6 +7458,7 @@ function mergeImportedJournalEntries(imported){
     }
   });
   localStorage.setItem('krishna_journal_page_entries', JSON.stringify(journalPageEntries));
+  clearJournalDraft();
   return {added, updated, matched, unmatched};
 }
 
@@ -7790,6 +7906,9 @@ document.querySelectorAll('.nav button').forEach(btn=>{
 
   if ('serviceWorker' in navigator && location.protocol !== 'file:') {
     window.addEventListener('load', () => {
+      if (typeof initDraftAutoSync === 'function') initDraftAutoSync();
+      if (typeof loadJournalDraft === 'function') loadJournalDraft();
+      if (typeof loadPsychologyDraft === 'function') loadPsychologyDraft();
       navigator.serviceWorker.register('./service-worker.js', { updateViaCache: 'none' })
         .then(reg => {
           // Force check for service worker updates on load
@@ -7994,6 +8113,17 @@ window.journallReloadDataFromStorage = function() {
   }
   filtered = [...trades];
   journalPageEntries = JSON.parse(localStorage.getItem('krishna_journal_page_entries') || '[]');
+  
+  if (localStorage.getItem('krishna_pre_trade_checklist_state')) {
+    try {
+      const saved = JSON.parse(localStorage.getItem('krishna_pre_trade_checklist_state'));
+      Object.assign(preTradeChecklistState, saved);
+      if (typeof updateChecklist === 'function') updateChecklist();
+    } catch(e) {}
+  }
+  
+  if (typeof loadJournalDraft === 'function') loadJournalDraft();
+  if (typeof loadPsychologyDraft === 'function') loadPsychologyDraft();
   
   if (typeof renderAll === 'function') renderAll();
   if (typeof renderCalendar === 'function') renderCalendar();
