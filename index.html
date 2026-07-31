@@ -5702,7 +5702,7 @@ function handleCSVUpload(event){
     const previousCount = Array.isArray(trades) ? trades.length : 0;
     let shouldReplace = false;
     if (previousCount > 0) {
-      shouldReplace = confirm("Would you like to clear your existing journal data and replace it with this new file?\n\nClick 'OK' to replace (overwrite) your journal.\nClick 'Cancel' to merge the new trades with your existing ones.");
+      shouldReplace = confirm("Would you like to clear your previously imported trades and replace them with this new file?\n\nNote: Your written journal notes/entries will NOT be affected or deleted.\n\nClick 'OK' to replace (overwrite) existing trades.\nClick 'Cancel' to merge the new trades with your existing ones.");
     }
     
     if (shouldReplace) {
