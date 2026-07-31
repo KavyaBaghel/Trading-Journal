@@ -7966,6 +7966,7 @@ const syncExactKeys = ['theme', 'selectedDate'];
 let firestoreDb = null;
 let cloudReady = false;
 let syncTimer = null;
+let unsubscribeCloudSync = null;
 window.journallGetFirebaseIdToken = async () => window.currentUser?.getIdToken ? window.currentUser.getIdToken() : null;
 window.journallAiProxyUrl = aiProxyConfig?.url || '';
 if(authRetryBtn) authRetryBtn.addEventListener('click', () => location.reload());
@@ -8003,14 +8004,19 @@ window.journallReloadDataFromStorage = function() {
 function applyCloudState(storage){
   if(!storage || typeof storage !== 'object') return false;
   let changed = false;
-  Object.entries(storage).forEach(([key,value])=>{
-    if(shouldSyncKey(key) && typeof value === 'string'){
-      if(localStorage.getItem(key) !== value){
-        localStorage.setItem(key, value);
-        changed = true;
+  window.__journallBlockCloudSave = true;
+  try {
+    Object.entries(storage).forEach(([key,value])=>{
+      if(shouldSyncKey(key) && typeof value === 'string'){
+        if(localStorage.getItem(key) !== value){
+          localStorage.setItem(key, value);
+          changed = true;
+        }
       }
-    }
-  });
+    });
+  } finally {
+    window.__journallBlockCloudSave = false;
+  }
   return changed;
 }
 
@@ -8027,11 +8033,11 @@ function patchLocalStorageForCloud(){
 
   localStorage.setItem = (key,value)=>{
     originalSetItem(key,value);
-    if(shouldSyncKey(String(key))) scheduleCloudSave();
+    if(shouldSyncKey(String(key)) && !window.__journallBlockCloudSave) scheduleCloudSave();
   };
   localStorage.removeItem = key=>{
     originalRemoveItem(key);
-    if(shouldSyncKey(String(key))) scheduleCloudSave();
+    if(shouldSyncKey(String(key)) && !window.__journallBlockCloudSave) scheduleCloudSave();
   };
   localStorage.clear = ()=>{
     originalClear();
@@ -8060,23 +8066,40 @@ async function loadCloudState(){
     cloudReady = true;
     return;
   }
-  const { doc, getDoc, setDoc, serverTimestamp } = await import(`https://www.gstatic.com/firebasejs/${firebaseSdkVersion}/firebase-firestore.js`);
+  const { doc, getDoc, setDoc, onSnapshot, serverTimestamp } = await import(`https://www.gstatic.com/firebasejs/${firebaseSdkVersion}/firebase-firestore.js`);
   const ref = doc(firestoreDb, 'users', currentUser.uid, 'journallState', 'main');
+  
+  // Verify document existence initially, create if missing and local state exists
   const snap = await getDoc(ref);
-  if(snap.exists() && snap.data()?.storage){
-    const changed = applyCloudState(snap.data().storage);
-    if(changed && typeof window.journallReloadDataFromStorage === 'function') {
-      window.journallReloadDataFromStorage();
-    }
-  }else if(hasMeaningfulLocalState()){
+  if(!snap.exists() && hasMeaningfulLocalState()){
     await setDoc(ref, {
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp(),
       storage: collectLocalState()
     }, { merge: true });
   }
+  
+  // Unsubscribe old listener if applicable
+  if (typeof unsubscribeCloudSync === 'function') {
+    try { unsubscribeCloudSync(); } catch(e) {}
+  }
+  
+  // Connect real-time Firestore synchronization listener
+  unsubscribeCloudSync = onSnapshot(ref, (docSnap) => {
+    if (docSnap.exists() && docSnap.data()?.storage) {
+      const changed = applyCloudState(docSnap.data().storage);
+      if (changed && typeof window.journallReloadDataFromStorage === 'function') {
+        window.journallReloadDataFromStorage();
+        setAuthStatus(`Signed in as ${currentUser.displayName || currentUser.email || 'trader'} - synced`);
+      }
+    }
+  }, (err) => {
+    console.error("Firestore onSnapshot sync error:", err);
+  });
+  
   cloudReady = true;
   patchLocalStorageForCloud();
+  
   if (window.splashHoldActive) {
     window.setAuthStatus(`Signed in as ${window.currentUser.displayName || window.currentUser.email || 'trader'}`);
     if(typeof window.renderAll === 'function') window.renderAll();
@@ -8203,6 +8226,10 @@ async function initFirebaseAuth(){
       window.setAuthLoading(true);
       window.setAuthStatus('Logging out securely...');
 
+      if (typeof unsubscribeCloudSync === 'function') {
+        try { unsubscribeCloudSync(); } catch(e) {}
+        unsubscribeCloudSync = null;
+      }
       localStorage.removeItem('journall_auth_bypassed');
       window.currentUser = null;
       try {

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'journall-android-pwa-v82';
+const CACHE_NAME = 'journall-android-pwa-v83';
 const APP_SHELL = [
   './manifest.webmanifest',
   './assets/icon-192.png',
