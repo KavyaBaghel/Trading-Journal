@@ -6298,10 +6298,78 @@ function postSessionStorageKey(data){
 }
 
 function renderPostSessionText(text){
-  const clean = escapeHtml(text || '').replace(/\r?\n/g,'<br>');
-  const chunks = clean.split(/<br>\s*<br>/).filter(Boolean).slice(0,6);
-  if(!chunks.length) return '<div class="insight empty"><strong>No review yet.</strong><br>Generate a post-session review.</div>';
-  return chunks.map((part,i)=>`<div class="insight ${i===0?'good':i===1?'warn':i===2?'danger':''}">${part}</div>`).join('');
+  if (!text) return '<div class="insight empty"><strong>No review yet.</strong><br>Generate a post-session review.</div>';
+  
+  const rawText = String(text).trim();
+  const lines = rawText.split(/\r?\n/);
+  
+  const cards = [];
+  let currentCard = null;
+  
+  lines.forEach(line => {
+    const trimmed = line.trim();
+    if (!trimmed) return;
+    
+    // Check if the line is a header like **Header** or ### Header or Header:
+    const headerMatch = trimmed.match(/^\*\*(.*?)\*\*$/) || trimmed.match(/^###\s*(.*)$/) || trimmed.match(/^\*\*(.*?)\*\*:\s*$/);
+    
+    if (headerMatch) {
+      if (currentCard) {
+        cards.push(currentCard);
+      }
+      currentCard = {
+        title: headerMatch[1].replace(/\*+/g, '').replace(/:$/, '').trim(),
+        content: []
+      };
+    } else {
+      let cleanLine = trimmed
+        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+        .replace(/^\s*[-*]\s+/, '• ');
+        
+      if (currentCard) {
+        currentCard.content.push(cleanLine);
+      } else {
+        currentCard = {
+          title: 'Session Summary',
+          content: [cleanLine]
+        };
+      }
+    }
+  });
+  
+  if (currentCard) {
+    cards.push(currentCard);
+  }
+  
+  if (!cards.length) {
+    const cleanParagraphs = rawText
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+      .replace(/\r?\n/g, '<br>');
+    return `<div class="insight"><span>${cleanParagraphs}</span></div>`;
+  }
+  
+  return cards.map(card => {
+    const title = card.title;
+    const body = card.content.join('<br>');
+    
+    // Assign custom high-contrast borders based on section titles
+    let borderStyle = '';
+    if (/verdict/i.test(title)) borderStyle = 'border-left-color: #22c55e !important;'; // green
+    else if (/mistake/i.test(title)) borderStyle = 'border-left-color: #ef4444 !important;'; // red
+    else if (/decision/i.test(title)) borderStyle = 'border-left-color: #f59e0b !important;'; // orange
+    else if (/risk/i.test(title)) borderStyle = 'border-left-color: #3b82f6 !important;'; // blue
+    else if (/rule|tomorrow/i.test(title)) borderStyle = 'border-left-color: #a855f7 !important;'; // purple
+    
+    return `
+      <div class="insight" style="${borderStyle} padding: 18px 20px !important; margin-top: 14px !important; margin-bottom: 14px !important; border-left-width: 4px !important;">
+        <strong style="display: block; margin-bottom: 8px; color: #ffffff !important; font-size: 14px; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 700 !important;">${title}</strong>
+        <span style="color: rgba(255, 255, 255, 0.78); line-height: 1.6; font-size: 13.5px; display: block;">${body}</span>
+      </div>
+    `;
+  }).join('');
 }
 
 function postSessionPayload(data){
