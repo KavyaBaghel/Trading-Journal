@@ -207,6 +207,46 @@ while ($true) {
       $bodyOffset += $chunkRead
     }
 
+    if ($rawPath -eq '/api/sync-mt5') {
+      if ($method -eq 'OPTIONS') {
+        Send-Response $stream 204 'No Content' ([byte[]]::new(0)) 'text/plain; charset=utf-8'
+        continue
+      }
+      try {
+        $reqText = [System.Text.Encoding]::UTF8.GetString($bodyBytes)
+        
+        $psi = [System.Diagnostics.ProcessStartInfo]::new()
+        $psi.FileName = "python"
+        $psi.Arguments = "mt5_sync.py"
+        $psi.RedirectStandardInput = $true
+        $psi.RedirectStandardOutput = $true
+        $psi.RedirectStandardError = $true
+        $psi.UseShellExecute = $false
+        $psi.CreateNoWindow = $true
+        
+        $proc = [System.Diagnostics.Process]::Start($psi)
+        $proc.StandardInput.Write($reqText)
+        $proc.StandardInput.Close()
+        
+        $stdout = $proc.StandardOutput.ReadToEnd()
+        $stderr = $proc.StandardError.ReadToEnd()
+        $proc.WaitForExit()
+        
+        if ($proc.ExitCode -ne 0) {
+          $errMsg = if ($stderr) { $stderr } else { "Python exited with code $($proc.ExitCode)" }
+          $body = [System.Text.Encoding]::UTF8.GetBytes("{`"error`":`"$($errMsg -replace '"', '\"' -replace "`r?`n", ' ' )`"}")
+          Send-Response $stream 500 'Internal Server Error' $body 'application/json; charset=utf-8'
+        } else {
+          $body = [System.Text.Encoding]::UTF8.GetBytes($stdout)
+          Send-Response $stream 200 'OK' $body 'application/json; charset=utf-8'
+        }
+      } catch {
+        $body = [System.Text.Encoding]::UTF8.GetBytes("{`"error`":`"Sync failed: $($_.Exception.Message -replace '"', '\"')`"}")
+        Send-Response $stream 500 'Internal Server Error' $body 'application/json; charset=utf-8'
+      }
+      continue
+    }
+
     if ($rawPath -like '/ollama/*') {
       Invoke-OllamaProxy $stream $method $rawPath $bodyBytes
       continue
