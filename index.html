@@ -8033,14 +8033,25 @@ window.bypassAuthAndOpenLocal = function(){
 
 window.openSignedInJournal = function(message){
   window.setAuthStatus(message || 'Journal opened on this device.');
-  if (window.splashHoldActive) {
+  
+  const proceedOpen = () => {
+    const uName = localStorage.getItem('journall_custom_username') || window.currentUser?.displayName || window.currentUser?.email || 'trader';
+    window.setAuthStatus(`Signed in as ${uName}`);
+    if (window.splashHoldActive) {
+      if(typeof window.renderAll === 'function') window.renderAll();
+      return;
+    }
+    window.journalAlreadyOpened = true;
+    window.setGateVisible(false);
     if(typeof window.renderAll === 'function') window.renderAll();
-    return;
+    if(typeof ensureAccountOnboarding === 'function') ensureAccountOnboarding();
+  };
+
+  if (window.currentUser && window.currentUser.uid !== 'local_user') {
+    checkAndPromptUsername(proceedOpen);
+  } else {
+    proceedOpen();
   }
-  window.journalAlreadyOpened = true;
-  window.setGateVisible(false);
-  if(typeof window.renderAll === 'function') window.renderAll();
-  if(typeof ensureAccountOnboarding === 'function') ensureAccountOnboarding();
 };
 
 window.setGateVisible = function(visible){
@@ -8237,19 +8248,19 @@ function patchLocalStorageForCloud(){
 }
 
 function scheduleCloudSave(){
-  if(!cloudReady || !currentUser || currentUser.uid === 'local_user' || !firestoreDb) return;
+  if(!cloudReady || !window.currentUser || window.currentUser.uid === 'local_user' || !firestoreDb) return;
   clearTimeout(syncTimer);
   syncTimer = setTimeout(saveCloudState, 900);
 }
 
 async function saveCloudState(){
-  if(!cloudReady || !currentUser || currentUser.uid === 'local_user' || !firestoreDb) return;
+  if(!cloudReady || !window.currentUser || window.currentUser.uid === 'local_user' || !firestoreDb) return;
   const { doc, setDoc, serverTimestamp } = await import(`https://www.gstatic.com/firebasejs/${firebaseSdkVersion}/firebase-firestore.js`);
-  await setDoc(doc(firestoreDb, 'users', currentUser.uid, 'journallState', 'main'), {
+  await setDoc(doc(firestoreDb, 'users', window.currentUser.uid, 'journallState', 'main'), {
     updatedAt: serverTimestamp(),
     storage: collectLocalState()
   }, { merge: true });
-  const uName = localStorage.getItem('journall_custom_username') || currentUser.displayName || currentUser.email || 'trader';
+  const uName = localStorage.getItem('journall_custom_username') || window.currentUser.displayName || window.currentUser.email || 'trader';
   setAuthStatus(`Signed in as ${uName} - synced`);
 }
 
@@ -8372,12 +8383,12 @@ function checkAndPromptUsername(callback) {
 }
 
 async function loadCloudState(){
-  if(!currentUser || currentUser.uid === 'local_user' || !firestoreDb){
+  if(!window.currentUser || window.currentUser.uid === 'local_user' || !firestoreDb){
     cloudReady = true;
     return;
   }
   const { doc, getDoc, setDoc, onSnapshot, serverTimestamp } = await import(`https://www.gstatic.com/firebasejs/${firebaseSdkVersion}/firebase-firestore.js`);
-  const ref = doc(firestoreDb, 'users', currentUser.uid, 'journallState', 'main');
+  const ref = doc(firestoreDb, 'users', window.currentUser.uid, 'journallState', 'main');
   
   // Verify document existence initially, create if missing and local state exists
   const snap = await getDoc(ref);
@@ -8400,8 +8411,8 @@ async function loadCloudState(){
       const changed = applyCloudState(docSnap.data().storage);
       if (changed && typeof window.journallReloadDataFromStorage === 'function') {
         window.journallReloadDataFromStorage();
-        const uName = localStorage.getItem('journall_custom_username') || currentUser.displayName || currentUser.email || 'trader';
-  setAuthStatus(`Signed in as ${uName} - synced`);
+        const uName = localStorage.getItem('journall_custom_username') || window.currentUser.displayName || window.currentUser.email || 'trader';
+        setAuthStatus(`Signed in as ${uName} - synced`);
       }
     }
   }, (err) => {
@@ -8424,8 +8435,7 @@ async function loadCloudState(){
     if(typeof window.renderAll === 'function') window.renderAll();
   };
 
-  // Verify and ask for custom username if not configured yet
-  checkAndPromptUsername(finalizeSignIn);
+  finalizeSignIn();
 }
 
 async function initFirebaseAuth(){
