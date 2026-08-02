@@ -2328,10 +2328,9 @@ tr:hover {
     </div>
 
     <div class="setup-section">
-      <div class="setup-section-label">Synced account</div><p id="accountSyncNote" class="account-sync-note">Account size, current balance, and phase are loaded from your Trading Dashboard.</p>
+      <div class="setup-section-label">Synced account</div><p id="accountSyncNote" class="account-sync-note">Account size and phase are configured here. Your current balance is automatically calculated and updated in real time from your synced trades.</p>
       <div class="account-form-grid">
         <label>Initial account balance ($)<div class="stepper-control"><button type="button" class="stepper-btn minus" onclick="stepInput('accountSizeInput', -1, 'renderAccountSetupPreview')">−</button><input id="accountSizeInput" class="account-source-input" type="number" min="1" step="100" placeholder="Enter a value" oninput="renderAccountSetupPreview()"><button type="button" class="stepper-btn plus" onclick="stepInput('accountSizeInput', 1, 'renderAccountSetupPreview')">+</button></div></label>
-        <label>Current balance ($)<div class="stepper-control"><button type="button" class="stepper-btn minus" onclick="stepInput('currentBalanceInput', -1, 'renderAccountSetupPreview')">−</button><input id="currentBalanceInput" class="account-source-input" type="number" min="0" step="100" placeholder="Enter a value" oninput="renderAccountSetupPreview()"><button type="button" class="stepper-btn plus" onclick="stepInput('currentBalanceInput', 1, 'renderAccountSetupPreview')">+</button></div></label>
         <label>Account phase<select id="accountPhaseInput" class="account-source-input" onchange="toggleFundedFields()"><option>Phase 1</option><option>Phase 2</option><option>Funded</option><option>Personal</option></select></label>
       </div>
     </div>
@@ -4902,10 +4901,8 @@ function openAccountSetup(blocking=false){
   if(syncNote) syncNote.textContent = hasSyncedAccount
     ? 'Account size, current balance, and phase are synced with your uploaded trades. Only the rules below are editable here.'
     : 'Enter your account details once. They will be reused automatically by the Trading Dashboard.';
-  ['accountSizeInput','currentBalanceInput'].forEach(id=>{
-    const el = document.getElementById(id);
-    if(el){ el.readOnly = hasSyncedAccount; el.setAttribute('aria-readonly', String(hasSyncedAccount)); }
-  });
+  const elSize = document.getElementById('accountSizeInput');
+  if(elSize){ elSize.readOnly = hasSyncedAccount; elSize.setAttribute('aria-readonly', String(hasSyncedAccount)); }
   const phaseInput = document.getElementById('accountPhaseInput');
   if(phaseInput) phaseInput.disabled = hasSyncedAccount;
   set('profitTargetType', config.profitTargetType || 'percent'); set('riskPercentInput', config.riskPercent ?? '');
@@ -4949,7 +4946,7 @@ async function saveAccountSetup(){
   let accountSize, currentBalance, riskPercent, profitTarget, maxTradesPerDay, minRr, maxDailyLoss = null, maxDrawdown = null;
   try{
     accountSize = existingAccount?.accountSize || readRequiredNumber('accountSizeInput','Account size');
-    currentBalance = existingAccount ? syncedCurrentBalance({...existingAccount, accountSize}, trades || []) : readRequiredNumber('currentBalanceInput','Current balance');
+    currentBalance = syncedCurrentBalance({accountSize, phase}, trades || []);
     profitTarget = readRequiredNumber('profitTargetInput','Profit target');
     riskPercent = clampNumber(readRequiredNumber('riskPercentInput','Risk per trade'), 0.5, 2);
     maxTradesPerDay = readRequiredNumber('maxTradesInput','Max trades per day');
