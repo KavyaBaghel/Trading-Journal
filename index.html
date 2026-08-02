@@ -5907,6 +5907,17 @@ function onBrokerPlatformChange(){
 }
 
 
+
+async function fetchWithCorsProxy(targetUrl, options = {}) {
+  try {
+    const res = await fetch(targetUrl, options);
+    if (res.ok || (res.status >= 200 && res.status < 500)) return res;
+  } catch (e) {}
+
+  const proxyUrl = 'https://corsproxy.io/?' + encodeURIComponent(targetUrl);
+  return await fetch(proxyUrl, options);
+}
+
 async function syncMatchTraderWeb(url, email, password, days) {
   let rawUrl = (url || '').trim().replace(/\/+$/, '');
   if (!rawUrl.startsWith('http://') && !rawUrl.startsWith('https://')) {
@@ -5935,7 +5946,7 @@ async function syncMatchTraderWeb(url, email, password, days) {
   for (const b of candidateBases) {
     for (const path of loginEndpoints) {
       try {
-        const res = await fetch(b + path, {
+        const res = await fetchWithCorsProxy(b + path, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ email: email, password: password })
@@ -5968,7 +5979,7 @@ async function syncMatchTraderWeb(url, email, password, days) {
   let tradesRaw = [];
   for (const path of historyEndpoints) {
     try {
-      const res = await fetch(activeBase + path, {
+      const res = await fetchWithCorsProxy(activeBase + path, {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`,
