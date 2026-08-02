@@ -5961,11 +5961,16 @@ async function triggerBrokerSync(){
     if (accountId) payload.accountId = accountId;
   }
 
+  const isLocalHost = window.location.hostname === '127.0.0.1' || window.location.hostname === 'localhost';
+  const syncApiUrl = isLocalHost ? '/api/sync-broker' : 'http://127.0.0.1:8787/api/sync-broker';
+
   try {
-    const res = await fetch('/api/sync-broker', {
+    const res = await fetch(syncApiUrl, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
+    }).catch(err => {
+      throw new Error(`Local server bridge is not running on your PC (http://127.0.0.1:8787).\n\nTo sync directly from your local MetaTrader 5 terminal:\n1. Double-click 'Journall App.bat' on your desktop/folder to start the local server.\n2. Open http://127.0.0.1:8787 in your browser.`);
     });
     
     const data = await res.json().catch(() => ({ error: 'Invalid response from local server.' }));
