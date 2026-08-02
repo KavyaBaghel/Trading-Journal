@@ -207,7 +207,7 @@ while ($true) {
       $bodyOffset += $chunkRead
     }
 
-    if ($rawPath -eq '/api/sync-mt5') {
+    if ($rawPath -eq '/api/sync-broker' -or $rawPath -eq '/api/sync-mt5') {
       if ($method -eq 'OPTIONS') {
         Send-Response $stream 204 'No Content' ([byte[]]::new(0)) 'text/plain; charset=utf-8'
         continue
@@ -215,9 +215,16 @@ while ($true) {
       try {
         $reqText = [System.Text.Encoding]::UTF8.GetString($bodyBytes)
         
+        $scriptName = "mt5_sync.py"
+        if ($reqText -match '"platform"\s*:\s*"matchtrader"') {
+          $scriptName = "matchtrader_sync.py"
+        } elseif ($reqText -match '"platform"\s*:\s*"ctrader"') {
+          $scriptName = "ctrader_sync.py"
+        }
+        
         $psi = [System.Diagnostics.ProcessStartInfo]::new()
         $psi.FileName = "python"
-        $psi.Arguments = "mt5_sync.py"
+        $psi.Arguments = $scriptName
         $psi.RedirectStandardInput = $true
         $psi.RedirectStandardOutput = $true
         $psi.RedirectStandardError = $true

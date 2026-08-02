@@ -2412,12 +2412,22 @@ tr:hover {
     <section id="uploadcsv" class="section">
       <!-- Auto Broker Integration Card -->
       <div class="card" style="margin-bottom: 24px;">
-        <div class="panel-title"><h3>Auto Broker Sync</h3><span>direct terminal import</span></div>
+        <div class="panel-title"><h3>Auto Broker Sync</h3><span>multi-platform direct import</span></div>
         <div class="sub" style="margin-bottom: 16px; color: rgba(255,255,255,0.6);">
-          Connect to MetaTrader 5 on this PC to fetch your trades automatically.
+          Select your trading platform below to automatically sync your trades directly into Journall.
         </div>
         
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 16px;">
+        <div style="margin-bottom: 16px;">
+          <label style="display:block; font-size:11px; text-transform:uppercase; color:rgba(255,255,255,0.4); margin-bottom:4px;">Trading Platform / Broker</label>
+          <select id="brokerPlatformSelect" onchange="onBrokerPlatformChange()" style="width:100% !important; border-radius:8px !important; padding:8px 12px !important; height: 38px !important; background: rgba(255,255,255,0.06); color: #fff;">
+            <option value="mt5" selected>MetaTrader 5 (Local PC Terminal)</option>
+            <option value="matchtrader">MatchTrader (Cloud Broker Sync)</option>
+            <option value="ctrader">cTrader (Spotware Open API Sync)</option>
+          </select>
+        </div>
+
+        <!-- MT5 Fields -->
+        <div id="fieldsMt5" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 16px;">
           <div>
             <label style="display:block; font-size:11px; text-transform:uppercase; color:rgba(255,255,255,0.4); margin-bottom:4px;">MT5 Account Login (Optional)</label>
             <input type="number" id="brokerSyncLogin" placeholder="Active account number..." style="width:100% !important; border-radius:8px !important; padding:8px 12px !important;">
@@ -2426,20 +2436,49 @@ tr:hover {
             <label style="display:block; font-size:11px; text-transform:uppercase; color:rgba(255,255,255,0.4); margin-bottom:4px;">MT5 Server Name (Optional)</label>
             <input type="text" id="brokerSyncServer" placeholder="e.g. FundingPips-Server..." style="width:100% !important; border-radius:8px !important; padding:8px 12px !important;">
           </div>
+        </div>
+
+        <!-- MatchTrader Fields -->
+        <div id="fieldsMatchtrader" style="display: none; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 16px;">
           <div>
-            <label style="display:block; font-size:11px; text-transform:uppercase; color:rgba(255,255,255,0.4); margin-bottom:4px;">Sync Window</label>
-            <select id="brokerSyncDays" style="width:100% !important; border-radius:8px !important; padding:8px 12px !important; height: 38px !important;">
-              <option value="7">Last 7 Days</option>
-              <option value="30" selected>Last 30 Days</option>
-              <option value="90">Last 90 Days</option>
-              <option value="365">Last 365 Days</option>
-            </select>
+            <label style="display:block; font-size:11px; text-transform:uppercase; color:rgba(255,255,255,0.4); margin-bottom:4px;">MatchTrader Platform URL</label>
+            <input type="text" id="matchtraderUrl" placeholder="https://matchtrader.fundingpips.com" style="width:100% !important; border-radius:8px !important; padding:8px 12px !important;">
           </div>
+          <div>
+            <label style="display:block; font-size:11px; text-transform:uppercase; color:rgba(255,255,255,0.4); margin-bottom:4px;">Account Email / Username</label>
+            <input type="text" id="matchtraderEmail" placeholder="Your account email..." style="width:100% !important; border-radius:8px !important; padding:8px 12px !important;">
+          </div>
+          <div>
+            <label style="display:block; font-size:11px; text-transform:uppercase; color:rgba(255,255,255,0.4); margin-bottom:4px;">Password</label>
+            <input type="password" id="matchtraderPassword" placeholder="MatchTrader password..." style="width:100% !important; border-radius:8px !important; padding:8px 12px !important;">
+          </div>
+        </div>
+
+        <!-- cTrader Fields -->
+        <div id="fieldsCtrader" style="display: none; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 16px;">
+          <div>
+            <label style="display:block; font-size:11px; text-transform:uppercase; color:rgba(255,255,255,0.4); margin-bottom:4px;">cTrader Access Token</label>
+            <input type="text" id="ctraderToken" placeholder="Spotware cTrader API Access Token..." style="width:100% !important; border-radius:8px !important; padding:8px 12px !important;">
+          </div>
+          <div>
+            <label style="display:block; font-size:11px; text-transform:uppercase; color:rgba(255,255,255,0.4); margin-bottom:4px;">cTrader Account ID (Optional)</label>
+            <input type="text" id="ctraderAccountId" placeholder="e.g. 1234567..." style="width:100% !important; border-radius:8px !important; padding:8px 12px !important;">
+          </div>
+        </div>
+
+        <div style="margin-bottom: 16px;">
+          <label style="display:block; font-size:11px; text-transform:uppercase; color:rgba(255,255,255,0.4); margin-bottom:4px;">Sync Window</label>
+          <select id="brokerSyncDays" style="width:100% !important; border-radius:8px !important; padding:8px 12px !important; height: 38px !important;">
+            <option value="7">Last 7 Days</option>
+            <option value="30" selected>Last 30 Days</option>
+            <option value="90">Last 90 Days</option>
+            <option value="365">Last 365 Days</option>
+          </select>
         </div>
         
         <div class="csv-only-box" style="margin-top: 0;">
           <button class="btn primary" id="btnBrokerSync" onclick="triggerBrokerSync()" style="margin: 0; display: inline-flex; align-items: center; justify-content: center; gap: 8px;">
-            <span>Sync from MetaTrader 5</span>
+            <span id="btnBrokerSyncText">Sync from MetaTrader 5</span>
           </button>
         </div>
         
@@ -5842,25 +5881,85 @@ function handleCSVUpload(event){
   reader.readAsText(file);
 }
 
+function onBrokerPlatformChange(){
+  const platform = document.getElementById('brokerPlatformSelect')?.value || 'mt5';
+  const fMt5 = document.getElementById('fieldsMt5');
+  const fMatchtrader = document.getElementById('fieldsMatchtrader');
+  const fCtrader = document.getElementById('fieldsCtrader');
+  const btnText = document.getElementById('btnBrokerSyncText');
+  const status = document.getElementById('brokerSyncStatus');
+
+  if(fMt5) fMt5.style.display = platform === 'mt5' ? 'grid' : 'none';
+  if(fMatchtrader) fMatchtrader.style.display = platform === 'matchtrader' ? 'grid' : 'none';
+  if(fCtrader) fCtrader.style.display = platform === 'ctrader' ? 'grid' : 'none';
+
+  if(platform === 'mt5'){
+    if(btnText) btnText.textContent = 'Sync from MetaTrader 5';
+    if(status) status.innerHTML = 'Ready to sync. MetaTrader 5 terminal must be open and running on this PC.';
+  } else if(platform === 'matchtrader'){
+    if(btnText) btnText.textContent = 'Sync from MatchTrader';
+    if(status) status.innerHTML = 'Ready to sync. Enter your MatchTrader platform URL and account credentials.';
+  } else if(platform === 'ctrader'){
+    if(btnText) btnText.textContent = 'Sync from cTrader';
+    if(status) status.innerHTML = 'Ready to sync. Enter your cTrader Open API Access Token.';
+  }
+}
+
 async function triggerBrokerSync(){
+  const platform = document.getElementById('brokerPlatformSelect')?.value || 'mt5';
   const status = document.getElementById('brokerSyncStatus');
   const btn = document.getElementById('btnBrokerSync');
-  const login = document.getElementById('brokerSyncLogin').value.trim();
-  const server = document.getElementById('brokerSyncServer').value.trim();
+  const btnText = document.getElementById('btnBrokerSyncText');
   const days = document.getElementById('brokerSyncDays').value;
 
-  if (status) status.innerHTML = `<strong>Connecting to MetaTrader 5...</strong>`;
+  const platformNames = {
+    mt5: 'MetaTrader 5',
+    matchtrader: 'MatchTrader',
+    ctrader: 'cTrader'
+  };
+  const pName = platformNames[platform] || 'Broker';
+
+  if (status) status.innerHTML = `<strong>Connecting to ${pName}...</strong>`;
   if (btn) {
     btn.disabled = true;
     btn.innerHTML = `<div class="spinner-mini" style="margin-right:8px;"></div><span>Syncing...</span>`;
   }
 
-  const payload = { days: parseInt(days) };
-  if (login) payload.login = login;
-  if (server) payload.server = server;
+  const payload = { platform, days: parseInt(days) };
+
+  if (platform === 'mt5') {
+    const login = document.getElementById('brokerSyncLogin')?.value.trim();
+    const server = document.getElementById('brokerSyncServer')?.value.trim();
+    if (login) payload.login = login;
+    if (server) payload.server = server;
+  } else if (platform === 'matchtrader') {
+    const url = document.getElementById('matchtraderUrl')?.value.trim();
+    const login = document.getElementById('matchtraderEmail')?.value.trim();
+    const password = document.getElementById('matchtraderPassword')?.value.trim();
+    if (!url || !login || !password) {
+      alert('Please fill in your MatchTrader Platform URL, Email/Username, and Password.');
+      if (btn) { btn.disabled = false; if (btnText) btnText.textContent = `Sync from ${pName}`; }
+      if (status) status.innerHTML = `<strong>Sync failed:</strong> Missing MatchTrader credentials.`;
+      return;
+    }
+    payload.url = url;
+    payload.login = login;
+    payload.password = password;
+  } else if (platform === 'ctrader') {
+    const token = document.getElementById('ctraderToken')?.value.trim();
+    const accountId = document.getElementById('ctraderAccountId')?.value.trim();
+    if (!token) {
+      alert('Please fill in your cTrader Access Token.');
+      if (btn) { btn.disabled = false; if (btnText) btnText.textContent = `Sync from ${pName}`; }
+      if (status) status.innerHTML = `<strong>Sync failed:</strong> Missing cTrader Access Token.`;
+      return;
+    }
+    payload.token = token;
+    if (accountId) payload.accountId = accountId;
+  }
 
   try {
-    const res = await fetch('/api/sync-mt5', {
+    const res = await fetch('/api/sync-broker', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
@@ -5875,13 +5974,12 @@ async function triggerBrokerSync(){
     const parsed = data.trades || [];
     if (!parsed.length) {
       if (status) status.innerHTML = `<strong>Sync complete.</strong><br>No new trades found in the last ${days} days.`;
-      alert('No new closed trades found in your MT5 terminal for the selected window.');
+      alert(`No new closed trades found in your ${pName} account for the selected window.`);
       return;
     }
 
     const previousCount = Array.isArray(trades) ? trades.length : 0;
     
-    // Always merge for auto-sync so we don't clear old history!
     trades = mergeImportedTrades(trades, parsed);
     filtered = [...trades];
     saveTrades();
@@ -5890,10 +5988,9 @@ async function triggerBrokerSync(){
     localStorage.setItem('viztrade_trading_page_trades', JSON.stringify(tradingPageTrades));
 
     if (status) {
-      status.innerHTML = `<strong>Sync successful!</strong><br>Imported: ${parsed.length} trades.<br>Total journal trades: ${trades.length}.`;
+      status.innerHTML = `<strong>Sync successful!</strong><br>Imported: ${parsed.length} trades from ${pName}.<br>Total journal trades: ${trades.length}.`;
     }
 
-    // Reset filters
     ['q','session','side','mistake','result'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
 
     const ys=document.getElementById('calendarYearSelect'); if(ys) ys.dataset.ready='';
@@ -5903,20 +6000,19 @@ async function triggerBrokerSync(){
     renderJournalPage();
     resizeChartsSoon();
 
-    // Trigger cloud save if signed in
     if (typeof scheduleCloudSave === 'function') {
       scheduleCloudSave();
     }
   } catch (err) {
-    console.error('MT5 sync failed:', err);
+    console.error(`${pName} sync failed:`, err);
     if (status) {
       status.innerHTML = `<strong style="color:var(--red);">Sync failed:</strong> ${err.message || err}`;
     }
-    alert(`Sync failed: ${err.message || err}\n\nMake sure MetaTrader 5 terminal is open and active on this PC, and you have Python installed with the 'MetaTrader5' library.`);
+    alert(`Sync failed: ${err.message || err}`);
   } finally {
     if (btn) {
       btn.disabled = false;
-      btn.innerHTML = `<span>Sync from MetaTrader 5</span>`;
+      if (btnText) btnText.textContent = `Sync from ${pName}`;
     }
   }
 }
