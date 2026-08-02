@@ -20,6 +20,32 @@ $ipAddress = if ($ListenHost -eq '0.0.0.0' -or $ListenHost -eq '*') {
 $listener = [System.Net.Sockets.TcpListener]::new($ipAddress, $Port)
 $listener.Start()
 
+function Get-PythonExe {
+  $candidates = @(
+    "$env:LOCALAPPDATA\Programs\Python\Python313\python.exe",
+    "$env:LOCALAPPDATA\Programs\Python\Python312\python.exe",
+    "$env:LOCALAPPDATA\Programs\Python\Python311\python.exe",
+    "$env:LOCALAPPDATA\Programs\Python\Python310\python.exe",
+    "$env:ProgramFiles\Python313\python.exe",
+    "$env:ProgramFiles\Python312\python.exe",
+    "$env:ProgramFiles\Python311\python.exe",
+    "$env:ProgramFiles\Python310\python.exe",
+    'python.exe',
+    'py.exe'
+  )
+  foreach ($candidate in $candidates) {
+    try {
+      if ($candidate -like '*\*') {
+        if (Test-Path -LiteralPath $candidate) { return $candidate }
+      } else {
+        $cmd = Get-Command $candidate -ErrorAction SilentlyContinue
+        if ($cmd) { return $cmd.Source }
+      }
+    } catch {}
+  }
+  return 'python'
+}
+
 function Get-ContentType([string]$Path) {
   switch ([System.IO.Path]::GetExtension($Path).ToLowerInvariant()) {
     '.html' { 'text/html; charset=utf-8'; break }
@@ -226,7 +252,7 @@ while ($true) {
         }
         
         $psi = [System.Diagnostics.ProcessStartInfo]::new()
-        $psi.FileName = "python"
+        $psi.FileName = Get-PythonExe
         $psi.Arguments = $scriptName
         $psi.RedirectStandardInput = $true
         $psi.RedirectStandardOutput = $true

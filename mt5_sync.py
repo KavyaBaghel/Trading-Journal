@@ -7,11 +7,15 @@ try:
     import MetaTrader5 as mt5
 except ImportError:
     try:
-        subprocess.check_call([sys.executable, "-m", "pip", "install", "MetaTrader5"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        subprocess.check_call([sys.executable, "-m", "pip", "install", "--user", "MetaTrader5"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         import MetaTrader5 as mt5
     except Exception:
-        print(json.dumps({"error": "MetaTrader5 Python library is missing. Please run 'pip install MetaTrader5' in your Command Prompt / Terminal."}))
-        sys.exit(0)
+        try:
+            subprocess.check_call(["pip", "install", "--user", "MetaTrader5"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            import MetaTrader5 as mt5
+        except Exception as err:
+            print(json.dumps({"error": f"MetaTrader5 Python library is missing. Please open Command Prompt on your PC and run: pip install MetaTrader5"}))
+            sys.exit(0)
 
 def main():
     input_data = {}
