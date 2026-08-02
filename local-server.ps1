@@ -243,7 +243,15 @@ while ($true) {
         $proc.WaitForExit()
         
         if ($proc.ExitCode -ne 0) {
-          $errMsg = if ($stderr) { $stderr } else { "Python exited with code $($proc.ExitCode)" }
+          $errMsg = ""
+          if ($stdout -and $stdout -match '"error"\s*:\s*"(.*?)"') {
+            $errMsg = $matches[1]
+          } elseif ($stderr) {
+            $errMsg = $stderr
+          } else {
+            $errMsg = $stdout
+          }
+          if ([string]::IsNullOrWhiteSpace($errMsg)) { $errMsg = "Python exited with code $($proc.ExitCode)" }
           $body = [System.Text.Encoding]::UTF8.GetBytes("{`"error`":`"$($errMsg -replace '"', '\"' -replace "`r?`n", ' ' )`"}")
           Send-Response $stream 500 'Internal Server Error' $body 'application/json; charset=utf-8'
         } else {
