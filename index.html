@@ -2420,9 +2420,9 @@ tr:hover {
         <div style="margin-bottom: 16px;">
           <label style="display:block; font-size:11px; text-transform:uppercase; color:rgba(255,255,255,0.4); margin-bottom:4px;">Trading Platform / Broker</label>
           <select id="brokerPlatformSelect" onchange="onBrokerPlatformChange()" style="width:100% !important; border-radius:8px !important; padding:8px 12px !important; height: 38px !important; background: rgba(255,255,255,0.06); color: #fff;">
-            <option value="mt5" selected>MetaTrader 5 (Local PC Terminal)</option>
-            <option value="matchtrader">MatchTrader (Cloud Broker Sync)</option>
-            <option value="ctrader">cTrader (Spotware Open API Sync)</option>
+            <option value="matchtrader" selected>MatchTrader (☁️ Direct Web Cloud Sync - No Install Required)</option>
+            <option value="ctrader">cTrader (☁️ Direct Open API Cloud Sync - No Install Required)</option>
+            <option value="mt5">MetaTrader 5 (🖥️ Local PC Terminal Bridge)</option>
           </select>
         </div>
 
@@ -5908,6 +5908,186 @@ function onBrokerPlatformChange(){
   }
 }
 
+
+async function syncMatchTraderWeb(url, email, password, days) {
+  let baseUrl = url.trim().replace(/\/+$/, '');
+  if (!baseUrl.startsWith('http://') && !baseUrl.startsWith('https://')) {
+    baseUrl = 'https://' + baseUrl;
+  }
+
+  const loginEndpoints = [
+    '/api/user/login',
+    '/api/auth/login',
+    '/api/v1/auth/login',
+    '/backend/api/user/login'
+  ];
+
+  let token = null;
+  let lastErr = '';
+
+  for (const path of loginEndpoints) {
+    try {
+      const res = await fetch(baseUrl + path, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: email, password: password })
+      });
+      const data = await res.json().catch(() => ({}));
+      if (res.ok) {
+        token = data.token || data.jwt || data.accessToken || data.data?.token || data.data?.jwt;
+        if (token) break;
+      } else {
+        lastErr = data.message || data.error || `HTTP ${res.status}`;
+      }
+    } catch (e) {
+      lastErr = e.message || String(e);
+    }
+  }
+
+  if (!token) {
+    throw new Error(`MatchTrader login failed: ${lastErr || 'Invalid credentials or URL. Ensure your platform URL is correct (e.g. https://matchtrader.fundingpips.com).'}`);
+  }
+
+  const historyEndpoints = [
+    '/api/user/trades-history',
+    '/api/trading/history',
+    '/api/v1/trades/history',
+    '/backend/api/user/trades-history'
+  ];
+
+  let tradesRaw = [];
+  for (const path of historyEndpoints) {
+    try {
+      const res = await fetch(baseUrl + path, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'x-auth-token': token,
+          'Accept': 'application/json'
+        }
+      });
+      if (res.ok) {
+        const data = await res.json().catch(() => ([]));
+        tradesRaw = Array.isArray(data) ? data : (data.trades || data.history || data.data || []);
+        if (tradesRaw.length) break;
+      }
+    } catch (e) {}
+  }
+
+  const parsedTrades = tradesRaw.map((t, i) => {
+    const symbol = String(t.symbol || t.instrument || '').trim();
+    if (!symbol) return null;
+    const sideRaw = String(t.side || t.cmd || t.type || '').toUpperCase();
+    const side = (sideRaw.includes('BUY') || sideRaw === '0') ? 'BUY' : 'SELL';
+    const pnl = parseFloat(t.profit || t.pnl || t.closedProfit || 0);
+    const comm = parseFloat(t.commission || 0);
+    const swap = parseFloat(t.swap || 0);
+    const netPnl = pnl + comm + swap;
+    const openPrice = parseFloat(t.openPrice || t.open_price || 0);
+    const closePrice = parseFloat(t.closePrice || t.close_price || 0);
+    const volume = parseFloat(t.volume || t.lots || t.quantity || 0);
+    
+    let closeTime = t.closeTime || t.close_time || t.time || t.updatedAt;
+    let dateStr = new Date().toISOString().slice(0, 10);
+    let timeStr = '00:00:00';
+    if (closeTime) {
+      const dt = new Date(typeof closeTime === 'number' && closeTime < 1e11 ? closeTime * 1000 : closeTime);
+      if (!isNaN(dt.getTime())) {
+        dateStr = dt.toISOString().slice(0, 10);
+        timeStr = dt.toTimeString().slice(0, 8);
+      }
+    }
+
+    const tid = String(t.id || t.positionId || t.tradeId || i);
+    const reason = String(t.closeReason || t.comment || '').toLowerCase();
+
+    return {
+      id: `matchtrader-${tid}`,
+      date: dateStr,
+      time: timeStr,
+      symbol: symbol,
+      side: side,
+      pnl: Math.round(netPnl * 100) / 100,
+      volume: Math.round(volume * 100) / 100,
+      openPrice: openPrice,
+      closePrice: closePrice,
+      reason: reason.includes('tp') ? 'TP' : (reason.includes('sl') ? 'SL' : 'User'),
+      commission: Math.round(comm * 100) / 100,
+      swap: Math.round(swap * 100) / 100,
+      notes: `MatchTrader Cloud Sync (#${tid})`
+    };
+  }).filter(Boolean);
+
+  return parsedTrades;
+}
+
+async function syncCTraderWeb(token, accountId, days) {
+  let accId = accountId;
+  if (!accId) {
+    const res = await fetch('https://openapi.ctrader.com/v2/accounts', {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    const data = await res.json().catch(() => ({}));
+    const accs = data.data || data.accounts || [];
+    if (accs.length) accId = String(accs[0].accountId || accs[0].id || '');
+  }
+
+  if (!accId) throw new Error('cTrader Account ID is required.');
+
+  const fromDt = new Date(Date.now() - days * 86400000).getTime();
+  const toDt = Date.now() + 86400000;
+
+  const res = await fetch(`https://openapi.ctrader.com/v2/accounts/${accId}/deals?from=${fromDt}&to=${toDt}`, {
+    headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/json' }
+  });
+
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(data.description || data.error || `HTTP ${res.status}`);
+
+  const deals = Array.isArray(data.deal) ? data.deal : (Array.isArray(data.deals) ? data.deals : []);
+  
+  return deals.map((d, i) => {
+    const symbol = String(d.symbolName || d.symbol || 'Unknown').trim();
+    const sideRaw = String(d.tradeSide || d.side || '').toUpperCase();
+    const side = (sideRaw.includes('BUY') || sideRaw === '1') ? 'BUY' : 'SELL';
+    const pnl = parseFloat(d.profit || 0);
+    const comm = parseFloat(d.commission || 0);
+    const swap = parseFloat(d.swap || 0);
+    const netPnl = (pnl > 10000 ? pnl / 100 : pnl) + comm + swap;
+    const vol = parseFloat(d.volume || 0);
+    const volume = vol > 100 ? vol / 100000 : vol;
+    const price = parseFloat(d.executionPrice || d.price || 0);
+
+    const ts = d.executionTimestamp || d.createTimestamp;
+    let dateStr = new Date().toISOString().slice(0, 10);
+    let timeStr = '00:00:00';
+    if (ts) {
+      const dt = new Date(ts > 1e11 ? ts : ts * 1000);
+      if (!isNaN(dt.getTime())) {
+        dateStr = dt.toISOString().slice(0, 10);
+        timeStr = dt.toTimeString().slice(0, 8);
+      }
+    }
+
+    const tid = String(d.dealId || d.positionId || i);
+    return {
+      id: `ctrader-${tid}`,
+      date: dateStr,
+      time: timeStr,
+      symbol: symbol,
+      side: side,
+      pnl: Math.round(netPnl * 100) / 100,
+      volume: Math.round(volume * 100) / 100,
+      openPrice: price,
+      closePrice: price,
+      reason: 'User',
+      commission: Math.round(comm * 100) / 100,
+      swap: Math.round(swap * 100) / 100,
+      notes: `cTrader Cloud Sync (#${tid})`
+    };
+  });
+}
+
 async function triggerBrokerSync(){
   const platform = document.getElementById('brokerPlatformSelect')?.value || 'mt5';
   const status = document.getElementById('brokerSyncStatus');
@@ -5965,21 +6145,34 @@ async function triggerBrokerSync(){
   const syncApiUrl = isLocalHost ? '/api/sync-broker' : 'http://localhost:8787/api/sync-broker';
 
   try {
-    const res = await fetch(syncApiUrl, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
-    }).catch(err => {
-      throw new Error(`Local server bridge is not running on your PC (http://localhost:8787).\n\nTo sync directly from your local MetaTrader 5 terminal:\n1. Double-click 'Journall App.bat' on your desktop/folder to start the local server.\n2. Open http://localhost:8787 in your browser.`);
-    });
-    
-    const data = await res.json().catch(() => ({ error: 'Invalid response from local server.' }));
-    
-    if (!res.ok || data.error) {
-      throw new Error(data.error || `Server returned ${res.status}`);
+    let parsed = [];
+
+    // Direct Web Cloud Sync for MatchTrader & cTrader (No python / local server required!)
+    if (platform === 'matchtrader') {
+      const url = document.getElementById('matchtraderUrl')?.value.trim();
+      const email = document.getElementById('matchtraderEmail')?.value.trim();
+      const pwd = document.getElementById('matchtraderPassword')?.value.trim();
+      parsed = await syncMatchTraderWeb(url, email, pwd, parseInt(days));
+    } else if (platform === 'ctrader') {
+      const token = document.getElementById('ctraderToken')?.value.trim();
+      const accId = document.getElementById('ctraderAccountId')?.value.trim();
+      parsed = await syncCTraderWeb(token, accId, parseInt(days));
+    } else {
+      // Local PC Terminal Sync for MT5
+      const res = await fetch(syncApiUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      }).catch(err => {
+        throw new Error(`MetaTrader 5 requires the local PC app launcher.\n\nTo sync from MT5:\n1. Double-click 'Journall App.bat' on your PC to launch Journall Desktop Mode.\n2. Or use MatchTrader / cTrader for 100% Direct Web Cloud Sync without downloading anything!`);
+      });
+      
+      const data = await res.json().catch(() => ({ error: 'Invalid response from local server.' }));
+      if (!res.ok || data.error) {
+        throw new Error(data.error || `Server returned ${res.status}`);
+      }
+      parsed = data.trades || [];
     }
-    
-    const parsed = data.trades || [];
     if (!parsed.length) {
       if (status) status.innerHTML = `<strong>Sync complete.</strong><br>No new trades found in the last ${days} days.`;
       alert(`No new closed trades found in your ${pName} account for the selected window.`);
