@@ -95,10 +95,6 @@ function Get-PythonExe {
   }
   return 'python.exe'
 }
-    } catch {}
-  }
-  return $null
-}
 
 function Start-RagServer {
   if (-not (Test-Path -LiteralPath $ragScript)) { return }

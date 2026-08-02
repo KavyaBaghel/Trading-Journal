@@ -62,10 +62,6 @@ function Get-PythonExe {
   }
   return 'python.exe'
 }
-    } catch {}
-  }
-  return 'python'
-}
 
 
 function Get-ContentType([string]$Path) {
