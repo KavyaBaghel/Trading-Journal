@@ -42,7 +42,7 @@ function Test-AppServer([int]$Port) {
   $client = $null
   try {
     $client = [System.Net.Sockets.TcpClient]::new()
-    $connect = $client.BeginConnect('127.0.0.1', $Port, $null, $null)
+    $connect = $client.BeginConnect('localhost', $Port, $null, $null)
     if (-not $connect.AsyncWaitHandle.WaitOne(700)) { return $false }
     $client.EndConnect($connect)
     return $true
@@ -129,7 +129,7 @@ try {
 }
 
 $appVersion = [System.IO.File]::GetLastWriteTimeUtc($indexPath).Ticks
-$appUrl = "http://127.0.0.1:$port/index.html?v=$appVersion"
+$appUrl = "http://localhost:$port/index.html?v=$appVersion"
 if ($Tab) {
   $safeTab = [uri]::EscapeDataString($Tab)
   $appUrl = "$appUrl#$safeTab"
