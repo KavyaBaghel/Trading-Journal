@@ -5908,7 +5908,7 @@ function onBrokerPlatformChange(){
 
 
 async function syncMatchTraderWeb(url, email, password, days) {
-  let rawUrl = url.trim().replace(/\/+$/, '');
+  let rawUrl = (url || '').trim().replace(/\/+$/, '');
   if (!rawUrl.startsWith('http://') && !rawUrl.startsWith('https://')) {
     rawUrl = 'https://' + rawUrl;
   }
@@ -5929,29 +5929,33 @@ async function syncMatchTraderWeb(url, email, password, days) {
   ];
 
   let token = null;
+  let activeBase = rootUrl;
   let lastErr = '';
 
-  for (const path of loginEndpoints) {
-    try {
-      const res = await fetch(baseUrl + path, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: email, password: password })
-      });
-      const data = await res.json().catch(() => ({}));
-      if (res.ok) {
-        token = data.token || data.jwt || data.accessToken || data.data?.token || data.data?.jwt;
-        if (token) break;
-      } else {
-        lastErr = data.message || data.error || `HTTP ${res.status}`;
+  for (const b of candidateBases) {
+    for (const path of loginEndpoints) {
+      try {
+        const res = await fetch(b + path, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: email, password: password })
+        });
+        const data = await res.json().catch(() => ({}));
+        if (res.ok) {
+          token = data.token || data.jwt || data.accessToken || data.data?.token || data.data?.jwt;
+          if (token) { activeBase = b; break; }
+        } else {
+          lastErr = data.message || data.error || `HTTP ${res.status}`;
+        }
+      } catch (e) {
+        lastErr = e.message || String(e);
       }
-    } catch (e) {
-      lastErr = e.message || String(e);
     }
+    if (token) break;
   }
 
   if (!token) {
-    throw new Error(`MatchTrader login failed: ${lastErr || 'Invalid credentials or URL. Ensure your platform URL is correct (e.g. https://matchtrader.fundingpips.com).'}`);
+    throw new Error(`MatchTrader login failed: ${lastErr || 'Invalid credentials or URL. Ensure your platform URL is correct (e.g. https://mtr-platform.fundingpips.com).'}`);
   }
 
   const historyEndpoints = [
@@ -5964,7 +5968,7 @@ async function syncMatchTraderWeb(url, email, password, days) {
   let tradesRaw = [];
   for (const path of historyEndpoints) {
     try {
-      const res = await fetch(baseUrl + path, {
+      const res = await fetch(activeBase + path, {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`,
