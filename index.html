@@ -2422,7 +2422,7 @@ tr:hover {
           <select id="brokerPlatformSelect" onchange="onBrokerPlatformChange()" style="width:100% !important; border-radius:8px !important; padding:8px 12px !important; height: 38px !important; background: rgba(255,255,255,0.06); color: #fff;">
             <option value="matchtrader" selected>MatchTrader (☁️ Direct Web Cloud Sync - No Install Required)</option>
             <option value="ctrader">cTrader (☁️ Direct Open API Cloud Sync - No Install Required)</option>
-            <option value="mt5">MetaTrader 5 (🖥️ Local PC Terminal Bridge)</option>
+            <option value="mt5">MetaTrader 5 (🖥️ Local PC Bridge / HTML Import)</option>
           </select>
         </div>
 
@@ -5873,6 +5873,7 @@ function handleCSVUpload(event){
     renderTradingPage();
     renderJournalPage();
     resizeChartsSoon();
+    if(typeof onBrokerPlatformChange === 'function') onBrokerPlatformChange();
   };
 
   reader.onerror = () => {
@@ -5885,7 +5886,7 @@ function handleCSVUpload(event){
 }
 
 function onBrokerPlatformChange(){
-  const platform = document.getElementById('brokerPlatformSelect')?.value || 'mt5';
+  const platform = document.getElementById('brokerPlatformSelect')?.value || 'matchtrader';
   const fMt5 = document.getElementById('fieldsMt5');
   const fMatchtrader = document.getElementById('fieldsMatchtrader');
   const fCtrader = document.getElementById('fieldsCtrader');
@@ -5896,15 +5897,15 @@ function onBrokerPlatformChange(){
   if(fMatchtrader) fMatchtrader.style.display = platform === 'matchtrader' ? 'grid' : 'none';
   if(fCtrader) fCtrader.style.display = platform === 'ctrader' ? 'grid' : 'none';
 
-  if(platform === 'mt5'){
-    if(btnText) btnText.textContent = 'Sync from MetaTrader 5';
-    if(status) status.innerHTML = 'Ready to sync. MetaTrader 5 terminal must be open and running on this PC.';
-  } else if(platform === 'matchtrader'){
-    if(btnText) btnText.textContent = 'Sync from MatchTrader';
-    if(status) status.innerHTML = 'Ready to sync. Enter your MatchTrader platform URL and account credentials.';
+  if(platform === 'matchtrader'){
+    if(btnText) btnText.textContent = 'Sync from MatchTrader (Cloud)';
+    if(status) status.innerHTML = '☁️ <strong>Direct Cloud Sync:</strong> Enter your MatchTrader URL and credentials. 100% online, no downloads needed!';
   } else if(platform === 'ctrader'){
-    if(btnText) btnText.textContent = 'Sync from cTrader';
-    if(status) status.innerHTML = 'Ready to sync. Enter your cTrader Open API Access Token.';
+    if(btnText) btnText.textContent = 'Sync from cTrader (Cloud)';
+    if(status) status.innerHTML = '☁️ <strong>Direct Cloud Sync:</strong> Enter your cTrader Access Token. 100% online, no downloads needed!';
+  } else if(platform === 'mt5'){
+    if(btnText) btnText.textContent = 'Sync from MetaTrader 5 (Local PC)';
+    if(status) status.innerHTML = '💡 <strong>Online MT5 Import (No Downloads):</strong> Drag & drop your MT5 HTML report into the Upload box below.<br>🖥️ <strong>Local PC Bridge:</strong> Requires running Journall App.bat on your PC.';
   }
 }
 
