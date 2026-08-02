@@ -5923,20 +5923,34 @@ async function syncMatchTraderWeb(url, email, password, days) {
   if (!rawUrl.startsWith('http://') && !rawUrl.startsWith('https://')) {
     rawUrl = 'https://' + rawUrl;
   }
-  let rootUrl = rawUrl;
+  
+  const candidateBases = [];
   try {
     const uObj = new URL(rawUrl);
-    rootUrl = uObj.origin;
-  } catch(e) {}
-
-  const candidateBases = [rootUrl];
-  if (rawUrl !== rootUrl) candidateBases.push(rawUrl);
+    const root = uObj.origin;
+    candidateBases.push(root);
+    const parts = uObj.pathname.split('/').filter(Boolean);
+    let curr = root;
+    for (const p of parts) {
+      curr += '/' + p;
+      if (!candidateBases.includes(curr)) candidateBases.push(curr);
+    }
+  } catch(e) {
+    candidateBases.push(rawUrl);
+  }
 
   const loginEndpoints = [
     '/api/user/login',
     '/api/auth/login',
     '/api/v1/auth/login',
-    '/backend/api/user/login'
+    '/backend/api/user/login',
+    '/api/login',
+    '/auth/login',
+    '/user/login',
+    '/api/client/login',
+    '/api/trader/login',
+    '/api/v1/login',
+    '/api/v2/login'
   ];
 
   let token = null;

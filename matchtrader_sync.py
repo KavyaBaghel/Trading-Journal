@@ -43,6 +43,23 @@ def http_get(url, headers_dict=None):
     except Exception as e:
         return 500, {"error": str(e)}
 
+def get_candidate_bases(raw_url):
+    if not raw_url.startswith("http://") and not raw_url.startswith("https://"):
+        raw_url = "https://" + raw_url
+    parsed = urllib.parse.urlparse(raw_url)
+    root = f"{parsed.scheme}://{parsed.netloc}"
+    
+    bases = [root]
+    path_parts = [p for p in parsed.path.split('/') if p]
+    
+    current = root
+    for part in path_parts:
+        current += '/' + part
+        if current not in bases:
+            bases.append(current)
+            
+    return bases
+
 def main():
     input_data = {}
     try:
@@ -64,28 +81,26 @@ def main():
         print(json.dumps({"error": "MatchTrader Email and Password are required."}))
         sys.exit(0)
 
-    if not raw_url.startswith("http://") and not raw_url.startswith("https://"):
-        raw_url = "https://" + raw_url
-
-    parsed_url = urllib.parse.urlparse(raw_url)
-    root_url = f"{parsed_url.scheme}://{parsed_url.netloc}"
-    base_url = raw_url.rstrip("/")
-
-    candidate_bases = [root_url]
-    if base_url != root_url:
-        candidate_bases.append(base_url)
+    candidate_bases = get_candidate_bases(raw_url)
 
     login_paths = [
         "/api/user/login",
         "/api/auth/login",
         "/api/v1/auth/login",
-        "/backend/api/user/login"
+        "/backend/api/user/login",
+        "/api/login",
+        "/auth/login",
+        "/user/login",
+        "/api/client/login",
+        "/api/trader/login",
+        "/api/v1/login",
+        "/api/v2/login"
     ]
 
     token = None
     user_id = None
     last_err = ""
-    active_base = root_url
+    active_base = candidate_bases[0]
 
     for b in candidate_bases:
         for path in login_paths:
@@ -100,13 +115,13 @@ def main():
                     active_base = b
                     break
             else:
-                err_detail = resp.get("message") or resp.get("error") or str(resp)
-                last_err = f"{status} - {err_detail}"
+                err_detail = resp.get("message") or resp.get("error") or f"HTTP {status}"
+                last_err = err_detail
         if token:
             break
 
     if not token:
-        print(json.dumps({"error": f"MatchTrader login failed: {last_err or 'Invalid email/password or server URL'}. Ensure your email and password match your MatchTrader account."}))
+        print(json.dumps({"error": f"MatchTrader login failed ({last_err or 'HTTP 404'}). Please verify your platform URL (e.g. https://mtr-platform.fundingpips.com) and email/password."}))
         sys.exit(0)
 
     headers = {
@@ -118,7 +133,11 @@ def main():
         "/api/user/trades-history",
         "/api/trading/history",
         "/api/v1/trades/history",
-        "/backend/api/user/trades-history"
+        "/backend/api/user/trades-history",
+        "/api/trades-history",
+        "/api/history",
+        "/api/user/history",
+        "/api/v1/user/trades-history"
     ]
 
     trades_raw = []
