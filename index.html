@@ -5954,7 +5954,7 @@ async function syncMatchTraderWeb(url, email, password, days) {
   ];
 
   let token = null;
-  let activeBase = rootUrl;
+  let activeBase = candidateBases[0] || rawUrl;
   let lastErr = '';
 
   for (const b of candidateBases) {

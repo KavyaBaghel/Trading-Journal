@@ -1,7 +1,25 @@
 import json
 import sys
+import os
+import site
 import datetime
 import subprocess
+
+# Dynamically add user site-packages and AppData Python paths to sys.path
+try:
+    user_site = site.getusersitepackages()
+    if user_site and os.path.exists(user_site) and user_site not in sys.path:
+        sys.path.insert(0, user_site)
+except Exception:
+    pass
+
+appdata = os.environ.get('APPDATA', '')
+if appdata:
+    for py_ver in ['Python313', 'Python312', 'Python311', 'Python310', 'Python39']:
+        p = os.path.join(appdata, 'Python', py_ver, 'site-packages')
+        if os.path.exists(p) and p not in sys.path:
+            sys.path.insert(0, p)
+
 
 try:
     import MetaTrader5 as mt5
