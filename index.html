@@ -8261,7 +8261,11 @@ window.openSignedInJournal = function(message){
   };
 
   if (window.currentUser && window.currentUser.uid !== 'local_user') {
-    checkAndPromptUsername(proceedOpen);
+    if (typeof window.checkAndPromptUsername === 'function') {
+      window.checkAndPromptUsername(proceedOpen);
+    } else {
+      proceedOpen();
+    }
   } else {
     proceedOpen();
   }
@@ -8477,7 +8481,7 @@ async function saveCloudState(){
   setAuthStatus(`Signed in as ${uName} - synced`);
 }
 
-function checkAndPromptUsername(callback) {
+window.checkAndPromptUsername = function checkAndPromptUsername(callback) {
   const savedUsername = localStorage.getItem('journall_custom_username');
   if (savedUsername) {
     if (callback) callback();
