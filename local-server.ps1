@@ -21,31 +21,53 @@ $listener = [System.Net.Sockets.TcpListener]::new($ipAddress, $Port)
 $listener.Start()
 
 function Get-PythonExe {
+  $localAppData = $env:LOCALAPPDATA
+  $progFiles = $env:ProgramFiles
   $candidates = @(
-    "$env:LOCALAPPDATA\Programs\Python\Python313\python.exe",
-    "$env:LOCALAPPDATA\Programs\Python\Python312\python.exe",
-    "$env:LOCALAPPDATA\Programs\Python\Python311\python.exe",
-    "$env:LOCALAPPDATA\Programs\Python\Python310\python.exe",
-    "$env:ProgramFiles\Python313\python.exe",
-    "$env:ProgramFiles\Python312\python.exe",
-    "$env:ProgramFiles\Python311\python.exe",
-    "$env:ProgramFiles\Python310\python.exe",
-    'python.exe',
-    'py.exe'
+    "$localAppData\Programs\Python\Python313\python.exe",
+    "$localAppData\Programs\Python\Python312\python.exe",
+    "$localAppData\Programs\Python\Python311\python.exe",
+    "$localAppData\Programs\Python\Python310\python.exe",
+    "$progFiles\Python313\python.exe",
+    "$progFiles\Python312\python.exe",
+    "$progFiles\Python311\python.exe",
+    "$progFiles\Python310\python.exe",
+    'py.exe',
+    'python.exe'
   )
+  foreach ($candidate in $candidates) {
+    try {
+      if ($candidate -like '*\*') {
+        if (Test-Path -LiteralPath $candidate) {
+          $logFile = [System.IO.Path]::GetTempFileName()
+          $p = Start-Process -FilePath $candidate -ArgumentList '-c', '"import MetaTrader5; print(1)"' -NoNewWindow -PassThru -Wait -RedirectStandardOutput $logFile -ErrorAction SilentlyContinue
+          $out = if (Test-Path $logFile) { Get-Content $logFile -Raw } else { '' }
+          Remove-Item $logFile -ErrorAction SilentlyContinue
+          if ($p.ExitCode -eq 0 -and $out.Trim() -eq '1') {
+            return $candidate
+          }
+        }
+      }
+    } catch {}
+  }
   foreach ($candidate in $candidates) {
     try {
       if ($candidate -like '*\*') {
         if (Test-Path -LiteralPath $candidate) { return $candidate }
       } else {
         $cmd = Get-Command $candidate -ErrorAction SilentlyContinue
-        if ($cmd) { return $cmd.Source }
+        if ($cmd -and $cmd.Source -notlike '*hermes*') { return $cmd.Source }
       }
+    } catch {}
+  }
+  return 'python.exe'
+}
     } catch {}
   }
   return 'python'
 }
-
+
+
 function Get-ContentType([string]$Path) {
   switch ([System.IO.Path]::GetExtension($Path).ToLowerInvariant()) {
     '.html' { 'text/html; charset=utf-8'; break }

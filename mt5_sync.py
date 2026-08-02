@@ -14,12 +14,17 @@ except Exception:
     pass
 
 appdata = os.environ.get('APPDATA', '')
+localappdata = os.environ.get('LOCALAPPDATA', '')
 if appdata:
     for py_ver in ['Python313', 'Python312', 'Python311', 'Python310', 'Python39']:
         p = os.path.join(appdata, 'Python', py_ver, 'site-packages')
         if os.path.exists(p) and p not in sys.path:
             sys.path.insert(0, p)
-
+if localappdata:
+    for py_ver in ['Python313', 'Python312', 'Python311', 'Python310', 'Python39']:
+        p = os.path.join(localappdata, 'Programs', 'Python', py_ver, 'Lib', 'site-packages')
+        if os.path.exists(p) and p not in sys.path:
+            sys.path.insert(0, p)
 
 try:
     import MetaTrader5 as mt5
