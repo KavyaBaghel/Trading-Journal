@@ -53,21 +53,28 @@ def main():
     except Exception:
         pass
 
-    base_url = input_data.get("url", "").rstrip("/")
-    email = input_data.get("login") or input_data.get("email") or ""
-    password = input_data.get("password") or ""
+    raw_url = input_data.get("url") or input_data.get("matchtraderUrl") or ""
+    email = input_data.get("login") or input_data.get("email") or input_data.get("matchtraderEmail") or ""
+    password = input_data.get("password") or input_data.get("matchtraderPassword") or ""
 
-    if not base_url:
-        print(json.dumps({"error": "MatchTrader Platform URL is required (e.g. https://matchtrader.fundingpips.com)."}))
-        sys.exit(1)
+    if not raw_url:
+        print(json.dumps({"error": "MatchTrader Platform URL is required (e.g. https://mtr-platform.fundingpips.com)."}))
+        sys.exit(0)
     if not email or not password:
-        print(json.dumps({"error": "MatchTrader Email/Login and Password are required."}))
-        sys.exit(1)
+        print(json.dumps({"error": "MatchTrader Email and Password are required."}))
+        sys.exit(0)
 
-    if not base_url.startswith("http://") and not base_url.startswith("https://"):
-        base_url = "https://" + base_url
+    if not raw_url.startswith("http://") and not raw_url.startswith("https://"):
+        raw_url = "https://" + raw_url
 
-    # Attempt login against common MatchTrader endpoint paths
+    parsed_url = urllib.parse.urlparse(raw_url)
+    root_url = f"{parsed_url.scheme}://{parsed_url.netloc}"
+    base_url = raw_url.rstrip("/")
+
+    candidate_bases = [root_url]
+    if base_url != root_url:
+        candidate_bases.append(base_url)
+
     login_paths = [
         "/api/user/login",
         "/api/auth/login",
@@ -78,26 +85,30 @@ def main():
     token = None
     user_id = None
     last_err = ""
+    active_base = root_url
 
-    for path in login_paths:
-        url = base_url + path
-        status, resp = http_post(url, {"email": email, "password": password})
-        if status in (200, 201):
-            token = resp.get("token") or resp.get("jwt") or resp.get("accessToken")
-            if not token and isinstance(resp.get("data"), dict):
-                token = resp["data"].get("token") or resp["data"].get("jwt") or resp["data"].get("accessToken")
-                user_id = resp["data"].get("id") or resp["data"].get("userId")
-            if token:
-                break
-        else:
-            err_detail = resp.get("message") or resp.get("error") or str(resp)
-            last_err = f"{status} - {err_detail}"
+    for b in candidate_bases:
+        for path in login_paths:
+            url = b + path
+            status, resp = http_post(url, {"email": email, "password": password})
+            if status in (200, 201):
+                token = resp.get("token") or resp.get("jwt") or resp.get("accessToken")
+                if not token and isinstance(resp.get("data"), dict):
+                    token = resp["data"].get("token") or resp["data"].get("jwt") or resp["data"].get("accessToken")
+                    user_id = resp["data"].get("id") or resp["data"].get("userId")
+                if token:
+                    active_base = b
+                    break
+            else:
+                err_detail = resp.get("message") or resp.get("error") or str(resp)
+                last_err = f"{status} - {err_detail}"
+        if token:
+            break
 
     if not token:
-        print(json.dumps({"error": f"MatchTrader authentication failed: {last_err or 'Invalid credentials or server URL'}"}))
-        sys.exit(1)
+        print(json.dumps({"error": f"MatchTrader login failed: {last_err or 'Invalid email/password or server URL'}. Ensure your email and password match your MatchTrader account."}))
+        sys.exit(0)
 
-    # Fetch closed trades history
     headers = {
         "Authorization": f"Bearer {token}",
         "x-auth-token": token
@@ -112,7 +123,7 @@ def main():
 
     trades_raw = []
     for path in history_paths:
-        url = base_url + path
+        url = active_base + path
         status, resp = http_get(url, headers)
         if status == 200:
             if isinstance(resp, list):
@@ -143,14 +154,13 @@ def main():
         close_price = float(t.get("closePrice") or t.get("close_price") or 0.0)
         volume = float(t.get("volume") or t.get("lots") or t.get("quantity") or 0.0)
 
-        # Timestamps
         close_time_raw = t.get("closeTime") or t.get("close_time") or t.get("time") or t.get("updatedAt")
         date_str = ""
         time_str = ""
         if close_time_raw:
             try:
                 if isinstance(close_time_raw, (int, float)):
-                    if close_time_raw > 1e11: # milliseconds
+                    if close_time_raw > 1e11:
                         close_time_raw /= 1000
                     dt = datetime.datetime.fromtimestamp(close_time_raw)
                 else:

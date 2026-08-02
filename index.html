@@ -5908,10 +5908,18 @@ function onBrokerPlatformChange(){
 
 
 async function syncMatchTraderWeb(url, email, password, days) {
-  let baseUrl = url.trim().replace(/\/+$/, '');
-  if (!baseUrl.startsWith('http://') && !baseUrl.startsWith('https://')) {
-    baseUrl = 'https://' + baseUrl;
+  let rawUrl = url.trim().replace(/\/+$/, '');
+  if (!rawUrl.startsWith('http://') && !rawUrl.startsWith('https://')) {
+    rawUrl = 'https://' + rawUrl;
   }
+  let rootUrl = rawUrl;
+  try {
+    const uObj = new URL(rawUrl);
+    rootUrl = uObj.origin;
+  } catch(e) {}
+
+  const candidateBases = [rootUrl];
+  if (rawUrl !== rootUrl) candidateBases.push(rawUrl);
 
   const loginEndpoints = [
     '/api/user/login',
@@ -6145,31 +6153,39 @@ async function triggerBrokerSync(){
   try {
     let parsed = [];
 
-    // Direct Web Cloud Sync for MatchTrader & cTrader (No python / local server required!)
-    if (platform === 'matchtrader') {
-      const url = document.getElementById('matchtraderUrl')?.value.trim();
-      const email = document.getElementById('matchtraderEmail')?.value.trim();
-      const pwd = document.getElementById('matchtraderPassword')?.value.trim();
-      parsed = await syncMatchTraderWeb(url, email, pwd, parseInt(days));
-    } else if (platform === 'ctrader') {
-      const token = document.getElementById('ctraderToken')?.value.trim();
-      const accId = document.getElementById('ctraderAccountId')?.value.trim();
-      parsed = await syncCTraderWeb(token, accId, parseInt(days));
-    } else {
-      // Local PC Terminal Sync for MT5
+    // 1. Try local server bridge / backend sync first (No CORS issues!)
+    let backendSuccess = false;
+    try {
       const res = await fetch(syncApiUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
-      }).catch(err => {
-        throw new Error(`MetaTrader 5 requires the local PC app launcher.\n\nTo sync from MT5:\n1. Double-click 'Journall App.bat' on your PC to launch Journall Desktop Mode.\n2. Or use MatchTrader / cTrader for 100% Direct Web Cloud Sync without downloading anything!`);
       });
-      
-      const data = await res.json().catch(() => ({ error: 'Invalid response from local server.' }));
-      if (!res.ok || data.error) {
-        throw new Error(data.error || `Server returned ${res.status}`);
+      const data = await res.json().catch(() => ({}));
+      if (res.ok && !data.error) {
+        parsed = data.trades || [];
+        backendSuccess = true;
+      } else if (data.error && platform === 'mt5') {
+        throw new Error(data.error);
       }
-      parsed = data.trades || [];
+    } catch(err) {
+      if (platform === 'mt5') {
+        throw new Error(err.message || `Local server bridge is not running on your PC (http://localhost:8787).\n\nTo sync directly from MT5:\n1. Double-click 'Journall App.bat' on your PC.\n2. Or drag & drop your MT5 HTML report into the Upload box below.`);
+      }
+    }
+
+    // 2. If backend sync was not used, fallback to client-side Web Cloud Sync
+    if (!backendSuccess) {
+      if (platform === 'matchtrader') {
+        const url = document.getElementById('matchtraderUrl')?.value.trim();
+        const email = document.getElementById('matchtraderEmail')?.value.trim();
+        const pwd = document.getElementById('matchtraderPassword')?.value.trim();
+        parsed = await syncMatchTraderWeb(url, email, pwd, parseInt(days));
+      } else if (platform === 'ctrader') {
+        const token = document.getElementById('ctraderToken')?.value.trim();
+        const accId = document.getElementById('ctraderAccountId')?.value.trim();
+        parsed = await syncCTraderWeb(token, accId, parseInt(days));
+      }
     }
     if (!parsed.length) {
       if (status) status.innerHTML = `<strong>Sync complete.</strong><br>No new trades found in the last ${days} days.`;
