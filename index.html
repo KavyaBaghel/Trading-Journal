@@ -504,11 +504,30 @@ function rememberFirebaseUserProfile(user) {
   if (user.photoURL) localStorage.setItem('journall_user_photo', user.photoURL);
 }
 
+
+function handleCustomAvatarUpload(event) {
+  const file = event.target.files && event.target.files[0];
+  if (!file) return;
+  if (file.size > 5 * 1024 * 1024) {
+    alert('Please choose an image under 5MB.');
+    return;
+  }
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const dataUrl = e.target.result;
+    localStorage.setItem('journall_user_custom_avatar', dataUrl);
+    renderUserProfile();
+    alert('✓ Profile picture updated successfully!');
+  };
+  reader.readAsDataURL(file);
+}
+
 function renderUserProfile() {
   const user = window.currentUser || {};
   const dName = getActiveUserName();
   const dEmail = getActiveUserEmail();
-  const dPhoto = user.photoURL || localStorage.getItem('journall_user_photo') || `https://ui-avatars.com/api/?name=${encodeURIComponent(dName)}&background=a855f7&color=fff`;
+  const customAvatar = localStorage.getItem('journall_user_custom_avatar');
+  const dPhoto = customAvatar || user.photoURL || localStorage.getItem('journall_user_photo') || `https://ui-avatars.com/api/?name=${encodeURIComponent(dName)}&background=a855f7&color=fff`;
 
   // Top Right Fixed Floating Profile Widget
   const topName = document.getElementById('topProfileName');
@@ -3201,11 +3220,10 @@ tr:hover {
   </div>
 </div>
 <div id="journallApp" class="app" style="display: none;" hidden>
-  <div id="fixedTopRightProfile" class="fixed-top-right-profile" onclick="document.querySelector('[data-tab=&quot;userprofile&quot;]')?.click()">
+  <div id="fixedTopRightProfile" class="fixed-top-right-profile" onclick="document.querySelector('[data-tab=&quot;userprofile&quot;]')?.click()" title="Open User Profile">
     <img id="topAvatarImg" class="top-avatar-img" src="https://lh3.googleusercontent.com/a/default-user" onerror="this.src='https://ui-avatars.com/api/?name=Trader&background=a855f7&color=fff'" alt="Trader Profile">
     <div class="top-profile-details">
       <div class="top-profile-name" id="topProfileName">krishna</div>
-      <div class="top-profile-email" id="topProfileEmail">krishnacnjack@gmail.com</div>
     </div>
   </div>
   <aside class="sidebar">
@@ -3261,9 +3279,10 @@ tr:hover {
     <section id="userprofile" class="section">
       <div class="card profile-card-hero">
         <div style="display:flex; align-items:center; gap:24px; flex-wrap:wrap;">
-          <div style="position:relative;">
+          <div class="avatar-upload-container" style="position:relative; cursor:pointer;" onclick="document.getElementById('customAvatarInput').click()" title="Click to change profile picture">
             <img id="userProfileAvatar" src="https://lh3.googleusercontent.com/a/default-user" onerror="this.src='https://ui-avatars.com/api/?name=Trader&background=a855f7&color=fff'" alt="Google Profile" style="width:90px; height:90px; border-radius:50%; border:3px solid #a855f7; object-fit:cover; box-shadow:0 0 25px rgba(168,85,247,0.4);">
-            <span style="position:absolute; bottom:3px; right:3px; width:18px; height:18px; background:#22c55e; border:3px solid #0f172a; border-radius:50%;"></span>
+            <div class="avatar-upload-badge">📷</div>
+            <input type="file" id="customAvatarInput" accept="image/*" style="display:none;" onchange="handleCustomAvatarUpload(event)">
           </div>
           <div style="flex:1;">
             <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
