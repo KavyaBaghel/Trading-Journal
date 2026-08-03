@@ -469,34 +469,47 @@ function renderLiveTraderControllerMarkup(metrics) {
 
 
 function getActiveUserEmail() {
-  const fbEmail = (window.currentUser && window.currentUser.email && window.currentUser.email !== 'local@journall.app') ? window.currentUser.email.trim() : '';
+  if (window.currentUser && window.currentUser.email && window.currentUser.email !== 'local@journall.app') {
+    return window.currentUser.email.trim();
+  }
   const savedEmail = (localStorage.getItem('journall_user_email') || localStorage.getItem('journall_google_email') || '').trim();
-  return fbEmail || savedEmail || 'krishnacnjack@gmail.com';
+  return savedEmail || 'Signed in';
 }
 
 function getActiveUserName() {
+  const userUid = window.currentUser?.uid || 'local';
   const customInputVal = document.getElementById('customUsernameInput')?.value?.trim();
-  if (customInputVal) {
-    localStorage.setItem('journall_custom_username', customInputVal);
-    localStorage.setItem('journall_user_name', customInputVal);
-    return customInputVal;
+  
+  const savedUserCustom = localStorage.getItem(`journall_custom_username_${userUid}`) || localStorage.getItem('journall_custom_username');
+  if (savedUserCustom && savedUserCustom.trim()) return savedUserCustom.trim();
+
+  if (window.currentUser && window.currentUser.displayName && window.currentUser.displayName !== 'Local Trader') {
+    return window.currentUser.displayName.trim();
   }
 
-  const savedCustom = localStorage.getItem('journall_custom_username') || localStorage.getItem('journall_user_name');
-  if (savedCustom && savedCustom.trim()) return savedCustom.trim();
-
-  const fbName = (window.currentUser && window.currentUser.displayName && window.currentUser.displayName !== 'Local Trader') ? window.currentUser.displayName : null;
-  if (fbName) return fbName;
+  const savedName = localStorage.getItem('journall_user_name');
+  if (savedName && savedName.trim()) return savedName.trim();
 
   const email = getActiveUserEmail();
-  if (email && email.includes('@')) {
+  if (email && email.includes('@') && !email.includes('local@')) {
     return email.split('@')[0];
   }
-  return 'krishna';
+  return 'Trader';
 }
 
 function rememberFirebaseUserProfile(user) {
   if (!user || user.uid === 'local_user') return;
+  const prevUserUid = localStorage.getItem('journall_active_uid');
+  
+  // If a DIFFERENT Google Account signed in, reset account-specific profile caches
+  if (prevUserUid && prevUserUid !== user.uid) {
+    localStorage.removeItem('journall_custom_username');
+    localStorage.removeItem('journall_user_name');
+    localStorage.removeItem('journall_user_custom_avatar');
+    localStorage.removeItem('journall_name_change_history');
+  }
+  
+  localStorage.setItem('journall_active_uid', user.uid);
   if (user.email) localStorage.setItem('journall_user_email', user.email.trim());
   if (user.displayName && !localStorage.getItem('journall_custom_username')) {
     localStorage.setItem('journall_user_name', user.displayName.trim());
@@ -644,7 +657,8 @@ function handleLiveUsernameInput(val) {
 function saveCustomUsername() {
   const input = document.getElementById('customUsernameInput');
   const val = input?.value?.trim();
-  const currentSaved = (localStorage.getItem('journall_custom_username') || '').trim();
+  const userUid = window.currentUser?.uid || 'local';
+  const currentSaved = (localStorage.getItem(`journall_custom_username_${userUid}`) || localStorage.getItem('journall_custom_username') || '').trim();
 
   if (!val) {
     alert('Please enter a valid display name.');
@@ -666,8 +680,9 @@ Your next name change will be available on the 1st of next month.');
     return;
   }
 
-  // Save name change and record history
+  // Save name change under active user session
   recordNameChangeHistory(val);
+  localStorage.setItem(`journall_custom_username_${userUid}`, val);
   localStorage.setItem('journall_custom_username', val);
   localStorage.setItem('journall_user_name', val);
 
@@ -7140,8 +7155,15 @@ function onBrokerPlatformChange(){
     if(btnText) btnText.textContent = 'Sync from cTrader (Cloud)';
     if(status) status.innerHTML = '☁️ <strong>Direct Cloud Sync:</strong> Enter your cTrader Access Token. Works on desktop and phone through the Journall cloud sync Worker.';
   } else if(platform === 'mt5'){
-    if(btnText) btnText.textContent = 'Upload MT5 Report';
-    if(status) status.innerHTML = '<strong>MT5 import:</strong> Export your MT5 HTML statement/report, then tap Upload MT5 Report. Direct terminal sync is disabled on the website because browsers cannot access your private MT5 desktop terminal.';
+    const isLocalHost = window.location.hostname === '127.0.0.1' || window.location.hostname === 'localhost';
+    const isMobileBroker = isMobileBrokerDevice();
+    if(isLocalHost && !isMobileBroker){
+      if(btnText) btnText.textContent = 'Sync from MetaTrader 5 (Local PC)';
+      if(status) status.innerHTML = '<strong>Direct MT5 Sync:</strong> Journall will read from your local MT5 desktop bridge. Keep Journall App.bat running on this PC.';
+    } else {
+      if(btnText) btnText.textContent = 'Sync from MetaTrader 5';
+      if(status) status.innerHTML = '<strong>MT5 sync:</strong> Direct MT5 terminal sync requires the local Journall desktop bridge on your PC. Mobile browsers cannot read desktop MT5 directly; use MatchTrader/cTrader cloud sync on phone.';
+    }
   }
 }
 
@@ -7460,19 +7482,27 @@ async function triggerBrokerSync(){
 
   const payload = { platform, days: parseInt(days) };
 
+  const isLocalHost = window.location.hostname === '127.0.0.1' || window.location.hostname === 'localhost';
+  const isMobileBroker = isMobileBrokerDevice();
+
   if (platform === 'mt5') {
-    if (status) {
-      status.innerHTML =
-        `<strong>MT5 uses file import on the website.</strong><br>` +
-        `Choose your MT5 HTML statement/report now. Your saved old trades will be kept and merged safely.`;
+    if (!isLocalHost || isMobileBroker) {
+      if (status) {
+        status.innerHTML =
+          `<strong>MT5 direct sync needs your local PC.</strong><br>` +
+          `Open Journall locally from your laptop with Journall App.bat, then use Sync from MetaTrader 5. A phone cannot directly read your desktop MT5 terminal.`;
+      }
+      alert('MT5 direct sync works only on the laptop/PC where MT5 and Journall App.bat are running. On mobile, use MatchTrader/cTrader cloud sync or import an MT5 report.');
+      if (btn) {
+        btn.disabled = false;
+        btn.innerHTML = `<span>Sync from MetaTrader 5</span>`;
+      }
+      return;
     }
-    const upload = document.getElementById('mainCsvUpload') || document.getElementById('tradingPageUpload');
-    if (upload) upload.click();
-    if (btn) {
-      btn.disabled = false;
-      btn.innerHTML = `<span>Upload MT5 Report</span>`;
-    }
-    return;
+    const login = document.getElementById('brokerSyncLogin')?.value.trim();
+    const server = document.getElementById('brokerSyncServer')?.value.trim();
+    if (login) payload.login = login;
+    if (server) payload.server = server;
   } else if (platform === 'matchtrader') {
     const url = document.getElementById('matchtraderUrl')?.value.trim();
     const login = document.getElementById('matchtraderEmail')?.value.trim();
@@ -7498,11 +7528,9 @@ async function triggerBrokerSync(){
     payload.token = token;
     if (accountId) payload.accountId = accountId;
   }
-  const isLocalHost = window.location.hostname === '127.0.0.1' || window.location.hostname === 'localhost';
-  const isMobileBroker = isMobileBrokerDevice();
   const syncApiUrl = isLocalHost ? '/api/sync-broker' : 'http://localhost:8787/api/sync-broker';
 
-let parsed = [];
+  let parsed = [];
   try {
     // 1. Try local server bridge / backend sync first (No CORS issues!)
     let backendSuccess = false;
@@ -10465,6 +10493,12 @@ async function initFirebaseAuth(){
       }
 
       sessionStorage.clear();
+      localStorage.removeItem('journall_user_email');
+      localStorage.removeItem('journall_google_email');
+      localStorage.removeItem('journall_custom_username');
+      localStorage.removeItem('journall_user_name');
+      localStorage.removeItem('journall_user_custom_avatar');
+      localStorage.removeItem('journall_active_uid');
 
       // Delay slightly for smooth transition, then reload
       setTimeout(() => {
