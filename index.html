@@ -2415,7 +2415,7 @@ tr:hover {
         <div class="sub" style="margin-bottom: 16px; color: rgba(255,255,255,0.6);">
           Select your trading platform below to automatically sync your trades directly into Journall.
         </div>
-        
+
         <div style="margin-bottom: 16px;">
           <label style="display:block; font-size:11px; text-transform:uppercase; color:rgba(255,255,255,0.4); margin-bottom:4px;">Trading Platform / Broker</label>
           <select id="brokerPlatformSelect" onchange="onBrokerPlatformChange()" style="width:100% !important; border-radius:8px !important; padding:8px 12px !important; height: 38px !important; background: rgba(255,255,255,0.06); color: #fff;">
@@ -2477,13 +2477,13 @@ tr:hover {
             <option value="365">Last 365 Days</option>
           </select>
         </div>
-        
+
         <div class="csv-only-box" style="margin-top: 0;">
           <button class="btn primary" id="btnBrokerSync" onclick="triggerBrokerSync()" style="margin: 0; display: inline-flex; align-items: center; justify-content: center; gap: 8px;">
             <span id="btnBrokerSyncText">Sync from MetaTrader 5</span>
           </button>
         </div>
-        
+
         <div class="sync-status" id="brokerSyncStatus" style="margin-top: 10px;">
           Ready to sync. MetaTrader 5 terminal must be open and running on this PC.
         </div>
@@ -2837,7 +2837,7 @@ tr:hover {
               <button class="btn" onclick="document.querySelector('[data-tab=&quot;journalpage&quot;]')?.click()">Open Journal</button>
             </div>
           </div>
-        
+
           <div class="card" style="margin-top: 24px;">
             <div class="panel-title"><h3>Debrief</h3><span>journal close loop</span></div>
             <div class="sub psych-intro">Record the outcome and lessons - this closes the loop and saves to your Journal.</div>
@@ -3156,9 +3156,9 @@ function cleanDuplicateDeals(arr) {
   if (!Array.isArray(arr)) return [];
   return arr.filter(t => {
     // Skip raw entry deal rows which are mapped as trades with no duration and matching price
-    const isEntryDeal = 
-      t.entry === t.exit && 
-      (t.duration === 0 || !t.duration) && 
+    const isEntryDeal =
+      t.entry === t.exit &&
+      (t.duration === 0 || !t.duration) &&
       (t.rawProfit === 0 || !t.rawProfit);
     return !isEntryDeal;
   });
@@ -3523,7 +3523,7 @@ function renderSide(){
   const tradeProgress = maxTrades ? Math.min(100, todayTrades.length / maxTrades * 100) : null;
   const lossProgress = dailyLimit ? Math.min(100, lossUsed / dailyLimit * 100) : null;
   const pnlProgress = dailyLimit && todayPnl > 0 ? Math.min(100, todayPnl / dailyLimit * 100) : 0;
-  
+
   const todayWins = todayTrades.filter(t => (Number(t.pnl) || 0) > 0).length;
   const winRateVal = todayTrades.length ? (todayWins / todayTrades.length * 100) : 0;
   const winRateText = todayTrades.length ? `${Math.round(winRateVal)}% (${todayWins}/${todayTrades.length})` : '0% (0/0)';
@@ -4398,11 +4398,11 @@ function renderRuleBasedDashboardInsights(){
 function renderAIReportText(text){
   const cleaned = cleanAIReportText(text);
   if(!cleaned) return renderRuleBasedDashboardInsights();
-  
+
   // Find all matches for Report Card sections
   const cards = [];
   const matches = [...cleaned.matchAll(/(?:Report Card\s*\d+|Card\s*\d+|\b\d+\b\s*:\s*Diagnosis)/gi)];
-  
+
   if (matches.length > 1) {
     for (let i = 0; i < matches.length; i++) {
       const start = matches[i].index;
@@ -4413,14 +4413,14 @@ function renderAIReportText(text){
     // Fallback: split by newlines
     cards.push(...cleaned.split(/\n\s*\n/).map(c => c.trim()).filter(Boolean));
   }
-  
+
   if(!cards.length) return renderRuleBasedDashboardInsights();
-  
+
   return cards.map((card, i) => {
     let title = `Report Card ${i+1}`;
     let diagnosis = '';
     let action = '';
-    
+
     const lines = card.split('\n').map(l => l.trim()).filter(Boolean);
     if (lines.length > 0) {
       if (lines[0].toLowerCase().includes('card') || /^\d+$/.test(lines[0]) || lines[0].toLowerCase().startsWith('report')) {
@@ -4428,21 +4428,21 @@ function renderAIReportText(text){
         lines.shift();
       }
     }
-    
+
     const rest = lines.join(' ');
     const diagMatch = rest.match(/Diagnosis:\s*(.*?)(?=Action:|$)/i);
     const actMatch = rest.match(/Action:\s*(.*)/i);
-    
+
     if (diagMatch) diagnosis = diagMatch[1].trim();
     if (actMatch) action = actMatch[1].trim();
-    
+
     if (!diagnosis && !action) {
       diagnosis = rest;
     }
-    
+
     const tones = ['verdict', 'mistake', 'decision', 'strength', 'reminder', 'setup'];
     const tone = tones[i % tones.length];
-    
+
     return `
       <div class="insight" style="border-left: 4px solid var(--accent-${tone}, #494fdf) !important; margin-bottom: 14px !important; padding: 16px 20px !important; border-radius: 12px !important; background: rgba(255,255,255,0.02) !important; border-top: 1px solid rgba(255,255,255,0.03) !important; border-right: 1px solid rgba(255,255,255,0.03) !important; border-bottom: 1px solid rgba(255,255,255,0.03) !important;">
         <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
@@ -5054,7 +5054,7 @@ function stepInput(id, delta, callbackName){
   }
   const decimals = (String(step).split('.')[1] || '').length;
   el.value = updated.toFixed(decimals);
-  
+
   if(callbackName && typeof window[callbackName] === 'function'){
     window[callbackName]();
   }
@@ -5371,7 +5371,7 @@ function parseMatchTraderCSV(text){
     if(!symbol && !openRaw && !closeRaw) continue;
 
     // Ignore non-trade entries (commissions, swaps, fees, balance adjustments, credit, correction)
-    const isNonTrade = 
+    const isNonTrade =
       !symbol ||
       /commission|fee|swap|interest|balance|deposit|withdrawal|credit|correction|bonus|tax/i.test(symbol) ||
       /commission|fee|swap|interest|balance|deposit|withdrawal|credit|correction|bonus|tax/i.test(sideRaw) ||
@@ -5475,7 +5475,7 @@ function parseFundingPipsMt5History(text){
         if(!symbol || !timeRaw) return;
 
         // Ignore non-trade entries
-        const isNonTrade = 
+        const isNonTrade =
           /commission|fee|swap|interest|balance|deposit|withdrawal|credit|correction|bonus|tax/i.test(symbol) ||
           /commission|fee|swap|interest|balance|deposit|withdrawal|credit|correction|bonus|tax/i.test(typeRaw) ||
           /commission|fee|swap|interest|balance|deposit|withdrawal|credit|correction|bonus|tax/i.test(directionRaw) ||
@@ -5514,7 +5514,7 @@ function parseFundingPipsMt5History(text){
     // If it's an entry deal
     if (deal.direction.includes('IN') && !deal.direction.includes('OUT')) {
       openDeals.push(deal);
-    } 
+    }
     // If it's an exit deal
     else if (deal.direction.includes('OUT')) {
       let matchIdx = -1;
@@ -5829,7 +5829,7 @@ function parseMatchTraderHTML(text){
     if(!symbol && !openRaw && !closeRaw) return;
 
     // Ignore non-trade entries (commissions, swaps, fees, balance adjustments, credit, correction)
-    const isNonTrade = 
+    const isNonTrade =
       !symbol ||
       /commission|fee|swap|interest|balance|deposit|withdrawal|credit|correction|bonus|tax/i.test(symbol) ||
       /commission|fee|swap|interest|balance|deposit|withdrawal|credit|correction|bonus|tax/i.test(sideRaw) ||
@@ -5905,7 +5905,7 @@ function handleCSVUpload(event){
     if (previousCount > 0) {
       shouldReplace = confirm("Would you like to clear your previously imported trades and replace them with this new file?\n\nNote: Your written journal notes/entries will NOT be affected or deleted.\n\nClick 'OK' to replace (overwrite) existing trades.\nClick 'Cancel' to merge the new trades with your existing ones.");
     }
-    
+
     if (shouldReplace) {
       trades = normalizeImportedTradeList(parsed);
       if (typeof cleanDuplicateDeals === 'function') {
@@ -5914,7 +5914,7 @@ function handleCSVUpload(event){
     } else {
       trades = mergeImportedTrades(trades, parsed);
     }
-    
+
     filtered = [...trades];
     saveTrades();
 
@@ -5983,26 +5983,57 @@ async function fetchWithCorsProxy(targetUrl, options = {}) {
   return await fetch(proxyUrl, options);
 }
 
+function addUniqueMatchTraderBase(list, value) {
+  const clean = String(value || '').trim().replace(/\/+$/, '');
+  if (clean && !list.includes(clean)) list.push(clean);
+}
+
+function normalizeMatchTraderBaseUrls(inputUrl) {
+  let rawUrl = String(inputUrl || '').trim();
+  if (!rawUrl) return [];
+  if (!rawUrl.startsWith('http://') && !rawUrl.startsWith('https://')) {
+    rawUrl = 'https://' + rawUrl;
+  }
+
+  const candidateBases = [];
+  let origin = rawUrl.replace(/\/+$/, '');
+  try {
+    const parsed = new URL(rawUrl);
+    origin = parsed.origin.replace('://www.', '://');
+  } catch (e) {}
+
+  addUniqueMatchTraderBase(candidateBases, origin);
+
+  let host = '';
+  try { host = new URL(origin).hostname.toLowerCase(); } catch (e) {}
+  if (host.includes('fundingpips') || host.includes('ingpips')) {
+    [
+      'https://mtr-platform.fundingpips.com',
+      'https://matchtrader.fundingpips.com',
+      'https://mtr.fundingpips.com',
+      'https://platform.fundingpips.com',
+      'https://fundingpips.com'
+    ].forEach(base => addUniqueMatchTraderBase(candidateBases, base));
+  }
+
+  const hostParts = host.split('.').filter(Boolean);
+  if (hostParts.length >= 2) {
+    const rootDomain = hostParts.slice(-2).join('.');
+    ['mtr-platform', 'matchtrader', 'mtr', 'platform'].forEach(prefix => {
+      addUniqueMatchTraderBase(candidateBases, `https://${prefix}.${rootDomain}`);
+    });
+  }
+
+  return candidateBases;
+}
+
 async function syncMatchTraderWeb(url, email, password, days) {
   let rawUrl = (url || '').trim().replace(/\/+$/, '');
   if (!rawUrl.startsWith('http://') && !rawUrl.startsWith('https://')) {
     rawUrl = 'https://' + rawUrl;
   }
-  
-  const candidateBases = [];
-  try {
-    const uObj = new URL(rawUrl);
-    const root = uObj.origin;
-    candidateBases.push(root);
-    const parts = uObj.pathname.split('/').filter(Boolean);
-    let curr = root;
-    for (const p of parts) {
-      curr += '/' + p;
-      if (!candidateBases.includes(curr)) candidateBases.push(curr);
-    }
-  } catch(e) {
-    candidateBases.push(rawUrl);
-  }
+
+  const candidateBases = normalizeMatchTraderBaseUrls(rawUrl);
 
   const loginEndpoints = [
     '/api/user/login',
@@ -6045,7 +6076,7 @@ async function syncMatchTraderWeb(url, email, password, days) {
   }
 
   if (!token) {
-    throw new Error(`MatchTrader login failed: ${lastErr || 'Invalid credentials or URL. Ensure your platform URL is correct (e.g. https://mtr-platform.fundingpips.com).'}`);
+    throw new Error(`MatchTrader login failed: ${lastErr || 'Invalid credentials or URL.'} I tried clean platform domains (${candidateBases.slice(0, 6).join(', ')}). Paste the exact MatchTrader platform domain, not the /app/trade page path.`);
   }
 
   const historyEndpoints = [
@@ -6086,7 +6117,7 @@ async function syncMatchTraderWeb(url, email, password, days) {
     const openPrice = parseFloat(t.openPrice || t.open_price || 0);
     const closePrice = parseFloat(t.closePrice || t.close_price || 0);
     const volume = parseFloat(t.volume || t.lots || t.quantity || 0);
-    
+
     let closeTime = t.closeTime || t.close_time || t.time || t.updatedAt;
     let dateStr = new Date().toISOString().slice(0, 10);
     let timeStr = '00:00:00';
@@ -6145,7 +6176,7 @@ async function syncCTraderWeb(token, accountId, days) {
   if (!res.ok) throw new Error(data.description || data.error || `HTTP ${res.status}`);
 
   const deals = Array.isArray(data.deal) ? data.deal : (Array.isArray(data.deals) ? data.deals : []);
-  
+
   return deals.map((d, i) => {
     const symbol = String(d.symbolName || d.symbol || 'Unknown').trim();
     const sideRaw = String(d.tradeSide || d.side || '').toUpperCase();
@@ -6288,7 +6319,7 @@ async function triggerBrokerSync(){
     }
 
     const previousCount = Array.isArray(trades) ? trades.length : 0;
-    
+
     trades = mergeImportedTrades(trades, parsed);
     filtered = [...trades];
     saveTrades();
@@ -6661,7 +6692,7 @@ function initDraftAutoSync() {
     'journalEmotionAfter',
     'journalImprovement'
   ];
-  
+
   journalInputs.forEach(id => {
     const el = document.getElementById(id);
     if (el) {
@@ -6669,13 +6700,13 @@ function initDraftAutoSync() {
       el.addEventListener('change', saveJournalDraft);
     }
   });
-  
+
   const psychInputs = [
     'psychTomorrowRule',
     'psychDebriefMistakes',
     'psychDebriefNotes'
   ];
-  
+
   psychInputs.forEach(id => {
     const el = document.getElementById(id);
     if (el) {
@@ -6705,14 +6736,14 @@ function loadJournalDraft() {
     const draftRaw = localStorage.getItem('krishna_journal_form_draft');
     if (!draftRaw) return;
     const draft = JSON.parse(draftRaw);
-    
+
     const setVal = (id, val) => {
       const el = document.getElementById(id);
       if (el && el.value !== val) {
         el.value = val || '';
       }
     };
-    
+
     setVal('journalId', draft.id);
     setVal('journalTradeKey', draft.tradeKey);
     setVal('journalSetupCategory', draft.category);
@@ -6746,14 +6777,14 @@ function loadPsychologyDraft() {
     const draftRaw = localStorage.getItem('krishna_psychology_form_draft');
     if (!draftRaw) return;
     const draft = JSON.parse(draftRaw);
-    
+
     const setVal = (id, val) => {
       const el = document.getElementById(id);
       if (el && el.value !== val) {
         el.value = val || '';
       }
     };
-    
+
     setVal('psychTomorrowRule', draft.tomorrowRule);
     setVal('psychDebriefMistakes', draft.debriefMistakes);
     setVal('psychDebriefNotes', draft.debriefNotes);
@@ -6993,20 +7024,20 @@ function postSessionStorageKey(data){
 
 function renderPostSessionText(text){
   if (!text) return '<div class="insight empty"><strong>No review yet.</strong><br>Generate a post-session review.</div>';
-  
+
   const rawText = String(text).trim();
   const lines = rawText.split(/\r?\n/);
-  
+
   const cards = [];
   let currentCard = null;
-  
+
   lines.forEach(line => {
     const trimmed = line.trim();
     if (!trimmed) return;
-    
+
     // Check if the line is a header like **Header** or ### Header or Header:
     const headerMatch = trimmed.match(/^\*\*(.*?)\*\*$/) || trimmed.match(/^###\s*(.*)$/) || trimmed.match(/^\*\*(.*?)\*\*:\s*$/);
-    
+
     if (headerMatch) {
       if (currentCard) {
         cards.push(currentCard);
@@ -7019,7 +7050,7 @@ function renderPostSessionText(text){
       let cleanLine = trimmed
         .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
         .replace(/^\s*[-*]\s+/, '• ');
-        
+
       if (currentCard) {
         currentCard.content.push(cleanLine);
       } else {
@@ -7030,11 +7061,11 @@ function renderPostSessionText(text){
       }
     }
   });
-  
+
   if (currentCard) {
     cards.push(currentCard);
   }
-  
+
   if (!cards.length) {
     const cleanParagraphs = rawText
       .replace(/&/g, '&amp;')
@@ -7044,11 +7075,11 @@ function renderPostSessionText(text){
       .replace(/\r?\n/g, '<br>');
     return `<div class="insight"><span>${cleanParagraphs}</span></div>`;
   }
-  
+
   return cards.map(card => {
     const title = card.title;
     const body = card.content.join('<br>');
-    
+
     // Assign custom high-contrast borders based on section titles
     let borderStyle = '';
     if (/verdict/i.test(title)) borderStyle = 'border-left-color: #22c55e !important;'; // green
@@ -7056,7 +7087,7 @@ function renderPostSessionText(text){
     else if (/decision/i.test(title)) borderStyle = 'border-left-color: #f59e0b !important;'; // orange
     else if (/risk/i.test(title)) borderStyle = 'border-left-color: #3b82f6 !important;'; // blue
     else if (/rule|tomorrow/i.test(title)) borderStyle = 'border-left-color: #a855f7 !important;'; // purple
-    
+
     return `
       <div class="insight" style="${borderStyle} padding: 18px 20px !important; margin-top: 14px !important; margin-bottom: 14px !important; border-left-width: 4px !important;">
         <strong style="display: block; margin-bottom: 8px; color: #ffffff !important; font-size: 14px; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 700 !important;">${title}</strong>
@@ -8557,7 +8588,7 @@ window.bypassAuthAndOpenLocal = function(){
 
 window.openSignedInJournal = function(message){
   window.setAuthStatus(message || 'Journal opened on this device.');
-  
+
   const proceedOpen = () => {
     const uName = localStorage.getItem('journall_custom_username') || window.currentUser?.displayName || window.currentUser?.email || 'trader';
     window.setAuthStatus(`Signed in as ${uName}`);
@@ -8713,7 +8744,7 @@ window.journallReloadDataFromStorage = function() {
   }
   filtered = [...trades];
   journalPageEntries = JSON.parse(localStorage.getItem('krishna_journal_page_entries') || '[]');
-  
+
   if (localStorage.getItem('krishna_pre_trade_checklist_state')) {
     try {
       const saved = JSON.parse(localStorage.getItem('krishna_pre_trade_checklist_state'));
@@ -8721,10 +8752,10 @@ window.journallReloadDataFromStorage = function() {
       if (typeof updateChecklist === 'function') updateChecklist();
     } catch(e) {}
   }
-  
+
   if (typeof loadJournalDraft === 'function') loadJournalDraft();
   if (typeof loadPsychologyDraft === 'function') loadPsychologyDraft();
-  
+
   if (typeof renderAll === 'function') renderAll();
   if (typeof renderCalendar === 'function') renderCalendar();
   if (typeof renderTradingPage === 'function') renderTradingPage();
@@ -8798,7 +8829,7 @@ window.checkAndPromptUsername = function checkAndPromptUsername(callback) {
     if (callback) callback();
     return;
   }
-  
+
   const modal = document.createElement('div');
   modal.id = 'journallUsernamePromptModal';
   modal.style.cssText = `
@@ -8815,7 +8846,7 @@ window.checkAndPromptUsername = function checkAndPromptUsername(callback) {
     z-index: 99999 !important;
     animation: fadeIn 300ms ease !important;
   `;
-  
+
   const card = document.createElement('div');
   card.style.cssText = `
     background: #16181a !important;
@@ -8828,7 +8859,7 @@ window.checkAndPromptUsername = function checkAndPromptUsername(callback) {
     text-align: center !important;
     animation: scaleUp 300ms cubic-bezier(0.34, 1.56, 0.64, 1) !important;
   `;
-  
+
   const title = document.createElement('h3');
   title.innerText = 'Welcome to Journall';
   title.style.cssText = `
@@ -8838,7 +8869,7 @@ window.checkAndPromptUsername = function checkAndPromptUsername(callback) {
     margin: 0 0 8px 0 !important;
     font-family: var(--sans) !important;
   `;
-  
+
   const desc = document.createElement('p');
   desc.innerText = 'Please choose a trading username for this account. You can work with this name across all your devices.';
   desc.style.cssText = `
@@ -8848,7 +8879,7 @@ window.checkAndPromptUsername = function checkAndPromptUsername(callback) {
     margin: 0 0 24px 0 !important;
     font-family: var(--sans) !important;
   `;
-  
+
   const input = document.createElement('input');
   input.type = 'text';
   input.placeholder = 'Enter trading username...';
@@ -8866,7 +8897,7 @@ window.checkAndPromptUsername = function checkAndPromptUsername(callback) {
     outline: none !important;
     transition: border-color 0.2s !important;
   `;
-  
+
   const btn = document.createElement('button');
   btn.innerText = 'Save Username';
   btn.style.cssText = `
@@ -8881,7 +8912,7 @@ window.checkAndPromptUsername = function checkAndPromptUsername(callback) {
     cursor: pointer !important;
     transition: opacity 0.2s !important;
   `;
-  
+
   btn.addEventListener('click', () => {
     const val = input.value.trim();
     if (!val) {
@@ -8890,7 +8921,7 @@ window.checkAndPromptUsername = function checkAndPromptUsername(callback) {
     }
     localStorage.setItem('journall_custom_username', val);
     if (typeof scheduleCloudSave === 'function') scheduleCloudSave();
-    
+
     modal.style.opacity = '0';
     modal.style.transition = 'opacity 200ms ease';
     setTimeout(() => {
@@ -8901,7 +8932,7 @@ window.checkAndPromptUsername = function checkAndPromptUsername(callback) {
       if (callback) callback();
     }, 200);
   });
-  
+
   card.appendChild(title);
   card.appendChild(desc);
   card.appendChild(input);
@@ -8917,7 +8948,7 @@ async function loadCloudState(){
   }
   const { doc, getDoc, setDoc, onSnapshot, serverTimestamp } = await import(`https://www.gstatic.com/firebasejs/${firebaseSdkVersion}/firebase-firestore.js`);
   const ref = doc(firestoreDb, 'users', window.currentUser.uid, 'journallState', 'main');
-  
+
   // Verify document existence initially, create if missing and local state exists
   const snap = await getDoc(ref);
   if(!snap.exists() && hasMeaningfulLocalState()){
@@ -8927,12 +8958,12 @@ async function loadCloudState(){
       storage: collectLocalState()
     }, { merge: true });
   }
-  
+
   // Unsubscribe old listener if applicable
   if (typeof unsubscribeCloudSync === 'function') {
     try { unsubscribeCloudSync(); } catch(e) {}
   }
-  
+
   // Connect real-time Firestore synchronization listener
   unsubscribeCloudSync = onSnapshot(ref, (docSnap) => {
     if (docSnap.exists() && docSnap.data()?.storage) {
@@ -8946,10 +8977,10 @@ async function loadCloudState(){
   }, (err) => {
     console.error("Firestore onSnapshot sync error:", err);
   });
-  
+
   cloudReady = true;
   patchLocalStorageForCloud();
-  
+
   const finalizeSignIn = () => {
     const uName = localStorage.getItem('journall_custom_username') || window.currentUser?.displayName || window.currentUser?.email || 'trader';
     if (window.splashHoldActive) {
@@ -8972,7 +9003,7 @@ async function initFirebaseAuth(){
     window.currentUser = { uid: 'local_user', displayName: 'Local Trader', email: 'local@journall.app' };
     window.openSignedInJournal('Opened locally. Cloud sync is disabled.');
     if(signOutBtn){
-      signOutBtn.addEventListener('click', () => { 
+      signOutBtn.addEventListener('click', () => {
         localStorage.removeItem('journall_auth_bypassed');
         location.reload();
       });
@@ -9075,7 +9106,7 @@ async function initFirebaseAuth(){
   if(gateSignInBtn) gateSignInBtn.addEventListener('click', signIn);
   if(bypassAuthBtn) bypassAuthBtn.addEventListener('click', window.bypassAuthAndOpenLocal);
   if(signOutBtn) {
-    signOutBtn.addEventListener('click', async () => { 
+    signOutBtn.addEventListener('click', async () => {
       // Show "Logging out..." spinner immediately
       window.setGateVisible(true);
       window.setAuthLoading(true);
@@ -9094,7 +9125,7 @@ async function initFirebaseAuth(){
       }
 
       sessionStorage.clear();
-      
+
       // Delay slightly for smooth transition, then reload
       setTimeout(() => {
         location.reload();
@@ -11380,7 +11411,7 @@ main,
   document.addEventListener('click', function(event){
     var btn = event.target.closest('[data-tab]');
     if(!btn || btn.closest('.journal-result-tabs') || btn.closest('.account-onboarding-actions') || btn.classList.contains('mobile-upload-btn')) return;
-    
+
     var tab = btn.dataset.tab;
     var isMainTab = ['tradingpage', 'dashboard', 'grid', 'journalpage', 'psychology', 'calendar', 'reports', 'widgets', 'goals', 'ailab', 'uploadcsv'].includes(tab);
     if(!isMainTab) return;
@@ -11957,7 +11988,7 @@ input{
   -webkit-backdrop-filter: blur(16px) !important;
   border: 1px solid rgba(255, 255, 255, 0.04) !important;
   box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.45) !important;
-  transition: border-color 0.25s cubic-bezier(0.25, 0.8, 0.25, 1), 
+  transition: border-color 0.25s cubic-bezier(0.25, 0.8, 0.25, 1),
               transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1),
               box-shadow 0.25s ease !important;
 }
@@ -12015,16 +12046,16 @@ input{
 }
 
 /* 3. Glowing Colors & Typography Highlights */
-.green, 
-.pnl-positive, 
+.green,
+.pnl-positive,
 .calendar-pnl.green,
 #journallApp .calendar-dot.green {
   color: #34d399 !important;
   text-shadow: 0 0 12px rgba(52, 211, 153, 0.25) !important;
 }
 
-.red, 
-.pnl-negative, 
+.red,
+.pnl-negative,
 .calendar-pnl.red,
 #journallApp .calendar-dot.red {
   color: #f87171 !important;
@@ -12145,15 +12176,15 @@ body:not(.firebase-auth-required) #journallApp > .sidebar .nav button.active {
 
 .logo::before {
   color: #5e6ad2 !important;
-  text-shadow: 0 0 10px rgba(94, 106, 210, 0.8), 
-               0 0 20px rgba(94, 106, 210, 0.4), 
+  text-shadow: 0 0 10px rgba(94, 106, 210, 0.8),
+               0 0 20px rgba(94, 106, 210, 0.4),
                0 0 30px rgba(94, 106, 210, 0.2) !important;
 }
 
 .logo::after {
   background: #34d399 !important;
-  box-shadow: 0 0 12px rgba(52, 211, 153, 0.9), 
-              0 0 24px rgba(52, 211, 153, 0.5), 
+  box-shadow: 0 0 12px rgba(52, 211, 153, 0.9),
+              0 0 24px rgba(52, 211, 153, 0.5),
               0 0 36px rgba(52, 211, 153, 0.3) !important;
 }
 
@@ -12283,7 +12314,7 @@ body:not(.firebase-auth-required) #journallApp > .sidebar .brand {
     grid-template-columns: 1fr !important;
     gap: 12px !important;
   }
-  
+
   /* Stack Psychology & Journal Action buttons vertically */
   #journallApp .journal-form-actions {
     flex-direction: column !important;
@@ -12561,7 +12592,7 @@ body:not(.firebase-auth-required) #journallApp > .sidebar .nav button {
   background: linear-gradient(180deg, #12141a, #0e1014) !important;
   backdrop-filter: blur(16px) !important;
   border: 1px solid rgba(255, 255, 255, 0.08) !important;
-  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.65), 
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.65),
               0 0 40px rgba(99, 102, 241, 0.04) !important;
   margin: auto !important;
   overflow: visible !important;
@@ -12622,7 +12653,7 @@ body:not(.firebase-auth-required) #journallApp > .sidebar .nav button {
   border-radius: 14px !important;
   font-weight: 600 !important;
   min-height: 52px !important;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4), 
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4),
               0 0 20px rgba(99, 102, 241, 0.05) !important;
   transition: all 0.25s cubic-bezier(0.2, 0.8, 0.2, 1) !important;
   border: 1px solid rgba(255, 255, 255, 0.15) !important;
@@ -12634,7 +12665,7 @@ body:not(.firebase-auth-required) #journallApp > .sidebar .nav button {
   background: #0c0d10 !important;
   border-color: rgba(255, 255, 255, 0.25) !important;
   transform: translateY(-1.5px) !important;
-  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.5), 
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.5),
               0 0 30px rgba(99, 102, 241, 0.1) !important;
 }
 
@@ -12696,8 +12727,8 @@ body:not(.firebase-auth-required) #journallApp > .sidebar .nav button {
   font-size: 18px !important;
   font-weight: 600 !important;
   line-height: 1 !important;
-  text-shadow: 0 0 10px rgba(94, 106, 210, 0.85), 
-               0 0 20px rgba(94, 106, 210, 0.45), 
+  text-shadow: 0 0 10px rgba(94, 106, 210, 0.85),
+               0 0 20px rgba(94, 106, 210, 0.45),
                0 0 30px rgba(94, 106, 210, 0.25) !important;
 }
 
@@ -12712,8 +12743,8 @@ body:not(.firebase-auth-required) #journallApp > .sidebar .nav button {
   border-radius: 99px !important;
   transform: rotate(-28deg) !important;
   background: #34d399 !important;
-  box-shadow: 0 0 12px rgba(52, 211, 153, 0.95), 
-              0 0 24px rgba(52, 211, 153, 0.55), 
+  box-shadow: 0 0 12px rgba(52, 211, 153, 0.95),
+              0 0 24px rgba(52, 211, 153, 0.55),
               0 0 36px rgba(52, 211, 153, 0.35) !important;
 }
 
@@ -12764,8 +12795,8 @@ body:not(.firebase-auth-required) #journallApp > .sidebar .nav button {
   border: 1px solid rgba(255, 255, 255, 0.08) !important;
   border-radius: 24px !important;
   padding: 6px !important;
-  box-shadow: 
-    0 24px 50px rgba(0, 0, 0, 0.7), 
+  box-shadow:
+    0 24px 50px rgba(0, 0, 0, 0.7),
     0 0 0 1px rgba(255, 255, 255, 0.02),
     inset 0 1px 1px rgba(255, 255, 255, 0.1) !important;
   z-index: 9999 !important;

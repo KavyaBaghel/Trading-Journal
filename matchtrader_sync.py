@@ -43,21 +43,48 @@ def http_get(url, headers_dict=None):
     except Exception as e:
         return 500, {"error": str(e)}
 
+def add_unique(items, value):
+    value = (value or "").strip().rstrip("/")
+    if value and value not in items:
+        items.append(value)
+
+def clean_origin(raw_url):
+    raw = (raw_url or "").strip()
+    if not raw:
+        return ""
+    if not raw.startswith("http://") and not raw.startswith("https://"):
+        raw = "https://" + raw
+    parsed = urllib.parse.urlparse(raw)
+    host = (parsed.netloc or parsed.path.split("/")[0]).strip().lower()
+    host = host.replace("www.", "")
+    if not host:
+        return raw.rstrip("/")
+    scheme = parsed.scheme or "https"
+    return f"{scheme}://{host}"
+
 def get_candidate_bases(raw_url):
-    if not raw_url.startswith("http://") and not raw_url.startswith("https://"):
-        raw_url = "https://" + raw_url
-    parsed = urllib.parse.urlparse(raw_url)
-    root = f"{parsed.scheme}://{parsed.netloc}"
-    
-    bases = [root]
-    path_parts = [p for p in parsed.path.split('/') if p]
-    
-    current = root
-    for part in path_parts:
-        current += '/' + part
-        if current not in bases:
-            bases.append(current)
-            
+    origin = clean_origin(raw_url)
+    bases = []
+    add_unique(bases, origin)
+
+    parsed = urllib.parse.urlparse(origin)
+    host = (parsed.netloc or "").lower()
+    if "fundingpips" in host or "ingpips" in host:
+        for base in [
+            "https://mtr-platform.fundingpips.com",
+            "https://matchtrader.fundingpips.com",
+            "https://mtr.fundingpips.com",
+            "https://platform.fundingpips.com",
+            "https://fundingpips.com",
+        ]:
+            add_unique(bases, base)
+
+    host_parts = [part for part in host.split(".") if part]
+    if len(host_parts) >= 2:
+        root_domain = ".".join(host_parts[-2:])
+        for prefix in ["mtr-platform", "matchtrader", "mtr", "platform"]:
+            add_unique(bases, f"https://{prefix}.{root_domain}")
+
     return bases
 
 def main():
@@ -121,7 +148,8 @@ def main():
             break
 
     if not token:
-        print(json.dumps({"error": f"MatchTrader login failed ({last_err or 'HTTP 404'}). Please verify your platform URL (e.g. https://mtr-platform.fundingpips.com) and email/password."}))
+        tried = ", ".join(candidate_bases[:6])
+        print(json.dumps({"error": f"MatchTrader login failed ({last_err or 'HTTP 404'}). I tried clean platform domains ({tried}). Paste the exact MatchTrader platform domain from your browser address bar, not the /app/trade page path, and verify email/password."}))
         sys.exit(0)
 
     headers = {
