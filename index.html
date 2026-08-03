@@ -2751,6 +2751,50 @@ tr:hover {
   box-shadow: 0 12px 35px rgba(0, 0, 0, 0.4);
 }
 </style>
+<style>
+/* --- WIDGET & GRID ALIGNMENT FIXES --- */
+#journallApp .widget-grid,
+#journallApp .goal-card-grid,
+#journallApp .live-metrics-grid {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)) !important;
+  gap: 20px !important;
+  align-items: stretch !important;
+}
+
+#journallApp .widget,
+#journallApp .goal-card,
+#journallApp .live-metric-box {
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: space-between !important;
+  height: 100% !important;
+  box-sizing: border-box !important;
+  margin: 0 !important;
+}
+
+#journallApp .widget.big {
+  grid-column: span 2 !important;
+}
+
+@media (max-width: 900px) {
+  #journallApp .widget-grid,
+  #journallApp .goal-card-grid {
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)) !important;
+  }
+  #journallApp .widget.big {
+    grid-column: span 1 !important;
+  }
+}
+
+@media (max-width: 600px) {
+  #journallApp .widget-grid,
+  #journallApp .goal-card-grid,
+  #journallApp .live-metrics-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+</style>
 </head>
 <body>
 <button id="androidInstallBtn" class="android-install-btn" type="button" hidden>Install Journall</button>
