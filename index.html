@@ -553,7 +553,20 @@ function renderUserProfile() {
   if (profName) profName.textContent = dName;
   if (profEmail) profEmail.textContent = dEmail;
   if (profImg) profImg.src = dPhoto;
-  if (customInput && !customInput.value) customInput.value = localStorage.getItem('journall_custom_username') || dName;
+  if (customInput) {
+    customInput.value = localStorage.getItem('journall_custom_username') || dName;
+  }
+  const nameCount = getNameChangesThisMonthCount();
+  const badge = document.getElementById('nameChangeLimitBadge');
+  if (badge) {
+    if (nameCount >= 2) {
+      badge.textContent = '⚠️ Name change limit reached (2/2 changes used this month)';
+      badge.style.color = '#f87171';
+    } else {
+      badge.textContent = `Name changes remaining this month: ${2 - nameCount} of 2`;
+      badge.style.color = '#a855f7';
+    }
+  }
 
   // Stats
   const statTrades = document.getElementById('profStatTrades');
@@ -570,15 +583,103 @@ function renderUserProfile() {
   if (statBroker) statBroker.textContent = broker ? `${broker.platform} (${broker.account})` : 'MetaTrader 5';
 }
 
-function saveCustomUsername() {
-  const val = document.getElementById('customUsernameInput')?.value.trim();
-  if (val) {
-    localStorage.setItem('journall_custom_username', val);
-    localStorage.setItem('journall_user_name', val);
-    alert('✓ Profile display name updated to: ' + val);
-    renderUserProfile();
-    if (typeof scheduleCloudSave === 'function') scheduleCloudSave();
+function getNameChangeHistory() {
+  try {
+    return JSON.parse(localStorage.getItem('journall_name_change_history') || '[]');
+  } catch(e) {
+    return [];
   }
+}
+
+function getNameChangesThisMonthCount() {
+  const history = getNameChangeHistory();
+  const now = new Date();
+  const currentMonthKey = `${now.getFullYear()}-${now.getMonth() + 1}`;
+  
+  const thisMonthChanges = history.filter(item => {
+    if (!item || !item.timestamp) return false;
+    const d = new Date(item.timestamp);
+    const key = `${d.getFullYear()}-${d.getMonth() + 1}`;
+    return key === currentMonthKey;
+  });
+
+  return thisMonthChanges.length;
+}
+
+function recordNameChangeHistory(newName) {
+  const history = getNameChangeHistory();
+  history.push({ name: newName, timestamp: Date.now() });
+  localStorage.setItem('journall_name_change_history', JSON.stringify(history));
+}
+
+function handleLiveUsernameInput(val) {
+  const clean = String(val || '').trim();
+  const count = getNameChangesThisMonthCount();
+  const badge = document.getElementById('nameChangeLimitBadge');
+
+  if (count >= 2) {
+    if (badge) {
+      badge.textContent = '⚠️ Name change limit reached (2/2 changes used this month)';
+      badge.style.color = '#f87171';
+    }
+  } else {
+    if (badge) {
+      const remaining = 2 - count;
+      badge.textContent = `Name changes remaining this month: ${remaining} of 2`;
+      badge.style.color = '#a855f7';
+    }
+  }
+
+  // Update live preview titles across the UI instantly without page refresh
+  if (clean) {
+    const topName = document.getElementById('topProfileName');
+    const sidebarName = document.getElementById('sidebarProfileName');
+    const profName = document.getElementById('userProfileName');
+    if (topName) topName.textContent = clean;
+    if (sidebarName) sidebarName.textContent = clean;
+    if (profName) profName.textContent = clean;
+  }
+}
+
+function saveCustomUsername() {
+  const input = document.getElementById('customUsernameInput');
+  const val = input?.value?.trim();
+  const currentSaved = (localStorage.getItem('journall_custom_username') || '').trim();
+
+  if (!val) {
+    alert('Please enter a valid display name.');
+    return;
+  }
+
+  if (val === currentSaved) {
+    alert(`Your display name is already set to "${val}".`);
+    return;
+  }
+
+  const count = getNameChangesThisMonthCount();
+  if (count >= 2) {
+    alert('⚠️ Name change limit reached!
+
+You can only change your display name 2 times per month.
+Your next name change will be available on the 1st of next month.');
+    renderUserProfile();
+    return;
+  }
+
+  // Save name change and record history
+  recordNameChangeHistory(val);
+  localStorage.setItem('journall_custom_username', val);
+  localStorage.setItem('journall_user_name', val);
+
+  const newCount = getNameChangesThisMonthCount();
+  const remaining = Math.max(0, 2 - newCount);
+
+  alert(`✓ Display name updated to "${val}"!
+
+Name changes remaining this month: ${remaining} of 2.`);
+  renderUserProfile();
+
+  if (typeof scheduleCloudSave === 'function') scheduleCloudSave();
 }
 </script>
 <style>
@@ -3322,7 +3423,11 @@ tr:hover {
         <div class="panel-title"><h3>Profile Settings</h3><span>Customize Account</span></div>
         <div style="display:grid; gap:16px; max-width:520px; margin-top:16px;">
           <label style="display:block; font-size:13px; color:#94a3b8; font-weight:600;">DISPLAY TRADER NAME
-            <input type="text" id="customUsernameInput" style="width:100%; border-radius:8px; padding:12px; background:rgba(255,255,255,0.06); color:#fff; margin-top:6px;" placeholder="Enter custom display name..." oninput="localStorage.setItem('journall_custom_username', this.value.trim()); localStorage.setItem('journall_user_name', this.value.trim()); renderUserProfile();">
+            <input type="text" id="customUsernameInput" style="width:100%; border-radius:8px; padding:12px; background:rgba(255,255,255,0.06); color:#fff; margin-top:6px;" placeholder="Enter custom display name..." oninput="handleLiveUsernameInput(this.value)">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-top:6px; flex-wrap:wrap; gap:6px;">
+              <span id="nameChangeLimitBadge" style="font-size:12px; color:#a855f7; font-weight:600;">Name changes remaining this month: 2 of 2</span>
+              <span style="font-size:11px; color:#64748b;">Limit: Max 2 name changes / month</span>
+            </div>
           </label>
           <div style="display:flex; gap:12px; flex-wrap:wrap;">
             <button type="button" class="btn primary" onclick="saveCustomUsername()">Save Profile Changes</button>
