@@ -475,20 +475,18 @@ function getActiveUserEmail() {
 }
 
 function getActiveUserName() {
-  const savedCustom = localStorage.getItem('journall_custom_username');
-  if (savedCustom && savedCustom.trim()) return savedCustom.trim();
-
   const customInputVal = document.getElementById('customUsernameInput')?.value?.trim();
   if (customInputVal) {
     localStorage.setItem('journall_custom_username', customInputVal);
+    localStorage.setItem('journall_user_name', customInputVal);
     return customInputVal;
   }
 
+  const savedCustom = localStorage.getItem('journall_custom_username') || localStorage.getItem('journall_user_name');
+  if (savedCustom && savedCustom.trim()) return savedCustom.trim();
+
   const fbName = (window.currentUser && window.currentUser.displayName && window.currentUser.displayName !== 'Local Trader') ? window.currentUser.displayName : null;
   if (fbName) return fbName;
-
-  const savedName = localStorage.getItem('journall_user_name');
-  if (savedName) return savedName;
 
   const email = getActiveUserEmail();
   if (email && email.includes('@')) {
@@ -3206,8 +3204,8 @@ tr:hover {
   <div id="fixedTopRightProfile" class="fixed-top-right-profile" onclick="document.querySelector('[data-tab=&quot;userprofile&quot;]')?.click()">
     <img id="topAvatarImg" class="top-avatar-img" src="https://lh3.googleusercontent.com/a/default-user" onerror="this.src='https://ui-avatars.com/api/?name=Trader&background=a855f7&color=fff'" alt="Trader Profile">
     <div class="top-profile-details">
-      <div class="top-profile-name" id="topProfileName">Trader</div>
-      <div class="top-profile-email" id="topProfileEmail">Signed in</div>
+      <div class="top-profile-name" id="topProfileName">krishna</div>
+      <div class="top-profile-email" id="topProfileEmail">krishnacnjack@gmail.com</div>
     </div>
   </div>
   <aside class="sidebar">
@@ -3269,10 +3267,10 @@ tr:hover {
           </div>
           <div style="flex:1;">
             <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
-              <h2 style="margin:0; font-size:26px; color:#fff;" id="userProfileName">Trader Name</h2>
+              <h2 style="margin:0; font-size:26px; color:#fff;" id="userProfileName">krishna</h2>
               <span class="badge" style="background:rgba(34,197,94,0.15); color:#4ade80; border:1px solid rgba(34,197,94,0.3); padding:4px 12px; border-radius:9999px; font-size:11px; font-weight:700;">✓ GOOGLE ACCOUNT AUTHORIZED</span>
             </div>
-            <p style="margin:6px 0 0 0; font-size:15px; color:#94a3b8;" id="userProfileEmail">trader@gmail.com</p>
+            <p style="margin:6px 0 0 0; font-size:15px; color:#94a3b8;" id="userProfileEmail">krishnacnjack@gmail.com</p>
             <div style="margin-top:10px; font-size:12px; color:#cbd5e1;" id="userProfileMeta">Active Session &bull; Verified Trader Account</div>
           </div>
         </div>
@@ -3305,7 +3303,7 @@ tr:hover {
         <div class="panel-title"><h3>Profile Settings</h3><span>Customize Account</span></div>
         <div style="display:grid; gap:16px; max-width:520px; margin-top:16px;">
           <label style="display:block; font-size:13px; color:#94a3b8; font-weight:600;">DISPLAY TRADER NAME
-            <input type="text" id="customUsernameInput" style="width:100%; border-radius:8px; padding:12px; background:rgba(255,255,255,0.06); color:#fff; margin-top:6px;" placeholder="Enter custom display name...">
+            <input type="text" id="customUsernameInput" style="width:100%; border-radius:8px; padding:12px; background:rgba(255,255,255,0.06); color:#fff; margin-top:6px;" placeholder="Enter custom display name..." oninput="localStorage.setItem('journall_custom_username', this.value.trim()); localStorage.setItem('journall_user_name', this.value.trim()); renderUserProfile();">
           </label>
           <div style="display:flex; gap:12px; flex-wrap:wrap;">
             <button type="button" class="btn primary" onclick="saveCustomUsername()">Save Profile Changes</button>
@@ -7018,13 +7016,8 @@ function onBrokerPlatformChange(){
     if(btnText) btnText.textContent = 'Sync from cTrader (Cloud)';
     if(status) status.innerHTML = '☁️ <strong>Direct Cloud Sync:</strong> Enter your cTrader Access Token. Works on desktop and phone through the Journall cloud sync Worker.';
   } else if(platform === 'mt5'){
-    if(isMobileBrokerDevice()){
-      if(btnText) btnText.textContent = 'Upload MT5 Report';
-      if(status) status.innerHTML = '📱 <strong>MT5 on phone:</strong> Export your MT5 HTML statement/report, save it on this phone, then upload it below. Direct terminal sync only works on your Windows laptop.';
-    } else {
-      if(btnText) btnText.textContent = 'Sync from MetaTrader 5 (Local PC)';
-      if(status) status.innerHTML = '💡 <strong>Online MT5 Import:</strong> Drag & drop your MT5 HTML report into the Upload box below.<br>🖥️ <strong>Local PC Bridge:</strong> Requires running Journall App.bat on your PC.';
-    }
+    if(btnText) btnText.textContent = 'Upload MT5 Report';
+    if(status) status.innerHTML = '<strong>MT5 import:</strong> Export your MT5 HTML statement/report, then tap Upload MT5 Report. Direct terminal sync is disabled on the website because browsers cannot access your private MT5 desktop terminal.';
   }
 }
 
@@ -7344,10 +7337,18 @@ async function triggerBrokerSync(){
   const payload = { platform, days: parseInt(days) };
 
   if (platform === 'mt5') {
-    const login = document.getElementById('brokerSyncLogin')?.value.trim();
-    const server = document.getElementById('brokerSyncServer')?.value.trim();
-    if (login) payload.login = login;
-    if (server) payload.server = server;
+    if (status) {
+      status.innerHTML =
+        `<strong>MT5 uses file import on the website.</strong><br>` +
+        `Choose your MT5 HTML statement/report now. Your saved old trades will be kept and merged safely.`;
+    }
+    const upload = document.getElementById('mainCsvUpload') || document.getElementById('tradingPageUpload');
+    if (upload) upload.click();
+    if (btn) {
+      btn.disabled = false;
+      btn.innerHTML = `<span>Upload MT5 Report</span>`;
+    }
+    return;
   } else if (platform === 'matchtrader') {
     const url = document.getElementById('matchtraderUrl')?.value.trim();
     const login = document.getElementById('matchtraderEmail')?.value.trim();
@@ -7373,28 +7374,11 @@ async function triggerBrokerSync(){
     payload.token = token;
     if (accountId) payload.accountId = accountId;
   }
-
   const isLocalHost = window.location.hostname === '127.0.0.1' || window.location.hostname === 'localhost';
   const isMobileBroker = isMobileBrokerDevice();
   const syncApiUrl = isLocalHost ? '/api/sync-broker' : 'http://localhost:8787/api/sync-broker';
 
-  if (platform === 'mt5' && !isLocalHost && isMobileBroker) {
-    if (status) {
-      status.innerHTML =
-        `<strong>MT5 mobile sync uses file import.</strong><br>` +
-        `Export your MT5 HTML statement/report, save it on this phone, then tap Upload Trading Data below. ` +
-        `Direct MT5 terminal sync only works on the Windows laptop because MT5 runs locally there.`;
-    }
-    const upload = document.getElementById('mainCsvUpload');
-    if (upload) upload.click();
-    if (btn) {
-      btn.disabled = false;
-      btn.innerHTML = `<span>Upload MT5 Report</span>`;
-    }
-    return;
-  }
-
-  let parsed = [];
+let parsed = [];
   try {
     // 1. Try local server bridge / backend sync first (No CORS issues!)
     let backendSuccess = false;
@@ -9386,7 +9370,7 @@ function updateHeroTitle(label){
   if(title) title.textContent = label || 'Journall';
 }
 
-document.querySelectorAll('.nav button').forEach(btn=>btn.addEventListener('click',()=>{document.querySelectorAll('.nav button').forEach(b=>b.classList.remove('active'));btn.classList.add('active');document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));const section=document.getElementById(btn.dataset.tab); if(section) section.classList.add('active');updateHeroTitle(btn.textContent.trim());setTimeout(()=>{renderCharts();renderTradingPage();renderJournalPage();renderPsychology();renderSetupPerformanceTracker();renderPropChallengeDashboard();renderCalendar();resizeChartsSoon();},80);}));
+document.querySelectorAll('.nav button').forEach(btn=>btn.addEventListener('click',()=>{document.querySelectorAll('.nav button').forEach(b=>b.classList.remove('active'));btn.classList.add('active');document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));const section=document.getElementById(btn.dataset.tab); if(section) section.classList.add('active');updateHeroTitle(btn.textContent.trim());setTimeout(()=>{renderCharts();renderTradingPage();renderJournalPage();renderPsychology();renderUserProfile();renderSetupPerformanceTracker();renderPropChallengeDashboard();renderCalendar();resizeChartsSoon();},80);}));
 function syncMobileActiveTab(){
   const active = document.querySelector('.nav button.active');
   const label = document.getElementById('mobileActiveTab');
