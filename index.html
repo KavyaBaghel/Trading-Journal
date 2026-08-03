@@ -2610,6 +2610,43 @@ tr:hover {
   50% { transform: scale(1.15); box-shadow: 0 0 40px rgba(99,102,241,0.6); }
 }
 </style>
+<style>
+/* --- SYNCED BROKER HEADER CARD STYLES --- */
+.synced-broker-header-card {
+  background: linear-gradient(135deg, rgba(15, 23, 42, 0.85), rgba(30, 41, 59, 0.7));
+  border: 1px solid rgba(34, 197, 94, 0.3);
+  border-radius: 16px;
+  padding: 18px 24px;
+  margin-bottom: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+}
+.pulse-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  position: relative;
+}
+.pulse-dot.green {
+  background: #22c55e;
+  box-shadow: 0 0 10px #22c55e;
+}
+.pulse-dot.green::after {
+  content: '';
+  position: absolute;
+  top: -4px; left: -4px; right: -4px; bottom: -4px;
+  border-radius: 50%;
+  border: 2px solid rgba(34, 197, 94, 0.5);
+  animation: pulseDotAnim 2s infinite;
+}
+@keyframes pulseDotAnim {
+  0% { transform: scale(0.8); opacity: 1; }
+  100% { transform: scale(1.6); opacity: 0; }
+}
+</style>
 </head>
 <body>
 <button id="androidInstallBtn" class="android-install-btn" type="button" hidden>Install Journall</button>
@@ -5518,7 +5555,72 @@ function saveTrades(){
   localStorage.setItem('viztrade_trades', JSON.stringify(trades));
 }
 
+
+function saveSyncedBrokerInfo(platform, login, server) {
+  const info = {
+    platform: platform || 'MetaTrader 5',
+    account: login || 'Active Account',
+    server: server || 'Broker Server',
+    lastSynced: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+    date: new Date().toLocaleDateString()
+  };
+  localStorage.setItem('journall_synced_broker', JSON.stringify(info));
+}
+
+function getSyncedBrokerInfo() {
+  try { return JSON.parse(localStorage.getItem('journall_synced_broker') || 'null'); }
+  catch { return null; }
+}
+
 function tradeImportKey(trade){
+  if(!trade) return '';
+  const idVal = String(trade.id || trade.position || trade.positionId || trade.ticket || trade.deal || '').trim();
+  if (idVal) return idVal;
+
+  const symbol = String(trade.symbol || 'UNKNOWN').trim().toUpperCase();
+  const side = String(trade.side || '').trim().toUpperCase();
+  const date = String(trade.date || '').trim();
+  const time = String(trade.time || '').trim().slice(0, 5);
+  const pnl = Number(trade.pnl || 0).toFixed(2);
+  const vol = Number(trade.volume || trade.lot || 0).toFixed(2);
+
+  return `${date}|${time}|${symbol}|${side}|${pnl}|${vol}`;
+}
+
+function mergeImportedTrades(existingTrades, incomingTrades){
+  const merged = new Map();
+  
+  (Array.isArray(existingTrades) ? existingTrades : []).forEach(trade => {
+    const normalized = normalizeImportedTrade(trade);
+    const key = tradeImportKey(normalized);
+    if(key) merged.set(key, normalized);
+  });
+
+  (Array.isArray(incomingTrades) ? incomingTrades : []).forEach(trade => {
+    const normalized = normalizeImportedTrade(trade);
+    const key = tradeImportKey(normalized);
+    if(key) {
+      if (merged.has(key)) {
+        const existing = merged.get(key);
+        // Preserve user journal edits (notes, setup, mistakes) if present
+        normalized.notes = existing.notes && !existing.notes.includes('Sync (#') ? existing.notes : normalized.notes;
+        normalized.setup = existing.setup || normalized.setup;
+        normalized.mistakes = Array.isArray(existing.mistakes) && existing.mistakes.length ? existing.mistakes : normalized.mistakes;
+        normalized.journaled = existing.journaled || normalized.journaled;
+      }
+      merged.set(key, normalized);
+    }
+  });
+
+  return [...merged.values()].sort((a,b) => {
+    const aDate = `${a.date || ''} ${a.time || ''}`;
+    const bDate = `${b.date || ''} ${b.time || ''}`;
+    return aDate.localeCompare(bDate);
+  });
+}
+
+/* old tradeImportKey replaced */
+function old_tradeImportKey(trade){
   if(!trade) return '';
   const entry = safeTradeNumber(trade.entry, 0);
   const exit = safeTradeNumber(trade.exit, 0);
@@ -6689,6 +6791,10 @@ async function triggerBrokerSync(){
     filtered = [...trades];
     saveTrades();
 
+    const loginVal = document.getElementById('mt5Login')?.value.trim() || document.getElementById('matchtraderEmail')?.value.trim() || 'Active Account';
+    const serverVal = document.getElementById('mt5Server')?.value.trim() || document.getElementById('matchtraderUrl')?.value.trim() || 'Broker Server';
+    saveSyncedBrokerInfo(pName, loginVal, serverVal);
+
     tradingPageTrades = mergeImportedTrades(tradingPageTrades, parsed);
     localStorage.setItem('viztrade_trading_page_trades', JSON.stringify(tradingPageTrades));
 
@@ -6916,6 +7022,27 @@ function clearTradingPageData(){
 
 function renderTradingPage(){
   const today = todayISTDate();
+  const brokerInfo = getSyncedBrokerInfo();
+  const brokerBox = document.getElementById('tradingPageBrokerHeader');
+  if (brokerBox) {
+    if (brokerInfo) {
+      brokerBox.innerHTML = `
+        <div class="synced-broker-header-card">
+          <div style="display:flex; align-items:center; gap:14px;">
+            <div class="pulse-dot green"></div>
+            <div>
+              <div style="font-size:11px; font-weight:700; color:#4ade80; text-transform:uppercase; letter-spacing:0.05em;">Live Synced Broker</div>
+              <h3 style="margin:2px 0 0 0; font-size:18px; color:#fff;">${escapeHtml(brokerInfo.platform)}</h3>
+              <div style="font-size:12px; color:#94a3b8;">${escapeHtml(brokerInfo.account)} &bull; ${escapeHtml(brokerInfo.server)} &bull; Synced at ${escapeHtml(brokerInfo.lastSynced)}</div>
+            </div>
+          </div>
+          <button type="button" class="btn primary" onclick="document.querySelector('[data-tab=&quot;uploaddata&quot;]')?.click()">↻ Sync Latest Deals</button>
+        </div>
+      `;
+    } else {
+      brokerBox.innerHTML = '';
+    }
+  }
   const todayTrades = tradingPageTrades.filter(t => t.date === today);
   const label = document.getElementById('todayDateLabel');
   if(label) label.textContent = today + ' IST';
