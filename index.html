@@ -3787,17 +3787,66 @@ function safeFixed(value, decimals=2, fallback='-'){
   return Number.isFinite(n) ? n.toFixed(decimals) : fallback;
 }
 
+function deriveTradeTimeFields(trade) {
+  if (!trade) return { weekday: 'Mon', hour: 12, session: 'New York', timestamp: Date.now() };
+
+  const dateStr = String(trade.date || '').trim();
+  const timeStr = String(trade.time || '12:00:00').trim();
+
+  let d = null;
+  if (dateStr) {
+    const fullStr = timeStr ? `${dateStr}T${timeStr}` : dateStr;
+    d = new Date(fullStr);
+    if (isNaN(d.getTime())) {
+      d = new Date(dateStr);
+    }
+  }
+
+  if (!d || isNaN(d.getTime())) {
+    d = new Date();
+  }
+
+  const daysMap = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  const weekday = trade.weekday || daysMap[d.getDay()] || 'Mon';
+  
+  let hour = trade.hour;
+  if (hour == null || isNaN(hour)) {
+    const parts = timeStr.split(':');
+    hour = parts.length > 0 && !isNaN(parseInt(parts[0])) ? parseInt(parts[0]) : d.getHours();
+  }
+  hour = Math.min(23, Math.max(0, Number(hour) || 0));
+
+  let session = trade.session;
+  if (!session || session === 'Unknown' || session === 'undefined') {
+    if (hour >= 0 && hour < 8) session = 'Asia';
+    else if (hour >= 8 && hour < 13) session = 'London';
+    else session = 'New York';
+  }
+
+  const timestamp = !isNaN(d.getTime()) ? d.getTime() : Date.now();
+
+  return { weekday, hour, session, timestamp };
+}
+
 function normalizeImportedTrade(trade){
   if(!trade || typeof trade !== 'object') return null;
+  const timeFields = deriveTradeTimeFields(trade);
   const entry = firstTradeNumber([trade.entry, trade.openPrice, trade.open, trade.price, trade.exit, trade.closePrice, trade.close], 0);
   const exit = firstTradeNumber([trade.exit, trade.closePrice, trade.close, trade.price, trade.entry, trade.openPrice, trade.open], entry);
   const sideRaw = String(trade.side || trade.type || trade.direction || '').toUpperCase();
   const side = sideRaw.includes('SELL') ? 'SELL' : sideRaw.includes('BUY') ? 'BUY' : (trade.side || 'BUY');
+
   return {
     ...trade,
     symbol: trade.symbol || 'Unknown',
     side,
-    session: trade.session || 'Unknown',
+    date: trade.date || new Date().toISOString().slice(0,10),
+    time: trade.time || '12:00:00',
+    weekday: timeFields.weekday,
+    hour: timeFields.hour,
+    session: timeFields.session,
+    timestamp: timeFields.timestamp,
+    openUtc: trade.openUtc || `${trade.date || new Date().toISOString().slice(0,10)}T${trade.time || '12:00:00'}`,
     entry,
     exit,
     sl: safeTradeNumber(trade.sl, 0),
@@ -4052,10 +4101,14 @@ function mistakes(t){
 }
 
 function getB2B(data=filtered){
-  const s=sorted(data), out=[];
-  for(let i=1;i<s.length;i++){
-    const diff=(new Date(s[i].openUtc)-new Date(s[i-1].openUtc))/60000;
-    if(diff>=0 && diff<=5) out.push({...s[i],prev:s[i-1],diff});
+  const s = sorted(data);
+  const out = [];
+  for(let i=1; i<s.length; i++){
+    const currT = s[i].timestamp || (s[i].openUtc ? new Date(s[i].openUtc).getTime() : new Date(`${s[i].date}T${s[i].time}`).getTime());
+    const prevT = s[i-1].timestamp || (s[i-1].openUtc ? new Date(s[i-1].openUtc).getTime() : new Date(`${s[i-1].date}T${s[i-1].time}`).getTime());
+    if (isNaN(currT) || isNaN(prevT)) continue;
+    const diff = (currT - prevT) / 60000;
+    if(diff >= 0 && diff <= 30) out.push({...s[i], prev:s[i-1], diff});
   }
   return out;
 }
@@ -5354,7 +5407,17 @@ function renderHeatmap(){
   if(!filtered.length){ document.getElementById('heatmap').innerHTML='<div class="insight">No trades yet. Upload CSV to build heatmap.</div>'; return; }
   const days=['Mon','Tue','Wed','Thu','Fri']; let h='<div class="heatcell heatlabel">Day / Hr</div>';
   for(let i=0;i<24;i++) h+=`<div class="heatcell">${i}</div>`;
-  days.forEach(day=>{h+=`<div class="heatcell heatlabel">${day}</div>`; for(let hr=0;hr<24;hr++){const arr=filtered.filter(t=>t.weekday===day&&t.hour===hr); const p=arr.reduce((a,b)=>a+b.pnl,0); h+=`<div class="heatcell ${arr.length?(p>0?'profit':p<0?'loss':''):''}" title="${day} ${hr}:00 | ${arr.length} trades | ${fmt(p)}">${arr.length||''}</div>`;}});
+  days.forEach(day=>{
+    h+=`<div class="heatcell heatlabel">${day}</div>`;
+    for(let hr=0;hr<24;hr++){
+      const arr=filtered.filter(t=>{
+        const norm = normalizeImportedTrade(t);
+        return norm.weekday===day && norm.hour===hr;
+      });
+      const p=arr.reduce((a,b)=>a+(Number(b.pnl)||0),0);
+      h+=`<div class="heatcell ${arr.length?(p>0?'profit':p<0?'loss':''):''}" title="${day} ${hr}:00 | ${arr.length} trades | ${fmt(p)}">${arr.length||''}</div>`;
+    }
+  });
   document.getElementById('heatmap').innerHTML=h;
 }
 
