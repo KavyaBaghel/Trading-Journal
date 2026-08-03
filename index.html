@@ -3579,9 +3579,11 @@ tr:hover {
               <div id="journalAiFeedback" class="journal-video-status">Write a journal, then ask AI for feedback.</div>
             </div>
 
-            <div class="journal-form-actions">
-              <button class="btn primary" onclick="saveJournalPageEntry()">Save Trade Journal</button>
-              <button class="btn" onclick="clearJournalPageForm()">Clear</button>
+            <div class="journal-form-actions" style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+              <button type="button" class="btn primary" onclick="saveJournalPageEntry()">Save Trade Journal</button>
+              <button type="button" class="btn" onclick="openNextJournalTrade()">Next Trade &rarr;</button>
+              <button type="button" class="btn" onclick="openPrevJournalTrade()">&larr; Prev Trade</button>
+              <button type="button" class="btn" onclick="clearJournalPageForm()">Clear Form</button>
             </div>
           </div>
         </div>
@@ -8610,14 +8612,72 @@ function saveJournalPageEntry(){
 
   localStorage.setItem('krishna_journal_page_entries', JSON.stringify(journalPageEntries));
   clearJournalDraft();
-  alert('Trade journal saved.');
+  
+  // Mark trade as journaled in global trades array
+  if (t) {
+    t.journaled = true;
+    const tIdx = trades.findIndex(x => x.id === t.id);
+    if (tIdx !== -1) trades[tIdx].journaled = true;
+    saveTrades();
+  }
+
   renderJournalPage();
   renderCalendar();
   renderGrid();
   renderSetupPerformanceTracker();
   generateJournalAIFeedback(false);
+
+  // Auto-advance to next trade
+  openNextJournalTrade(true);
 }
 
+
+
+function openNextJournalTrade(autoFromSave = false) {
+  const data = sorted(Array.isArray(trades) ? trades : []).filter(t => !journalTradeFilter || tradeResult(t.pnl) === journalTradeFilter);
+  if (!data.length) {
+    if (!autoFromSave) alert('No trades available in your journal list.');
+    return;
+  }
+  const currentKey = document.getElementById('journalTradeKey')?.value || '';
+  let currentIndex = data.findIndex(t => makeTradeKey(t) === currentKey);
+
+  let nextIndex = -1;
+  if (currentIndex >= 0 && currentIndex < data.length - 1) {
+    nextIndex = currentIndex + 1;
+  } else if (currentIndex === -1) {
+    // Pick first unjournaled trade or first trade
+    const unjournaledIdx = data.findIndex(t => !hasJournalForTrade(t));
+    nextIndex = unjournaledIdx >= 0 ? unjournaledIdx : 0;
+  }
+
+  if (nextIndex >= 0 && nextIndex < data.length) {
+    const nextTrade = data[nextIndex];
+    const key = makeTradeKey(nextTrade);
+    openTradeJournal(key);
+  } else {
+    if (autoFromSave) {
+      clearJournalPageForm();
+      alert('✓ Trade journal saved! All trades in your list are now reviewed.');
+    } else {
+      alert('You have reached the last trade in the list.');
+    }
+  }
+}
+
+function openPrevJournalTrade() {
+  const data = sorted(Array.isArray(trades) ? trades : []).filter(t => !journalTradeFilter || tradeResult(t.pnl) === journalTradeFilter);
+  if (!data.length) return;
+  const currentKey = document.getElementById('journalTradeKey')?.value || '';
+  let currentIndex = data.findIndex(t => makeTradeKey(t) === currentKey);
+
+  if (currentIndex > 0) {
+    const prevTrade = data[currentIndex - 1];
+    openTradeJournal(makeTradeKey(prevTrade));
+  } else {
+    alert('You are at the first trade in the list.');
+  }
+}
 
 function clearJournalPageForm(){
   clearJournalDraft();
