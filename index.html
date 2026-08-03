@@ -3164,12 +3164,68 @@ function cleanDuplicateDeals(arr) {
   });
 }
 
-let trades = cleanDuplicateDeals(JSON.parse(localStorage.getItem('viztrade_trades') || '[]'));
+function safeTradeNumber(value, fallback=0){
+  if(value === null || value === undefined) return fallback;
+  if(typeof value === 'number') return Number.isFinite(value) ? value : fallback;
+  let s = String(value).replace(/\$/g,'').replace(/,/g,'').replace(/\s/g,'').trim();
+  if(s === '' || s === '-' || s.toLowerCase() === 'null' || s.toLowerCase() === 'undefined') return fallback;
+  let negative = false;
+  if(s.startsWith('(') && s.endsWith(')')){ negative = true; s = s.slice(1,-1); }
+  const n = Number.parseFloat(s);
+  if(!Number.isFinite(n)) return fallback;
+  return negative ? -Math.abs(n) : n;
+}
+
+function firstTradeNumber(values, fallback=0){
+  let zeroFallback = null;
+  for(const value of values){
+    const n = safeTradeNumber(value, Number.NaN);
+    if(!Number.isFinite(n)) continue;
+    if(n !== 0) return n;
+    zeroFallback = 0;
+  }
+  return zeroFallback === 0 ? 0 : fallback;
+}
+
+function safeFixed(value, decimals=2, fallback='-'){
+  const n = safeTradeNumber(value, Number.NaN);
+  return Number.isFinite(n) ? n.toFixed(decimals) : fallback;
+}
+
+function normalizeImportedTrade(trade){
+  if(!trade || typeof trade !== 'object') return null;
+  const entry = firstTradeNumber([trade.entry, trade.openPrice, trade.open, trade.price, trade.exit, trade.closePrice, trade.close], 0);
+  const exit = firstTradeNumber([trade.exit, trade.closePrice, trade.close, trade.price, trade.entry, trade.openPrice, trade.open], entry);
+  const sideRaw = String(trade.side || trade.type || trade.direction || '').toUpperCase();
+  const side = sideRaw.includes('SELL') ? 'SELL' : sideRaw.includes('BUY') ? 'BUY' : (trade.side || 'BUY');
+  return {
+    ...trade,
+    symbol: trade.symbol || 'Unknown',
+    side,
+    session: trade.session || 'Unknown',
+    entry,
+    exit,
+    sl: safeTradeNumber(trade.sl, 0),
+    tp: safeTradeNumber(trade.tp, 0),
+    volume: firstTradeNumber([trade.volume, trade.lot, trade.lots, trade.size], 0),
+    duration: safeTradeNumber(trade.duration, 0),
+    pnl: firstTradeNumber([trade.pnl, trade.profit, trade.net], 0),
+    commission: safeTradeNumber(trade.commission, 0),
+    swap: safeTradeNumber(trade.swap, 0),
+    reason: trade.reason || trade.comment || 'Imported trade'
+  };
+}
+
+function normalizeImportedTradeList(list){
+  return (Array.isArray(list) ? list : []).map(normalizeImportedTrade).filter(Boolean);
+}
+
+let trades = normalizeImportedTradeList(cleanDuplicateDeals(JSON.parse(localStorage.getItem('viztrade_trades') || '[]')));
 localStorage.setItem('viztrade_trades', JSON.stringify(trades));
 
 let filtered = [...trades];
 let charts = {};
-let tradingPageTrades = cleanDuplicateDeals(JSON.parse(localStorage.getItem('viztrade_trading_page_trades') || '[]'));
+let tradingPageTrades = normalizeImportedTradeList(cleanDuplicateDeals(JSON.parse(localStorage.getItem('viztrade_trading_page_trades') || '[]')));
 localStorage.setItem('viztrade_trading_page_trades', JSON.stringify(tradingPageTrades));
 let journalPageEntries = JSON.parse(localStorage.getItem('krishna_journal_page_entries') || '[]');
 
@@ -3928,7 +3984,7 @@ function renderCharts(){
   const buckets=['0-1m','1-5m','5-15m','15-60m','60m+'], bm=by(bucket,buckets);
   chartBar('durationChart',buckets,buckets.map(x=>bm[x]));
 
-  const lots=[...new Set(filtered.map(t=>t.volume.toFixed(2)))].sort(), lm=by(t=>t.volume.toFixed(2),lots);
+  const lots=[...new Set(filtered.map(t=>safeFixed((normalizeImportedTrade(t) || t).volume,2,'0.00')))].sort(), lm=by(t=>safeFixed((normalizeImportedTrade(t) || t).volume,2,'0.00'),lots);
   chartBar('lotChart',lots,lots.map(x=>lm[x]));
 
   const reasons=[...new Set(filtered.map(t=>t.reason||'Unknown'))], rm=by(t=>t.reason||'Unknown',reasons);
@@ -4714,10 +4770,12 @@ function renderGrid(){
   if(!rowsEl) return;
   if(!filtered.length){ rowsEl.innerHTML='<tr><td colspan="14">No trades yet. Upload your CSV using the Upload Trading Data button.</td></tr>'; return; }
   rowsEl.innerHTML=sorted(filtered).reverse().map(t=>{
-    const ms=mistakes(t), dur=t.duration<60?t.duration.toFixed(1)+'m':(t.duration/60).toFixed(1)+'h';
+    t = normalizeImportedTrade(t) || {};
+    const duration = safeTradeNumber(t.duration, 0);
+    const ms=mistakes(t), dur=duration<60?safeFixed(duration,1,'0.0')+'m':safeFixed(duration/60,1,'0.0')+'h';
     const hasJournal = hasJournalForTrade(t);
     const journalBtn = `<span class="journal-table-status" title="${hasJournal?'Journal done':'Journal not done'}"><span class="journal-dot-status ${hasJournal?'done':'todo'}"></span>${hasJournal?'Journal Done':'Need Journal'}</span>`;
-    return `<tr><td>${t.date || 'No date'}<br><small style="color:var(--faint)">${t.time || '-'}</small></td><td>${t.symbol || 'Unknown'}</td><td><span class="badge ${t.side==='BUY'?'buy':'sell'}">${t.side}</span></td><td>${t.session}</td><td>${t.entry.toFixed(2)}</td><td>${t.exit.toFixed(2)}</td><td class="${t.sl?'':'red'}">${t.sl?t.sl.toFixed(2):'None'}</td><td>${t.tp?t.tp.toFixed(2):'-'}</td><td>${t.volume.toFixed(2)}</td><td>${dur}</td><td>${t.reason}</td><td class="${pnlClass(t.pnl)}"><strong>${fmt(t.pnl)}</strong><br><span class="badge ${resultBadgeClass(t.pnl)}">${resultLabel(t.pnl)}</span></td><td>${ms.length?ms.map(x=>`<span class="badge loss">${x}</span>`).join(' '):'<span class="badge win">Clean</span>'}</td><td>${journalBtn}</td></tr>`;
+    return `<tr><td>${t.date || 'No date'}<br><small style="color:var(--faint)">${t.time || '-'}</small></td><td>${t.symbol || 'Unknown'}</td><td><span class="badge ${t.side==='BUY'?'buy':'sell'}">${t.side}</span></td><td>${t.session}</td><td>${safeFixed(t.entry)}</td><td>${safeFixed(t.exit)}</td><td class="${t.sl?'':'red'}">${t.sl?safeFixed(t.sl):'None'}</td><td>${t.tp?safeFixed(t.tp):'-'}</td><td>${safeFixed(t.volume)}</td><td>${dur}</td><td>${t.reason}</td><td class="${pnlClass(t.pnl)}"><strong>${fmt(t.pnl)}</strong><br><span class="badge ${resultBadgeClass(t.pnl)}">${resultLabel(t.pnl)}</span></td><td>${ms.length?ms.map(x=>`<span class="badge loss">${x}</span>`).join(' '):'<span class="badge win">Clean</span>'}</td><td>${journalBtn}</td></tr>`;
   }).join('');
 }
 
@@ -5081,7 +5139,10 @@ function saveNotes(){const n=document.getElementById('notes'); if(!n) return; lo
 
 function downloadCSV(){
   const header=['date','time','symbol','side','session','entry','exit','sl','tp','lot','duration','pnl','mistakes'];
-  const rows=filtered.map(t=>[t.date,t.time,t.symbol,t.side,t.session,t.entry,t.exit,t.sl,t.tp,t.volume,t.duration.toFixed(2),t.pnl.toFixed(2),mistakes(t).join('|')]);
+  const rows=filtered.map(t=>{
+    t = normalizeImportedTrade(t) || {};
+    return [t.date,t.time,t.symbol,t.side,t.session,t.entry,t.exit,t.sl,t.tp,t.volume,safeFixed(t.duration),safeFixed(t.pnl),mistakes(t).join('|')];
+  });
   const csv=[header,...rows].map(r=>r.map(x=>`"${String(x).replaceAll('"','')}'"`).join(',')).join('\n');
   const blob=new Blob([csv],{type:'text/csv'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='viztrade_analysis_export.csv'; a.click();
 }
@@ -5094,6 +5155,8 @@ function saveTrades(){
 
 function tradeImportKey(trade){
   if(!trade) return '';
+  const entry = safeTradeNumber(trade.entry, 0);
+  const exit = safeTradeNumber(trade.exit, 0);
   return String(
     trade.id ||
     trade.position ||
@@ -5104,8 +5167,8 @@ function tradeImportKey(trade){
       trade.symbol || 'Unknown',
       trade.side || '',
       Number(trade.pnl || 0).toFixed(2),
-      trade.entry || '',
-      trade.exit || ''
+      entry || '',
+      exit || ''
     ].join('|')
   );
 }
@@ -5113,12 +5176,14 @@ function tradeImportKey(trade){
 function mergeImportedTrades(existingTrades, incomingTrades){
   const merged = new Map();
   (Array.isArray(existingTrades) ? existingTrades : []).forEach(trade => {
-    const key = tradeImportKey(trade);
-    if(key) merged.set(key, trade);
+    const normalized = normalizeImportedTrade(trade);
+    const key = tradeImportKey(normalized);
+    if(key) merged.set(key, normalized);
   });
   (Array.isArray(incomingTrades) ? incomingTrades : []).forEach(trade => {
-    const key = tradeImportKey(trade);
-    if(key) merged.set(key, trade);
+    const normalized = normalizeImportedTrade(trade);
+    const key = tradeImportKey(normalized);
+    if(key) merged.set(key, normalized);
   });
   return [...merged.values()].sort((a,b) => {
     const aDate = `${a.date || ''} ${a.time || ''}`;
@@ -5130,7 +5195,7 @@ function mergeImportedTrades(existingTrades, incomingTrades){
 function restoreTradesFromStorageIfNeeded(){
   if(Array.isArray(trades) && trades.length) return;
   try{
-    const saved = cleanDuplicateDeals(JSON.parse(localStorage.getItem('viztrade_trades') || '[]'));
+    const saved = normalizeImportedTradeList(cleanDuplicateDeals(JSON.parse(localStorage.getItem('viztrade_trades') || '[]')));
     if(Array.isArray(saved) && saved.length){
       trades = saved;
       filtered = [...trades];
@@ -5799,15 +5864,15 @@ function parseMatchTraderHTML(text){
 function parseUploadedTradeFile(fileName, text){
   const lower = String(fileName || '').toLowerCase();
   const fundingPipsMt5Trades = parseFundingPipsMt5History(text);
-  if(fundingPipsMt5Trades.length) return fundingPipsMt5Trades;
+  if(fundingPipsMt5Trades.length) return normalizeImportedTradeList(fundingPipsMt5Trades);
 
   const fundingPipsSummaryTrades = parseFundingPipsSummaryReport(text);
-  if(fundingPipsSummaryTrades.length) return fundingPipsSummaryTrades;
+  if(fundingPipsSummaryTrades.length) return normalizeImportedTradeList(fundingPipsSummaryTrades);
 
   if(lower.endsWith('.html') || lower.endsWith('.htm')){
-    return parseMatchTraderHTML(text);
+    return normalizeImportedTradeList(parseMatchTraderHTML(text));
   }
-  return parseMatchTraderCSV(text);
+  return normalizeImportedTradeList(parseMatchTraderCSV(text));
 }
 
 function handleCSVUpload(event){
@@ -5842,9 +5907,9 @@ function handleCSVUpload(event){
     }
     
     if (shouldReplace) {
-      trades = parsed;
+      trades = normalizeImportedTradeList(parsed);
       if (typeof cleanDuplicateDeals === 'function') {
-        trades = cleanDuplicateDeals(trades);
+        trades = normalizeImportedTradeList(cleanDuplicateDeals(trades));
       }
     } else {
       trades = mergeImportedTrades(trades, parsed);
@@ -7117,18 +7182,20 @@ function renderTodayRows(data){
   }
 
   el.innerHTML = sorted(data).reverse().map(t=>{
+    t = normalizeImportedTrade(t) || {};
     const ms = mistakes(t);
-    const dur = t.duration < 60 ? t.duration.toFixed(1)+'m' : (t.duration/60).toFixed(1)+'h';
+    const duration = safeTradeNumber(t.duration, 0);
+    const dur = duration < 60 ? safeFixed(duration,1,'0.0')+'m' : safeFixed(duration/60,1,'0.0')+'h';
     return `<tr>
       <td>${t.time}</td>
       <td>${t.symbol || 'Unknown'}</td>
       <td><span class="badge ${t.side==='BUY'?'buy':'sell'}">${t.side}</span></td>
       <td>${t.session}</td>
-      <td>${t.entry.toFixed(2)}</td>
-      <td>${t.exit.toFixed(2)}</td>
-      <td class="${t.sl?'':'red'}">${t.sl?t.sl.toFixed(2):'None'}</td>
-      <td>${t.tp?t.tp.toFixed(2):'-'}</td>
-      <td>${t.volume.toFixed(2)}</td>
+      <td>${safeFixed(t.entry)}</td>
+      <td>${safeFixed(t.exit)}</td>
+      <td class="${t.sl?'':'red'}">${t.sl?safeFixed(t.sl):'None'}</td>
+      <td>${t.tp?safeFixed(t.tp):'-'}</td>
+      <td>${safeFixed(t.volume)}</td>
       <td>${dur}</td>
       <td>${t.reason}</td>
       <td class="${pnlClass(t.pnl)}"><strong>${fmt(t.pnl)}</strong><br><span class="badge ${resultBadgeClass(t.pnl)}">${resultLabel(t.pnl)}</span></td>
