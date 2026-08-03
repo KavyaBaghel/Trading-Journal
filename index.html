@@ -476,14 +476,14 @@ function renderUserProfile() {
   const dEmail = user.email || 'local@journall.app';
   const dPhoto = user.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(dName)}&background=a855f7&color=fff`;
 
-  // Sidebar mini avatar & info
-  const sideName = document.getElementById('sidebarProfileName');
-  const sideEmail = document.getElementById('sidebarProfileEmail');
-  const sideImg = document.getElementById('sidebarAvatarImg');
+  // Top Right Profile Pill
+  const topName = document.getElementById('topProfileName');
+  const topEmail = document.getElementById('topProfileEmail');
+  const topImg = document.getElementById('topAvatarImg');
 
-  if (sideName) sideName.textContent = dName;
-  if (sideEmail) sideEmail.textContent = dEmail;
-  if (sideImg) sideImg.src = dPhoto;
+  if (topName) topName.textContent = dName;
+  if (topEmail) topEmail.textContent = dEmail;
+  if (topImg) topImg.src = dPhoto;
 
   // Full Profile Page elements
   const profName = document.getElementById('userProfileName');
@@ -498,15 +498,26 @@ function renderUserProfile() {
 
   // Stats
   const statTrades = document.getElementById('profStatTrades');
-  const statAccount = document.getElementById('profStatAccount');
+  const statBalance = document.getElementById('profStatBalance');
   const statBroker = document.getElementById('profStatBroker');
+  const statDeposit = document.getElementById('profStatDeposit');
 
   const m = typeof accountMetrics === 'function' ? accountMetrics(trades || []) : null;
   const broker = typeof getSyncedBrokerInfo === 'function' ? getSyncedBrokerInfo() : null;
 
-  if (statTrades) statTrades.textContent = (trades || []).length;
-  if (statAccount) statAccount.textContent = m ? `$${m.startBalance.toFixed(2)}` : '$0.00';
-  if (statBroker) statBroker.textContent = broker ? broker.platform : 'MetaTrader 5';
+  if (statTrades) statTrades.textContent = (trades || []).length + ' trades';
+  if (statBalance) statBalance.textContent = m ? `$${m.currentBalance.toFixed(2)}` : '$0.00';
+  if (statDeposit) statDeposit.textContent = m ? `$${m.startBalance.toFixed(2)}` : '$0.00';
+  if (statBroker) statBroker.textContent = broker ? `${broker.platform} (${broker.account})` : 'MetaTrader 5';
+}
+
+function saveCustomUsername() {
+  const val = document.getElementById('customUsernameInput')?.value.trim();
+  if (val) {
+    localStorage.setItem('journall_custom_username', val);
+    alert('✓ Profile name updated successfully!');
+    renderUserProfile();
+  }
 }
 
 function saveCustomUsername() {
@@ -2926,6 +2937,66 @@ tr:hover {
   }
 }
 </style>
+<style>
+/* --- TOP RIGHT PROFILE PILL & CLEAN PROFILE PAGE STYLES --- */
+.top {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  margin-bottom: 24px !important;
+  gap: 16px !important;
+}
+
+.top-right-profile-pill {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 18px 8px 10px;
+  background: rgba(30, 41, 59, 0.6);
+  border: 1px solid rgba(168, 85, 247, 0.3);
+  border-radius: 9999px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+  flex-shrink: 0;
+}
+
+.top-right-profile-pill:hover {
+  background: rgba(168, 85, 247, 0.18);
+  border-color: rgba(168, 85, 247, 0.5);
+  transform: translateY(-1px);
+}
+
+.top-avatar-img {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #a855f7;
+}
+
+.top-profile-details {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.top-profile-name {
+  font-size: 13px;
+  font-weight: 700;
+  color: #fff;
+  line-height: 1.2;
+}
+
+.top-profile-email {
+  font-size: 11px;
+  color: #94a3b8;
+  line-height: 1.2;
+}
+
+/* Remove old sidebar card if present */
+.sidebar-profile-card { display: none !important; }
+</style>
 </head>
 <body>
 <button id="androidInstallBtn" class="android-install-btn" type="button" hidden>Install Journall</button>
@@ -3079,54 +3150,65 @@ tr:hover {
         <span class="hero-tag">AI-powered &bull; Trade review</span>
 
       </div>
-      <div class="quick-actions"></div>
+      <div class="top-right-profile-pill" onclick="document.querySelector('[data-tab=&quot;userprofile&quot;]')?.click()">
+        <img id="topAvatarImg" class="top-avatar-img" src="https://lh3.googleusercontent.com/a/default-user" onerror="this.src='https://ui-avatars.com/api/?name=Trader&background=a855f7&color=fff'" alt="Trader Profile">
+        <div class="top-profile-details">
+          <div class="top-profile-name" id="topProfileName">Trader</div>
+          <div class="top-profile-email" id="topProfileEmail">Signed in</div>
+        </div>
+      </div>
     </div>
 
 
     
     <section id="userprofile" class="section">
       <div class="card profile-card-hero">
-        <div style="display:flex; align-items:center; gap:20px; flex-wrap:wrap;">
+        <div style="display:flex; align-items:center; gap:24px; flex-wrap:wrap;">
           <div style="position:relative;">
-            <img id="userProfileAvatar" src="https://lh3.googleusercontent.com/a/default-user" onerror="this.src='https://ui-avatars.com/api/?name=Trader&background=a855f7&color=fff'" alt="Google Profile" style="width:84px; height:84px; border-radius:50%; border:3px solid #a855f7; object-fit:cover; box-shadow:0 0 20px rgba(168,85,247,0.4);">
-            <span style="position:absolute; bottom:2px; right:2px; width:16px; height:16px; background:#22c55e; border:2px solid #0f172a; border-radius:50%;"></span>
+            <img id="userProfileAvatar" src="https://lh3.googleusercontent.com/a/default-user" onerror="this.src='https://ui-avatars.com/api/?name=Trader&background=a855f7&color=fff'" alt="Google Profile" style="width:90px; height:90px; border-radius:50%; border:3px solid #a855f7; object-fit:cover; box-shadow:0 0 25px rgba(168,85,247,0.4);">
+            <span style="position:absolute; bottom:3px; right:3px; width:18px; height:18px; background:#22c55e; border:3px solid #0f172a; border-radius:50%;"></span>
           </div>
-          <div>
-            <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
-              <h2 style="margin:0; font-size:24px; color:#fff;" id="userProfileName">Trader Name</h2>
-              <span class="badge" style="background:rgba(34,197,94,0.15); color:#4ade80; border:1px solid rgba(34,197,94,0.3); padding:4px 10px; border-radius:9999px; font-size:11px; font-weight:700;">✓ GOOGLE ACCOUNT AUTHORIZED</span>
+          <div style="flex:1;">
+            <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+              <h2 style="margin:0; font-size:26px; color:#fff;" id="userProfileName">Trader Name</h2>
+              <span class="badge" style="background:rgba(34,197,94,0.15); color:#4ade80; border:1px solid rgba(34,197,94,0.3); padding:4px 12px; border-radius:9999px; font-size:11px; font-weight:700;">✓ GOOGLE ACCOUNT AUTHORIZED</span>
             </div>
-            <p style="margin:6px 0 0 0; font-size:14px; color:#94a3b8;" id="userProfileEmail">trader@gmail.com</p>
-            <div style="margin-top:8px; font-size:12px; color:#cbd5e1;" id="userProfileMeta">Active Session &bull; Local & Google Cloud Sync Ready</div>
+            <p style="margin:6px 0 0 0; font-size:15px; color:#94a3b8;" id="userProfileEmail">trader@gmail.com</p>
+            <div style="margin-top:10px; font-size:12px; color:#cbd5e1;" id="userProfileMeta">Active Session &bull; Verified Trader Account</div>
           </div>
         </div>
       </div>
 
       <div class="goal-card-grid" style="margin-top:24px;">
         <div class="goal-card">
-          <div class="goal-card-label">Journaled Trades</div>
-          <div class="goal-card-value neutral" id="profStatTrades">0</div>
-          <div class="goal-card-sub">Total trades saved in your database</div>
-        </div>
-        <div class="goal-card">
-          <div class="goal-card-label">Account Deposit</div>
-          <div class="goal-card-value neutral" id="profStatAccount">$0</div>
-          <div class="goal-card-sub">Configured account size</div>
+          <div class="goal-card-label">Current Balance</div>
+          <div class="goal-card-value green" id="profStatBalance">$0.00</div>
+          <div class="goal-card-sub">Real-time balance calculated from synced trades</div>
         </div>
         <div class="goal-card">
           <div class="goal-card-label">Connected Platform</div>
           <div class="goal-card-value green" id="profStatBroker">MetaTrader 5</div>
           <div class="goal-card-sub">Active auto-sync broker source</div>
         </div>
+        <div class="goal-card">
+          <div class="goal-card-label">Journaled Trades</div>
+          <div class="goal-card-value neutral" id="profStatTrades">0 trades</div>
+          <div class="goal-card-sub">Total trades saved in database</div>
+        </div>
+        <div class="goal-card">
+          <div class="goal-card-label">Initial Deposit</div>
+          <div class="goal-card-value neutral" id="profStatDeposit">$0.00</div>
+          <div class="goal-card-sub">Configured starting balance</div>
+        </div>
       </div>
 
       <div class="card" style="margin-top:24px;">
         <div class="panel-title"><h3>Profile Settings</h3><span>Customize Account</span></div>
-        <div style="display:grid; gap:16px; max-width:500px; margin-top:16px;">
-          <label style="display:block; font-size:13px; color:#94a3b8; font-weight:600;">CUSTOM DISPLAY NAME
-            <input type="text" id="customUsernameInput" style="width:100%; border-radius:8px; padding:10px; background:rgba(255,255,255,0.06); color:#fff; margin-top:6px;" placeholder="Enter custom display name...">
+        <div style="display:grid; gap:16px; max-width:520px; margin-top:16px;">
+          <label style="display:block; font-size:13px; color:#94a3b8; font-weight:600;">DISPLAY TRADER NAME
+            <input type="text" id="customUsernameInput" style="width:100%; border-radius:8px; padding:12px; background:rgba(255,255,255,0.06); color:#fff; margin-top:6px;" placeholder="Enter custom display name...">
           </label>
-          <div style="display:flex; gap:12px;">
+          <div style="display:flex; gap:12px; flex-wrap:wrap;">
             <button type="button" class="btn primary" onclick="saveCustomUsername()">Save Profile Changes</button>
             <button type="button" class="btn nav-signout-btn" onclick="triggerJournalSignOut()">Sign Out of Account</button>
           </div>
