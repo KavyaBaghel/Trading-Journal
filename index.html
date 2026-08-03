@@ -2997,6 +2997,70 @@ tr:hover {
 /* Remove old sidebar card if present */
 .sidebar-profile-card { display: none !important; }
 </style>
+<style>
+/* --- PERMANENT FIXED FLOATING TOP-RIGHT PROFILE WIDGET --- */
+.fixed-top-right-profile {
+  position: fixed !important;
+  top: 16px !important;
+  right: 24px !important;
+  z-index: 99999 !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  padding: 6px 14px 6px 8px !important;
+  background: rgba(15, 23, 42, 0.88) !important;
+  backdrop-filter: blur(14px) !important;
+  -webkit-backdrop-filter: blur(14px) !important;
+  border: 1px solid rgba(168, 85, 247, 0.4) !important;
+  border-radius: 9999px !important;
+  cursor: pointer !important;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5) !important;
+  transition: all 0.2s ease !important;
+}
+
+.fixed-top-right-profile:hover {
+  background: rgba(30, 41, 59, 0.95) !important;
+  border-color: rgba(168, 85, 247, 0.7) !important;
+  box-shadow: 0 10px 30px rgba(168, 85, 247, 0.4) !important;
+  transform: translateY(-1px) !important;
+}
+
+.top-avatar-img {
+  width: 34px !important;
+  height: 34px !important;
+  border-radius: 50% !important;
+  object-fit: cover !important;
+  border: 2px solid #a855f7 !important;
+}
+
+.top-profile-details {
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+}
+
+.top-profile-name {
+  font-size: 13px !important;
+  font-weight: 700 !important;
+  color: #fff !important;
+  line-height: 1.2 !important;
+}
+
+.top-profile-email {
+  font-size: 11px !important;
+  color: #94a3b8 !important;
+  line-height: 1.2 !important;
+}
+
+@media (max-width: 820px) {
+  .fixed-top-right-profile {
+    top: 10px !important;
+    right: 12px !important;
+    padding: 4px 10px 4px 6px !important;
+  }
+  .top-profile-email { display: none !important; }
+}
+</style>
 </head>
 <body>
 <button id="androidInstallBtn" class="android-install-btn" type="button" hidden>Install Journall</button>
@@ -3105,6 +3169,13 @@ tr:hover {
   </div>
 </div>
 <div id="journallApp" class="app" style="display: none;" hidden>
+  <div id="fixedTopRightProfile" class="fixed-top-right-profile" onclick="document.querySelector('[data-tab=&quot;userprofile&quot;]')?.click()">
+    <img id="topAvatarImg" class="top-avatar-img" src="https://lh3.googleusercontent.com/a/default-user" onerror="this.src='https://ui-avatars.com/api/?name=Trader&background=a855f7&color=fff'" alt="Trader Profile">
+    <div class="top-profile-details">
+      <div class="top-profile-name" id="topProfileName">Trader</div>
+      <div class="top-profile-email" id="topProfileEmail">Signed in</div>
+    </div>
+  </div>
   <aside class="sidebar">
     <div class="brand"><div class="logo" aria-hidden="true"></div><div><div class="brand-title">Journall</div><div class="brand-sub">Trading command center</div></div></div>
     <div class="sidebar-profile-card" onclick="document.querySelector('[data-tab=&quot;userprofile&quot;]')?.click()">
@@ -3150,13 +3221,7 @@ tr:hover {
         <span class="hero-tag">AI-powered &bull; Trade review</span>
 
       </div>
-      <div class="top-right-profile-pill" onclick="document.querySelector('[data-tab=&quot;userprofile&quot;]')?.click()">
-        <img id="topAvatarImg" class="top-avatar-img" src="https://lh3.googleusercontent.com/a/default-user" onerror="this.src='https://ui-avatars.com/api/?name=Trader&background=a855f7&color=fff'" alt="Trader Profile">
-        <div class="top-profile-details">
-          <div class="top-profile-name" id="topProfileName">Trader</div>
-          <div class="top-profile-email" id="topProfileEmail">Signed in</div>
-        </div>
-      </div>
+<div class="quick-actions"></div>
     </div>
 
 
@@ -6917,10 +6982,15 @@ function onBrokerPlatformChange(){
     if(status) status.innerHTML = '☁️ <strong>Direct Cloud Sync:</strong> Enter your MatchTrader URL and credentials. 100% online, no downloads needed!';
   } else if(platform === 'ctrader'){
     if(btnText) btnText.textContent = 'Sync from cTrader (Cloud)';
-    if(status) status.innerHTML = '☁️ <strong>Direct Cloud Sync:</strong> Enter your cTrader Access Token. 100% online, no downloads needed!';
+    if(status) status.innerHTML = '☁️ <strong>Direct Cloud Sync:</strong> Enter your cTrader Access Token. Works on desktop and phone through the Journall cloud sync Worker.';
   } else if(platform === 'mt5'){
-    if(btnText) btnText.textContent = 'Sync from MetaTrader 5 (Local PC)';
-    if(status) status.innerHTML = '💡 <strong>Online MT5 Import (No Downloads):</strong> Drag & drop your MT5 HTML report into the Upload box below.<br>🖥️ <strong>Local PC Bridge:</strong> Requires running Journall App.bat on your PC.';
+    if(isMobileBrokerDevice()){
+      if(btnText) btnText.textContent = 'Upload MT5 Report';
+      if(status) status.innerHTML = '📱 <strong>MT5 on phone:</strong> Export your MT5 HTML statement/report, save it on this phone, then upload it below. Direct terminal sync only works on your Windows laptop.';
+    } else {
+      if(btnText) btnText.textContent = 'Sync from MetaTrader 5 (Local PC)';
+      if(status) status.innerHTML = '💡 <strong>Online MT5 Import:</strong> Drag & drop your MT5 HTML report into the Upload box below.<br>🖥️ <strong>Local PC Bridge:</strong> Requires running Journall App.bat on your PC.';
+    }
   }
 }
 
@@ -7172,6 +7242,42 @@ async function syncCTraderWeb(token, accountId, days) {
   });
 }
 
+function isMobileBrokerDevice(){
+  return /Android|iPhone|iPad|iPod|Opera Mini|IEMobile/i.test(navigator.userAgent || '') ||
+    (window.matchMedia && window.matchMedia('(max-width: 820px)').matches);
+}
+
+async function syncCTraderViaWorker(token, accountId, days) {
+  const endpoint = String(window.journallAiProxyUrl || '').trim();
+  if (!endpoint || endpoint.includes('YOUR_WORKERS_SUBDOMAIN')) {
+    throw new Error('Cloud sync backend is not configured yet.');
+  }
+
+  const firebaseToken = await window.journallGetFirebaseIdToken?.();
+  if (!firebaseToken) {
+    throw new Error('Sign in again before syncing cTrader.');
+  }
+
+  const res = await fetch(endpoint.replace(/\/+$/, '') + '/ctraderSync', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${firebaseToken}`
+    },
+    body: JSON.stringify({
+      token,
+      accountId,
+      days: parseInt(days, 10) || 30
+    })
+  });
+
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok || data.error) {
+    throw new Error(data.error || `Cloud cTrader sync failed (${res.status}).`);
+  }
+  return data.trades || [];
+}
+
 async function triggerBrokerSync(){
   const platform = document.getElementById('brokerPlatformSelect')?.value || 'mt5';
   const status = document.getElementById('brokerSyncStatus');
@@ -7226,14 +7332,32 @@ async function triggerBrokerSync(){
   }
 
   const isLocalHost = window.location.hostname === '127.0.0.1' || window.location.hostname === 'localhost';
+  const isMobileBroker = isMobileBrokerDevice();
   const syncApiUrl = isLocalHost ? '/api/sync-broker' : 'http://localhost:8787/api/sync-broker';
 
-  try {
-    let parsed = [];
+  if (platform === 'mt5' && !isLocalHost && isMobileBroker) {
+    if (status) {
+      status.innerHTML =
+        `<strong>MT5 mobile sync uses file import.</strong><br>` +
+        `Export your MT5 HTML statement/report, save it on this phone, then tap Upload Trading Data below. ` +
+        `Direct MT5 terminal sync only works on the Windows laptop because MT5 runs locally there.`;
+    }
+    const upload = document.getElementById('mainCsvUpload');
+    if (upload) upload.click();
+    if (btn) {
+      btn.disabled = false;
+      btn.innerHTML = `<span>Upload MT5 Report</span>`;
+    }
+    return;
+  }
 
+  let parsed = [];
+  try {
     // 1. Try local server bridge / backend sync first (No CORS issues!)
     let backendSuccess = false;
+    const canUseLocalBridge = isLocalHost || (!isMobileBroker && platform !== 'ctrader');
     try {
+      if (!canUseLocalBridge) throw new Error('Local desktop bridge is not available on this device.');
       const res = await fetch(syncApiUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -7262,7 +7386,12 @@ async function triggerBrokerSync(){
       } else if (platform === 'ctrader') {
         const token = document.getElementById('ctraderToken')?.value.trim();
         const accId = document.getElementById('ctraderAccountId')?.value.trim();
-        parsed = await syncCTraderWeb(token, accId, parseInt(days));
+        try {
+          parsed = await syncCTraderViaWorker(token, accId, parseInt(days));
+        } catch (cloudErr) {
+          if (isMobileBroker || !isLocalHost) throw cloudErr;
+          parsed = await syncCTraderWeb(token, accId, parseInt(days));
+        }
       }
     }
     if (!parsed.length) {
