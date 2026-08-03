@@ -98,6 +98,102 @@ async function handleAiCoach(request, env, cors) {
   return json({ text: text.trim() }, 200, cors);
 }
 
+function numberOrZero(value) {
+  const n = Number(value);
+  return Number.isFinite(n) ? n : 0;
+}
+
+function toTradeDateParts(timestamp) {
+  const raw = Number(timestamp);
+  const dt = timestamp
+    ? new Date(raw > 1e11 ? raw : raw * 1000)
+    : new Date();
+  const safe = Number.isNaN(dt.getTime()) ? new Date() : dt;
+  return {
+    date: safe.toISOString().slice(0, 10),
+    time: safe.toTimeString().slice(0, 8)
+  };
+}
+
+async function cTraderGet(url, token) {
+  const response = await fetch(url, {
+    method: "GET",
+    headers: {
+      "Authorization": `Bearer ${token}`,
+      "Accept": "application/json"
+    }
+  });
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    throw new Error(data?.description || data?.error || data?.message || `cTrader HTTP ${response.status}`);
+  }
+  return data;
+}
+
+async function handleCTraderSync(request, env, cors) {
+  const authHeader = request.headers.get("authorization") || "";
+  const idToken = authHeader.startsWith("Bearer ") ? authHeader.slice(7) : "";
+  if (!idToken) return json({ error: "Sign in required." }, 401, cors);
+  await verifyFirebaseIdToken(idToken, env);
+
+  const { token = "", accountId = "", days = 30 } = await request.json().catch(() => ({}));
+  const cTraderToken = String(token || "").trim();
+  if (!cTraderToken) return json({ error: "cTrader Access Token is required." }, 400, cors);
+
+  let accId = String(accountId || "").trim();
+  if (!accId) {
+    const accountsData = await cTraderGet("https://openapi.ctrader.com/v2/accounts", cTraderToken);
+    const accounts = accountsData?.data || accountsData?.accounts || [];
+    if (accounts.length) accId = String(accounts[0].accountId || accounts[0].id || "");
+  }
+  if (!accId) return json({ error: "cTrader Account ID is required. Paste it from cTrader if auto-detect fails." }, 400, cors);
+
+  const safeDays = Math.max(1, Math.min(365, Number(days) || 30));
+  const fromDt = Date.now() - safeDays * 86400000;
+  const toDt = Date.now() + 86400000;
+  const dealsData = await cTraderGet(
+    `https://openapi.ctrader.com/v2/accounts/${encodeURIComponent(accId)}/deals?from=${fromDt}&to=${toDt}`,
+    cTraderToken
+  );
+  const deals = Array.isArray(dealsData?.deal)
+    ? dealsData.deal
+    : (Array.isArray(dealsData?.deals) ? dealsData.deals : []);
+
+  const trades = deals.map((d, i) => {
+    const symbol = String(d.symbolName || d.symbol || "Unknown").trim();
+    const sideRaw = String(d.tradeSide || d.side || "").toUpperCase();
+    const side = (sideRaw.includes("BUY") || sideRaw === "1") ? "BUY" : "SELL";
+    const pnl = numberOrZero(d.profit);
+    const commission = numberOrZero(d.commission);
+    const swap = numberOrZero(d.swap);
+    const netPnl = (Math.abs(pnl) > 10000 ? pnl / 100 : pnl) + commission + swap;
+    const rawVolume = numberOrZero(d.volume);
+    const volume = rawVolume > 100 ? rawVolume / 100000 : rawVolume;
+    const price = numberOrZero(d.executionPrice || d.price);
+    const ts = d.executionTimestamp || d.createTimestamp;
+    const parts = toTradeDateParts(ts);
+    const tid = String(d.dealId || d.positionId || i);
+
+    return {
+      id: `ctrader-${tid}`,
+      date: parts.date,
+      time: parts.time,
+      symbol,
+      side,
+      pnl: Math.round(netPnl * 100) / 100,
+      volume: Math.round(volume * 100) / 100,
+      openPrice: price,
+      closePrice: price,
+      reason: "User",
+      commission: Math.round(commission * 100) / 100,
+      swap: Math.round(swap * 100) / 100,
+      notes: `cTrader Cloud Sync (#${tid})`
+    };
+  }).filter(t => t.symbol);
+
+  return json({ ok: true, trades }, 200, cors);
+}
+
 export default {
   async fetch(request, env) {
     const origin = request.headers.get("origin") || "";
@@ -110,6 +206,13 @@ export default {
         return await handleAiCoach(request, env, cors);
       } catch (error) {
         return json({ error: error.message || "AI backend failed." }, 500, cors);
+      }
+    }
+    if (request.method === "POST" && url.pathname === "/ctraderSync") {
+      try {
+        return await handleCTraderSync(request, env, cors);
+      } catch (error) {
+        return json({ error: error.message || "cTrader sync backend failed." }, 500, cors);
       }
     }
     return json({ ok: true, service: "Journall AI Worker" }, 200, cors);
