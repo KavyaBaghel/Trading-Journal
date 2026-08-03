@@ -468,15 +468,36 @@ function renderLiveTraderControllerMarkup(metrics) {
 }
 
 
+function getActiveUserEmail() {
+  const fbEmail = (window.currentUser && window.currentUser.email && window.currentUser.email !== 'local@journall.app') ? window.currentUser.email : null;
+  const savedEmail = localStorage.getItem('journall_user_email') || localStorage.getItem('journall_google_email');
+  return fbEmail || savedEmail || 'krishnacnjack@gmail.com';
+}
+
+function getActiveUserName() {
+  const savedCustom = localStorage.getItem('journall_custom_username');
+  if (savedCustom && savedCustom.trim()) return savedCustom.trim();
+
+  const fbName = (window.currentUser && window.currentUser.displayName && window.currentUser.displayName !== 'Local Trader') ? window.currentUser.displayName : null;
+  if (fbName) return fbName;
+
+  const savedName = localStorage.getItem('journall_user_name');
+  if (savedName) return savedName;
+
+  const email = getActiveUserEmail();
+  if (email && email.includes('@')) {
+    return email.split('@')[0];
+  }
+  return 'Krishna';
+}
+
 function renderUserProfile() {
   const user = window.currentUser || {};
-  const customName = localStorage.getItem('journall_custom_username');
-  
-  const dName = customName || user.displayName || (user.email ? user.email.split('@')[0] : 'Trader');
-  const dEmail = user.email || 'local@journall.app';
-  const dPhoto = user.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(dName)}&background=a855f7&color=fff`;
+  const dName = getActiveUserName();
+  const dEmail = getActiveUserEmail();
+  const dPhoto = user.photoURL || localStorage.getItem('journall_user_photo') || `https://ui-avatars.com/api/?name=${encodeURIComponent(dName)}&background=a855f7&color=fff`;
 
-  // Top Right Profile Pill
+  // Top Right Fixed Floating Profile Widget
   const topName = document.getElementById('topProfileName');
   const topEmail = document.getElementById('topProfileEmail');
   const topImg = document.getElementById('topAvatarImg');
@@ -494,7 +515,7 @@ function renderUserProfile() {
   if (profName) profName.textContent = dName;
   if (profEmail) profEmail.textContent = dEmail;
   if (profImg) profImg.src = dPhoto;
-  if (customInput && !customInput.value) customInput.value = customName || '';
+  if (customInput && !customInput.value) customInput.value = localStorage.getItem('journall_custom_username') || dName;
 
   // Stats
   const statTrades = document.getElementById('profStatTrades');
@@ -515,20 +536,11 @@ function saveCustomUsername() {
   const val = document.getElementById('customUsernameInput')?.value.trim();
   if (val) {
     localStorage.setItem('journall_custom_username', val);
-    alert('✓ Profile name updated successfully!');
+    localStorage.setItem('journall_user_name', val);
+    alert('✓ Profile display name updated to: ' + val);
     renderUserProfile();
   }
 }
-
-function saveCustomUsername() {
-  const val = document.getElementById('customUsernameInput')?.value.trim();
-  if (val) {
-    localStorage.setItem('journall_custom_username', val);
-    alert('✓ Profile name updated successfully!');
-    renderUserProfile();
-  }
-}
-
 </script>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap');
@@ -10324,6 +10336,12 @@ async function initFirebaseAuth(){
       return;
     }
     window.currentUser = user;
+    if (user && user.email) {
+      localStorage.setItem('journall_user_email', user.email);
+      if (user.displayName) localStorage.setItem('journall_user_name', user.displayName);
+      if (user.photoURL) localStorage.setItem('journall_user_photo', user.photoURL);
+    }
+    renderUserProfile();
     cloudReady = false;
     if(!user){
       sessionStorage.removeItem('journall:cloud-loaded');
