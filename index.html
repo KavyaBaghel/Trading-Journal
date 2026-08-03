@@ -469,9 +469,9 @@ function renderLiveTraderControllerMarkup(metrics) {
 
 
 function getActiveUserEmail() {
-  const fbEmail = (window.currentUser && window.currentUser.email && window.currentUser.email !== 'local@journall.app') ? window.currentUser.email : null;
-  const savedEmail = localStorage.getItem('journall_user_email') || localStorage.getItem('journall_google_email');
-  return fbEmail || savedEmail || 'krishnacnjack@gmail.com';
+  const fbEmail = (window.currentUser && window.currentUser.email && window.currentUser.email !== 'local@journall.app') ? window.currentUser.email.trim() : '';
+  const savedEmail = (localStorage.getItem('journall_user_email') || localStorage.getItem('journall_google_email') || '').trim();
+  return fbEmail || savedEmail || 'Signed in';
 }
 
 function getActiveUserName() {
@@ -488,7 +488,16 @@ function getActiveUserName() {
   if (email && email.includes('@')) {
     return email.split('@')[0];
   }
-  return 'Krishna';
+  return 'Trader';
+}
+
+function rememberFirebaseUserProfile(user) {
+  if (!user || user.uid === 'local_user') return;
+  if (user.email) localStorage.setItem('journall_user_email', user.email.trim());
+  if (user.displayName && !localStorage.getItem('journall_custom_username')) {
+    localStorage.setItem('journall_user_name', user.displayName.trim());
+  }
+  if (user.photoURL) localStorage.setItem('journall_user_photo', user.photoURL);
 }
 
 function renderUserProfile() {
@@ -505,6 +514,12 @@ function renderUserProfile() {
   if (topName) topName.textContent = dName;
   if (topEmail) topEmail.textContent = dEmail;
   if (topImg) topImg.src = dPhoto;
+
+  // Sidebar profile card
+  const sidebarName = document.getElementById('sidebarProfileName');
+  const sidebarEmail = document.getElementById('sidebarProfileEmail');
+  if (sidebarName) sidebarName.textContent = dName;
+  if (sidebarEmail) sidebarEmail.textContent = dEmail;
 
   // Full Profile Page elements
   const profName = document.getElementById('userProfileName');
@@ -7009,13 +7024,31 @@ function onBrokerPlatformChange(){
 
 
 async function fetchWithCorsProxy(targetUrl, options = {}) {
+  // 1. Try direct fetch first
   try {
     const res = await fetch(targetUrl, options);
     if (res.ok || (res.status >= 200 && res.status < 500)) return res;
   } catch (e) {}
 
-  const proxyUrl = 'https://corsproxy.io/?' + encodeURIComponent(targetUrl);
-  return await fetch(proxyUrl, options);
+  // 2. Try proxy chain (corsproxy.io -> allorigins -> thingproxy)
+  const proxies = [
+    url => 'https://corsproxy.io/?' + encodeURIComponent(url),
+    url => 'https://api.allorigins.win/raw?url=' + encodeURIComponent(url),
+    url => 'https://thingproxy.freeboard.io/fetch/' + url
+  ];
+
+  let lastErr = null;
+  for (const getProxyUrl of proxies) {
+    try {
+      const proxyUrl = getProxyUrl(targetUrl);
+      const res = await fetch(proxyUrl, options);
+      if (res.ok || (res.status >= 200 && res.status < 500)) return res;
+    } catch (e) {
+      lastErr = e;
+    }
+  }
+
+  throw new Error('Mobile network proxy check failed. Please verify credentials or upload your MatchTrader CSV/HTML report below.');
 }
 
 function addUniqueMatchTraderBase(list, value) {
@@ -7025,23 +7058,15 @@ function addUniqueMatchTraderBase(list, value) {
 
 function normalizeMatchTraderBaseUrls(inputUrl) {
   let rawUrl = String(inputUrl || '').trim();
-  if (!rawUrl) return [];
+  if (!rawUrl) rawUrl = 'https://mtr-platform.fundingpips.com';
   if (!rawUrl.startsWith('http://') && !rawUrl.startsWith('https://')) {
     rawUrl = 'https://' + rawUrl;
   }
 
   const candidateBases = [];
-  let origin = rawUrl.replace(/\/+$/, '');
-  try {
-    const parsed = new URL(rawUrl);
-    origin = parsed.origin.replace('://www.', '://');
-  } catch (e) {}
 
-  addUniqueMatchTraderBase(candidateBases, origin);
-
-  let host = '';
-  try { host = new URL(origin).hostname.toLowerCase(); } catch (e) {}
-  if (host.includes('fundingpips') || host.includes('ingpips')) {
+  // Prioritize FundingPips and MatchTrader platform domains
+  if (rawUrl.includes('fundingpips') || rawUrl.includes('ingpips') || rawUrl.length < 15) {
     [
       'https://mtr-platform.fundingpips.com',
       'https://matchtrader.fundingpips.com',
@@ -7051,14 +7076,13 @@ function normalizeMatchTraderBaseUrls(inputUrl) {
     ].forEach(base => addUniqueMatchTraderBase(candidateBases, base));
   }
 
-  const hostParts = host.split('.').filter(Boolean);
-  if (hostParts.length >= 2) {
-    const rootDomain = hostParts.slice(-2).join('.');
-    ['mtr-platform', 'matchtrader', 'mtr', 'platform'].forEach(prefix => {
-      addUniqueMatchTraderBase(candidateBases, `https://${prefix}.${rootDomain}`);
-    });
-  }
+  let origin = rawUrl.replace(/\/+$/, '');
+  try {
+    const parsed = new URL(rawUrl);
+    origin = parsed.origin.replace('://www.', '://');
+  } catch (e) {}
 
+  addUniqueMatchTraderBase(candidateBases, origin);
   return candidateBases;
 }
 
@@ -10103,6 +10127,14 @@ window.checkAndPromptUsername = function checkAndPromptUsername(callback) {
       return;
     }
     localStorage.setItem('journall_custom_username', val);
+    localStorage.setItem('journall_user_name', val);
+    if (window.currentUser?.email && window.currentUser.email !== 'local@journall.app') {
+      localStorage.setItem('journall_user_email', window.currentUser.email.trim());
+    }
+    if (window.currentUser?.photoURL) {
+      localStorage.setItem('journall_user_photo', window.currentUser.photoURL);
+    }
+    if (typeof renderUserProfile === 'function') renderUserProfile();
     if (typeof scheduleCloudSave === 'function') scheduleCloudSave();
 
     modal.style.opacity = '0';
@@ -10151,6 +10183,8 @@ async function loadCloudState(){
   unsubscribeCloudSync = onSnapshot(ref, (docSnap) => {
     if (docSnap.exists() && docSnap.data()?.storage) {
       const changed = applyCloudState(docSnap.data().storage);
+      rememberFirebaseUserProfile(window.currentUser);
+      renderUserProfile();
       if (changed && typeof window.journallReloadDataFromStorage === 'function') {
         window.journallReloadDataFromStorage();
         const uName = localStorage.getItem('journall_custom_username') || window.currentUser.displayName || window.currentUser.email || 'trader';
@@ -10336,11 +10370,7 @@ async function initFirebaseAuth(){
       return;
     }
     window.currentUser = user;
-    if (user && user.email) {
-      localStorage.setItem('journall_user_email', user.email);
-      if (user.displayName) localStorage.setItem('journall_user_name', user.displayName);
-      if (user.photoURL) localStorage.setItem('journall_user_photo', user.photoURL);
-    }
+    rememberFirebaseUserProfile(user);
     renderUserProfile();
     cloudReady = false;
     if(!user){
