@@ -283,6 +283,190 @@ document.querySelectorAll('.nav button').forEach(btn=>{
   });
 });
 
+
+// --- LIVE TRADER CONTROLLER & UNJOURNALED TRADES LOGIC ---
+let qjCurrentIndex = 0;
+let qjUnjournaledList = [];
+let cooldownInterval = null;
+let cooldownRemainingSeconds = 0;
+
+function getUnjournaledTrades() {
+  const all = trades || [];
+  return all.filter(t => {
+    if (t.journaled) return false;
+    const hasNotes = t.notes && !t.notes.includes('Sync (#') && !t.notes.includes('MT5 Sync') && !t.notes.includes('MatchTrader') && !t.notes.includes('cTrader');
+    const hasSetup = !!t.setup;
+    const hasMistakes = Array.isArray(t.mistakes) && t.mistakes.length > 0;
+    return !(hasNotes || hasSetup || hasMistakes);
+  });
+}
+
+function openQuickJournalModal() {
+  qjUnjournaledList = getUnjournaledTrades();
+  if (!qjUnjournaledList.length) {
+    alert('🎉 All your trades are fully journaled!');
+    return;
+  }
+  qjCurrentIndex = 0;
+  loadQuickJournalTrade();
+  document.getElementById('quickJournalBackdrop')?.classList.add('active');
+}
+
+function closeQuickJournalModal() {
+  document.getElementById('quickJournalBackdrop')?.classList.remove('active');
+}
+
+function loadQuickJournalTrade() {
+  if (qjCurrentIndex < 0 || qjCurrentIndex >= qjUnjournaledList.length) {
+    closeQuickJournalModal();
+    alert('✨ Great job! You have journaled all remaining trades.');
+    if (typeof renderPropChallengeDashboard === 'function') renderPropChallengeDashboard();
+    if (typeof renderAll === 'function') renderAll();
+    return;
+  }
+  const t = qjUnjournaledList[qjCurrentIndex];
+  const summaryEl = document.getElementById('qjTradeSummary');
+  const titleEl = document.getElementById('qjModalTitle');
+  const progressEl = document.getElementById('qjProgressText');
+
+  if (titleEl) titleEl.textContent = `Journal Trade #${t.id || (qjCurrentIndex+1)}`;
+  if (progressEl) progressEl.textContent = `Trade ${qjCurrentIndex + 1} of ${qjUnjournaledList.length}`;
+
+  const pnlCls = (t.pnl || 0) >= 0 ? 'green' : 'red';
+  const pnlStr = (t.pnl || 0) >= 0 ? `+$${(t.pnl || 0).toFixed(2)}` : `-$${Math.abs(t.pnl || 0).toFixed(2)}`;
+
+  if (summaryEl) {
+    summaryEl.innerHTML = `
+      <div>
+        <strong style="font-size:16px; color:#fff;">${t.symbol || 'Symbol'} (${t.side || 'BUY'})</strong>
+        <div style="font-size:12px; color:#94a3b8; margin-top:2px;">${t.date || ''} ${t.time || ''} &bull; Vol: ${t.volume || 0.01} lots</div>
+      </div>
+      <div style="text-align:right;">
+        <span class="${pnlCls}" style="font-size:18px; font-weight:700;">${pnlStr}</span>
+      </div>
+    `;
+  }
+
+  const setupEl = document.getElementById('qjSetupSelect');
+  if (setupEl) setupEl.value = t.setup || '';
+  
+  const notesEl = document.getElementById('qjNotesInput');
+  if (notesEl) notesEl.value = t.notes && !t.notes.includes('Sync (#') ? t.notes : '';
+
+  const boxes = document.querySelectorAll('#qjMistakesCheckboxes input[type="checkbox"]');
+  const currentMistakes = Array.isArray(t.mistakes) ? t.mistakes : [];
+  boxes.forEach(b => {
+    b.checked = currentMistakes.includes(b.value);
+  });
+}
+
+function saveQuickJournalTrade() {
+  if (qjCurrentIndex < 0 || qjCurrentIndex >= qjUnjournaledList.length) return;
+  const t = qjUnjournaledList[qjCurrentIndex];
+
+  const setupVal = document.getElementById('qjSetupSelect')?.value || '';
+  const notesVal = document.getElementById('qjNotesInput')?.value || '';
+  
+  const boxes = document.querySelectorAll('#qjMistakesCheckboxes input[type="checkbox"]:checked');
+  const mistakeVals = Array.from(boxes).map(b => b.value);
+
+  t.setup = setupVal;
+  t.notes = notesVal;
+  t.mistakes = mistakeVals;
+  t.journaled = true;
+
+  const idx = trades.findIndex(x => x.id === t.id);
+  if (idx !== -1) {
+    trades[idx] = t;
+  }
+
+  if (typeof saveTrades === 'function') saveTrades();
+
+  qjCurrentIndex++;
+  loadQuickJournalTrade();
+}
+
+function skipQuickJournalTrade() {
+  qjCurrentIndex++;
+  loadQuickJournalTrade();
+}
+
+function triggerCooldownPause() {
+  cooldownRemainingSeconds = 15 * 60;
+  document.getElementById('cooldownModalBackdrop')?.classList.add('active');
+  updateCooldownTimerDisplay();
+
+  if (cooldownInterval) clearInterval(cooldownInterval);
+  cooldownInterval = setInterval(() => {
+    cooldownRemainingSeconds--;
+    if (cooldownRemainingSeconds <= 0) {
+      clearInterval(cooldownInterval);
+      closeCooldownModal();
+    } else {
+      updateCooldownTimerDisplay();
+    }
+  }, 1000);
+}
+
+function updateCooldownTimerDisplay() {
+  const mins = Math.floor(cooldownRemainingSeconds / 60);
+  const secs = cooldownRemainingSeconds % 60;
+  const circle = document.getElementById('cooldownTimerCircle');
+  if (circle) circle.textContent = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+}
+
+function closeCooldownModal() {
+  if (cooldownInterval) clearInterval(cooldownInterval);
+  document.getElementById('cooldownModalBackdrop')?.classList.remove('active');
+}
+
+function renderLiveTraderControllerMarkup(metrics) {
+  const m = metrics || accountMetrics(trades || []);
+  if (!m) return '';
+
+  const isLockout = (m.maxDailyLossAmount && m.dailyLossUsed >= m.maxDailyLossAmount) || (m.maxDrawdownAmount && m.maxDrawdownUsed >= m.maxDrawdownAmount);
+  const isWarning = m.maxDailyLossRemaining != null && m.maxDailyLossRemaining < (m.maxDailyLossAmount * 0.25);
+  
+  const statusCls = isLockout ? 'lockout' : (isWarning ? 'warning' : 'ready');
+  const statusText = isLockout ? '🔴 LOCKOUT (MAX LOSS REACHED)' : (isWarning ? '🟡 RISK HIGH' : '🟢 SESSION ACTIVE / READY');
+
+  return `
+    <div class="live-controller-card">
+      <div class="live-controller-header">
+        <div>
+          <span style="font-size:11px; font-weight:700; color:#a855f7; text-transform:uppercase; letter-spacing:0.05em;">Live Trader Guard</span>
+          <h3 style="margin:2px 0 0 0; font-size:20px; color:#fff;">Session Controller</h3>
+        </div>
+        <div class="live-status-pill ${statusCls}">${statusText}</div>
+      </div>
+
+      <div class="live-metrics-grid">
+        <div class="live-metric-box">
+          <div class="live-metric-label">Daily Loss Room</div>
+          <div class="live-metric-val ${m.maxDailyLossRemaining <= 0 ? 'red' : 'green'}">${m.maxDailyLossRemaining == null ? 'Unlimited' : '$' + m.maxDailyLossRemaining.toFixed(2)}</div>
+        </div>
+        <div class="live-metric-box">
+          <div class="live-metric-label">Trades Taken Today</div>
+          <div class="live-metric-val neutral">${m.todayTrades.length} / ${m.config.maxTradesPerDay || '∞'}</div>
+        </div>
+        <div class="live-metric-box">
+          <div class="live-metric-label">Today P&L</div>
+          <div class="live-metric-val ${pnlClass(m.todayPnl)}">$${m.todayPnl.toFixed(2)}</div>
+        </div>
+        <div class="live-metric-box">
+          <div class="live-metric-label">Mind Check</div>
+          <div class="live-metric-val green">${typeof isMindCheckComplete === 'function' && isMindCheckComplete() ? '100% Ready' : 'Pending'}</div>
+        </div>
+      </div>
+
+      <div class="live-action-bar">
+        <button class="btn primary" type="button" onclick="document.querySelector('[data-tab=&quot;psychology&quot;]')?.click()">Open Psychology Room</button>
+        <button class="btn" type="button" onclick="triggerCooldownPause()">🧘 Pause 15m Cooldown</button>
+      </div>
+    </div>
+  `;
+}
+
 </script>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap');
@@ -2260,7 +2444,173 @@ tr:hover {
 <style id="journall-trading-dashboard-sync">
 .account-sync-note{margin:0 0 14px!important;color:rgba(255,255,255,.56)!important;font-size:13px!important;line-height:1.5!important}
 .account-source-input[readonly],.account-source-input:disabled{opacity:.72!important;cursor:not-allowed!important;border-color:rgba(255,255,255,.05)!important}
-</style></head>
+</style><style>
+/* --- LIVE TRADER CONTROLLER & UNJOURNALED TRADES BANNER STYLES --- */
+.unjournaled-banner {
+  background: linear-gradient(135deg, rgba(30, 41, 59, 0.7), rgba(15, 23, 42, 0.9));
+  border: 1px solid rgba(99, 102, 241, 0.3);
+  border-radius: 16px;
+  padding: 20px 24px;
+  margin-bottom: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  position: relative;
+  overflow: hidden;
+}
+.unjournaled-banner::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, #6366f1, #a855f7, #ec4899);
+}
+.unjournaled-banner-left {
+  flex: 1;
+}
+.unjournaled-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #a855f7;
+  background: rgba(168, 85, 247, 0.12);
+  border: 1px solid rgba(168, 85, 247, 0.3);
+  padding: 4px 10px;
+  border-radius: 9999px;
+  margin-bottom: 8px;
+}
+.unjournaled-banner h3 {
+  margin: 0 0 4px 0;
+  font-size: 18px;
+  font-weight: 700;
+  color: #fff;
+}
+.unjournaled-banner p {
+  margin: 0;
+  font-size: 13px;
+  color: #94a3b8;
+}
+
+/* Live Trader Controller Hub */
+.live-controller-card {
+  background: linear-gradient(135deg, rgba(15, 23, 42, 0.8), rgba(30, 41, 59, 0.6));
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 24px;
+  margin-bottom: 24px;
+  box-shadow: 0 12px 32px rgba(0,0,0,0.3);
+}
+.live-controller-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+.live-status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  border-radius: 9999px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.live-status-pill.ready { background: rgba(34, 197, 94, 0.15); color: #4ade80; border: 1px solid rgba(34, 197, 94, 0.3); }
+.live-status-pill.warning { background: rgba(234, 179, 8, 0.15); color: #facc15; border: 1px solid rgba(234, 179, 8, 0.3); }
+.live-status-pill.lockout { background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3); }
+
+.live-metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 16px;
+  margin-bottom: 20px;
+}
+.live-metric-box {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 12px;
+  padding: 14px 16px;
+}
+.live-metric-label { font-size: 11px; color: #94a3b8; text-transform: uppercase; margin-bottom: 4px; }
+.live-metric-val { font-size: 18px; font-weight: 700; color: #fff; }
+
+.live-action-bar {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+/* Quick Journal Modal Overlay */
+.quick-journal-backdrop {
+  position: fixed;
+  top: 0; left: 0; width: 100vw; height: 100vh;
+  background: rgba(0,0,0,0.8);
+  backdrop-filter: blur(8px);
+  z-index: 99999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+}
+.quick-journal-backdrop.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+.quick-journal-modal {
+  background: #0f172a;
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 20px;
+  width: 90%;
+  max-width: 580px;
+  padding: 28px;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.6);
+  transform: translateY(20px);
+  transition: transform 0.25s ease;
+}
+.quick-journal-backdrop.active .quick-journal-modal {
+  transform: translateY(0);
+}
+.qj-trade-summary {
+  background: rgba(255,255,255,0.04);
+  border-radius: 12px;
+  padding: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+/* Breathing Cooldown Modal */
+.cooldown-circle {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(99,102,241,0.4) 0%, rgba(168,85,247,0.1) 70%);
+  border: 2px solid #a855f7;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  font-weight: 700;
+  color: #fff;
+  margin: 20px auto;
+  animation: breathAnimation 4s ease-in-out infinite;
+}
+@keyframes breathAnimation {
+  0%, 100% { transform: scale(1); box-shadow: 0 0 20px rgba(168,85,247,0.3); }
+  50% { transform: scale(1.15); box-shadow: 0 0 40px rgba(99,102,241,0.6); }
+}
+</style>
+</head>
 <body>
 <button id="androidInstallBtn" class="android-install-btn" type="button" hidden>Install Journall</button>
 <div id="firebaseAuthBar" class="firebase-auth-bar">
@@ -5094,8 +5444,23 @@ function accountSetupEmptyMarkup(){ return `<div class="goal-card"><div class="g
 function renderPropChallengeDashboard(){
   const box = document.getElementById('propChallengeDashboard'); if(!box) return;
   const m = accountMetrics(trades || []); if(!m){ box.innerHTML = accountSetupEmptyMarkup(); return; }
+  const unjournaledCount = getUnjournaledTrades().length;
+  let bannerHtml = '';
+  if (unjournaledCount > 0) {
+    bannerHtml = `
+      <div class="unjournaled-banner">
+        <div class="unjournaled-banner-left">
+          <div class="unjournaled-badge">📝 ${unjournaledCount} TRADES AWAITING JOURNAL</div>
+          <h3>${unjournaledCount} Trades Left to Journal</h3>
+          <p>Complete your setup tags, rule checks, and lessons for newly synced trades to build your discipline score.</p>
+        </div>
+        <button type="button" class="btn primary" onclick="openQuickJournalModal()">Journal Remaining Trades -&gt;</button>
+      </div>
+    `;
+  }
+  const liveCtrlHtml = renderLiveTraderControllerMarkup(m);
   const statusClass = (m.maxDailyLossAmount && m.dailyLossUsed >= m.maxDailyLossAmount) || (m.maxDrawdownAmount && m.maxDrawdownUsed >= m.maxDrawdownAmount) ? 'red' : m.currentBalance >= m.targetBalance && m.profitTargetAmount ? 'green' : 'neutral';
-  box.innerHTML = `<div class="goal-card-grid"><div class="goal-card"><div class="goal-card-label">Account Phase</div><div class="goal-card-value ${statusClass}">${escapeHtml(m.config.phase)}</div><div class="goal-card-sub">${m.s.total} trades tracked &bull; ${m.s.wr.toFixed(0)}% win rate &bull; ${fmt(m.s.pnl)} net. <button class="btn" type="button" onclick="openAccountSetup()">Edit setup</button></div></div><div class="goal-card"><div class="goal-card-label">Current Balance</div><div class="goal-card-value ${pnlClass(m.currentBalance-m.startBalance)}">$${m.currentBalance.toFixed(2)}</div><div class="goal-card-sub">Initial deposit $${m.startBalance.toFixed(2)} &bull; today ${fmt(m.todayPnl)}.</div></div><div class="goal-card"><div class="goal-card-label">Profit Target</div><div class="goal-card-value ${m.remainingToTarget<=0&&m.profitTargetAmount?'green':'neutral'}">$${m.remainingToTarget.toFixed(2)} left</div><div class="bar" style="margin-top:12px"><div style="width:${m.profitProgress}%"></div></div><div class="goal-card-sub">Target $${m.targetBalance.toFixed(2)} &bull; ${m.profitProgress.toFixed(0)}% complete.</div></div><div class="goal-card"><div class="goal-card-label">Days Remaining</div><div class="goal-card-value neutral">${m.daysRemaining==null?'No deadline':m.daysRemaining+' days'}</div><div class="goal-card-sub">Phase deadline ${m.config.phaseDeadline || 'not set'}.</div></div><div class="goal-card"><div class="goal-card-label">Daily Loss Remaining</div><div class="goal-card-value ${m.maxDailyLossRemaining!=null&&m.maxDailyLossRemaining<=0?'red':'green'}">${m.maxDailyLossRemaining==null?'Skipped':'$'+m.maxDailyLossRemaining.toFixed(2)}</div><div class="goal-card-sub">${m.maxDailyLossAmount==null?'Daily loss limit applies only to funded account setup.':'$'+m.dailyLossUsed.toFixed(2)+' used today of $'+m.maxDailyLossAmount.toFixed(2)}.</div></div><div class="goal-card"><div class="goal-card-label">Drawdown Buffer</div><div class="goal-card-value ${m.maxDrawdownRemaining!=null&&m.maxDrawdownRemaining<=0?'red':'green'}">${m.maxDrawdownRemaining==null?'Skipped':'$'+m.maxDrawdownRemaining.toFixed(2)}</div><div class="goal-card-sub">${m.maxDrawdownAmount==null?'Overall drawdown applies only to funded account setup.':'$'+m.maxDrawdownUsed.toFixed(2)+' max DD used of $'+m.maxDrawdownAmount.toFixed(2)}.</div></div>${riskCalculatorMarkup(m)}</div>`;
+  box.innerHTML = bannerHtml + liveCtrlHtml + `<div class="goal-card-grid"><div class="goal-card"><div class="goal-card-label">Account Phase</div><div class="goal-card-value ${statusClass}">${escapeHtml(m.config.phase)}</div><div class="goal-card-sub">${m.s.total} trades tracked &bull; ${m.s.wr.toFixed(0)}% win rate &bull; ${fmt(m.s.pnl)} net. <button class="btn" type="button" onclick="openAccountSetup()">Edit setup</button></div></div><div class="goal-card"><div class="goal-card-label">Current Balance</div><div class="goal-card-value ${pnlClass(m.currentBalance-m.startBalance)}">$${m.currentBalance.toFixed(2)}</div><div class="goal-card-sub">Initial deposit $${m.startBalance.toFixed(2)} &bull; today ${fmt(m.todayPnl)}.</div></div><div class="goal-card"><div class="goal-card-label">Profit Target</div><div class="goal-card-value ${m.remainingToTarget<=0&&m.profitTargetAmount?'green':'neutral'}">$${m.remainingToTarget.toFixed(2)} left</div><div class="bar" style="margin-top:12px"><div style="width:${m.profitProgress}%"></div></div><div class="goal-card-sub">Target $${m.targetBalance.toFixed(2)} &bull; ${m.profitProgress.toFixed(0)}% complete.</div></div><div class="goal-card"><div class="goal-card-label">Days Remaining</div><div class="goal-card-value neutral">${m.daysRemaining==null?'No deadline':m.daysRemaining+' days'}</div><div class="goal-card-sub">Phase deadline ${m.config.phaseDeadline || 'not set'}.</div></div><div class="goal-card"><div class="goal-card-label">Daily Loss Remaining</div><div class="goal-card-value ${m.maxDailyLossRemaining!=null&&m.maxDailyLossRemaining<=0?'red':'green'}">${m.maxDailyLossRemaining==null?'Skipped':'$'+m.maxDailyLossRemaining.toFixed(2)}</div><div class="goal-card-sub">${m.maxDailyLossAmount==null?'Daily loss limit applies only to funded account setup.':'$'+m.dailyLossUsed.toFixed(2)+' used today of $'+m.maxDailyLossAmount.toFixed(2)}.</div></div><div class="goal-card"><div class="goal-card-label">Drawdown Buffer</div><div class="goal-card-value ${m.maxDrawdownRemaining!=null&&m.maxDrawdownRemaining<=0?'red':'green'}">${m.maxDrawdownRemaining==null?'Skipped':'$'+m.maxDrawdownRemaining.toFixed(2)}</div><div class="goal-card-sub">${m.maxDrawdownAmount==null?'Overall drawdown applies only to funded account setup.':'$'+m.maxDrawdownUsed.toFixed(2)+' max DD used of $'+m.maxDrawdownAmount.toFixed(2)}.</div></div>${riskCalculatorMarkup(m)}</div>`;
 }
 async function generateAIPropGoals(force=false){
   if(!(trades || []).length){ const propBox=document.getElementById('propBox'); if(propBox) propBox.innerHTML='<div class="insight empty"><strong>No trades yet.</strong><br>Upload trades first.</div>'; return; }
@@ -12938,5 +13303,75 @@ body:not(.firebase-auth-required) #journallApp > .sidebar .nav button {
   width: 92px !important;
   flex-shrink: 0 !important;
 }
-</style></body>
+</style>
+<!-- QUICK JOURNALING MODAL -->
+<div id="quickJournalBackdrop" class="quick-journal-backdrop">
+  <div class="quick-journal-modal">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+      <div>
+        <span style="font-size:11px; font-weight:700; color:#a855f7; text-transform:uppercase; letter-spacing:0.05em;">Quick Trade Journaling</span>
+        <h3 style="margin:4px 0 0 0; font-size:20px; color:#fff;" id="qjModalTitle">Trade Review</h3>
+      </div>
+      <button type="button" class="btn" onclick="closeQuickJournalModal()" style="padding:6px 12px; border-radius:9999px;">&times; Close</button>
+    </div>
+    
+    <div id="qjTradeSummary" class="qj-trade-summary"></div>
+
+    <div style="display:grid; gap:16px;">
+      <div>
+        <label style="display:block; font-size:12px; color:#94a3b8; margin-bottom:6px; font-weight:600;">SETUP / STRATEGY</label>
+        <select id="qjSetupSelect" style="width:100%; border-radius:8px; padding:10px; background:rgba(255,255,255,0.06); color:#fff;">
+          <option value="">Select strategy setup...</option>
+          <option value="Breakout">Breakout</option>
+          <option value="Retest / Pullback">Retest / Pullback</option>
+          <option value="Liquidity Sweep">Liquidity Sweep</option>
+          <option value="Order Block / FVG">Order Block / FVG</option>
+          <option value="Trend Continuation">Trend Continuation</option>
+          <option value="News Spike">News Spike</option>
+        </select>
+      </div>
+
+      <div>
+        <label style="display:block; font-size:12px; color:#94a3b8; margin-bottom:6px; font-weight:600;">MISTAKES & RULE BREAKS (IF ANY)</label>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; font-size:13px;" id="qjMistakesCheckboxes">
+          <label style="display:flex; align-items:center; gap:8px; color:#cbd5e1;"><input type="checkbox" value="Revenge Trade"> Revenge Trade</label>
+          <label style="display:flex; align-items:center; gap:8px; color:#cbd5e1;"><input type="checkbox" value="Moved Stop Loss"> Moved Stop Loss</label>
+          <label style="display:flex; align-items:center; gap:8px; color:#cbd5e1;"><input type="checkbox" value="No Confirmation Entry"> Entered Early</label>
+          <label style="display:flex; align-items:center; gap:8px; color:#cbd5e1;"><input type="checkbox" value="Overtrading"> Overtrading</label>
+          <label style="display:flex; align-items:center; gap:8px; color:#cbd5e1;"><input type="checkbox" value="Increased Lot Size"> Oversized Lot</label>
+          <label style="display:flex; align-items:center; gap:8px; color:#cbd5e1;"><input type="checkbox" value="No Patience"> FOMO Entry</label>
+        </div>
+      </div>
+
+      <div>
+        <label style="display:block; font-size:12px; color:#94a3b8; margin-bottom:6px; font-weight:600;">TRADE NOTES & LESSONS</label>
+        <textarea id="qjNotesInput" placeholder="Why did you take this trade? What did you do well or need to improve tomorrow?" style="width:100%; height:80px; border-radius:8px; padding:10px; background:rgba(255,255,255,0.06); color:#fff; resize:none;"></textarea>
+      </div>
+
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-top:8px;">
+        <span id="qjProgressText" style="font-size:12px; color:#94a3b8;">Trade 1 of 3</span>
+        <div style="display:flex; gap:10px;">
+          <button type="button" class="btn" onclick="skipQuickJournalTrade()">Skip</button>
+          <button type="button" class="btn primary" onclick="saveQuickJournalTrade()">Save & Next Trade -&gt;</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- COOL-DOWN PAUSE MODAL -->
+<div id="cooldownModalBackdrop" class="quick-journal-backdrop">
+  <div class="quick-journal-modal" style="text-align:center; max-width:460px;">
+    <span style="font-size:11px; font-weight:700; color:#ec4899; text-transform:uppercase; letter-spacing:0.05em;">Mindset Reset & Cooldown</span>
+    <h3 style="margin:6px 0 0 0; font-size:22px; color:#fff;">15-Minute Pause</h3>
+    <p style="font-size:13px; color:#94a3b8; margin-top:6px;">Breathe in slowly. Step away from your charts to clear emotion before taking any new trades.</p>
+    
+    <div id="cooldownTimerCircle" class="cooldown-circle">15:00</div>
+    <p id="cooldownInstruction" style="font-size:13px; color:#cbd5e1; font-style:italic; margin-bottom:20px;">"Deep breath in... hold... exhale slowly."</p>
+
+    <button type="button" class="btn primary" onclick="closeCooldownModal()" style="width:100%;">Resume Trading Session</button>
+  </div>
+</div>
+
+</body>
 </html>
