@@ -471,12 +471,18 @@ function renderLiveTraderControllerMarkup(metrics) {
 function getActiveUserEmail() {
   const fbEmail = (window.currentUser && window.currentUser.email && window.currentUser.email !== 'local@journall.app') ? window.currentUser.email.trim() : '';
   const savedEmail = (localStorage.getItem('journall_user_email') || localStorage.getItem('journall_google_email') || '').trim();
-  return fbEmail || savedEmail || 'Signed in';
+  return fbEmail || savedEmail || 'krishnacnjack@gmail.com';
 }
 
 function getActiveUserName() {
   const savedCustom = localStorage.getItem('journall_custom_username');
   if (savedCustom && savedCustom.trim()) return savedCustom.trim();
+
+  const customInputVal = document.getElementById('customUsernameInput')?.value?.trim();
+  if (customInputVal) {
+    localStorage.setItem('journall_custom_username', customInputVal);
+    return customInputVal;
+  }
 
   const fbName = (window.currentUser && window.currentUser.displayName && window.currentUser.displayName !== 'Local Trader') ? window.currentUser.displayName : null;
   if (fbName) return fbName;
@@ -488,7 +494,7 @@ function getActiveUserName() {
   if (email && email.includes('@')) {
     return email.split('@')[0];
   }
-  return 'Trader';
+  return 'krishna';
 }
 
 function rememberFirebaseUserProfile(user) {
@@ -547,13 +553,6 @@ function renderUserProfile() {
   if (statBroker) statBroker.textContent = broker ? `${broker.platform} (${broker.account})` : 'MetaTrader 5';
 }
 
-function refreshSignedInProfile() {
-  if (window.currentUser && window.currentUser.uid !== 'local_user') {
-    rememberFirebaseUserProfile(window.currentUser);
-  }
-  renderUserProfile();
-}
-
 function saveCustomUsername() {
   const val = document.getElementById('customUsernameInput')?.value.trim();
   if (val) {
@@ -561,6 +560,7 @@ function saveCustomUsername() {
     localStorage.setItem('journall_user_name', val);
     alert('✓ Profile display name updated to: ' + val);
     renderUserProfile();
+    if (typeof scheduleCloudSave === 'function') scheduleCloudSave();
   }
 }
 </script>
