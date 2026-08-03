@@ -467,6 +467,57 @@ function renderLiveTraderControllerMarkup(metrics) {
   `;
 }
 
+
+function renderUserProfile() {
+  const user = window.currentUser || {};
+  const customName = localStorage.getItem('journall_custom_username');
+  
+  const dName = customName || user.displayName || (user.email ? user.email.split('@')[0] : 'Trader');
+  const dEmail = user.email || 'local@journall.app';
+  const dPhoto = user.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(dName)}&background=a855f7&color=fff`;
+
+  // Sidebar mini avatar & info
+  const sideName = document.getElementById('sidebarProfileName');
+  const sideEmail = document.getElementById('sidebarProfileEmail');
+  const sideImg = document.getElementById('sidebarAvatarImg');
+
+  if (sideName) sideName.textContent = dName;
+  if (sideEmail) sideEmail.textContent = dEmail;
+  if (sideImg) sideImg.src = dPhoto;
+
+  // Full Profile Page elements
+  const profName = document.getElementById('userProfileName');
+  const profEmail = document.getElementById('userProfileEmail');
+  const profImg = document.getElementById('userProfileAvatar');
+  const customInput = document.getElementById('customUsernameInput');
+
+  if (profName) profName.textContent = dName;
+  if (profEmail) profEmail.textContent = dEmail;
+  if (profImg) profImg.src = dPhoto;
+  if (customInput && !customInput.value) customInput.value = customName || '';
+
+  // Stats
+  const statTrades = document.getElementById('profStatTrades');
+  const statAccount = document.getElementById('profStatAccount');
+  const statBroker = document.getElementById('profStatBroker');
+
+  const m = typeof accountMetrics === 'function' ? accountMetrics(trades || []) : null;
+  const broker = typeof getSyncedBrokerInfo === 'function' ? getSyncedBrokerInfo() : null;
+
+  if (statTrades) statTrades.textContent = (trades || []).length;
+  if (statAccount) statAccount.textContent = m ? `$${m.startBalance.toFixed(2)}` : '$0.00';
+  if (statBroker) statBroker.textContent = broker ? broker.platform : 'MetaTrader 5';
+}
+
+function saveCustomUsername() {
+  const val = document.getElementById('customUsernameInput')?.value.trim();
+  if (val) {
+    localStorage.setItem('journall_custom_username', val);
+    alert('✓ Profile name updated successfully!');
+    renderUserProfile();
+  }
+}
+
 </script>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap');
@@ -2647,6 +2698,59 @@ tr:hover {
   100% { transform: scale(1.6); opacity: 0; }
 }
 </style>
+<style>
+/* --- USER PROFILE SECTION STYLES --- */
+.sidebar-profile-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  margin: 12px 0 16px 0;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.sidebar-profile-card:hover {
+  background: rgba(168, 85, 247, 0.12);
+  border-color: rgba(168, 85, 247, 0.3);
+}
+.sidebar-avatar-img {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #a855f7;
+  flex-shrink: 0;
+}
+.sidebar-profile-info {
+  overflow: hidden;
+}
+.sidebar-profile-name {
+  font-size: 13px;
+  font-weight: 700;
+  color: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.sidebar-profile-email {
+  font-size: 11px;
+  color: #94a3b8;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.profile-card-hero {
+  background: linear-gradient(135deg, rgba(30, 41, 59, 0.8), rgba(15, 23, 42, 0.95));
+  border: 1px solid rgba(168, 85, 247, 0.3);
+  border-radius: 20px;
+  padding: 28px;
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.4);
+}
+</style>
 </head>
 <body>
 <button id="androidInstallBtn" class="android-install-btn" type="button" hidden>Install Journall</button>
@@ -2757,6 +2861,14 @@ tr:hover {
 <div id="journallApp" class="app" style="display: none;" hidden>
   <aside class="sidebar">
     <div class="brand"><div class="logo" aria-hidden="true"></div><div><div class="brand-title">Journall</div><div class="brand-sub">Trading command center</div></div></div>
+    <div class="sidebar-profile-card" onclick="document.querySelector('[data-tab=&quot;userprofile&quot;]')?.click()">
+      <img id="sidebarAvatarImg" class="sidebar-avatar-img" src="https://lh3.googleusercontent.com/a/default-user" onerror="this.src='https://ui-avatars.com/api/?name=Trader&background=a855f7&color=fff'" alt="User">
+      <div class="sidebar-profile-info">
+        <div class="sidebar-profile-name" id="sidebarProfileName">Trader</div>
+        <div class="sidebar-profile-email" id="sidebarProfileEmail">Signed in</div>
+      </div>
+    </div>
+
 
 <div class="nav">
       <button class="active" data-tab="tradingpage">Today's Summary</button>
@@ -2769,6 +2881,7 @@ tr:hover {
       <button data-tab="widgets">Widgets</button>
       <button data-tab="goals">Goals</button>
       <button data-tab="ailab">AI Coach</button>
+      <button data-tab="userprofile">User Profile</button>
       <button data-tab="uploadcsv">Upload Data</button>
       <button class="nav-signout-btn" type="button" onclick="triggerJournalSignOut()">Sign Out</button>
     </div>
@@ -2795,7 +2908,58 @@ tr:hover {
     </div>
 
 
-    <section id="uploadcsv" class="section">
+    
+    <section id="userprofile" class="section">
+      <div class="card profile-card-hero">
+        <div style="display:flex; align-items:center; gap:20px; flex-wrap:wrap;">
+          <div style="position:relative;">
+            <img id="userProfileAvatar" src="https://lh3.googleusercontent.com/a/default-user" onerror="this.src='https://ui-avatars.com/api/?name=Trader&background=a855f7&color=fff'" alt="Google Profile" style="width:84px; height:84px; border-radius:50%; border:3px solid #a855f7; object-fit:cover; box-shadow:0 0 20px rgba(168,85,247,0.4);">
+            <span style="position:absolute; bottom:2px; right:2px; width:16px; height:16px; background:#22c55e; border:2px solid #0f172a; border-radius:50%;"></span>
+          </div>
+          <div>
+            <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+              <h2 style="margin:0; font-size:24px; color:#fff;" id="userProfileName">Trader Name</h2>
+              <span class="badge" style="background:rgba(34,197,94,0.15); color:#4ade80; border:1px solid rgba(34,197,94,0.3); padding:4px 10px; border-radius:9999px; font-size:11px; font-weight:700;">✓ GOOGLE ACCOUNT AUTHORIZED</span>
+            </div>
+            <p style="margin:6px 0 0 0; font-size:14px; color:#94a3b8;" id="userProfileEmail">trader@gmail.com</p>
+            <div style="margin-top:8px; font-size:12px; color:#cbd5e1;" id="userProfileMeta">Active Session &bull; Local & Google Cloud Sync Ready</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="goal-card-grid" style="margin-top:24px;">
+        <div class="goal-card">
+          <div class="goal-card-label">Journaled Trades</div>
+          <div class="goal-card-value neutral" id="profStatTrades">0</div>
+          <div class="goal-card-sub">Total trades saved in your database</div>
+        </div>
+        <div class="goal-card">
+          <div class="goal-card-label">Account Deposit</div>
+          <div class="goal-card-value neutral" id="profStatAccount">$0</div>
+          <div class="goal-card-sub">Configured account size</div>
+        </div>
+        <div class="goal-card">
+          <div class="goal-card-label">Connected Platform</div>
+          <div class="goal-card-value green" id="profStatBroker">MetaTrader 5</div>
+          <div class="goal-card-sub">Active auto-sync broker source</div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:24px;">
+        <div class="panel-title"><h3>Profile Settings</h3><span>Customize Account</span></div>
+        <div style="display:grid; gap:16px; max-width:500px; margin-top:16px;">
+          <label style="display:block; font-size:13px; color:#94a3b8; font-weight:600;">CUSTOM DISPLAY NAME
+            <input type="text" id="customUsernameInput" style="width:100%; border-radius:8px; padding:10px; background:rgba(255,255,255,0.06); color:#fff; margin-top:6px;" placeholder="Enter custom display name...">
+          </label>
+          <div style="display:flex; gap:12px;">
+            <button type="button" class="btn primary" onclick="saveCustomUsername()">Save Profile Changes</button>
+            <button type="button" class="btn nav-signout-btn" onclick="triggerJournalSignOut()">Sign Out of Account</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+<section id="uploadcsv" class="section">
       <!-- Auto Broker Integration Card -->
       <div class="card" style="margin-bottom: 24px;">
         <div class="panel-title"><h3>Auto Broker Sync</h3><span>multi-platform direct import</span></div>
