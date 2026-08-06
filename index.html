@@ -7159,7 +7159,7 @@ function onBrokerPlatformChange(){
     const isMobileBroker = isMobileBrokerDevice();
     if(isLocalHost && !isMobileBroker){
       if(btnText) btnText.textContent = 'Sync from MetaTrader 5 (Local PC)';
-      if(status) status.innerHTML = '<strong>Direct MT5 Sync:</strong> Journall will read from your local MT5 desktop bridge. Keep Journall App.bat running on this PC.';
+      if(status) status.innerHTML = '<strong>Direct MT5 Sync:</strong> Keep MT5 installed, logged in with your account ID/password, open, and running on this PC. If you do not have it yet, click Download MT5 Terminal below.';
     } else {
       if(btnText) btnText.textContent = 'Sync from MetaTrader 5';
       if(status) status.innerHTML = '<strong>MT5 sync:</strong> Direct MT5 terminal sync requires the local Journall desktop bridge on your PC. Mobile browsers cannot read desktop MT5 directly; use MatchTrader/cTrader cloud sync on phone.';
@@ -7460,6 +7460,38 @@ async function syncCTraderViaWorker(token, accountId, days) {
   return data.trades || [];
 }
 
+const MT5_DOWNLOAD_URL = 'https://www.metatrader.com/en/download';
+
+function isMt5TerminalSetupError(err){
+  const message = String(err?.message || err || '').toLowerCase();
+  return message.includes('could not connect to metatrader 5') ||
+    message.includes('ensure mt5 application is open') ||
+    message.includes('terminal') ||
+    message.includes('initialize') ||
+    message.includes('not installed') ||
+    message.includes('access is denied');
+}
+
+function showMt5TerminalInstallMessage(status, rawMessage=''){
+  const safeMessage = String(rawMessage || '').replace(/[<>&"]/g, ch => ({
+    '<': '&lt;',
+    '>': '&gt;',
+    '&': '&amp;',
+    '"': '&quot;'
+  })[ch]);
+  if (!status) return;
+  status.innerHTML = `
+    <div style="background:#050505;border:1px solid rgba(255,255,255,.12);border-left:3px solid #5e6ad2;border-radius:12px;padding:16px 18px;line-height:1.45;">
+      <strong style="display:block;color:#fff;margin-bottom:8px;">MetaTrader 5 terminal is required for direct MT5 sync.</strong>
+      <div style="color:rgba(255,255,255,.72);font-size:14px;margin-bottom:12px;">
+        Download the MT5 terminal from the web, install it, then log in using your MT5 account ID, password, and broker server. Keep MT5 open, then click Sync from MetaTrader 5 again.
+      </div>
+      ${safeMessage ? `<div style="color:rgba(255,255,255,.45);font-size:12px;margin-bottom:12px;">Details: ${safeMessage}</div>` : ''}
+      <button type="button" class="btn primary" onclick="window.open(MT5_DOWNLOAD_URL, '_blank', 'noopener,noreferrer')" style="margin:0;display:inline-flex;align-items:center;justify-content:center;">
+        Download MT5 Terminal
+      </button>
+    </div>`;
+}
 async function triggerBrokerSync(){
   const platform = document.getElementById('brokerPlatformSelect')?.value || 'mt5';
   const status = document.getElementById('brokerSyncStatus');
@@ -7492,7 +7524,7 @@ async function triggerBrokerSync(){
           `<strong>MT5 direct sync needs your local PC.</strong><br>` +
           `Open Journall locally from your laptop with Journall App.bat, then use Sync from MetaTrader 5. A phone cannot directly read your desktop MT5 terminal.`;
       }
-      alert('MT5 direct sync works only on the laptop/PC where MT5 and Journall App.bat are running. On mobile, use MatchTrader/cTrader cloud sync or import an MT5 report.');
+      alert('MT5 direct sync works only on the laptop/PC where MT5 and Journall App.bat are running. On mobile, direct desktop MT5 sync is not available.');
       if (btn) {
         btn.disabled = false;
         btn.innerHTML = `<span>Sync from MetaTrader 5</span>`;
@@ -7551,7 +7583,7 @@ async function triggerBrokerSync(){
       }
     } catch(err) {
       if (platform === 'mt5') {
-        throw new Error(err.message || `Local server bridge is not running on your PC (http://localhost:8787).\n\nTo sync directly from MT5:\n1. Double-click 'Journall App.bat' on your PC.\n2. Or drag & drop your MT5 HTML report into the Upload box below.`);
+        throw new Error(err.message || `Local server bridge is not running on your PC (http://localhost:8787).\n\nTo sync directly from MT5:\n1. Keep MetaTrader 5 open on this PC.\n2. Double-click 'Journall App.bat'.\n3. Open the local Journall link and click Sync from MetaTrader 5 again.`);
       }
     }
 
@@ -7610,10 +7642,14 @@ async function triggerBrokerSync(){
     }
   } catch (err) {
     console.error(`${pName} sync failed:`, err);
-    if (status) {
-      status.innerHTML = `<strong style="color:var(--red);">Sync failed:</strong> ${err.message || err}`;
+    if (platform === 'mt5' && isMt5TerminalSetupError(err)) {
+      showMt5TerminalInstallMessage(status, err.message || err);
+    } else {
+      if (status) {
+        status.innerHTML = `<strong style="color:var(--red);">Sync failed:</strong> ${err.message || err}`;
+      }
+      alert(`Sync failed: ${err.message || err}`);
     }
-    alert(`Sync failed: ${err.message || err}`);
   } finally {
     if (btn) {
       btn.disabled = false;
@@ -10092,6 +10128,108 @@ function collectLocalState(){
   return storage;
 }
 
+function parseSyncValue(value){
+  if(typeof value !== 'string' || !value.trim()) return null;
+  try{
+    return JSON.parse(value);
+  }catch{
+    return null;
+  }
+}
+
+function syncStorageValueKey(entry){
+  if(!entry || typeof entry !== 'object') return '';
+  return String(
+    entry.tradeKey ||
+    entry.id ||
+    entry.updatedAt ||
+    entry.createdAt ||
+    [
+      entry.date || '',
+      entry.title || '',
+      entry.body || ''
+    ].join('|')
+  ).trim();
+}
+
+function mergeJournalEntriesForSync(existingEntries, incomingEntries){
+  const merged = new Map();
+  (Array.isArray(existingEntries) ? existingEntries : []).forEach(entry => {
+    const key = syncStorageValueKey(entry);
+    if(!key) return;
+    merged.set(key, {...entry});
+  });
+  (Array.isArray(incomingEntries) ? incomingEntries : []).forEach(entry => {
+    const key = syncStorageValueKey(entry);
+    if(!key) return;
+    if(merged.has(key)){
+      merged.set(key, {...merged.get(key), ...entry, id: merged.get(key).id ?? entry.id});
+    } else {
+      merged.set(key, {...entry});
+    }
+  });
+  return [...merged.values()].sort((a,b) => {
+    const aDate = String(a.date || a.updatedAt || a.createdAt || '');
+    const bDate = String(b.date || b.updatedAt || b.createdAt || '');
+    return aDate.localeCompare(bDate);
+  });
+}
+
+function mergeSyncedStorageMaps(remoteStorage = {}, localStorageSnapshot = {}){
+  const merged = {...remoteStorage};
+  const keys = new Set([...Object.keys(remoteStorage || {}), ...Object.keys(localStorageSnapshot || {})]);
+  keys.forEach(key => {
+    if(!shouldSyncKey(key)) return;
+    const remoteVal = remoteStorage?.[key];
+    const localVal = localStorageSnapshot?.[key];
+
+    if(localVal == null || localVal === ''){
+      if(remoteVal != null) merged[key] = remoteVal;
+      return;
+    }
+    if(remoteVal == null || remoteVal === ''){
+      merged[key] = localVal;
+      return;
+    }
+
+    if(key === 'viztrade_trades' || key === 'viztrade_trading_page_trades'){
+      const remoteArr = parseSyncValue(remoteVal);
+      const localArr = parseSyncValue(localVal);
+      if(Array.isArray(remoteArr) && Array.isArray(localArr)){
+        merged[key] = JSON.stringify(mergeImportedTrades(remoteArr, localArr));
+        return;
+      }
+    }
+
+    if(key === 'krishna_journal_page_entries'){
+      const remoteArr = parseSyncValue(remoteVal);
+      const localArr = parseSyncValue(localVal);
+      if(Array.isArray(remoteArr) && Array.isArray(localArr)){
+        merged[key] = JSON.stringify(mergeJournalEntriesForSync(remoteArr, localArr));
+        return;
+      }
+    }
+
+    const remoteObj = parseSyncValue(remoteVal);
+    const localObj = parseSyncValue(localVal);
+    if(remoteObj && localObj && typeof remoteObj === 'object' && typeof localObj === 'object' && !Array.isArray(remoteObj) && !Array.isArray(localObj)){
+      merged[key] = JSON.stringify({...remoteObj, ...localObj});
+      return;
+    }
+
+    merged[key] = localVal;
+  });
+  return merged;
+}
+
+function syncedStorageMapsEqual(a = {}, b = {}){
+  const keys = new Set([...Object.keys(a || {}), ...Object.keys(b || {})]);
+  for(const key of keys){
+    if(String(a?.[key] ?? '') !== String(b?.[key] ?? '')) return false;
+  }
+  return true;
+}
+
 window.journallReloadDataFromStorage = function() {
   if (typeof cleanDuplicateDeals === 'function') {
     trades = cleanDuplicateDeals(JSON.parse(localStorage.getItem('viztrade_trades') || '[]'));
@@ -10121,11 +10259,15 @@ window.journallReloadDataFromStorage = function() {
 };
 
 function applyCloudState(storage){
-  if(!storage || typeof storage !== 'object') return false;
+  if(!storage || typeof storage !== 'object'){
+    return { changed: false, mergedStorage: collectLocalState() };
+  }
+  const localSnapshot = collectLocalState();
+  const mergedStorage = mergeSyncedStorageMaps(storage, localSnapshot);
   let changed = false;
   window.__journallBlockCloudSave = true;
   try {
-    Object.entries(storage).forEach(([key,value])=>{
+    Object.entries(mergedStorage).forEach(([key,value])=>{
       if(shouldSyncKey(key) && typeof value === 'string'){
         if(localStorage.getItem(key) !== value){
           localStorage.setItem(key, value);
@@ -10136,7 +10278,7 @@ function applyCloudState(storage){
   } finally {
     window.__journallBlockCloudSave = false;
   }
-  return changed;
+  return { changed, mergedStorage };
 }
 
 function hasMeaningfulLocalState(){
@@ -10172,10 +10314,15 @@ function scheduleCloudSave(){
 
 async function saveCloudState(){
   if(!cloudReady || !window.currentUser || window.currentUser.uid === 'local_user' || !firestoreDb) return;
-  const { doc, setDoc, serverTimestamp } = await import(`https://www.gstatic.com/firebasejs/${firebaseSdkVersion}/firebase-firestore.js`);
-  await setDoc(doc(firestoreDb, 'users', window.currentUser.uid, 'journallState', 'main'), {
-    updatedAt: serverTimestamp(),
-    storage: collectLocalState()
+  const { doc, getDoc, setDoc, serverTimestamp } = await import(`https://www.gstatic.com/firebasejs/${firebaseSdkVersion}/firebase-firestore.js`);
+  const ref = doc(firestoreDb, 'users', window.currentUser.uid, 'journallState', 'main');
+  const snap = await getDoc(ref);
+  const mergedStorage = mergeSyncedStorageMaps(snap.exists() ? (snap.data()?.storage || {}) : {}, collectLocalState());
+  const stamp = serverTimestamp();
+  await setDoc(ref, {
+    createdAt: snap.exists() ? (snap.data()?.createdAt || stamp) : stamp,
+    updatedAt: stamp,
+    storage: mergedStorage
   }, { merge: true });
   const uName = localStorage.getItem('journall_custom_username') || window.currentUser.displayName || window.currentUser.email || 'trader';
   setAuthStatus(`Signed in as ${uName} - synced`);
@@ -10317,11 +10464,15 @@ async function loadCloudState(){
 
   // Verify document existence initially, create if missing and local state exists
   const snap = await getDoc(ref);
-  if(!snap.exists() && hasMeaningfulLocalState()){
+  const remoteStorage = snap.exists() && snap.data()?.storage ? snap.data().storage : {};
+  const localStorageSnapshot = collectLocalState();
+  const mergedStorage = mergeSyncedStorageMaps(remoteStorage, localStorageSnapshot);
+  if(!syncedStorageMapsEqual(remoteStorage, mergedStorage) || (!snap.exists() && hasMeaningfulLocalState())){
+    const stamp = serverTimestamp();
     await setDoc(ref, {
-      createdAt: serverTimestamp(),
-      updatedAt: serverTimestamp(),
-      storage: collectLocalState()
+      createdAt: snap.exists() ? (snap.data()?.createdAt || stamp) : stamp,
+      updatedAt: stamp,
+      storage: mergedStorage
     }, { merge: true });
   }
 
@@ -10333,9 +10484,12 @@ async function loadCloudState(){
   // Connect real-time Firestore synchronization listener
   unsubscribeCloudSync = onSnapshot(ref, (docSnap) => {
     if (docSnap.exists() && docSnap.data()?.storage) {
-      const changed = applyCloudState(docSnap.data().storage);
+      const { changed, mergedStorage: reconciledStorage } = applyCloudState(docSnap.data().storage);
       rememberFirebaseUserProfile(window.currentUser);
       renderUserProfile();
+      if (!syncedStorageMapsEqual(docSnap.data().storage || {}, reconciledStorage) && hasMeaningfulLocalState()) {
+        scheduleCloudSave();
+      }
       if (changed && typeof window.journallReloadDataFromStorage === 'function') {
         window.journallReloadDataFromStorage();
         const uName = localStorage.getItem('journall_custom_username') || window.currentUser.displayName || window.currentUser.email || 'trader';

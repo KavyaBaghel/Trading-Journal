@@ -56,7 +56,7 @@ function Get-PythonExe {
         if (Test-Path -LiteralPath $candidate) { return $candidate }
       } else {
         $cmd = Get-Command $candidate -ErrorAction SilentlyContinue
-        if ($cmd -and $cmd.Source -notlike '*hermes*') { return $cmd.Source }
+        if ($cmd -and $cmd.Source -notlike '*hermes*' -and $cmd.Source -notlike '*WindowsApps*') { return $cmd.Source }
       }
     } catch {}
   }
@@ -269,9 +269,20 @@ while ($true) {
           $scriptName = "ctrader_sync.py"
         }
         
+        $pythonExe = Get-PythonExe
+        $scriptPath = Join-Path $rootPath $scriptName
+        if (-not (Test-Path -LiteralPath $scriptPath)) {
+          throw "Sync script not found: $scriptPath"
+        }
+
         $psi = [System.Diagnostics.ProcessStartInfo]::new()
-        $psi.FileName = Get-PythonExe
-        $psi.Arguments = $scriptName
+        $psi.FileName = $pythonExe
+        if ([System.IO.Path]::GetFileName($pythonExe).ToLowerInvariant() -eq 'py.exe') {
+          $psi.Arguments = "-3 `"$scriptPath`""
+        } else {
+          $psi.Arguments = "`"$scriptPath`""
+        }
+        $psi.WorkingDirectory = $rootPath
         $psi.RedirectStandardInput = $true
         $psi.RedirectStandardOutput = $true
         $psi.RedirectStandardError = $true
