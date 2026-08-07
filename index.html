@@ -3319,7 +3319,7 @@ tr:hover {
   </div>
 </div>
 <div id="journallApp" class="app" style="display: none;" hidden>
-  <div id="fixedTopRightProfile" class="fixed-top-right-profile" onclick="document.querySelector('[data-tab=&quot;userprofile&quot;]')?.click()" title="Open User Profile">
+  <div id="fixedTopRightProfile" class="fixed-top-right-profile" onclick="selectTab('userprofile')" title="Open User Profile">
     <img id="topAvatarImg" class="top-avatar-img" src="https://lh3.googleusercontent.com/a/default-user" onerror="this.src='https://ui-avatars.com/api/?name=Trader&background=a855f7&color=fff'" alt="Trader Profile">
     <div class="top-profile-details">
       <div class="top-profile-name" id="topProfileName">krishna</div>
@@ -3327,7 +3327,7 @@ tr:hover {
   </div>
   <aside class="sidebar">
     <div class="brand"><div class="logo" aria-hidden="true"></div><div><div class="brand-title">Journall</div><div class="brand-sub">Trading command center</div></div></div>
-    <div class="sidebar-profile-card" onclick="document.querySelector('[data-tab=&quot;userprofile&quot;]')?.click()">
+    <div class="sidebar-profile-card" onclick="selectTab('userprofile')">
       <img id="sidebarAvatarImg" class="sidebar-avatar-img" src="https://lh3.googleusercontent.com/a/default-user" onerror="this.src='https://ui-avatars.com/api/?name=Trader&background=a855f7&color=fff'" alt="User">
       <div class="sidebar-profile-info">
         <div class="sidebar-profile-name" id="sidebarProfileName">Trader</div>
@@ -6098,7 +6098,8 @@ function hideAccountSetupAfterSave(){
 }
 function ensureAccountOnboarding(){
   if(document.documentElement.classList.contains('firebase-auth-required')) return;
-  if(!getAccountConfig()) openAccountSetup();
+  const done = localStorage.getItem('journall_onboarding_completed');
+  if(!done && !getAccountConfig()) openAccountSetup();
 }
 async function saveAccountSetup(){
   const msg = document.getElementById('accountSetupMessage');
@@ -9538,6 +9539,50 @@ function renderJournalPage(){
 
 function renderAll(){applyFilters();renderSide();renderAnalyticsBars();renderMetrics();renderPropChallengeDashboard();if(document.getElementById('mistakeModalBackdrop')?.classList.contains('active')) renderMistakeDashboard();renderInsights();renderCharts();renderWidgets();renderReports();renderSetupPerformanceTracker();renderCalendar();renderHeatmap();renderGrid();renderGoals();renderProcess();renderTradingPage();renderJournalPage();renderPsychology();refreshSignedInProfile();}
 
+
+function selectTab(tabId) {
+  if (!tabId) return;
+  const navBtns = document.querySelectorAll('.nav button');
+  navBtns.forEach(btn => {
+    const isMatch = btn.dataset.tab === tabId;
+    btn.classList.toggle('active', isMatch);
+  });
+
+  const sections = document.querySelectorAll('.section');
+  sections.forEach(sec => {
+    const isMatch = sec.id === tabId;
+    sec.classList.toggle('active', isMatch);
+    if (isMatch) {
+      sec.style.display = 'block';
+      sec.style.visibility = 'visible';
+      sec.style.opacity = '1';
+    } else {
+      sec.style.display = 'none';
+      sec.style.visibility = 'hidden';
+      sec.style.opacity = '0';
+    }
+  });
+
+  const activeBtn = document.querySelector(`.nav button[data-tab="${tabId}"]`);
+  if (activeBtn) {
+    updateHeroTitle(activeBtn.textContent.trim());
+    const mobSub = document.getElementById('mobileActiveTab');
+    if (mobSub) mobSub.textContent = activeBtn.textContent.trim();
+  }
+
+  if (tabId === 'userprofile') {
+    renderUserProfile();
+  } else if (tabId === 'tradingpage') {
+    renderTradingPage();
+  } else if (tabId === 'journalpage') {
+    renderJournalPage();
+  } else if (tabId === 'psychology') {
+    renderPsychology();
+  } else if (tabId === 'dashboard') {
+    renderCharts();
+  }
+}
+
 function updateHeroTitle(label){
   const title = document.querySelector('.hero h1');
   if(title) title.textContent = label || 'Journall';
@@ -9550,7 +9595,11 @@ function syncMobileActiveTab(){
   if(label && active) label.textContent = active.textContent.trim();
   if(active) updateHeroTitle(active.textContent.trim());
 }
-document.querySelectorAll('.nav button').forEach(btn=>btn.addEventListener('click',syncMobileActiveTab));
+document.querySelectorAll('.nav button').forEach(btn => {
+  btn.addEventListener('click', () => {
+    selectTab(btn.dataset.tab);
+  });
+});
 function openHashTab(){
   const tab = String(location.hash || '').replace('#','').trim();
   if(!tab) return;
@@ -10313,7 +10362,7 @@ async function saveCloudState(){
 }
 
 window.checkAndPromptUsername = function checkAndPromptUsername(callback) {
-  const savedUsername = localStorage.getItem('journall_custom_username');
+  const savedUsername = localStorage.getItem('journall_custom_username') || localStorage.getItem('journall_onboarding_completed');
   if (savedUsername) {
     if (callback) callback();
     return;
