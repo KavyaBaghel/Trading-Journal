@@ -472,28 +472,33 @@ function getActiveUserEmail() {
   if (window.currentUser && window.currentUser.email && window.currentUser.email !== 'local@journall.app') {
     return window.currentUser.email.trim();
   }
-  const savedEmail = (localStorage.getItem('journall_user_email') || localStorage.getItem('journall_google_email') || '').trim();
-  return savedEmail || 'Signed in';
+  const activeUid = localStorage.getItem('journall_active_uid');
+  if (activeUid) {
+    const savedEmail = localStorage.getItem(`journall_user_email_${activeUid}`);
+    if (savedEmail) return savedEmail.trim();
+  }
+  const legacyEmail = (localStorage.getItem('journall_user_email') || '').trim();
+  return (legacyEmail && !legacyEmail.includes('local@')) ? legacyEmail : 'Signed in';
 }
 
 function getActiveUserName() {
-  const userUid = window.currentUser?.uid || 'local';
-  const customInputVal = document.getElementById('customUsernameInput')?.value?.trim();
+  const userUid = window.currentUser?.uid || localStorage.getItem('journall_active_uid') || 'local';
   
-  const savedUserCustom = localStorage.getItem(`journall_custom_username_${userUid}`) || localStorage.getItem('journall_custom_username');
+  // 1. Account-specific custom username bound to userUid
+  const savedUserCustom = localStorage.getItem(`journall_custom_username_${userUid}`);
   if (savedUserCustom && savedUserCustom.trim()) return savedUserCustom.trim();
 
+  // 2. Google Display Name from Auth
   if (window.currentUser && window.currentUser.displayName && window.currentUser.displayName !== 'Local Trader') {
     return window.currentUser.displayName.trim();
   }
 
-  const savedName = localStorage.getItem('journall_user_name');
-  if (savedName && savedName.trim()) return savedName.trim();
-
+  // 3. Derived from active signed-in email
   const email = getActiveUserEmail();
   if (email && email.includes('@') && !email.includes('local@')) {
     return email.split('@')[0];
   }
+
   return 'Trader';
 }
 
@@ -501,46 +506,34 @@ function rememberFirebaseUserProfile(user) {
   if (!user || user.uid === 'local_user') return;
   const prevUserUid = localStorage.getItem('journall_active_uid');
   
-  // If a DIFFERENT Google Account signed in, reset account-specific profile caches
+  // If a DIFFERENT Google Account signed in, reset input and stale non-namespaced keys
   if (prevUserUid && prevUserUid !== user.uid) {
+    const customInput = document.getElementById('customUsernameInput');
+    if (customInput) customInput.value = '';
     localStorage.removeItem('journall_custom_username');
     localStorage.removeItem('journall_user_name');
-    localStorage.removeItem('journall_user_custom_avatar');
-    localStorage.removeItem('journall_name_change_history');
   }
   
   localStorage.setItem('journall_active_uid', user.uid);
-  if (user.email) localStorage.setItem('journall_user_email', user.email.trim());
-  if (user.displayName && !localStorage.getItem('journall_custom_username')) {
-    localStorage.setItem('journall_user_name', user.displayName.trim());
+  if (user.email) {
+    localStorage.setItem('journall_user_email', user.email.trim());
+    localStorage.setItem(`journall_user_email_${user.uid}`, user.email.trim());
   }
-  if (user.photoURL) localStorage.setItem('journall_user_photo', user.photoURL);
-}
-
-
-function handleCustomAvatarUpload(event) {
-  const file = event.target.files && event.target.files[0];
-  if (!file) return;
-  if (file.size > 5 * 1024 * 1024) {
-    alert('Please choose an image under 5MB.');
-    return;
+  if (user.displayName) {
+    localStorage.setItem(`journall_user_name_${user.uid}`, user.displayName.trim());
   }
-  const reader = new FileReader();
-  reader.onload = function(e) {
-    const dataUrl = e.target.result;
-    localStorage.setItem('journall_user_custom_avatar', dataUrl);
-    renderUserProfile();
-    alert('✓ Profile picture updated successfully!');
-  };
-  reader.readAsDataURL(file);
+  if (user.photoURL) {
+    localStorage.setItem(`journall_user_photo_${user.uid}`, user.photoURL);
+  }
 }
 
 function renderUserProfile() {
   const user = window.currentUser || {};
+  const userUid = user.uid || localStorage.getItem('journall_active_uid') || 'local';
   const dName = getActiveUserName();
   const dEmail = getActiveUserEmail();
-  const customAvatar = localStorage.getItem('journall_user_custom_avatar');
-  const dPhoto = customAvatar || user.photoURL || localStorage.getItem('journall_user_photo') || `https://ui-avatars.com/api/?name=${encodeURIComponent(dName)}&background=a855f7&color=fff`;
+  const customAvatar = localStorage.getItem(`journall_user_custom_avatar_${userUid}`) || localStorage.getItem('journall_user_custom_avatar');
+  const dPhoto = customAvatar || user.photoURL || localStorage.getItem(`journall_user_photo_${userUid}`) || `https://ui-avatars.com/api/?name=${encodeURIComponent(dName)}&background=a855f7&color=fff`;
 
   // Top Right Fixed Floating Profile Widget
   const topName = document.getElementById('topProfileName');
@@ -566,9 +559,12 @@ function renderUserProfile() {
   if (profName) profName.textContent = dName;
   if (profEmail) profEmail.textContent = dEmail;
   if (profImg) profImg.src = dPhoto;
+  
   if (customInput) {
-    customInput.value = localStorage.getItem('journall_custom_username') || dName;
+    const savedCustomForUser = localStorage.getItem(`journall_custom_username_${userUid}`);
+    customInput.value = savedCustomForUser || '';
   }
+
   const nameCount = getNameChangesThisMonthCount();
   const badge = document.getElementById('nameChangeLimitBadge');
   if (badge) {
@@ -596,33 +592,23 @@ function renderUserProfile() {
   if (statBroker) statBroker.textContent = broker ? `${broker.platform} (${broker.account})` : 'MetaTrader 5';
 }
 
-function getNameChangeHistory() {
-  try {
-    return JSON.parse(localStorage.getItem('journall_name_change_history') || '[]');
-  } catch(e) {
-    return [];
+function handleCustomAvatarUpload(event) {
+  const file = event.target.files && event.target.files[0];
+  if (!file) return;
+  if (file.size > 5 * 1024 * 1024) {
+    alert('Please choose an image under 5MB.');
+    return;
   }
-}
-
-function getNameChangesThisMonthCount() {
-  const history = getNameChangeHistory();
-  const now = new Date();
-  const currentMonthKey = `${now.getFullYear()}-${now.getMonth() + 1}`;
-  
-  const thisMonthChanges = history.filter(item => {
-    if (!item || !item.timestamp) return false;
-    const d = new Date(item.timestamp);
-    const key = `${d.getFullYear()}-${d.getMonth() + 1}`;
-    return key === currentMonthKey;
-  });
-
-  return thisMonthChanges.length;
-}
-
-function recordNameChangeHistory(newName) {
-  const history = getNameChangeHistory();
-  history.push({ name: newName, timestamp: Date.now() });
-  localStorage.setItem('journall_name_change_history', JSON.stringify(history));
+  const userUid = window.currentUser?.uid || localStorage.getItem('journall_active_uid') || 'local';
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const dataUrl = e.target.result;
+    localStorage.setItem(`journall_user_custom_avatar_${userUid}`, dataUrl);
+    localStorage.setItem('journall_user_custom_avatar', dataUrl);
+    renderUserProfile();
+    alert('✓ Profile picture updated successfully!');
+  };
+  reader.readAsDataURL(file);
 }
 
 function handleLiveUsernameInput(val) {
@@ -643,22 +629,20 @@ function handleLiveUsernameInput(val) {
     }
   }
 
-  // Update live preview titles across the UI instantly without page refresh
-  if (clean) {
-    const topName = document.getElementById('topProfileName');
-    const sidebarName = document.getElementById('sidebarProfileName');
-    const profName = document.getElementById('userProfileName');
-    if (topName) topName.textContent = clean;
-    if (sidebarName) sidebarName.textContent = clean;
-    if (profName) profName.textContent = clean;
-  }
+  const activeName = clean || getActiveUserName();
+  const topName = document.getElementById('topProfileName');
+  const sidebarName = document.getElementById('sidebarProfileName');
+  const profName = document.getElementById('userProfileName');
+  if (topName) topName.textContent = activeName;
+  if (sidebarName) sidebarName.textContent = activeName;
+  if (profName) profName.textContent = activeName;
 }
 
 function saveCustomUsername() {
   const input = document.getElementById('customUsernameInput');
   const val = input?.value?.trim();
-  const userUid = window.currentUser?.uid || 'local';
-  const currentSaved = (localStorage.getItem(`journall_custom_username_${userUid}`) || localStorage.getItem('journall_custom_username') || '').trim();
+  const userUid = window.currentUser?.uid || localStorage.getItem('journall_active_uid') || 'local';
+  const currentSaved = (localStorage.getItem(`journall_custom_username_${userUid}`) || '').trim();
 
   if (!val) {
     alert('Please enter a valid display name.');
@@ -680,11 +664,10 @@ Your next name change will be available on the 1st of next month.');
     return;
   }
 
-  // Save name change under active user session
+  // Save name change strictly under user.uid
   recordNameChangeHistory(val);
   localStorage.setItem(`journall_custom_username_${userUid}`, val);
   localStorage.setItem('journall_custom_username', val);
-  localStorage.setItem('journall_user_name', val);
 
   const newCount = getNameChangesThisMonthCount();
   const remaining = Math.max(0, 2 - newCount);
@@ -3365,7 +3348,6 @@ tr:hover {
       <button data-tab="goals">Goals</button>
       <button data-tab="ailab">AI Coach</button>
       <button data-tab="userprofile">User Profile</button>
-      <button data-tab="uploadcsv">Upload Data</button>
       <button class="nav-signout-btn" type="button" onclick="triggerJournalSignOut()">Sign Out</button>
     </div>
 
@@ -3533,20 +3515,6 @@ tr:hover {
         </div>
       </div>
 
-      <div class="card">
-        <div class="panel-title"><h3>Upload Trading Data</h3><span>CSV / HTML import area</span></div>
-
-        <div class="csv-only-box">
-          <input id="mainCsvUpload" type="file" accept=".csv,.html,.htm" style="display:none" onchange="handleCSVUpload(event)">
-          <label class="btn primary" for="mainCsvUpload" onclick="document.getElementById('mainCsvUpload').value=''" style="cursor: pointer; display: inline-flex; align-items: center; justify-content: center; margin: 0;">Upload Trading Data</label>
-          <button class="btn" style="border-color:rgba(255,119,136,.25);color:#ff7788; margin: 0;" onclick="resetAllData()">Reset All Data</button>
-        </div>
-
-        <div class="sync-status" id="mainUploadStatus">
-          No file uploaded yet. Upload your Match-Trader CSV or HTML export here.
-        </div>
-        <div class="sync-status" id="csvDebugInfo" style="margin-top:10px">CSV/HTML parser ready: reads Symbol, Open Time, Profit, Side, Entry, Exit, SL, TP safely.</div>
-      </div>
     </section>
 
 
@@ -4315,13 +4283,42 @@ function normalizeImportedTradeList(list){
   return (Array.isArray(list) ? list : []).map(normalizeImportedTrade).filter(Boolean);
 }
 
-let trades = normalizeImportedTradeList(cleanDuplicateDeals(JSON.parse(localStorage.getItem('viztrade_trades') || '[]')));
-localStorage.setItem('viztrade_trades', JSON.stringify(trades));
+const MAIN_TRADES_STORAGE_KEY = 'viztrade_trades';
+const TRADING_PAGE_TRADES_STORAGE_KEY = 'viztrade_trading_page_trades';
+
+function readStoredTradeList(key){
+  try{
+    const raw = JSON.parse(localStorage.getItem(key) || '[]');
+    return normalizeImportedTradeList(cleanDuplicateDeals(Array.isArray(raw) ? raw : []));
+  }catch{
+    return [];
+  }
+}
+
+function mergeStoredTradeSources(primary, secondary){
+  const first = normalizeImportedTradeList(cleanDuplicateDeals(Array.isArray(primary) ? primary : []));
+  const second = normalizeImportedTradeList(cleanDuplicateDeals(Array.isArray(secondary) ? secondary : []));
+  return mergeImportedTrades(first, second);
+}
+
+function persistTradeStores(list){
+  const clean = normalizeImportedTradeList(cleanDuplicateDeals(Array.isArray(list) ? list : []));
+  trades = [...clean];
+  tradingPageTrades = [...clean];
+  localStorage.setItem(MAIN_TRADES_STORAGE_KEY, JSON.stringify(clean));
+  localStorage.setItem(TRADING_PAGE_TRADES_STORAGE_KEY, JSON.stringify(clean));
+  return clean;
+}
+
+let trades = mergeStoredTradeSources(
+  readStoredTradeList(MAIN_TRADES_STORAGE_KEY),
+  readStoredTradeList(TRADING_PAGE_TRADES_STORAGE_KEY)
+);
+persistTradeStores(trades);
 
 let filtered = [...trades];
 let charts = {};
-let tradingPageTrades = normalizeImportedTradeList(cleanDuplicateDeals(JSON.parse(localStorage.getItem('viztrade_trading_page_trades') || '[]')));
-localStorage.setItem('viztrade_trading_page_trades', JSON.stringify(tradingPageTrades));
+let tradingPageTrades = [...trades];
 let journalPageEntries = JSON.parse(localStorage.getItem('krishna_journal_page_entries') || '[]');
 
 const fmt = n => signedMoney(n);
@@ -5103,7 +5100,7 @@ let aiWidgetGenerating = false;
 function aiWidgetSignature(){
   const data = filtered || [];
   const s = stats(data);
-  return [data.length, data[0]?.date || '', data[data.length-1]?.date || '', Number(s.pnl||0).toFixed(2), Number(s.wr||0).toFixed(1), Number(s.maxDD||0).toFixed(2)].join('|');
+  return [data.length, data[0]?.date || '', data[data.length-1]?.date || '', Number(s.pnl||0).toFixed(2), Math.round(Number(s.wr||0)), Number(s.maxDD||0).toFixed(2)].join('|');
 }
 
 function aiWidgetStorageKey(){
@@ -5419,7 +5416,7 @@ function aiReportSignature(){
     data[0]?.date || '',
     data[data.length-1]?.date || '',
     Number(s.pnl || 0).toFixed(2),
-    Number(s.wr || 0).toFixed(1),
+    Math.round(Number(s.wr || 0)),
     Number(s.pf || 0).toFixed(2)
   ].join('|');
 }
@@ -5438,7 +5435,7 @@ function aiReportPayload(){
     wins: Array.isArray(s.wins) ? s.wins.length : 0,
     losses: Array.isArray(s.losses) ? s.losses.length : 0,
     breakeven: Array.isArray(s.breakEvens) ? s.breakEvens.length : 0,
-    winRate: Number(Number(s.wr || 0).toFixed(1)),
+    winRate: Number(Math.round(Number(s.wr || 0))),
     pnl: Number(Number(s.pnl || 0).toFixed(2)),
     profitFactor: Number(Number(s.pf || 0).toFixed(2)),
     maxDrawdown: Number(Number(s.maxDD || 0).toFixed(2))
@@ -5485,7 +5482,7 @@ function renderRuleBasedDashboardInsights(){
   const leaks = mistakeNames.map(name=>({name,count:filtered.filter(t=>mistakes(t).includes(name)).length})).sort((a,b)=>b.count-a.count);
   const mainLeak = leaks[0] || {name:'Rule discipline',count:0};
   const cards = [
-    `<strong>Performance:</strong> ${s.total} trades, ${s.wr.toFixed(1)}% win rate, net ${signedMoney(s.pnl)}. <br><strong>Action:</strong> Review only the trades that followed your rules first.`,
+    `<strong>Performance:</strong> ${s.total} trades, ${Math.round(Number(s.wr)||0)}% win rate, net ${signedMoney(s.pnl)}. <br><strong>Action:</strong> Review only the trades that followed your rules first.`,
     `<strong>Main leak:</strong> ${mainLeak.count ? `${mainLeak.name} appeared ${mainLeak.count} times.` : 'No repeated rule leak is dominating the sample.'} <br><strong>Action:</strong> Make this tomorrow's first checklist item before entry.`,
     `<strong>Worst session:</strong> ${worstSession[0]} is currently ${signedMoney(worstSession[1])}. <br><strong>Action:</strong> Reduce size or skip that session until the setup quality improves.`,
     `<strong>Drawdown:</strong> Max drawdown is ${signedMoney(s.maxDD)}. <br><strong>Action:</strong> Stop trading for the day after two rule breaks or after hitting your daily loss limit.`,
@@ -5933,20 +5930,23 @@ function uploadedTradePnl(data=trades){
 }
 function syncedCurrentBalance(config, data=trades){
   if(!config) return 0;
+  const manualBalance = Number(config.currentBalance);
+  if(Number.isFinite(manualBalance) && manualBalance > 0) return manualBalance;
   const accountSize = Number(config.accountSize) || 0;
   const list = Array.isArray(data) ? data : [];
   if(list.length) return accountSize + uploadedTradePnl(list);
-  const manualBalance = Number(config.currentBalance);
-  return Number.isFinite(manualBalance) && manualBalance > 0 ? manualBalance : accountSize;
+  return accountSize;
 }
 function syncStoredAccountBalanceWithTrades(data=trades){
   const list = Array.isArray(data) ? data : [];
   if(!list.length) return;
   try{
     const raw = JSON.parse(localStorage.getItem(ACCOUNT_CONFIG_KEY) || 'null');
+    const savedBalance = Number(raw?.currentBalance);
+    if(raw && Number.isFinite(savedBalance) && savedBalance > 0) return;
     if(!raw || !Number(raw.accountSize)) return;
     const nextBalance = Number((Number(raw.accountSize) + uploadedTradePnl(list)).toFixed(2));
-    if(Math.abs((Number(raw.currentBalance) || 0) - nextBalance) >= 0.01){
+    if(Number.isFinite(nextBalance) && nextBalance > 0 && Math.abs((Number(raw.currentBalance) || 0) - nextBalance) >= 0.01){
       raw.currentBalance = nextBalance;
       localStorage.setItem(ACCOUNT_CONFIG_KEY, JSON.stringify(raw));
     }
@@ -6060,7 +6060,7 @@ function openAccountSetup(blocking=false){
   const existingAccount = getAccountConfig();
   const hasSyncedAccount = !!existingAccount;
   const config = existingAccount || {accountSize:'',phase:'Phase 1',profitTarget:'',profitTargetType:'percent',maxDailyLoss:'',maxDailyLossType:'percent',maxDrawdown:'',maxDrawdownType:'percent',currentBalance:'',riskPercent:'',maxTradesPerDay:'',minRr:'',phaseDeadline:'',userSetupCriteria:[]};
-  const liveBalance = existingAccount ? syncedCurrentBalance(existingAccount, trades || []) : config.currentBalance;
+  const liveBalance = existingAccount?.currentBalance ?? config.currentBalance;
   const set = (id,value)=>{ const el=document.getElementById(id); if(el) el.value = value ?? ''; };
   set('accountSizeInput', config.accountSize ?? ''); set('currentBalanceInput', liveBalance ?? '');
   set('accountPhaseInput', config.phase || 'Phase 1'); set('profitTargetInput', config.profitTarget);
@@ -6113,7 +6113,7 @@ async function saveAccountSetup(){
   let accountSize, currentBalance, riskPercent, profitTarget, maxTradesPerDay, minRr, maxDailyLoss = null, maxDrawdown = null;
   try{
     accountSize = existingAccount?.accountSize || readRequiredNumber('accountSizeInput','Account size');
-    currentBalance = syncedCurrentBalance({accountSize, phase}, trades || []);
+    currentBalance = readRequiredNumber('currentBalanceInput','Current balance');
     profitTarget = readRequiredNumber('profitTargetInput','Profit target');
     riskPercent = clampNumber(readRequiredNumber('riskPercentInput','Risk per trade'), 0.5, 2);
     maxTradesPerDay = readRequiredNumber('maxTradesInput','Max trades per day');
@@ -6274,7 +6274,7 @@ function downloadCSV(){
 
 
 function saveTrades(){
-  localStorage.setItem('viztrade_trades', JSON.stringify(trades));
+  persistTradeStores(trades);
 }
 
 
@@ -6362,32 +6362,18 @@ function old_tradeImportKey(trade){
   );
 }
 
-function mergeImportedTrades(existingTrades, incomingTrades){
-  const merged = new Map();
-  (Array.isArray(existingTrades) ? existingTrades : []).forEach(trade => {
-    const normalized = normalizeImportedTrade(trade);
-    const key = tradeImportKey(normalized);
-    if(key) merged.set(key, normalized);
-  });
-  (Array.isArray(incomingTrades) ? incomingTrades : []).forEach(trade => {
-    const normalized = normalizeImportedTrade(trade);
-    const key = tradeImportKey(normalized);
-    if(key) merged.set(key, normalized);
-  });
-  return [...merged.values()].sort((a,b) => {
-    const aDate = `${a.date || ''} ${a.time || ''}`;
-    const bDate = `${b.date || ''} ${b.time || ''}`;
-    return aDate.localeCompare(bDate);
-  });
-}
-
 function restoreTradesFromStorageIfNeeded(){
   if(Array.isArray(trades) && trades.length) return;
   try{
-    const saved = normalizeImportedTradeList(cleanDuplicateDeals(JSON.parse(localStorage.getItem('viztrade_trades') || '[]')));
+    const saved = mergeStoredTradeSources(
+      readStoredTradeList(MAIN_TRADES_STORAGE_KEY),
+      readStoredTradeList(TRADING_PAGE_TRADES_STORAGE_KEY)
+    );
     if(Array.isArray(saved) && saved.length){
       trades = saved;
+      tradingPageTrades = [...saved];
       filtered = [...trades];
+      persistTradeStores(trades);
     }
   }catch(err){
     console.warn('Could not restore saved trades', err);
@@ -6619,12 +6605,63 @@ function reportTimestampToDate(value, hourOffset=0){
 function parseFundingPipsMt5History(text){
   if(typeof DOMParser === 'undefined') return [];
   const source = String(text || '');
-  if(!/deal|direction|balance|profit/i.test(source)) return [];
+  if(!/deal|direction|balance|profit|open time|close time|symbol|entry|exit|volume|comment/i.test(source)) return [];
 
   const parser = new DOMParser();
   const doc = parser.parseFromString(source, 'text/html');
   const tables = [...doc.querySelectorAll('table')];
   const parsedDeals = [];
+
+  const parseTableRows = (rows, headerIndex, headerMap) => {
+    rows.slice(headerIndex + 1).forEach((row, i)=>{
+      const timeRaw = getColumn(row, headerMap, ['Time','Open Time','Close Time','Date','Timestamp'], '').trim();
+      const symbol = getColumn(row, headerMap, ['Symbol','Instrument','Market'], '').trim();
+      const typeRaw = getColumn(row, headerMap, ['Type','Deal Type','Action'], '').trim().toUpperCase();
+      const directionRaw = getColumn(row, headerMap, ['Direction','Side'], '').trim().toUpperCase();
+      const commentRaw = getColumn(row, headerMap, ['Comment','Description','Notes'], '').trim().toUpperCase();
+      const profit = toNumber(getColumn(row, headerMap, ['Profit','P&L','PnL','Net Profit'], '0'));
+      const commission = toNumber(getColumn(row, headerMap, ['Commission'], '0'));
+      const fee = toNumber(getColumn(row, headerMap, ['Fee'], '0'));
+      const swap = toNumber(getColumn(row, headerMap, ['Swap'], '0'));
+      const volume = toNumber(getColumn(row, headerMap, ['Volume','Lot','Lots'], '0'));
+      const price = toNumber(getColumn(row, headerMap, ['Price','Entry Price','Open Price','Close Price'], '0'));
+      const dealId = getColumn(row, headerMap, ['Deal','Ticket','Order','ID'], `mt5-deal-${Date.now()}-${parsedDeals.length}-${i}`);
+      const orderId = getColumn(row, headerMap, ['Order','Position','Position ID'], '').trim();
+      const sideGuess = getColumn(row, headerMap, ['Side'], '').trim().toUpperCase();
+
+      if(!symbol || !timeRaw) return;
+
+      const isNonTrade =
+        /commission|fee|swap|interest|balance|deposit|withdrawal|credit|correction|bonus|tax/i.test(symbol) ||
+        /commission|fee|swap|interest|balance|deposit|withdrawal|credit|correction|bonus|tax/i.test(typeRaw) ||
+        /commission|fee|swap|interest|balance|deposit|withdrawal|credit|correction|bonus|tax/i.test(directionRaw) ||
+        /commission|fee|swap|interest|balance|deposit|withdrawal|credit|correction|bonus|tax/i.test(commentRaw);
+      if(isNonTrade) return;
+
+      const looksLikeTrade =
+        typeRaw.includes('BUY') || typeRaw.includes('SELL') ||
+        directionRaw.includes('BUY') || directionRaw.includes('SELL') ||
+        /BUY|SELL/i.test(sideGuess) ||
+        /BUY|SELL/i.test(commentRaw) ||
+        /ENTRY|EXIT/i.test(typeRaw);
+      if(!looksLikeTrade) return;
+
+      parsedDeals.push({
+        time: parseDateUTC(timeRaw),
+        symbol,
+        type: typeRaw || sideGuess || 'TRADE',
+        direction: directionRaw || sideGuess || '',
+        volume,
+        price,
+        commission: commission + fee,
+        swap,
+        profit,
+        dealId,
+        orderId,
+        comment: commentRaw
+      });
+    });
+  };
 
   tables.forEach(table=>{
     const rows = [...table.querySelectorAll('tr')]
@@ -6632,92 +6669,45 @@ function parseFundingPipsMt5History(text){
       .filter(row => row.some(Boolean));
 
     for(let headerIndex=0; headerIndex<rows.length; headerIndex++){
-      const headers = rows[headerIndex].map(h => String(h || '').replace(/^\uFEFF/,'').trim());
+      const headers = rows[headerIndex].map(h => String(h || '').replace(/^﻿/,'').trim());
       const headerMap = buildHeaderMap(headers);
-      const hasMt5Shape =
-        headerMap[normalizeHeaderName('Time')] !== undefined &&
-        headerMap[normalizeHeaderName('Symbol')] !== undefined &&
-        headerMap[normalizeHeaderName('Profit')] !== undefined &&
-        (
-          headerMap[normalizeHeaderName('Deal')] !== undefined ||
-          headerMap[normalizeHeaderName('Direction')] !== undefined ||
-          headerMap[normalizeHeaderName('Balance')] !== undefined
-        );
-
-      if(!hasMt5Shape) continue;
-
-      rows.slice(headerIndex + 1).forEach((row, i)=>{
-        const timeRaw = getColumn(row, headerMap, ['Time'], '');
-        const symbol = getColumn(row, headerMap, ['Symbol'], '').trim();
-        const typeRaw = getColumn(row, headerMap, ['Type'], '').trim().toUpperCase();
-        const directionRaw = getColumn(row, headerMap, ['Direction'], '').trim().toUpperCase();
-        const commentRaw = getColumn(row, headerMap, ['Comment'], '').trim().toUpperCase();
-        const profit = toNumber(getColumn(row, headerMap, ['Profit'], '0'));
-        const commission = toNumber(getColumn(row, headerMap, ['Commission'], '0'));
-        const fee = toNumber(getColumn(row, headerMap, ['Fee'], '0'));
-        const swap = toNumber(getColumn(row, headerMap, ['Swap'], '0'));
-        const volume = toNumber(getColumn(row, headerMap, ['Volume'], '0'));
-        const price = toNumber(getColumn(row, headerMap, ['Price'], '0'));
-        const dealId = getColumn(row, headerMap, ['Deal','Ticket','Order'], `mt5-deal-${Date.now()}-${parsedDeals.length}-${i}`);
-        const orderId = getColumn(row, headerMap, ['Order'], '').trim();
-
-        if(!symbol || !timeRaw) return;
-
-        // Ignore non-trade entries
-        const isNonTrade =
-          /commission|fee|swap|interest|balance|deposit|withdrawal|credit|correction|bonus|tax/i.test(symbol) ||
-          /commission|fee|swap|interest|balance|deposit|withdrawal|credit|correction|bonus|tax/i.test(typeRaw) ||
-          /commission|fee|swap|interest|balance|deposit|withdrawal|credit|correction|bonus|tax/i.test(directionRaw) ||
-          /commission|fee|swap|interest|balance|deposit|withdrawal|credit|correction|bonus|tax/i.test(commentRaw);
-        if(isNonTrade) return;
-
-        if(!typeRaw.includes('BUY') && !typeRaw.includes('SELL')) return;
-
-        parsedDeals.push({
-          time: parseDateUTC(timeRaw),
-          symbol,
-          type: typeRaw,
-          direction: directionRaw,
-          volume,
-          price,
-          commission: commission + fee,
-          swap,
-          profit,
-          dealId,
-          orderId,
-          comment: commentRaw
-        });
-      });
+      const headerNames = ['Time','Open Time','Close Time','Date','Symbol','Instrument','Profit','P&L','PnL','Side','Direction','Deal','Ticket','Order'];
+      const hasAnyUsefulHeader = headerNames.some(name => headerMap[normalizeHeaderName(name)] !== undefined);
+      if(!hasAnyUsefulHeader) continue;
+      parseTableRows(rows, headerIndex, headerMap);
     }
   });
 
   if (!parsedDeals.length) return [];
 
-  // Sort deals chronologically
   parsedDeals.sort((a, b) => (a.time ? a.time.getTime() : 0) - (b.time ? b.time.getTime() : 0));
 
   const openDeals = [];
   const finalTrades = [];
 
   parsedDeals.forEach(deal => {
-    // If it's an entry deal
-    if (deal.direction.includes('IN') && !deal.direction.includes('OUT')) {
+    const direction = String(deal.direction || '').toUpperCase();
+    const typeRaw = String(deal.type || '').toUpperCase();
+    const symbol = deal.symbol;
+    const isEntry = direction.includes('IN') || typeRaw.includes('BUY') || typeRaw.includes('OPEN') || /ENTRY/.test(typeRaw);
+    const isExit = direction.includes('OUT') || typeRaw.includes('SELL') || typeRaw.includes('CLOSE') || /EXIT/.test(typeRaw);
+
+    if (isEntry && !isExit) {
       openDeals.push(deal);
+      return;
     }
-    // If it's an exit deal
-    else if (deal.direction.includes('OUT')) {
+
+    if (isExit || !direction) {
       let matchIdx = -1;
-      // 1. Try to match by symbol and exact volume
       for (let j = openDeals.length - 1; j >= 0; j--) {
-        if (openDeals[j].symbol === deal.symbol && Math.abs(openDeals[j].volume - deal.volume) < 0.0001) {
+        if (openDeals[j].symbol === symbol && Math.abs(openDeals[j].volume - deal.volume) < 0.0001) {
           matchIdx = j;
           break;
         }
       }
-      // 2. Fall back to matching by symbol only
       if (matchIdx === -1) {
         for (let j = openDeals.length - 1; j >= 0; j--) {
-          if (openDeals[j].symbol === deal.symbol) {
+          if (openDeals[j].symbol === symbol) {
             matchIdx = j;
             break;
           }
@@ -6726,8 +6716,8 @@ function parseFundingPipsMt5History(text){
 
       if (matchIdx !== -1) {
         const entryDeal = openDeals.splice(matchIdx, 1)[0];
-        const openDate = entryDeal.time;
-        const closeDate = deal.time;
+        const openDate = entryDeal.time || deal.time;
+        const closeDate = deal.time || entryDeal.time;
         const ist = toISTParts(closeDate || openDate);
         const pnl = deal.profit + entryDeal.commission + deal.commission + entryDeal.swap + deal.swap;
 
@@ -6743,7 +6733,7 @@ function parseFundingPipsMt5History(text){
           dayIndex: ist.dayIndex,
           hour: ist.hour,
           session: classifySessionIST(closeDate || openDate),
-          volume: deal.volume,
+          volume: deal.volume || entryDeal.volume,
           side: entryDeal.type.includes('SELL') ? 'SELL' : 'BUY',
           entry: entryDeal.price,
           exit: deal.price,
@@ -6753,11 +6743,10 @@ function parseFundingPipsMt5History(text){
           swap: entryDeal.swap + deal.swap,
           rawProfit: deal.profit,
           pnl: pnl,
-          reason: deal.comment || 'FundingPips MT5 history import',
+          reason: deal.comment || entryDeal.comment || 'FundingPips MT5 history import',
           duration: openDate && closeDate ? (closeDate - openDate) / 60000 : 0
         });
       } else {
-        // Unmatched exit deal (fallback to preserve data)
         const openDate = deal.time;
         const ist = toISTParts(openDate);
         finalTrades.push({
@@ -6773,7 +6762,7 @@ function parseFundingPipsMt5History(text){
           hour: ist.hour,
           session: classifySessionIST(openDate),
           volume: deal.volume,
-          side: deal.type.includes('BUY') ? 'SELL' : 'BUY',
+          side: /SELL/i.test(typeRaw) || /SELL/i.test(direction) ? 'SELL' : 'BUY',
           entry: deal.price,
           exit: deal.price,
           sl: 0,
@@ -6782,7 +6771,7 @@ function parseFundingPipsMt5History(text){
           swap: deal.swap,
           rawProfit: deal.profit,
           pnl: deal.profit + deal.commission + deal.swap,
-          reason: deal.comment || 'FundingPips MT5 history import (unmatched exit)',
+          reason: deal.comment || 'FundingPips MT5 history import (unmatched)',
           duration: 0
         });
       }
@@ -7095,26 +7084,23 @@ function handleCSVUpload(event){
       shouldReplace = confirm("Would you like to clear your previously imported trades and replace them with this new file?\n\nNote: Your written journal notes/entries will NOT be affected or deleted.\n\nClick 'OK' to replace (overwrite) existing trades.\nClick 'Cancel' to merge the new trades with your existing ones.");
     }
 
+    let nextTrades;
     if (shouldReplace) {
-      trades = normalizeImportedTradeList(parsed);
+      nextTrades = normalizeImportedTradeList(parsed);
       if (typeof cleanDuplicateDeals === 'function') {
-        trades = normalizeImportedTradeList(cleanDuplicateDeals(trades));
+        nextTrades = normalizeImportedTradeList(cleanDuplicateDeals(nextTrades));
       }
     } else {
-      trades = mergeImportedTrades(trades, parsed);
+      nextTrades = mergeImportedTrades(trades, parsed);
     }
 
-    filtered = [...trades];
-    saveTrades();
+    filtered = [...persistTradeStores(nextTrades)];
 
     if(status){
       const missingDates = parsed.filter(t=>!t.date).length;
       const missingSymbols = parsed.filter(t=>!t.symbol || t.symbol === 'Unknown').length;
       status.innerHTML=`<strong>File uploaded successfully.</strong><br>Imported: ${parsed.length}<br>Journal total: ${trades.length}<br>Existing trades kept: ${previousCount}<br>Missing dates: ${missingDates}<br>Missing symbols: ${missingSymbols}`;
     }
-
-    tradingPageTrades = mergeImportedTrades(tradingPageTrades, parsed);
-    localStorage.setItem('viztrade_trading_page_trades', JSON.stringify(tradingPageTrades));
 
     ['q','session','side','mistake','result'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
 
@@ -7738,13 +7724,9 @@ function handleTradingPageUpload(event){
     }
 
     const previousCount = Array.isArray(trades) ? trades.length : 0;
-    tradingPageTrades = mergeImportedTrades(tradingPageTrades, parsed);
-    localStorage.setItem('viztrade_trading_page_trades', JSON.stringify(tradingPageTrades));
-
     // Keep the dashboard, analytics, journal page, and trading page in sync without deleting older saved trades.
-    trades = mergeImportedTrades(trades, parsed);
-    filtered = [...trades];
-    saveTrades();
+    const nextTrades = mergeImportedTrades(trades, parsed);
+    filtered = [...persistTradeStores(nextTrades)];
 
     ['q','session','side','mistake','result'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
 
@@ -7849,8 +7831,11 @@ function showTodayTrades(){
 }
 
 function clearTradingPageData(){
-  localStorage.removeItem('viztrade_trading_page_trades');
+  localStorage.removeItem(MAIN_TRADES_STORAGE_KEY);
+  localStorage.removeItem(TRADING_PAGE_TRADES_STORAGE_KEY);
+  trades = [];
   tradingPageTrades = [];
+  filtered = [];
   const upload = document.getElementById('tradingPageUpload');
   if(upload) upload.value = '';
   renderTradingPage();renderJournalPage();
@@ -8340,7 +8325,7 @@ function postSessionSignature(data){
     todayISTDate(),
     (data || []).length,
     Number(s.pnl || 0).toFixed(2),
-    Number(s.wr || 0).toFixed(1),
+    Math.round(Number(s.wr || 0)),
     Number(s.maxDD || 0).toFixed(2),
     (data || []).map(t=>`${t.time}-${t.pnl}`).join(',')
   ].join('|');
@@ -9792,7 +9777,7 @@ document.querySelectorAll('.nav button').forEach(btn=>{
       'Journall psychology and trade-review context',
       `Period: last ${sample.length} trades, scoped to last 7 days when available.`,
       `Total logged trades in scope: ${sample.length}`,
-      s ? `Scope stats: win rate ${Number(s.wr||0).toFixed(1)}%, net P&L ${signedMoney(s.pnl)}, wins ${s.wins.length}, losses ${s.losses.length}, breakeven ${s.breakEvens.length}.` : 'Scope stats: unavailable.',
+      s ? `Scope stats: win rate ${Math.round(Number(s.wr)||0)}%, net P&L ${signedMoney(s.pnl)}, wins ${s.wins.length}, losses ${s.losses.length}, breakeven ${s.breakEvens.length}.` : 'Scope stats: unavailable.',
       account ? `Account state: phase ${account.config.phase}, account size $${account.accountSize.toFixed(2)}, current balance $${account.currentBalance.toFixed(2)}, daily loss used $${account.dailyLossUsed.toFixed(2)} of ${account.maxDailyLossAmount == null ? 'not set' : '$'+account.maxDailyLossAmount.toFixed(2)}.` : 'Account state: account setup not completed.',
       todayState ? `Today: ${todayState.tradesCount} trades, ${signedMoney(todayState.todayPnl)}, ${todayState.mistakesToday} mistake tags, action ${todayState.nextAction}.` : 'Today: unavailable.',
       `Mind Stability Check today: ${Object.entries(psychState).map(([k,v])=>`${k}=${v?'yes':'no'}`).join(', ') || 'not logged'}.`,
@@ -10231,13 +10216,12 @@ function syncedStorageMapsEqual(a = {}, b = {}){
 }
 
 window.journallReloadDataFromStorage = function() {
-  if (typeof cleanDuplicateDeals === 'function') {
-    trades = cleanDuplicateDeals(JSON.parse(localStorage.getItem('viztrade_trades') || '[]'));
-    tradingPageTrades = cleanDuplicateDeals(JSON.parse(localStorage.getItem('viztrade_trading_page_trades') || '[]'));
-  } else {
-    trades = JSON.parse(localStorage.getItem('viztrade_trades') || '[]');
-    tradingPageTrades = JSON.parse(localStorage.getItem('viztrade_trading_page_trades') || '[]');
-  }
+  trades = mergeStoredTradeSources(
+    readStoredTradeList(MAIN_TRADES_STORAGE_KEY),
+    readStoredTradeList(TRADING_PAGE_TRADES_STORAGE_KEY)
+  );
+  persistTradeStores(trades);
+  tradingPageTrades = [...trades];
   filtered = [...trades];
   journalPageEntries = JSON.parse(localStorage.getItem('krishna_journal_page_entries') || '[]');
 
