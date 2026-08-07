@@ -2652,7 +2652,28 @@ tr:hover {
 }
 .signin-feature-grid {
   grid-template-columns:repeat(2,minmax(0,1fr)) !important;
-}</style>
+}
+/* JOURNALL_MAIN_LAYOUT_SPACING_FIX */
+#journallApp > .main {
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: flex-start !important;
+  gap: 16px !important;
+  height: 100vh !important;
+  overflow-y: auto !important;
+  padding: 24px 32px 110px 32px !important;
+}
+
+#journallApp .section {
+  margin-top: 0 !important;
+  padding-top: 0 !important;
+}
+
+#journallApp #commandCenter.command-center {
+  margin-top: 0 !important;
+}
+
+</style>
 <style id="journall-trading-dashboard-sync">
 .account-sync-note{margin:0 0 14px!important;color:rgba(255,255,255,.56)!important;font-size:13px!important;line-height:1.5!important}
 .account-source-input[readonly],.account-source-input:disabled{opacity:.72!important;cursor:not-allowed!important;border-color:rgba(255,255,255,.05)!important}
@@ -9613,6 +9634,7 @@ window.addEventListener('hashchange', openHashTab);
   el.addEventListener(eventName, renderAll);
 });
 
+if(typeof window.journallReloadDataFromStorage === 'function') window.journallReloadDataFromStorage();
 renderAll();
 openHashTab();
 syncMobileActiveTab();
