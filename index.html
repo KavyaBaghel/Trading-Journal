@@ -3347,7 +3347,7 @@ tr:hover {
     </div>
   </div>
   <aside class="sidebar">
-    <div class="brand"><div class="logo" aria-hidden="true"></div><div><div class="brand-title">Journall</div><div class="brand-sub">Trading command center</div></div></div>
+    <div class="brand"><div class="logo" aria-hidden="true"></div><div><h1 class="title">Journal</h1><div class="brand-sub">Trading command center</div></div><button id="theme-toggle" style="cursor:pointer; padding: 8px; border-radius: 50%;">🌙</button></div>
     <div class="sidebar-profile-card" onclick="selectTab('userprofile')">
       <img id="sidebarAvatarImg" class="sidebar-avatar-img" src="https://lh3.googleusercontent.com/a/default-user" onerror="this.src='https://ui-avatars.com/api/?name=Trader&background=a855f7&color=fff'" alt="User">
       <div class="sidebar-profile-info">
@@ -4328,12 +4328,15 @@ function persistTradeStores(list){
   tradingPageTrades = [...clean];
   localStorage.setItem(MAIN_TRADES_STORAGE_KEY, JSON.stringify(clean));
   localStorage.setItem(TRADING_PAGE_TRADES_STORAGE_KEY, JSON.stringify(clean));
+  localStorage.setItem('myTrades', JSON.stringify(clean));
   return clean;
 }
 
+const savedTrades = JSON.parse(localStorage.getItem('myTrades')) || [];
 let trades = mergeStoredTradeSources(
   readStoredTradeList(MAIN_TRADES_STORAGE_KEY),
-  readStoredTradeList(TRADING_PAGE_TRADES_STORAGE_KEY)
+  readStoredTradeList(TRADING_PAGE_TRADES_STORAGE_KEY),
+  savedTrades
 );
 persistTradeStores(trades);
 
@@ -6296,7 +6299,66 @@ function downloadCSV(){
 
 
 function saveTrades(){
+  localStorage.setItem('myTrades', JSON.stringify(trades));
   persistTradeStores(trades);
+}
+
+const JOURNALL_BROKER_SYNC_SETTINGS_KEY = 'journall_broker_sync_settings';
+const JOURNALL_BROKER_SYNC_AUTO_KEY = 'journall_broker_sync_auto_done';
+
+function normalizeBrokerSyncSettings(value){
+  const raw = value && typeof value === 'object' ? value : {};
+  const platform = String(raw.platform || 'mt5').trim().toLowerCase();
+  return {
+    platform: ['mt5', 'matchtrader', 'ctrader'].includes(platform) ? platform : 'mt5',
+    login: String(raw.login || '').trim(),
+    server: String(raw.server || '').trim(),
+    days: Math.max(1, Math.min(365, parseInt(raw.days || 30, 10) || 30)),
+    matchtraderUrl: String(raw.matchtraderUrl || '').trim(),
+    matchtraderEmail: String(raw.matchtraderEmail || '').trim(),
+    matchtraderPassword: String(raw.matchtraderPassword || '').trim(),
+    ctraderToken: String(raw.ctraderToken || '').trim(),
+    ctraderAccountId: String(raw.ctraderAccountId || '').trim(),
+    lastSynced: raw.lastSynced || '',
+    date: raw.date || ''
+  };
+}
+
+function saveBrokerSyncSettings(settings){
+  const normalized = normalizeBrokerSyncSettings(settings);
+  localStorage.setItem(JOURNALL_BROKER_SYNC_SETTINGS_KEY, JSON.stringify(normalized));
+  return normalized;
+}
+
+function getBrokerSyncSettings(){
+  try{
+    return normalizeBrokerSyncSettings(JSON.parse(localStorage.getItem(JOURNALL_BROKER_SYNC_SETTINGS_KEY) || 'null'));
+  }catch{
+    return normalizeBrokerSyncSettings(null);
+  }
+}
+
+function restoreBrokerSyncSettingsToForm(){
+  const settings = getBrokerSyncSettings();
+  const platformEl = document.getElementById('brokerPlatformSelect');
+  const loginEl = document.getElementById('brokerSyncLogin');
+  const serverEl = document.getElementById('brokerSyncServer');
+  const daysEl = document.getElementById('brokerSyncDays');
+  const matchUrlEl = document.getElementById('matchtraderUrl');
+  const matchEmailEl = document.getElementById('matchtraderEmail');
+  const matchPwdEl = document.getElementById('matchtraderPassword');
+  const cTraderTokenEl = document.getElementById('ctraderToken');
+  const cTraderAccountEl = document.getElementById('ctraderAccountId');
+
+  if(platformEl && settings.platform) platformEl.value = settings.platform;
+  if(loginEl && settings.login) loginEl.value = settings.login;
+  if(serverEl && settings.server) serverEl.value = settings.server;
+  if(daysEl && settings.days) daysEl.value = String(settings.days);
+  if(matchUrlEl && settings.matchtraderUrl) matchUrlEl.value = settings.matchtraderUrl;
+  if(matchEmailEl && settings.matchtraderEmail) matchEmailEl.value = settings.matchtraderEmail;
+  if(matchPwdEl && settings.matchtraderPassword) matchPwdEl.value = settings.matchtraderPassword;
+  if(cTraderTokenEl && settings.ctraderToken) cTraderTokenEl.value = settings.ctraderToken;
+  if(cTraderAccountEl && settings.ctraderAccountId) cTraderAccountEl.value = settings.ctraderAccountId;
 }
 
 
@@ -6314,6 +6376,50 @@ function saveSyncedBrokerInfo(platform, login, server) {
 function getSyncedBrokerInfo() {
   try { return JSON.parse(localStorage.getItem('journall_synced_broker') || 'null'); }
   catch { return null; }
+}
+
+function getBrokerSyncAutoFlagKey(){
+  const uid = window.currentUser?.uid || localStorage.getItem('journall_active_uid') || 'local';
+  return `${JOURNALL_BROKER_SYNC_AUTO_KEY}:${uid}`;
+}
+
+async function autoSyncSavedBrokerOnce(force = false){
+  const settings = getBrokerSyncSettings();
+  const platform = settings.platform || 'mt5';
+  if (!settings || !platform) return false;
+  if (!force && sessionStorage.getItem(getBrokerSyncAutoFlagKey()) === '1') return false;
+  if (!settings.login && !settings.server && !settings.matchtraderUrl && !settings.matchtraderEmail && !settings.ctraderToken) return false;
+
+  sessionStorage.setItem(getBrokerSyncAutoFlagKey(), '1');
+  const platformEl = document.getElementById('brokerPlatformSelect');
+  const loginEl = document.getElementById('brokerSyncLogin');
+  const serverEl = document.getElementById('brokerSyncServer');
+  const daysEl = document.getElementById('brokerSyncDays');
+  const matchUrlEl = document.getElementById('matchtraderUrl');
+  const matchEmailEl = document.getElementById('matchtraderEmail');
+  const matchPwdEl = document.getElementById('matchtraderPassword');
+  const cTraderTokenEl = document.getElementById('ctraderToken');
+  const cTraderAccountEl = document.getElementById('ctraderAccountId');
+  const status = document.getElementById('brokerSyncStatus');
+
+  if (platformEl) platformEl.value = platform;
+  if (loginEl && settings.login) loginEl.value = settings.login;
+  if (serverEl && settings.server) serverEl.value = settings.server;
+  if (daysEl && settings.days) daysEl.value = String(settings.days);
+  if (matchUrlEl && settings.matchtraderUrl) matchUrlEl.value = settings.matchtraderUrl;
+  if (matchEmailEl && settings.matchtraderEmail) matchEmailEl.value = settings.matchtraderEmail;
+  if (matchPwdEl && settings.matchtraderPassword) matchPwdEl.value = settings.matchtraderPassword;
+  if (cTraderTokenEl && settings.ctraderToken) cTraderTokenEl.value = settings.ctraderToken;
+  if (cTraderAccountEl && settings.ctraderAccountId) cTraderAccountEl.value = settings.ctraderAccountId;
+
+  try{
+    if (status) status.innerHTML = `<strong>Auto-syncing saved ${platform === 'mt5' ? 'MetaTrader 5' : platform === 'ctrader' ? 'cTrader' : 'MatchTrader'} settings...</strong>`;
+    await triggerBrokerSync({ auto: true, quiet: true, useSavedSettings: true });
+    return true;
+  }catch(err){
+    console.warn('Auto broker sync skipped:', err);
+    return false;
+  }
 }
 
 function tradeImportKey(trade){
@@ -14592,6 +14698,24 @@ body:not(.firebase-auth-required) #journallApp > .sidebar .nav button {
     <button type="button" class="btn primary" onclick="closeCooldownModal()" style="width:100%;">Resume Trading Session</button>
   </div>
 </div>
+
+<script>
+const toggle = document.getElementById('theme-toggle');
+const root = document.documentElement;
+if (localStorage.getItem('theme') === 'dark') {
+  root.setAttribute('data-theme', 'dark');
+  if (toggle) toggle.textContent = '☀️';
+}
+if (toggle) {
+  toggle.addEventListener('click', () => {
+    const isDark = root.getAttribute('data-theme') === 'dark';
+    const newTheme = isDark ? 'light' : 'dark';
+    root.setAttribute('data-theme', newTheme);
+    localStorage.setItem('theme', newTheme);
+    toggle.textContent = isDark ? '🌙' : '☀️';
+  });
+}
+</script>
 
 </body>
 </html>
