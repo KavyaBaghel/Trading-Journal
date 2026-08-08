@@ -1,0 +1,49 @@
+{
+  "name": "Journall - Trading Journal",
+  "short_name": "Journall",
+  "id": "/index.html",
+  "start_url": "./index.html?source=pwa",
+  "scope": "./",
+  "display": "standalone",
+  "display_override": ["standalone", "minimal-ui"],
+  "orientation": "portrait-primary",
+  "background_color": "#0b0b0c",
+  "theme_color": "#0b0b0c",
+  "description": "Installable Android trading journal with analytics, psychology checks, goals, calendar, and AI coaching.",
+  "categories": ["finance", "productivity", "business"],
+  "prefer_related_applications": false,
+  "icons": [
+    {
+      "src": "assets/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "assets/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Today Summary",
+      "short_name": "Today",
+      "url": "./index.html#tradingpage",
+      "description": "Open today summary."
+    },
+    {
+      "name": "Old Trades",
+      "short_name": "Trades",
+      "url": "./index.html#journalpage",
+      "description": "Open saved trade journals."
+    },
+    {
+      "name": "AI Coach",
+      "short_name": "AI",
+      "url": "./index.html#ailab",
+      "description": "Ask the AI coach about your trades."
+    }
+  ]
+}
