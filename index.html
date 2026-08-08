@@ -4185,6 +4185,64 @@ tr:hover {
 </div>
 
 <script>
+/* --------------------------------------------------------------
+   AUTO‑SYNC WITH LOCAL MT5 SERVER (runs on http://localhost:3000)
+   -------------------------------------------------------------- */
+(function() {
+    document.addEventListener('DOMContentLoaded', () => {
+        autoSyncFromMT5();
+    });
+
+    async function autoSyncFromMT5() {
+        const endpoint = 'http://localhost:3000/mt5/trades';
+
+        try {
+            const response = await fetch(endpoint, { cache: 'no-store' });
+            if (!response.ok) {
+                console.warn(`MT5 sync endpoint returned ${response.status}`);
+                return;
+            }
+
+            const mt5Trades = await response.json();
+            if (!Array.isArray(mt5Trades) || mt5Trades.length === 0) {
+                console.info('MT5 sync returned no trades.');
+                return;
+            }
+
+            const localKey = 'trades';
+            const existing = JSON.parse(localStorage.getItem(localKey)) || [];
+
+            const existingIds = new Set(existing.map(t => String(t.id)));
+            let added = 0;
+
+            mt5Trades.forEach(trade => {
+                if (!trade.id) return;
+                if (!existingIds.has(String(trade.id))) {
+                    existing.push(trade);
+                    existingIds.add(String(trade.id));
+                    added++;
+                }
+            });
+
+            if (added > 0) {
+                localStorage.setItem(localKey, JSON.stringify(existing));
+                if (typeof displayTrades === 'function') {
+                    displayTrades();
+                } else if (typeof renderTradingPage === 'function') {
+                    renderTradingPage();
+                } else {
+                    location.reload();
+                }
+                console.info(`Auto‑sync: added ${added} new trade(s) from MT5.`);
+            } else {
+                console.info('Auto‑sync: no new trades to add.');
+            }
+        } catch (err) {
+            console.warn('Auto‑sync with MT5 failed:', err);
+        }
+    }
+})();
+
 const baseTrades = [];
 
 function cleanDuplicateDeals(arr) {
