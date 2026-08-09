@@ -304,7 +304,7 @@ function getUnjournaledTrades() {
 function openQuickJournalModal() {
   qjUnjournaledList = getUnjournaledTrades();
   if (!qjUnjournaledList.length) {
-    alert('🎉 All your trades are fully journaled!');
+    alert('ðŸŽ‰ All your trades are fully journaled!');
     return;
   }
   qjCurrentIndex = 0;
@@ -319,7 +319,7 @@ function closeQuickJournalModal() {
 function loadQuickJournalTrade() {
   if (qjCurrentIndex < 0 || qjCurrentIndex >= qjUnjournaledList.length) {
     closeQuickJournalModal();
-    alert('✨ Great job! You have journaled all remaining trades.');
+    alert('âœ¨ Great job! You have journaled all remaining trades.');
     if (typeof renderPropChallengeDashboard === 'function') renderPropChallengeDashboard();
     if (typeof renderAll === 'function') renderAll();
     return;
@@ -428,7 +428,7 @@ function renderLiveTraderControllerMarkup(metrics) {
   const isWarning = m.maxDailyLossRemaining != null && m.maxDailyLossRemaining < (m.maxDailyLossAmount * 0.25);
   
   const statusCls = isLockout ? 'lockout' : (isWarning ? 'warning' : 'ready');
-  const statusText = isLockout ? '🔴 LOCKOUT (MAX LOSS REACHED)' : (isWarning ? '🟡 RISK HIGH' : '🟢 SESSION ACTIVE / READY');
+  const statusText = isLockout ? 'ðŸ”´ LOCKOUT (MAX LOSS REACHED)' : (isWarning ? 'ðŸŸ¡ RISK HIGH' : 'ðŸŸ¢ SESSION ACTIVE / READY');
 
   return `
     <div class="live-controller-card">
@@ -447,7 +447,7 @@ function renderLiveTraderControllerMarkup(metrics) {
         </div>
         <div class="live-metric-box">
           <div class="live-metric-label">Trades Taken Today</div>
-          <div class="live-metric-val neutral">${m.todayTrades.length} / ${m.config.maxTradesPerDay || '∞'}</div>
+          <div class="live-metric-val neutral">${m.todayTrades.length} / ${m.config.maxTradesPerDay || 'âˆž'}</div>
         </div>
         <div class="live-metric-box">
           <div class="live-metric-label">Today P&L</div>
@@ -461,7 +461,7 @@ function renderLiveTraderControllerMarkup(metrics) {
 
       <div class="live-action-bar">
         <button class="btn primary" type="button" onclick="document.querySelector('[data-tab=&quot;psychology&quot;]')?.click()">Open Psychology Room</button>
-        <button class="btn" type="button" onclick="triggerCooldownPause()">🧘 Pause 15m Cooldown</button>
+        <button class="btn" type="button" onclick="triggerCooldownPause()">ðŸ§˜ Pause 15m Cooldown</button>
       </div>
     </div>
   `;
@@ -569,7 +569,7 @@ function renderUserProfile() {
   const badge = document.getElementById('nameChangeLimitBadge');
   if (badge) {
     if (nameCount >= 2) {
-      badge.textContent = '⚠️ Name change limit reached (2/2 changes used this month)';
+      badge.textContent = 'âš ï¸ Name change limit reached (2/2 changes used this month)';
       badge.style.color = '#f87171';
     } else {
       badge.textContent = `Name changes remaining this month: ${2 - nameCount} of 2`;
@@ -606,7 +606,7 @@ function handleCustomAvatarUpload(event) {
     localStorage.setItem(`journall_user_custom_avatar_${userUid}`, dataUrl);
     localStorage.setItem('journall_user_custom_avatar', dataUrl);
     renderUserProfile();
-    alert('✓ Profile picture updated successfully!');
+    alert('âœ“ Profile picture updated successfully!');
   };
   reader.readAsDataURL(file);
 }
@@ -618,7 +618,7 @@ function handleLiveUsernameInput(val) {
 
   if (count >= 2) {
     if (badge) {
-      badge.textContent = '⚠️ Name change limit reached (2/2 changes used this month)';
+      badge.textContent = 'âš ï¸ Name change limit reached (2/2 changes used this month)';
       badge.style.color = '#f87171';
     }
   } else {
@@ -656,7 +656,7 @@ function saveCustomUsername() {
 
   const count = getNameChangesThisMonthCount();
   if (count >= 2) {
-    alert('⚠️ Name change limit reached!
+    alert('âš ï¸ Name change limit reached!
 
 You can only change your display name 2 times per month.
 Your next name change will be available on the 1st of next month.');
@@ -672,7 +672,7 @@ Your next name change will be available on the 1st of next month.');
   const newCount = getNameChangesThisMonthCount();
   const remaining = Math.max(0, 2 - newCount);
 
-  alert(`✓ Display name updated to "${val}"!
+  alert(`âœ“ Display name updated to "${val}"!
 
 Name changes remaining this month: ${remaining} of 2.`);
   renderUserProfile();
@@ -2673,6 +2673,87 @@ tr:hover {
   margin-top: 0 !important;
 }
 
+
+/* JOURNALL_BRAND_AND_LOGO_ALIGNMENT_FIX */
+.sidebar .brand {
+  display: flex !important;
+  align-items: center !important;
+  gap: 12px !important;
+  padding: 14px 16px !important;
+  margin-bottom: 18px !important;
+  background: rgba(255, 255, 255, 0.03) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-radius: 16px !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+.sidebar .logo {
+  width: 38px !important;
+  height: 38px !important;
+  min-width: 38px !important;
+  min-height: 38px !important;
+  border-radius: 12px !important;
+  background: linear-gradient(135deg, #1e1b4b, #0f172a) !important;
+  border: 1px solid rgba(168, 85, 247, 0.35) !important;
+  display: grid !important;
+  place-items: center !important;
+  position: relative !important;
+  box-shadow: 0 4px 16px rgba(168, 85, 247, 0.25) !important;
+  flex-shrink: 0 !important;
+}
+
+.sidebar .logo::before {
+  content: "J" !important;
+  color: #ffffff !important;
+  font-family: Inter, -apple-system, sans-serif !important;
+  font-size: 19px !important;
+  font-weight: 800 !important;
+  line-height: 1 !important;
+}
+
+.sidebar .logo::after {
+  content: "" !important;
+  position: absolute !important;
+  width: 18px !important;
+  height: 2.5px !important;
+  right: 6px !important;
+  bottom: 9px !important;
+  background: #22c55e !important;
+  border-radius: 999px !important;
+  transform: rotate(-25deg) !important;
+  box-shadow: 0 0 8px rgba(34, 197, 94, 0.8) !important;
+}
+
+.sidebar .brand-text {
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+  overflow: hidden !important;
+}
+
+.sidebar .brand-title {
+  font-family: Inter, -apple-system, sans-serif !important;
+  font-size: 16px !important;
+  font-weight: 700 !important;
+  color: #ffffff !important;
+  line-height: 1.2 !important;
+  letter-spacing: -0.01em !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  white-space: nowrap !important;
+}
+
+.sidebar .brand-sub {
+  font-family: Inter, -apple-system, sans-serif !important;
+  font-size: 11px !important;
+  font-weight: 400 !important;
+  color: #94a3b8 !important;
+  line-height: 1.2 !important;
+  margin-top: 3px !important;
+  white-space: nowrap !important;
+}
+
 </style>
 <style id="journall-trading-dashboard-sync">
 .account-sync-note{margin:0 0 14px!important;color:rgba(255,255,255,.56)!important;font-size:13px!important;line-height:1.5!important}
@@ -3302,7 +3383,7 @@ tr:hover {
     <div class="setup-section">
       <div class="setup-section-label">Synced account</div><p id="accountSyncNote" class="account-sync-note">Account size and phase are configured here. Your current balance is automatically calculated and updated in real time from your synced trades.</p>
       <div class="account-form-grid">
-        <label>Initial account balance ($)<div class="stepper-control"><button type="button" class="stepper-btn minus" onclick="stepInput('accountSizeInput', -1, 'renderAccountSetupPreview')">−</button><input id="accountSizeInput" class="account-source-input" type="number" min="1" step="100" placeholder="Enter a value" oninput="renderAccountSetupPreview()"><button type="button" class="stepper-btn plus" onclick="stepInput('accountSizeInput', 1, 'renderAccountSetupPreview')">+</button></div></label>
+        <label>Initial account balance ($)<div class="stepper-control"><button type="button" class="stepper-btn minus" onclick="stepInput('accountSizeInput', -1, 'renderAccountSetupPreview')">âˆ’</button><input id="accountSizeInput" class="account-source-input" type="number" min="1" step="100" placeholder="Enter a value" oninput="renderAccountSetupPreview()"><button type="button" class="stepper-btn plus" onclick="stepInput('accountSizeInput', 1, 'renderAccountSetupPreview')">+</button></div></label>
         <label>Account phase<select id="accountPhaseInput" class="account-source-input" onchange="toggleFundedFields()"><option>Phase 1</option><option>Phase 2</option><option>Funded</option><option>Personal</option></select></label>
       </div>
     </div>
@@ -3310,17 +3391,17 @@ tr:hover {
     <div class="setup-section">
       <div class="setup-section-label">Targets</div>
       <div class="account-form-grid">
-        <label>Profit target<div class="account-inline-field"><div class="stepper-control"><button type="button" class="stepper-btn minus" onclick="stepInput('profitTargetInput', -1, 'renderAccountSetupPreview')">−</button><input id="profitTargetInput" type="number" min="0" step="1" placeholder="Enter a value" oninput="renderAccountSetupPreview()"><button type="button" class="stepper-btn plus" onclick="stepInput('profitTargetInput', 1, 'renderAccountSetupPreview')">+</button></div><select id="profitTargetType" onchange="renderAccountSetupPreview()"><option value="percent">%</option><option value="amount">$</option></select></div></label>
-        <label>Phase deadline (optional)<input id="phaseDeadlineInput" type="date"></label><label>Max trades per day<div class="stepper-control"><button type="button" class="stepper-btn minus" onclick="stepInput('maxTradesInput', -1, 'renderAccountSetupPreview')">−</button><input id="maxTradesInput" type="number" min="1" step="1" placeholder="Enter a value" oninput="renderAccountSetupPreview()"><button type="button" class="stepper-btn plus" onclick="stepInput('maxTradesInput', 1, 'renderAccountSetupPreview')">+</button></div></label>
+        <label>Profit target<div class="account-inline-field"><div class="stepper-control"><button type="button" class="stepper-btn minus" onclick="stepInput('profitTargetInput', -1, 'renderAccountSetupPreview')">âˆ’</button><input id="profitTargetInput" type="number" min="0" step="1" placeholder="Enter a value" oninput="renderAccountSetupPreview()"><button type="button" class="stepper-btn plus" onclick="stepInput('profitTargetInput', 1, 'renderAccountSetupPreview')">+</button></div><select id="profitTargetType" onchange="renderAccountSetupPreview()"><option value="percent">%</option><option value="amount">$</option></select></div></label>
+        <label>Phase deadline (optional)<input id="phaseDeadlineInput" type="date"></label><label>Max trades per day<div class="stepper-control"><button type="button" class="stepper-btn minus" onclick="stepInput('maxTradesInput', -1, 'renderAccountSetupPreview')">âˆ’</button><input id="maxTradesInput" type="number" min="1" step="1" placeholder="Enter a value" oninput="renderAccountSetupPreview()"><button type="button" class="stepper-btn plus" onclick="stepInput('maxTradesInput', 1, 'renderAccountSetupPreview')">+</button></div></label>
       </div>
     </div>
 
     <div class="setup-section">
       <div class="setup-section-label">Risk limits</div>
       <div class="account-form-grid">
-        <label>Risk per trade<div class="account-inline-field"><div class="stepper-control"><button type="button" class="stepper-btn minus" onclick="stepInput('riskPercentInput', -1, 'renderAccountSetupPreview')">−</button><input id="riskPercentInput" type="number" min="0.5" max="2" step="0.1" placeholder="Enter a value" oninput="renderAccountSetupPreview()"><button type="button" class="stepper-btn plus" onclick="stepInput('riskPercentInput', 1, 'renderAccountSetupPreview')">+</button></div><span>%</span></div></label><label>Minimum RR<div class="stepper-control"><button type="button" class="stepper-btn minus" onclick="stepInput('minRrInput', -1, 'renderAccountSetupPreview')">−</button><input id="minRrInput" type="number" min="1" step="0.5" placeholder="Enter a value" oninput="renderAccountSetupPreview()"><button type="button" class="stepper-btn plus" onclick="stepInput('minRrInput', 1, 'renderAccountSetupPreview')">+</button></div></label>
-        <label>Max daily loss<div class="account-inline-field"><div class="stepper-control"><button type="button" class="stepper-btn minus" onclick="stepInput('maxDailyLossInput', -1, 'renderAccountSetupPreview')">−</button><input id="maxDailyLossInput" type="number" min="0" step="1" placeholder="Enter a value" oninput="renderAccountSetupPreview()"><button type="button" class="stepper-btn plus" onclick="stepInput('maxDailyLossInput', 1, 'renderAccountSetupPreview')">+</button></div><select id="maxDailyLossType" onchange="renderAccountSetupPreview()"><option value="percent">%</option><option value="amount">$</option></select></div></label>
-        <label>Max overall drawdown<div class="account-inline-field"><div class="stepper-control"><button type="button" class="stepper-btn minus" onclick="stepInput('maxDrawdownInput', -1, 'renderAccountSetupPreview')">−</button><input id="maxDrawdownInput" type="number" min="0" step="1" placeholder="Enter a value" oninput="renderAccountSetupPreview()"><button type="button" class="stepper-btn plus" onclick="stepInput('maxDrawdownInput', 1, 'renderAccountSetupPreview')">+</button></div><select id="maxDrawdownType" onchange="renderAccountSetupPreview()"><option value="percent">%</option><option value="amount">$</option></select></div></label>
+        <label>Risk per trade<div class="account-inline-field"><div class="stepper-control"><button type="button" class="stepper-btn minus" onclick="stepInput('riskPercentInput', -1, 'renderAccountSetupPreview')">âˆ’</button><input id="riskPercentInput" type="number" min="0.5" max="2" step="0.1" placeholder="Enter a value" oninput="renderAccountSetupPreview()"><button type="button" class="stepper-btn plus" onclick="stepInput('riskPercentInput', 1, 'renderAccountSetupPreview')">+</button></div><span>%</span></div></label><label>Minimum RR<div class="stepper-control"><button type="button" class="stepper-btn minus" onclick="stepInput('minRrInput', -1, 'renderAccountSetupPreview')">âˆ’</button><input id="minRrInput" type="number" min="1" step="0.5" placeholder="Enter a value" oninput="renderAccountSetupPreview()"><button type="button" class="stepper-btn plus" onclick="stepInput('minRrInput', 1, 'renderAccountSetupPreview')">+</button></div></label>
+        <label>Max daily loss<div class="account-inline-field"><div class="stepper-control"><button type="button" class="stepper-btn minus" onclick="stepInput('maxDailyLossInput', -1, 'renderAccountSetupPreview')">âˆ’</button><input id="maxDailyLossInput" type="number" min="0" step="1" placeholder="Enter a value" oninput="renderAccountSetupPreview()"><button type="button" class="stepper-btn plus" onclick="stepInput('maxDailyLossInput', 1, 'renderAccountSetupPreview')">+</button></div><select id="maxDailyLossType" onchange="renderAccountSetupPreview()"><option value="percent">%</option><option value="amount">$</option></select></div></label>
+        <label>Max overall drawdown<div class="account-inline-field"><div class="stepper-control"><button type="button" class="stepper-btn minus" onclick="stepInput('maxDrawdownInput', -1, 'renderAccountSetupPreview')">âˆ’</button><input id="maxDrawdownInput" type="number" min="0" step="1" placeholder="Enter a value" oninput="renderAccountSetupPreview()"><button type="button" class="stepper-btn plus" onclick="stepInput('maxDrawdownInput', 1, 'renderAccountSetupPreview')">+</button></div><select id="maxDrawdownType" onchange="renderAccountSetupPreview()"><option value="percent">%</option><option value="amount">$</option></select></div></label>
       </div>
     </div>
 
@@ -3347,7 +3428,7 @@ tr:hover {
     </div>
   </div>
   <aside class="sidebar">
-    <div class="brand"><div class="logo" aria-hidden="true"></div><div><h1 class="title">Journal</h1><div class="brand-sub">Trading command center</div></div><button id="theme-toggle" style="cursor:pointer; padding: 8px; border-radius: 50%;">🌙</button></div>
+    <div class="brand"><div class="logo" aria-hidden="true"></div><div class="brand-text"><div class="brand-title">Journall</div><div class="brand-sub">Trading command center</div></div></div>
     <div class="sidebar-profile-card" onclick="selectTab('userprofile')">
       <img id="sidebarAvatarImg" class="sidebar-avatar-img" src="https://lh3.googleusercontent.com/a/default-user" onerror="this.src='https://ui-avatars.com/api/?name=Trader&background=a855f7&color=fff'" alt="User">
       <div class="sidebar-profile-info">
@@ -3400,13 +3481,13 @@ tr:hover {
         <div style="display:flex; align-items:center; gap:24px; flex-wrap:wrap;">
           <div class="avatar-upload-container" style="position:relative; cursor:pointer;" onclick="document.getElementById('customAvatarInput').click()" title="Click to change profile picture">
             <img id="userProfileAvatar" src="https://lh3.googleusercontent.com/a/default-user" onerror="this.src='https://ui-avatars.com/api/?name=Trader&background=a855f7&color=fff'" alt="Google Profile" style="width:90px; height:90px; border-radius:50%; border:3px solid #a855f7; object-fit:cover; box-shadow:0 0 25px rgba(168,85,247,0.4);">
-            <div class="avatar-upload-badge">📷</div>
+            <div class="avatar-upload-badge">ðŸ“·</div>
             <input type="file" id="customAvatarInput" accept="image/*" style="display:none;" onchange="handleCustomAvatarUpload(event)">
           </div>
           <div style="flex:1;">
             <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
               <h2 style="margin:0; font-size:26px; color:#fff;" id="userProfileName">krishna</h2>
-              <span class="badge" style="background:rgba(34,197,94,0.15); color:#4ade80; border:1px solid rgba(34,197,94,0.3); padding:4px 12px; border-radius:9999px; font-size:11px; font-weight:700;">✓ GOOGLE ACCOUNT AUTHORIZED</span>
+              <span class="badge" style="background:rgba(34,197,94,0.15); color:#4ade80; border:1px solid rgba(34,197,94,0.3); padding:4px 12px; border-radius:9999px; font-size:11px; font-weight:700;">âœ“ GOOGLE ACCOUNT AUTHORIZED</span>
             </div>
             <p style="margin:6px 0 0 0; font-size:15px; color:#94a3b8;" id="userProfileEmail">krishnacnjack@gmail.com</p>
             <div style="margin-top:10px; font-size:12px; color:#cbd5e1;" id="userProfileMeta">Active Session &bull; Verified Trader Account</div>
@@ -4186,7 +4267,7 @@ tr:hover {
 
 <script>
 /* --------------------------------------------------------------
-   AUTO‑SYNC WITH LOCAL MT5 SERVER (runs on http://localhost:3000)
+   AUTOâ€‘SYNC WITH LOCAL MT5 SERVER (runs on http://localhost:3000)
    -------------------------------------------------------------- */
 (function() {
     document.addEventListener('DOMContentLoaded', () => {
@@ -4233,12 +4314,12 @@ tr:hover {
                 } else {
                     location.reload();
                 }
-                console.info(`Auto‑sync: added ${added} new trade(s) from MT5.`);
+                console.info(`Autoâ€‘sync: added ${added} new trade(s) from MT5.`);
             } else {
-                console.info('Auto‑sync: no new trades to add.');
+                console.info('Autoâ€‘sync: no new trades to add.');
             }
         } catch (err) {
-            console.warn('Auto‑sync with MT5 failed:', err);
+            console.warn('Autoâ€‘sync with MT5 failed:', err);
         }
     }
 })();
@@ -6230,7 +6311,7 @@ function riskCalculatorMarkup(metrics){
   const pipValue = toNumber(localStorage.getItem('journall_risk_pip_value'), 1);
   const riskAmount = metrics.accountSize * config.riskPercent / 100;
   const positionSize = slPips > 0 && pipValue > 0 ? riskAmount / (slPips * pipValue) : 0;
-  return `<div class="goal-card risk-calc-card"><div class="goal-card-label">Risk Calculator</div><div class="goal-card-value neutral">$${riskAmount.toFixed(2)} risk</div><div class="risk-calc-grid"><label>SL pips<div class="stepper-control"><button type="button" class="stepper-btn minus" onclick="stepInput('riskSlPipsInput', -1, 'updateRiskCalculator')">−</button><input id="riskSlPipsInput" type="number" min="1" step="1" value="${slPips}" oninput="updateRiskCalculator()"><button type="button" class="stepper-btn plus" onclick="stepInput('riskSlPipsInput', 1, 'updateRiskCalculator')">+</button></div></label><label>Pip value<div class="stepper-control"><button type="button" class="stepper-btn minus" onclick="stepInput('riskPipValueInput', -1, 'updateRiskCalculator')">−</button><input id="riskPipValueInput" type="number" min="0.01" step="0.01" value="${pipValue}" oninput="updateRiskCalculator()"><button type="button" class="stepper-btn plus" onclick="stepInput('riskPipValueInput', 1, 'updateRiskCalculator')">+</button></div></label></div><div class="goal-card-sub">Position size: <strong>${positionSize.toFixed(3)}</strong>. Formula: account size x ${config.riskPercent}% / (SL pips x pip value).</div></div>`;
+  return `<div class="goal-card risk-calc-card"><div class="goal-card-label">Risk Calculator</div><div class="goal-card-value neutral">$${riskAmount.toFixed(2)} risk</div><div class="risk-calc-grid"><label>SL pips<div class="stepper-control"><button type="button" class="stepper-btn minus" onclick="stepInput('riskSlPipsInput', -1, 'updateRiskCalculator')">âˆ’</button><input id="riskSlPipsInput" type="number" min="1" step="1" value="${slPips}" oninput="updateRiskCalculator()"><button type="button" class="stepper-btn plus" onclick="stepInput('riskSlPipsInput', 1, 'updateRiskCalculator')">+</button></div></label><label>Pip value<div class="stepper-control"><button type="button" class="stepper-btn minus" onclick="stepInput('riskPipValueInput', -1, 'updateRiskCalculator')">âˆ’</button><input id="riskPipValueInput" type="number" min="0.01" step="0.01" value="${pipValue}" oninput="updateRiskCalculator()"><button type="button" class="stepper-btn plus" onclick="stepInput('riskPipValueInput', 1, 'updateRiskCalculator')">+</button></div></label></div><div class="goal-card-sub">Position size: <strong>${positionSize.toFixed(3)}</strong>. Formula: account size x ${config.riskPercent}% / (SL pips x pip value).</div></div>`;
 }
 function stepInput(id, delta, callbackName){
   const el = document.getElementById(id);
@@ -6292,7 +6373,7 @@ function renderPropChallengeDashboard(){
     bannerHtml = `
       <div class="unjournaled-banner">
         <div class="unjournaled-banner-left">
-          <div class="unjournaled-badge">📝 ${unjournaledCount} TRADES AWAITING JOURNAL</div>
+          <div class="unjournaled-badge">ðŸ“ ${unjournaledCount} TRADES AWAITING JOURNAL</div>
           <h3>${unjournaledCount} Trades Left to Journal</h3>
           <p>Complete your setup tags, rule checks, and lessons for newly synced trades to build your discipline score.</p>
         </div>
@@ -6446,7 +6527,7 @@ async function autoSyncSavedBrokerOnce(force = false){
   const platform = settings.platform || 'mt5';
   if (!settings || !platform) return false;
   if (!force && sessionStorage.getItem(getBrokerSyncAutoFlagKey()) === '1') return false;
-  if (!settings.login && !settings.server && !settings.matchtraderUrl && !settings.matchtraderEmail && !settings.ctraderToken) return false;
+  if (platform !== 'mt5' && !settings.login && !settings.server && !settings.matchtraderUrl && !settings.matchtraderEmail && !settings.ctraderToken) return false;
 
   sessionStorage.setItem(getBrokerSyncAutoFlagKey(), '1');
   const platformEl = document.getElementById('brokerPlatformSelect');
@@ -6855,7 +6936,7 @@ function parseFundingPipsMt5History(text){
       .filter(row => row.some(Boolean));
 
     for(let headerIndex=0; headerIndex<rows.length; headerIndex++){
-      const headers = rows[headerIndex].map(h => String(h || '').replace(/^﻿/,'').trim());
+      const headers = rows[headerIndex].map(h => String(h || '').replace(/^ï»¿/,'').trim());
       const headerMap = buildHeaderMap(headers);
       const headerNames = ['Time','Open Time','Close Time','Date','Symbol','Instrument','Profit','P&L','PnL','Side','Direction','Deal','Ticket','Order'];
       const hasAnyUsefulHeader = headerNames.some(name => headerMap[normalizeHeaderName(name)] !== undefined);
@@ -7322,10 +7403,10 @@ function onBrokerPlatformChange(){
 
   if(platform === 'matchtrader'){
     if(btnText) btnText.textContent = 'Sync from MatchTrader (Cloud)';
-    if(status) status.innerHTML = '☁️ <strong>Direct Cloud Sync:</strong> Enter your MatchTrader URL and credentials. 100% online, no downloads needed!';
+    if(status) status.innerHTML = 'â˜ï¸ <strong>Direct Cloud Sync:</strong> Enter your MatchTrader URL and credentials. 100% online, no downloads needed!';
   } else if(platform === 'ctrader'){
     if(btnText) btnText.textContent = 'Sync from cTrader (Cloud)';
-    if(status) status.innerHTML = '☁️ <strong>Direct Cloud Sync:</strong> Enter your cTrader Access Token. Works on desktop and phone through the Journall cloud sync Worker.';
+    if(status) status.innerHTML = 'â˜ï¸ <strong>Direct Cloud Sync:</strong> Enter your cTrader Access Token. Works on desktop and phone through the Journall cloud sync Worker.';
   } else if(platform === 'mt5'){
     const isLocalHost = window.location.hostname === '127.0.0.1' || window.location.hostname === 'localhost';
     const isMobileBroker = isMobileBrokerDevice();
@@ -7641,10 +7722,14 @@ function isMt5TerminalSetupError(err){
     message.includes('terminal') ||
     message.includes('initialize') ||
     message.includes('not installed') ||
+    message.includes('python with metatrader5') ||
+    message.includes('metatrader5 installed') ||
     message.includes('access is denied');
 }
 
 function showMt5TerminalInstallMessage(status, rawMessage=''){
+  const requiresPythonConnector = String(rawMessage || '').toLowerCase().includes('python with metatrader5') ||
+    String(rawMessage || '').toLowerCase().includes('metatrader5 installed');
   const safeMessage = String(rawMessage || '').replace(/[<>&"]/g, ch => ({
     '<': '&lt;',
     '>': '&gt;',
@@ -7654,22 +7739,23 @@ function showMt5TerminalInstallMessage(status, rawMessage=''){
   if (!status) return;
   status.innerHTML = `
     <div style="background:#050505;border:1px solid rgba(255,255,255,.12);border-left:3px solid #5e6ad2;border-radius:12px;padding:16px 18px;line-height:1.45;">
-      <strong style="display:block;color:#fff;margin-bottom:8px;">MetaTrader 5 terminal is required for direct MT5 sync.</strong>
+      <strong style="display:block;color:#fff;margin-bottom:8px;">${requiresPythonConnector ? 'The desktop MT5 connector needs one-time setup.' : 'MetaTrader 5 terminal is required for direct MT5 sync.'}</strong>
       <div style="color:rgba(255,255,255,.72);font-size:14px;margin-bottom:12px;">
-        Download the MT5 terminal from the web, install it, then log in using your MT5 account ID, password, and broker server. Keep MT5 open, then click Sync from MetaTrader 5 again.
+        ${requiresPythonConnector
+          ? 'Install Python 3.11 or 3.12, run <code>py -3 -m pip install MetaTrader5</code> once, then keep the MT5 terminal open and signed in before syncing.'
+          : 'Download the MT5 terminal from the web, install it, then log in using your MT5 account ID, password, and broker server. Keep MT5 open, then click Sync from MetaTrader 5 again.'}
       </div>
       ${safeMessage ? `<div style="color:rgba(255,255,255,.45);font-size:12px;margin-bottom:12px;">Details: ${safeMessage}</div>` : ''}
-      <button type="button" class="btn primary" onclick="window.open(MT5_DOWNLOAD_URL, '_blank', 'noopener,noreferrer')" style="margin:0;display:inline-flex;align-items:center;justify-content:center;">
-        Download MT5 Terminal
+      <button type="button" class="btn primary" onclick="window.open('${requiresPythonConnector ? 'https://www.python.org/downloads/windows/' : MT5_DOWNLOAD_URL}', '_blank', 'noopener,noreferrer')" style="margin:0;display:inline-flex;align-items:center;justify-content:center;">
+        ${requiresPythonConnector ? 'Download Python' : 'Download MT5 Terminal'}
       </button>
     </div>`;
 }
-async function triggerBrokerSync(){
+async function triggerBrokerSync(options = {}) {
   const platform = document.getElementById('brokerPlatformSelect')?.value || 'mt5';
   const status = document.getElementById('brokerSyncStatus');
   const btn = document.getElementById('btnBrokerSync');
-  const btnText = document.getElementById('btnBrokerSyncText');
-  const days = document.getElementById('brokerSyncDays').value;
+  const days = document.getElementById('brokerSyncDays')?.value || '30';
 
   const platformNames = {
     mt5: 'MetaTrader 5',
@@ -7677,6 +7763,20 @@ async function triggerBrokerSync(){
     ctrader: 'cTrader'
   };
   const pName = platformNames[platform] || 'Broker';
+  const isLocalHost = window.location.hostname === '127.0.0.1' || window.location.hostname === 'localhost';
+  const isMobileBroker = isMobileBrokerDevice();
+
+  const settingsSnapshot = saveBrokerSyncSettings({
+    platform,
+    days: parseInt(days, 10) || 30,
+    login: document.getElementById('brokerSyncLogin')?.value.trim() || '',
+    server: document.getElementById('brokerSyncServer')?.value.trim() || '',
+    matchtraderUrl: document.getElementById('matchtraderUrl')?.value.trim() || '',
+    matchtraderEmail: document.getElementById('matchtraderEmail')?.value.trim() || '',
+    matchtraderPassword: document.getElementById('matchtraderPassword')?.value.trim() || '',
+    ctraderToken: document.getElementById('ctraderToken')?.value.trim() || '',
+    ctraderAccountId: document.getElementById('ctraderAccountId')?.value.trim() || ''
+  });
 
   if (status) status.innerHTML = `<strong>Connecting to ${pName}...</strong>`;
   if (btn) {
@@ -7684,117 +7784,121 @@ async function triggerBrokerSync(){
     btn.innerHTML = `<div class="spinner-mini" style="margin-right:8px;"></div><span>Syncing...</span>`;
   }
 
-  const payload = { platform, days: parseInt(days) };
-
-  const isLocalHost = window.location.hostname === '127.0.0.1' || window.location.hostname === 'localhost';
-  const isMobileBroker = isMobileBrokerDevice();
+  const payload = { platform, days: settingsSnapshot.days };
 
   if (platform === 'mt5') {
-    if (!isLocalHost || isMobileBroker) {
+    if (isMobileBroker) {
       if (status) {
         status.innerHTML =
-          `<strong>MT5 direct sync needs your local PC.</strong><br>` +
-          `Open Journall locally from your laptop with Journall App.bat, then use Sync from MetaTrader 5. A phone cannot directly read your desktop MT5 terminal.`;
+          `<strong>MT5 direct sync needs your laptop.</strong><br>` +
+          `A phone cannot read your desktop MetaTrader terminal. Sync once on the laptop, then your Google account will show those saved trades on this phone.`;
       }
-      alert('MT5 direct sync works only on the laptop/PC where MT5 and Journall App.bat are running. On mobile, direct desktop MT5 sync is not available.');
+      alert('MT5 direct sync works only on the laptop/PC where MetaTrader 5 is installed. Sync once there, then reopen Journall on your phone with the same Google account.');
       if (btn) {
         btn.disabled = false;
         btn.innerHTML = `<span>Sync from MetaTrader 5</span>`;
       }
       return;
     }
-    const login = document.getElementById('brokerSyncLogin')?.value.trim();
-    const server = document.getElementById('brokerSyncServer')?.value.trim();
-    if (login) payload.login = login;
-    if (server) payload.server = server;
+    if (settingsSnapshot.login) payload.login = settingsSnapshot.login;
+    if (settingsSnapshot.server) payload.server = settingsSnapshot.server;
   } else if (platform === 'matchtrader') {
-    const url = document.getElementById('matchtraderUrl')?.value.trim();
-    const login = document.getElementById('matchtraderEmail')?.value.trim();
-    const password = document.getElementById('matchtraderPassword')?.value.trim();
-    if (!url || !login || !password) {
+    if (!settingsSnapshot.matchtraderUrl || !settingsSnapshot.matchtraderEmail || !settingsSnapshot.matchtraderPassword) {
       alert('Please fill in your MatchTrader Platform URL, Email/Username, and Password.');
-      if (btn) { btn.disabled = false; if (btnText) btnText.textContent = `Sync from ${pName}`; }
+      if (btn) { btn.disabled = false; btn.innerHTML = `<span>Sync from ${pName}</span>`; }
       if (status) status.innerHTML = `<strong>Sync failed:</strong> Missing MatchTrader credentials.`;
       return;
     }
-    payload.url = url;
-    payload.login = login;
-    payload.password = password;
+    payload.url = settingsSnapshot.matchtraderUrl;
+    payload.login = settingsSnapshot.matchtraderEmail;
+    payload.password = settingsSnapshot.matchtraderPassword;
   } else if (platform === 'ctrader') {
-    const token = document.getElementById('ctraderToken')?.value.trim();
-    const accountId = document.getElementById('ctraderAccountId')?.value.trim();
-    if (!token) {
+    if (!settingsSnapshot.ctraderToken) {
       alert('Please fill in your cTrader Access Token.');
-      if (btn) { btn.disabled = false; if (btnText) btnText.textContent = `Sync from ${pName}`; }
+      if (btn) { btn.disabled = false; btn.innerHTML = `<span>Sync from ${pName}</span>`; }
       if (status) status.innerHTML = `<strong>Sync failed:</strong> Missing cTrader Access Token.`;
       return;
     }
-    payload.token = token;
-    if (accountId) payload.accountId = accountId;
+    payload.token = settingsSnapshot.ctraderToken;
+    if (settingsSnapshot.ctraderAccountId) payload.accountId = settingsSnapshot.ctraderAccountId;
   }
-  const syncApiUrl = isLocalHost ? '/api/sync-broker' : 'http://localhost:8787/api/sync-broker';
+
+  const syncApiCandidates = isLocalHost
+    ? ['/api/sync-broker', 'http://localhost:8787/api/sync-broker']
+    : ['http://localhost:8787/api/sync-broker'];
 
   let parsed = [];
   try {
-    // 1. Try local server bridge / backend sync first (No CORS issues!)
     let backendSuccess = false;
-    const canUseLocalBridge = isLocalHost || (!isMobileBroker && platform !== 'ctrader');
+    const canUseLocalBridge = !isMobileBroker && (platform === 'mt5' || platform === 'matchtrader');
     try {
       if (!canUseLocalBridge) throw new Error('Local desktop bridge is not available on this device.');
-      const res = await fetch(syncApiUrl, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      });
-      const data = await res.json().catch(() => ({}));
-      if (res.ok && !data.error) {
-        parsed = data.trades || [];
-        backendSuccess = true;
-      } else if (data.error && platform === 'mt5') {
-        throw new Error(data.error);
+
+      let bridgeError = null;
+      for (const syncApiUrl of syncApiCandidates) {
+        try {
+          const res = await fetch(syncApiUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          });
+          const data = await res.json().catch(() => ({}));
+          if (res.ok && !data.error) {
+            parsed = data.trades || [];
+            backendSuccess = true;
+            bridgeError = null;
+            break;
+          }
+          bridgeError = new Error(data.error || `${res.status} ${res.statusText}`);
+        } catch (err) {
+          bridgeError = err;
+        }
       }
+
+      if (!backendSuccess && bridgeError && platform === 'mt5') throw bridgeError;
     } catch(err) {
       if (platform === 'mt5') {
         throw new Error(err.message || `Local server bridge is not running on your PC (http://localhost:8787).\n\nTo sync directly from MT5:\n1. Keep MetaTrader 5 open on this PC.\n2. Double-click 'Journall App.bat'.\n3. Open the local Journall link and click Sync from MetaTrader 5 again.`);
       }
     }
 
-    // 2. If backend sync was not used, fallback to client-side Web Cloud Sync
     if (!backendSuccess) {
       if (platform === 'matchtrader') {
-        const url = document.getElementById('matchtraderUrl')?.value.trim();
-        const email = document.getElementById('matchtraderEmail')?.value.trim();
-        const pwd = document.getElementById('matchtraderPassword')?.value.trim();
-        parsed = await syncMatchTraderWeb(url, email, pwd, parseInt(days));
+        parsed = await syncMatchTraderWeb(
+          settingsSnapshot.matchtraderUrl,
+          settingsSnapshot.matchtraderEmail,
+          settingsSnapshot.matchtraderPassword,
+          settingsSnapshot.days
+        );
       } else if (platform === 'ctrader') {
-        const token = document.getElementById('ctraderToken')?.value.trim();
-        const accId = document.getElementById('ctraderAccountId')?.value.trim();
         try {
-          parsed = await syncCTraderViaWorker(token, accId, parseInt(days));
+          parsed = await syncCTraderViaWorker(settingsSnapshot.ctraderToken, settingsSnapshot.ctraderAccountId, settingsSnapshot.days);
         } catch (cloudErr) {
           if (isMobileBroker || !isLocalHost) throw cloudErr;
-          parsed = await syncCTraderWeb(token, accId, parseInt(days));
+          parsed = await syncCTraderWeb(settingsSnapshot.ctraderToken, settingsSnapshot.ctraderAccountId, settingsSnapshot.days);
         }
       }
     }
+
+    saveBrokerSyncSettings({ ...settingsSnapshot, lastSynced: new Date().toISOString(), date: new Date().toLocaleDateString() });
+
     if (!parsed.length) {
-      if (status) status.innerHTML = `<strong>Sync complete.</strong><br>No new trades found in the last ${days} days.`;
+      if (status) status.innerHTML = `<strong>Sync complete.</strong><br>No new trades found in the last ${settingsSnapshot.days} days. Your broker settings are saved for automatic sync next time.`;
       alert(`No new closed trades found in your ${pName} account for the selected window.`);
       return;
     }
-
-    const previousCount = Array.isArray(trades) ? trades.length : 0;
 
     trades = mergeImportedTrades(trades, parsed);
     filtered = [...trades];
     saveTrades();
 
-    const loginVal = document.getElementById('mt5Login')?.value.trim() || document.getElementById('matchtraderEmail')?.value.trim() || 'Active Account';
-    const serverVal = document.getElementById('mt5Server')?.value.trim() || document.getElementById('matchtraderUrl')?.value.trim() || 'Broker Server';
+    const loginVal = settingsSnapshot.login || settingsSnapshot.matchtraderEmail || settingsSnapshot.ctraderAccountId || 'Active Account';
+    const serverVal = settingsSnapshot.server || settingsSnapshot.matchtraderUrl || 'Broker Server';
     saveSyncedBrokerInfo(pName, loginVal, serverVal);
+    saveBrokerSyncSettings({ ...settingsSnapshot, lastSynced: new Date().toISOString(), date: new Date().toLocaleDateString() });
 
     tradingPageTrades = mergeImportedTrades(tradingPageTrades, parsed);
-    localStorage.setItem('viztrade_trading_page_trades', JSON.stringify(tradingPageTrades));
+    persistTradeStores(tradingPageTrades);
 
     if (status) {
       status.innerHTML = `<strong>Sync successful!</strong><br>Imported: ${parsed.length} trades from ${pName}.<br>Total journal trades: ${trades.length}.`;
@@ -7809,33 +7913,28 @@ async function triggerBrokerSync(){
     renderJournalPage();
     resizeChartsSoon();
 
-    if (typeof scheduleCloudSave === 'function') {
-      scheduleCloudSave();
-    }
+    if (typeof scheduleCloudSave === 'function') scheduleCloudSave();
   } catch (err) {
     console.error(`${pName} sync failed:`, err);
     if (platform === 'mt5' && isMt5TerminalSetupError(err)) {
       showMt5TerminalInstallMessage(status, err.message || err);
     } else {
-      if (status) {
-        status.innerHTML = `<strong style="color:var(--red);">Sync failed:</strong> ${err.message || err}`;
-      }
+      if (status) status.innerHTML = `<strong style="color:var(--red);">Sync failed:</strong> ${err.message || err}`;
       alert(`Sync failed: ${err.message || err}`);
     }
   } finally {
     if (btn) {
       btn.disabled = false;
       if (parsed && parsed.length > 0) {
-        btn.innerHTML = `<span style="display:inline-flex; align-items:center; gap:6px; color:#4ade80;">✓ Synced (${pName})</span>`;
+        btn.innerHTML = `<span style="display:inline-flex; align-items:center; gap:6px; color:#4ade80;">âœ“ Synced (${pName})</span>`;
       } else if (status && status.innerHTML.includes('failed')) {
-        btn.innerHTML = `<span style="display:inline-flex; align-items:center; gap:6px; color:#f87171;">↻ Retry Sync (${pName})</span>`;
+        btn.innerHTML = `<span style="display:inline-flex; align-items:center; gap:6px; color:#f87171;">â†» Retry Sync (${pName})</span>`;
       } else {
         btn.innerHTML = `<span>Sync from ${pName}</span>`;
       }
     }
   }
 }
-
 
 function resetAllData(){
   const confirmReset = confirm('Reset all trade metrics and filters? This will clear imported trades, trading plans, stats charts, and metrics filters.\n\nNote: Your written journal notes/entries will NOT be touched or deleted.');
@@ -8043,7 +8142,7 @@ function renderTradingPage(){
               <div style="font-size:12px; color:#94a3b8;">${escapeHtml(brokerInfo.account)} &bull; ${escapeHtml(brokerInfo.server)} &bull; Synced at ${escapeHtml(brokerInfo.lastSynced)}</div>
             </div>
           </div>
-          <button type="button" class="btn primary" onclick="document.querySelector('[data-tab=&quot;uploaddata&quot;]')?.click()">↻ Sync Latest Deals</button>
+          <button type="button" class="btn primary" onclick="document.querySelector('[data-tab=&quot;uploaddata&quot;]')?.click()">â†» Sync Latest Deals</button>
         </div>
       `;
     } else {
@@ -8548,7 +8647,7 @@ function renderPostSessionText(text){
     } else {
       let cleanLine = trimmed
         .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-        .replace(/^\s*[-*]\s+/, '• ');
+        .replace(/^\s*[-*]\s+/, 'â€¢ ');
 
       if (currentCard) {
         currentCard.content.push(cleanLine);
@@ -9392,7 +9491,7 @@ function openNextJournalTrade(autoFromSave = false) {
   } else {
     if (autoFromSave) {
       clearJournalPageForm();
-      alert('✓ Trade journal saved! All trades in your list are now reviewed.');
+      alert('âœ“ Trade journal saved! All trades in your list are now reviewed.');
     } else {
       alert('You have reached the last trade in the list.');
     }
@@ -10205,6 +10304,10 @@ window.openSignedInJournal = function(message){
     window.journalAlreadyOpened = true;
     window.setGateVisible(false);
     if(typeof window.renderAll === 'function') window.renderAll();
+    setTimeout(() => {
+      if (typeof restoreBrokerSyncSettingsToForm === 'function') restoreBrokerSyncSettingsToForm();
+      if (typeof autoSyncSavedBrokerOnce === 'function') autoSyncSavedBrokerOnce();
+    }, 700);
     if(typeof refreshSignedInProfile === 'function') {
       refreshSignedInProfile();
       setTimeout(refreshSignedInProfile, 100);
@@ -10733,6 +10836,10 @@ async function loadCloudState(){
     window.setGateVisible(false);
     window.setAuthStatus(`Signed in as ${uName}`);
     if(typeof window.renderAll === 'function') window.renderAll();
+    setTimeout(() => {
+      if (typeof restoreBrokerSyncSettingsToForm === 'function') restoreBrokerSyncSettingsToForm();
+      if (typeof autoSyncSavedBrokerOnce === 'function') autoSyncSavedBrokerOnce();
+    }, 700);
   };
 
   finalizeSignIn();
@@ -14757,23 +14864,7 @@ body:not(.firebase-auth-required) #journallApp > .sidebar .nav button {
   </div>
 </div>
 
-<script>
-const toggle = document.getElementById('theme-toggle');
-const root = document.documentElement;
-if (localStorage.getItem('theme') === 'dark') {
-  root.setAttribute('data-theme', 'dark');
-  if (toggle) toggle.textContent = '☀️';
-}
-if (toggle) {
-  toggle.addEventListener('click', () => {
-    const isDark = root.getAttribute('data-theme') === 'dark';
-    const newTheme = isDark ? 'light' : 'dark';
-    root.setAttribute('data-theme', newTheme);
-    localStorage.setItem('theme', newTheme);
-    toggle.textContent = isDark ? '🌙' : '☀️';
-  });
-}
-</script>
+
 
 </body>
 </html>
