@@ -2842,6 +2842,118 @@ tr:hover {
   }
 }
 
+
+/* JOURNALL_BLOOMING_PURPLE_GREEN_LOGIN_AURA */
+.firebase-auth-gate {
+  background: #020305 !important;
+  display: grid !important;
+  place-items: center !important;
+  min-height: 100vh !important;
+  position: relative !important;
+  overflow: hidden !important;
+}
+
+#firebaseAuthGate .firebase-auth-card {
+  position: relative !important;
+  z-index: 10 !important;
+  background: rgba(10, 12, 16, 0.88) !important;
+  backdrop-filter: blur(32px) !important;
+  -webkit-backdrop-filter: blur(32px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.14) !important;
+  border-radius: 24px !important;
+  box-shadow: 0 0 120px rgba(168, 85, 247, 0.4),
+              0 0 160px rgba(16, 185, 129, 0.35),
+              0 30px 90px rgba(0, 0, 0, 0.95) !important;
+  margin: auto !important;
+  overflow: visible !important;
+}
+
+/* Remove any translucent container box around the signin brand and logo */
+.firebase-auth-card .signin-brand,
+.firebase-auth-card .signin-brand > div,
+#firebaseAuthGate .signin-brand,
+#firebaseAuthGate .signin-brand > div {
+  background: transparent !important;
+  background-color: transparent !important;
+  border: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  outline: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+.signin-brand {
+  margin-bottom: 24px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 14px !important;
+}
+
+/* Blooming Purple & Blue Sun Ray Aura emanating from behind login card */
+#firebaseAuthGate .firebase-auth-card::before {
+  content: "" !important;
+  position: absolute !important;
+  top: -140px !important;
+  left: -140px !important;
+  right: -140px !important;
+  bottom: -140px !important;
+  background: radial-gradient(circle at 30% 25%, rgba(168, 85, 247, 0.75) 0%, rgba(147, 51, 234, 0.45) 40%, rgba(59, 130, 246, 0.3) 65%, transparent 80%) !important;
+  border-radius: 50% !important;
+  filter: blur(70px) !important;
+  z-index: -2 !important;
+  animation: sunRayPurplePulse 6s ease-in-out infinite alternate !important;
+  pointer-events: none !important;
+}
+
+/* Blooming Emerald Green Sun Ray Aura emanating from behind login card */
+#firebaseAuthGate .firebase-auth-card::after {
+  content: "" !important;
+  position: absolute !important;
+  top: -160px !important;
+  left: -160px !important;
+  right: -160px !important;
+  bottom: -160px !important;
+  background: radial-gradient(circle at 70% 75%, rgba(16, 185, 129, 0.75) 0%, rgba(5, 150, 105, 0.45) 40%, rgba(168, 85, 247, 0.25) 65%, transparent 80%) !important;
+  border-radius: 50% !important;
+  filter: blur(80px) !important;
+  z-index: -1 !important;
+  animation: sunRayGreenPulse 7.5s ease-in-out infinite alternate !important;
+  pointer-events: none !important;
+}
+
+@keyframes sunRayPurplePulse {
+  0% {
+    transform: scale(0.9) rotate(0deg);
+    opacity: 0.75;
+  }
+  50% {
+    transform: scale(1.22) rotate(18deg);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(0.95) rotate(-12deg);
+    opacity: 0.8;
+  }
+}
+
+@keyframes sunRayGreenPulse {
+  0% {
+    transform: scale(1.12) rotate(0deg);
+    opacity: 0.8;
+  }
+  50% {
+    transform: scale(0.85) rotate(-22deg);
+    opacity: 0.95;
+  }
+  100% {
+    transform: scale(1.25) rotate(18deg);
+    opacity: 0.85;
+  }
+}
+
 </style>
 <style id="journall-trading-dashboard-sync">
 .account-sync-note{margin:0 0 14px!important;color:rgba(255,255,255,.56)!important;font-size:13px!important;line-height:1.5!important}
