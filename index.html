@@ -2980,6 +2980,85 @@ tr:hover {
   border-radius: 0 !important;
 }
 
+
+/* JOURNALL_MOUSE_CURSOR_SPOTLIGHT_AND_CLEAN_LOGO */
+.cursor-green-spotlight {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 480px !important;
+  height: 480px !important;
+  margin-top: -240px !important;
+  margin-left: -240px !important;
+  border-radius: 50% !important;
+  background: radial-gradient(circle at center, rgba(16, 185, 129, 0.75) 0%, rgba(34, 197, 94, 0.4) 35%, rgba(168, 85, 247, 0.15) 60%, transparent 75%) !important;
+  filter: blur(55px) !important;
+  pointer-events: none !important;
+  z-index: 5 !important;
+  opacity: 0;
+  transition: opacity 0.3s ease, transform 0.05s linear !important;
+  transform: translate3d(-1000px, -1000px, 0) !important;
+  will-change: transform, opacity !important;
+}
+
+.signin-brand-clean {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  margin: 0 auto 28px !important;
+  padding: 0 !important;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+.signin-symbol-wrapper {
+  position: relative !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 48px !important;
+  height: 48px !important;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  margin-bottom: 8px !important;
+}
+
+.signin-symbol-j {
+  font-family: Inter, -apple-system, sans-serif !important;
+  font-size: 26px !important;
+  font-weight: 800 !important;
+  color: #6366f1 !important;
+  line-height: 1 !important;
+  text-shadow: 0 0 16px rgba(99, 102, 241, 0.8) !important;
+}
+
+.signin-symbol-slash {
+  position: absolute !important;
+  width: 22px !important;
+  height: 3px !important;
+  right: 6px !important;
+  bottom: 8px !important;
+  background: #10b981 !important;
+  border-radius: 999px !important;
+  transform: rotate(-28deg) !important;
+  box-shadow: 0 0 14px rgba(16, 185, 129, 0.95), 0 0 28px rgba(16, 185, 129, 0.6) !important;
+}
+
+.signin-brand-title {
+  font-family: Inter, -apple-system, sans-serif !important;
+  font-size: 28px !important;
+  font-weight: 800 !important;
+  color: #ffffff !important;
+  letter-spacing: -0.02em !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  background: transparent !important;
+  border: none !important;
+}
+
 </style>
 <style id="journall-trading-dashboard-sync">
 .account-sync-note{margin:0 0 14px!important;color:rgba(255,255,255,.56)!important;font-size:13px!important;line-height:1.5!important}
@@ -3553,15 +3632,16 @@ tr:hover {
   </div>
 </div>
 <div id="firebaseAuthGate" class="firebase-auth-gate show">
+<div id="cursorGreenSpotlight" class="cursor-green-spotlight"></div>
     <div id="firebaseAuthLoading" class="login-loading"><div class="spinner" aria-hidden="true"></div><p id="firebaseAuthLoadingText">Loading Journall...</p><button id="firebaseAuthRetryBtn" class="btn primary" type="button" hidden>Retry</button></div>
 <div class="firebase-auth-card journall-signin-card" hidden>
     <section class="signin-copy" aria-label="Journall overview">
-      <div class="brand signin-brand">
-        <div class="logo" aria-hidden="true"></div>
-        <div>
-          <div class="brand-title">Journall</div>
-          <div class="brand-sub">Trading command center</div>
+      <div class="signin-brand-clean">
+        <div class="signin-symbol-wrapper">
+          <span class="signin-symbol-j">J</span>
+          <span class="signin-symbol-slash"></span>
         </div>
+        <div class="signin-brand-title">Journall</div>
       </div>
       <div class="signin-kicker">AI-powered trading journal</div>
       <h1>Sign in to Journall</h1>
