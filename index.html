@@ -304,7 +304,7 @@ function getUnjournaledTrades() {
 function openQuickJournalModal() {
   qjUnjournaledList = getUnjournaledTrades();
   if (!qjUnjournaledList.length) {
-    alert('ðŸŽ‰ All your trades are fully journaled!');
+    alert('🎉 All your trades are fully journaled!');
     return;
   }
   qjCurrentIndex = 0;
@@ -319,7 +319,7 @@ function closeQuickJournalModal() {
 function loadQuickJournalTrade() {
   if (qjCurrentIndex < 0 || qjCurrentIndex >= qjUnjournaledList.length) {
     closeQuickJournalModal();
-    alert('âœ¨ Great job! You have journaled all remaining trades.');
+    alert('✨ Great job! You have journaled all remaining trades.');
     if (typeof renderPropChallengeDashboard === 'function') renderPropChallengeDashboard();
     if (typeof renderAll === 'function') renderAll();
     return;
@@ -428,7 +428,7 @@ function renderLiveTraderControllerMarkup(metrics) {
   const isWarning = m.maxDailyLossRemaining != null && m.maxDailyLossRemaining < (m.maxDailyLossAmount * 0.25);
   
   const statusCls = isLockout ? 'lockout' : (isWarning ? 'warning' : 'ready');
-  const statusText = isLockout ? 'ðŸ”´ LOCKOUT (MAX LOSS REACHED)' : (isWarning ? 'ðŸŸ¡ RISK HIGH' : 'ðŸŸ¢ SESSION ACTIVE / READY');
+  const statusText = isLockout ? '🔴 LOCKOUT (MAX LOSS REACHED)' : (isWarning ? '🟡 RISK HIGH' : '🟢 SESSION ACTIVE / READY');
 
   return `
     <div class="live-controller-card">
@@ -447,7 +447,7 @@ function renderLiveTraderControllerMarkup(metrics) {
         </div>
         <div class="live-metric-box">
           <div class="live-metric-label">Trades Taken Today</div>
-          <div class="live-metric-val neutral">${m.todayTrades.length} / ${m.config.maxTradesPerDay || 'âˆž'}</div>
+          <div class="live-metric-val neutral">${m.todayTrades.length} / ${m.config.maxTradesPerDay || '∞'}</div>
         </div>
         <div class="live-metric-box">
           <div class="live-metric-label">Today P&L</div>
@@ -461,7 +461,7 @@ function renderLiveTraderControllerMarkup(metrics) {
 
       <div class="live-action-bar">
         <button class="btn primary" type="button" onclick="document.querySelector('[data-tab=&quot;psychology&quot;]')?.click()">Open Psychology Room</button>
-        <button class="btn" type="button" onclick="triggerCooldownPause()">ðŸ§˜ Pause 15m Cooldown</button>
+        <button class="btn" type="button" onclick="triggerCooldownPause()">🧘 Pause 15m Cooldown</button>
       </div>
     </div>
   `;
@@ -521,6 +521,11 @@ function rememberFirebaseUserProfile(user) {
   }
   if (user.displayName) {
     localStorage.setItem(`journall_user_name_${user.uid}`, user.displayName.trim());
+    // Also seed journall_custom_username if the user hasn't set a custom one yet
+    if (!localStorage.getItem(`journall_custom_username_${user.uid}`)) {
+      localStorage.setItem(`journall_custom_username_${user.uid}`, user.displayName.trim());
+      localStorage.setItem('journall_custom_username', user.displayName.trim());
+    }
   }
   if (user.photoURL) {
     localStorage.setItem(`journall_user_photo_${user.uid}`, user.photoURL);
@@ -569,7 +574,7 @@ function renderUserProfile() {
   const badge = document.getElementById('nameChangeLimitBadge');
   if (badge) {
     if (nameCount >= 2) {
-      badge.textContent = 'âš ï¸ Name change limit reached (2/2 changes used this month)';
+      badge.textContent = '⚠️ Name change limit reached (2/2 changes used this month)';
       badge.style.color = '#f87171';
     } else {
       badge.textContent = `Name changes remaining this month: ${2 - nameCount} of 2`;
@@ -606,7 +611,7 @@ function handleCustomAvatarUpload(event) {
     localStorage.setItem(`journall_user_custom_avatar_${userUid}`, dataUrl);
     localStorage.setItem('journall_user_custom_avatar', dataUrl);
     renderUserProfile();
-    alert('âœ“ Profile picture updated successfully!');
+    alert('✓ Profile picture updated successfully!');
   };
   reader.readAsDataURL(file);
 }
@@ -618,7 +623,7 @@ function handleLiveUsernameInput(val) {
 
   if (count >= 2) {
     if (badge) {
-      badge.textContent = 'âš ï¸ Name change limit reached (2/2 changes used this month)';
+      badge.textContent = '⚠️ Name change limit reached (2/2 changes used this month)';
       badge.style.color = '#f87171';
     }
   } else {
@@ -656,7 +661,7 @@ function saveCustomUsername() {
 
   const count = getNameChangesThisMonthCount();
   if (count >= 2) {
-    alert('âš ï¸ Name change limit reached!
+    alert('⚠️ Name change limit reached!
 
 You can only change your display name 2 times per month.
 Your next name change will be available on the 1st of next month.');
@@ -672,7 +677,7 @@ Your next name change will be available on the 1st of next month.');
   const newCount = getNameChangesThisMonthCount();
   const remaining = Math.max(0, 2 - newCount);
 
-  alert(`âœ“ Display name updated to "${val}"!
+  alert(`✓ Display name updated to "${val}"!
 
 Name changes remaining this month: ${remaining} of 2.`);
   renderUserProfile();
@@ -3692,7 +3697,7 @@ tr:hover {
     <div class="setup-section">
       <div class="setup-section-label">Synced account</div><p id="accountSyncNote" class="account-sync-note">Account size and phase are configured here. Your current balance is automatically calculated and updated in real time from your synced trades.</p>
       <div class="account-form-grid">
-        <label>Initial account balance ($)<div class="stepper-control"><button type="button" class="stepper-btn minus" onclick="stepInput('accountSizeInput', -1, 'renderAccountSetupPreview')">âˆ’</button><input id="accountSizeInput" class="account-source-input" type="number" min="1" step="100" placeholder="Enter a value" oninput="renderAccountSetupPreview()"><button type="button" class="stepper-btn plus" onclick="stepInput('accountSizeInput', 1, 'renderAccountSetupPreview')">+</button></div></label>
+        <label>Initial account balance ($)<div class="stepper-control"><button type="button" class="stepper-btn minus" onclick="stepInput('accountSizeInput', -1, 'renderAccountSetupPreview')">−</button><input id="accountSizeInput" class="account-source-input" type="number" min="1" step="100" placeholder="Enter a value" oninput="renderAccountSetupPreview()"><button type="button" class="stepper-btn plus" onclick="stepInput('accountSizeInput', 1, 'renderAccountSetupPreview')">+</button></div></label>
         <label>Account phase<select id="accountPhaseInput" class="account-source-input" onchange="toggleFundedFields()"><option>Phase 1</option><option>Phase 2</option><option>Funded</option><option>Personal</option></select></label>
       </div>
     </div>
@@ -3700,17 +3705,17 @@ tr:hover {
     <div class="setup-section">
       <div class="setup-section-label">Targets</div>
       <div class="account-form-grid">
-        <label>Profit target<div class="account-inline-field"><div class="stepper-control"><button type="button" class="stepper-btn minus" onclick="stepInput('profitTargetInput', -1, 'renderAccountSetupPreview')">âˆ’</button><input id="profitTargetInput" type="number" min="0" step="1" placeholder="Enter a value" oninput="renderAccountSetupPreview()"><button type="button" class="stepper-btn plus" onclick="stepInput('profitTargetInput', 1, 'renderAccountSetupPreview')">+</button></div><select id="profitTargetType" onchange="renderAccountSetupPreview()"><option value="percent">%</option><option value="amount">$</option></select></div></label>
-        <label>Phase deadline (optional)<input id="phaseDeadlineInput" type="date"></label><label>Max trades per day<div class="stepper-control"><button type="button" class="stepper-btn minus" onclick="stepInput('maxTradesInput', -1, 'renderAccountSetupPreview')">âˆ’</button><input id="maxTradesInput" type="number" min="1" step="1" placeholder="Enter a value" oninput="renderAccountSetupPreview()"><button type="button" class="stepper-btn plus" onclick="stepInput('maxTradesInput', 1, 'renderAccountSetupPreview')">+</button></div></label>
+        <label>Profit target<div class="account-inline-field"><div class="stepper-control"><button type="button" class="stepper-btn minus" onclick="stepInput('profitTargetInput', -1, 'renderAccountSetupPreview')">−</button><input id="profitTargetInput" type="number" min="0" step="1" placeholder="Enter a value" oninput="renderAccountSetupPreview()"><button type="button" class="stepper-btn plus" onclick="stepInput('profitTargetInput', 1, 'renderAccountSetupPreview')">+</button></div><select id="profitTargetType" onchange="renderAccountSetupPreview()"><option value="percent">%</option><option value="amount">$</option></select></div></label>
+        <label>Phase deadline (optional)<input id="phaseDeadlineInput" type="date"></label><label>Max trades per day<div class="stepper-control"><button type="button" class="stepper-btn minus" onclick="stepInput('maxTradesInput', -1, 'renderAccountSetupPreview')">−</button><input id="maxTradesInput" type="number" min="1" step="1" placeholder="Enter a value" oninput="renderAccountSetupPreview()"><button type="button" class="stepper-btn plus" onclick="stepInput('maxTradesInput', 1, 'renderAccountSetupPreview')">+</button></div></label>
       </div>
     </div>
 
     <div class="setup-section">
       <div class="setup-section-label">Risk limits</div>
       <div class="account-form-grid">
-        <label>Risk per trade<div class="account-inline-field"><div class="stepper-control"><button type="button" class="stepper-btn minus" onclick="stepInput('riskPercentInput', -1, 'renderAccountSetupPreview')">âˆ’</button><input id="riskPercentInput" type="number" min="0.5" max="2" step="0.1" placeholder="Enter a value" oninput="renderAccountSetupPreview()"><button type="button" class="stepper-btn plus" onclick="stepInput('riskPercentInput', 1, 'renderAccountSetupPreview')">+</button></div><span>%</span></div></label><label>Minimum RR<div class="stepper-control"><button type="button" class="stepper-btn minus" onclick="stepInput('minRrInput', -1, 'renderAccountSetupPreview')">âˆ’</button><input id="minRrInput" type="number" min="1" step="0.5" placeholder="Enter a value" oninput="renderAccountSetupPreview()"><button type="button" class="stepper-btn plus" onclick="stepInput('minRrInput', 1, 'renderAccountSetupPreview')">+</button></div></label>
-        <label>Max daily loss<div class="account-inline-field"><div class="stepper-control"><button type="button" class="stepper-btn minus" onclick="stepInput('maxDailyLossInput', -1, 'renderAccountSetupPreview')">âˆ’</button><input id="maxDailyLossInput" type="number" min="0" step="1" placeholder="Enter a value" oninput="renderAccountSetupPreview()"><button type="button" class="stepper-btn plus" onclick="stepInput('maxDailyLossInput', 1, 'renderAccountSetupPreview')">+</button></div><select id="maxDailyLossType" onchange="renderAccountSetupPreview()"><option value="percent">%</option><option value="amount">$</option></select></div></label>
-        <label>Max overall drawdown<div class="account-inline-field"><div class="stepper-control"><button type="button" class="stepper-btn minus" onclick="stepInput('maxDrawdownInput', -1, 'renderAccountSetupPreview')">âˆ’</button><input id="maxDrawdownInput" type="number" min="0" step="1" placeholder="Enter a value" oninput="renderAccountSetupPreview()"><button type="button" class="stepper-btn plus" onclick="stepInput('maxDrawdownInput', 1, 'renderAccountSetupPreview')">+</button></div><select id="maxDrawdownType" onchange="renderAccountSetupPreview()"><option value="percent">%</option><option value="amount">$</option></select></div></label>
+        <label>Risk per trade<div class="account-inline-field"><div class="stepper-control"><button type="button" class="stepper-btn minus" onclick="stepInput('riskPercentInput', -1, 'renderAccountSetupPreview')">−</button><input id="riskPercentInput" type="number" min="0.5" max="2" step="0.1" placeholder="Enter a value" oninput="renderAccountSetupPreview()"><button type="button" class="stepper-btn plus" onclick="stepInput('riskPercentInput', 1, 'renderAccountSetupPreview')">+</button></div><span>%</span></div></label><label>Minimum RR<div class="stepper-control"><button type="button" class="stepper-btn minus" onclick="stepInput('minRrInput', -1, 'renderAccountSetupPreview')">−</button><input id="minRrInput" type="number" min="1" step="0.5" placeholder="Enter a value" oninput="renderAccountSetupPreview()"><button type="button" class="stepper-btn plus" onclick="stepInput('minRrInput', 1, 'renderAccountSetupPreview')">+</button></div></label>
+        <label>Max daily loss<div class="account-inline-field"><div class="stepper-control"><button type="button" class="stepper-btn minus" onclick="stepInput('maxDailyLossInput', -1, 'renderAccountSetupPreview')">−</button><input id="maxDailyLossInput" type="number" min="0" step="1" placeholder="Enter a value" oninput="renderAccountSetupPreview()"><button type="button" class="stepper-btn plus" onclick="stepInput('maxDailyLossInput', 1, 'renderAccountSetupPreview')">+</button></div><select id="maxDailyLossType" onchange="renderAccountSetupPreview()"><option value="percent">%</option><option value="amount">$</option></select></div></label>
+        <label>Max overall drawdown<div class="account-inline-field"><div class="stepper-control"><button type="button" class="stepper-btn minus" onclick="stepInput('maxDrawdownInput', -1, 'renderAccountSetupPreview')">−</button><input id="maxDrawdownInput" type="number" min="0" step="1" placeholder="Enter a value" oninput="renderAccountSetupPreview()"><button type="button" class="stepper-btn plus" onclick="stepInput('maxDrawdownInput', 1, 'renderAccountSetupPreview')">+</button></div><select id="maxDrawdownType" onchange="renderAccountSetupPreview()"><option value="percent">%</option><option value="amount">$</option></select></div></label>
       </div>
     </div>
 
@@ -3792,13 +3797,13 @@ tr:hover {
         <div style="display:flex; align-items:center; gap:24px; flex-wrap:wrap;">
           <div class="avatar-upload-container" style="position:relative; cursor:pointer;" onclick="document.getElementById('customAvatarInput').click()" title="Click to change profile picture">
             <img id="userProfileAvatar" src="https://lh3.googleusercontent.com/a/default-user" onerror="this.src='https://ui-avatars.com/api/?name=Trader&background=a855f7&color=fff'" alt="Google Profile" style="width:90px; height:90px; border-radius:50%; border:3px solid #a855f7; object-fit:cover; box-shadow:0 0 25px rgba(168,85,247,0.4);">
-            <div class="avatar-upload-badge">ðŸ“·</div>
+            <div class="avatar-upload-badge">📷</div>
             <input type="file" id="customAvatarInput" accept="image/*" style="display:none;" onchange="handleCustomAvatarUpload(event)">
           </div>
           <div style="flex:1;">
             <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
               <h2 style="margin:0; font-size:26px; color:#fff;" id="userProfileName">krishna</h2>
-              <span class="badge" style="background:rgba(34,197,94,0.15); color:#4ade80; border:1px solid rgba(34,197,94,0.3); padding:4px 12px; border-radius:9999px; font-size:11px; font-weight:700;">âœ“ GOOGLE ACCOUNT AUTHORIZED</span>
+              <span class="badge" style="background:rgba(34,197,94,0.15); color:#4ade80; border:1px solid rgba(34,197,94,0.3); padding:4px 12px; border-radius:9999px; font-size:11px; font-weight:700;">✓ GOOGLE ACCOUNT AUTHORIZED</span>
             </div>
             <p style="margin:6px 0 0 0; font-size:15px; color:#94a3b8;" id="userProfileEmail">krishnacnjack@gmail.com</p>
             <div style="margin-top:10px; font-size:12px; color:#cbd5e1;" id="userProfileMeta">Active Session &bull; Verified Trader Account</div>
@@ -4578,7 +4583,7 @@ tr:hover {
 
 <script>
 /* --------------------------------------------------------------
-   AUTOâ€‘SYNC WITH LOCAL MT5 SERVER (runs on http://localhost:3000)
+   AUTO‑SYNC WITH LOCAL MT5 SERVER (runs on http://localhost:3000)
    -------------------------------------------------------------- */
 (function() {
     document.addEventListener('DOMContentLoaded', () => {
@@ -4625,12 +4630,12 @@ tr:hover {
                 } else {
                     location.reload();
                 }
-                console.info(`Autoâ€‘sync: added ${added} new trade(s) from MT5.`);
+                console.info(`Auto‑sync: added ${added} new trade(s) from MT5.`);
             } else {
-                console.info('Autoâ€‘sync: no new trades to add.');
+                console.info('Auto‑sync: no new trades to add.');
             }
         } catch (err) {
-            console.warn('Autoâ€‘sync with MT5 failed:', err);
+            console.warn('Auto‑sync with MT5 failed:', err);
         }
     }
 })();
@@ -6622,7 +6627,7 @@ function riskCalculatorMarkup(metrics){
   const pipValue = toNumber(localStorage.getItem('journall_risk_pip_value'), 1);
   const riskAmount = metrics.accountSize * config.riskPercent / 100;
   const positionSize = slPips > 0 && pipValue > 0 ? riskAmount / (slPips * pipValue) : 0;
-  return `<div class="goal-card risk-calc-card"><div class="goal-card-label">Risk Calculator</div><div class="goal-card-value neutral">$${riskAmount.toFixed(2)} risk</div><div class="risk-calc-grid"><label>SL pips<div class="stepper-control"><button type="button" class="stepper-btn minus" onclick="stepInput('riskSlPipsInput', -1, 'updateRiskCalculator')">âˆ’</button><input id="riskSlPipsInput" type="number" min="1" step="1" value="${slPips}" oninput="updateRiskCalculator()"><button type="button" class="stepper-btn plus" onclick="stepInput('riskSlPipsInput', 1, 'updateRiskCalculator')">+</button></div></label><label>Pip value<div class="stepper-control"><button type="button" class="stepper-btn minus" onclick="stepInput('riskPipValueInput', -1, 'updateRiskCalculator')">âˆ’</button><input id="riskPipValueInput" type="number" min="0.01" step="0.01" value="${pipValue}" oninput="updateRiskCalculator()"><button type="button" class="stepper-btn plus" onclick="stepInput('riskPipValueInput', 1, 'updateRiskCalculator')">+</button></div></label></div><div class="goal-card-sub">Position size: <strong>${positionSize.toFixed(3)}</strong>. Formula: account size x ${config.riskPercent}% / (SL pips x pip value).</div></div>`;
+  return `<div class="goal-card risk-calc-card"><div class="goal-card-label">Risk Calculator</div><div class="goal-card-value neutral">$${riskAmount.toFixed(2)} risk</div><div class="risk-calc-grid"><label>SL pips<div class="stepper-control"><button type="button" class="stepper-btn minus" onclick="stepInput('riskSlPipsInput', -1, 'updateRiskCalculator')">−</button><input id="riskSlPipsInput" type="number" min="1" step="1" value="${slPips}" oninput="updateRiskCalculator()"><button type="button" class="stepper-btn plus" onclick="stepInput('riskSlPipsInput', 1, 'updateRiskCalculator')">+</button></div></label><label>Pip value<div class="stepper-control"><button type="button" class="stepper-btn minus" onclick="stepInput('riskPipValueInput', -1, 'updateRiskCalculator')">−</button><input id="riskPipValueInput" type="number" min="0.01" step="0.01" value="${pipValue}" oninput="updateRiskCalculator()"><button type="button" class="stepper-btn plus" onclick="stepInput('riskPipValueInput', 1, 'updateRiskCalculator')">+</button></div></label></div><div class="goal-card-sub">Position size: <strong>${positionSize.toFixed(3)}</strong>. Formula: account size x ${config.riskPercent}% / (SL pips x pip value).</div></div>`;
 }
 function stepInput(id, delta, callbackName){
   const el = document.getElementById(id);
@@ -7714,10 +7719,10 @@ function onBrokerPlatformChange(){
 
   if(platform === 'matchtrader'){
     if(btnText) btnText.textContent = 'Sync from MatchTrader (Cloud)';
-    if(status) status.innerHTML = 'â˜ï¸ <strong>Direct Cloud Sync:</strong> Enter your MatchTrader URL and credentials. 100% online, no downloads needed!';
+    if(status) status.innerHTML = '☁️ <strong>Direct Cloud Sync:</strong> Enter your MatchTrader URL and credentials. 100% online, no downloads needed!';
   } else if(platform === 'ctrader'){
     if(btnText) btnText.textContent = 'Sync from cTrader (Cloud)';
-    if(status) status.innerHTML = 'â˜ï¸ <strong>Direct Cloud Sync:</strong> Enter your cTrader Access Token. Works on desktop and phone through the Journall cloud sync Worker.';
+    if(status) status.innerHTML = '☁️ <strong>Direct Cloud Sync:</strong> Enter your cTrader Access Token. Works on desktop and phone through the Journall cloud sync Worker.';
   } else if(platform === 'mt5'){
     const isLocalHost = window.location.hostname === '127.0.0.1' || window.location.hostname === 'localhost';
     const isMobileBroker = isMobileBrokerDevice();
@@ -8237,9 +8242,9 @@ async function triggerBrokerSync(options = {}) {
     if (btn) {
       btn.disabled = false;
       if (parsed && parsed.length > 0) {
-        btn.innerHTML = `<span style="display:inline-flex; align-items:center; gap:6px; color:#4ade80;">âœ“ Synced (${pName})</span>`;
+        btn.innerHTML = `<span style="display:inline-flex; align-items:center; gap:6px; color:#4ade80;">✓ Synced (${pName})</span>`;
       } else if (status && status.innerHTML.includes('failed')) {
-        btn.innerHTML = `<span style="display:inline-flex; align-items:center; gap:6px; color:#f87171;">â†» Retry Sync (${pName})</span>`;
+        btn.innerHTML = `<span style="display:inline-flex; align-items:center; gap:6px; color:#f87171;">↻ Retry Sync (${pName})</span>`;
       } else {
         btn.innerHTML = `<span>Sync from ${pName}</span>`;
       }
@@ -8453,7 +8458,7 @@ function renderTradingPage(){
               <div style="font-size:12px; color:#94a3b8;">${escapeHtml(brokerInfo.account)} &bull; ${escapeHtml(brokerInfo.server)} &bull; Synced at ${escapeHtml(brokerInfo.lastSynced)}</div>
             </div>
           </div>
-          <button type="button" class="btn primary" onclick="document.querySelector('[data-tab=&quot;uploaddata&quot;]')?.click()">â†» Sync Latest Deals</button>
+          <button type="button" class="btn primary" onclick="document.querySelector('[data-tab=&quot;uploaddata&quot;]')?.click()">↻ Sync Latest Deals</button>
         </div>
       `;
     } else {
@@ -8958,7 +8963,7 @@ function renderPostSessionText(text){
     } else {
       let cleanLine = trimmed
         .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-        .replace(/^\s*[-*]\s+/, 'â€¢ ');
+        .replace(/^\s*[-*]\s+/, '• ');
 
       if (currentCard) {
         currentCard.content.push(cleanLine);
@@ -9802,7 +9807,7 @@ function openNextJournalTrade(autoFromSave = false) {
   } else {
     if (autoFromSave) {
       clearJournalPageForm();
-      alert('âœ“ Trade journal saved! All trades in your list are now reviewed.');
+      alert('✓ Trade journal saved! All trades in your list are now reviewed.');
     } else {
       alert('You have reached the last trade in the list.');
     }
@@ -15444,6 +15449,84 @@ body:not(.firebase-auth-required) #journallApp > .sidebar .nav button {
 
     setStatus('Ready. Choose a file or a sync method.');
   });
+})();
+</script>
+
+
+<script id="journall-username-save-override">
+(function(){
+  'use strict';
+  function uid(){ return (window.currentUser && window.currentUser.uid) || localStorage.getItem('journall_active_uid') || 'local'; }
+
+  // Robust limit counter
+  window.getNameChangesThisMonthCount = function(){
+    try{
+      var h = JSON.parse(localStorage.getItem('journall_name_changes_' + uid()) || localStorage.getItem('journall_name_change_history') || '[]');
+      if(!Array.isArray(h)) return 0;
+      var now = new Date();
+      return h.filter(function(x){ try{ var d = new Date(x.date || x); return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear(); }catch(e){ return false; } }).length;
+    }catch(e){ return 0; }
+  };
+
+  // Robust name resolution: custom name always wins over Google name
+  window.getActiveUserName = function(){
+    var u = uid();
+    var n = localStorage.getItem('journall_custom_username_' + u) ||
+            localStorage.getItem('journall_custom_username') ||
+            localStorage.getItem('journall_user_name_' + u) ||
+            localStorage.getItem('journall_user_name') ||
+            (window.currentUser && window.currentUser.displayName) ||
+            'Trader';
+    return String(n || 'Trader').trim();
+  };
+
+  // Robust save — writes to all keys the app reads from
+  window.saveCustomUsername = function(){
+    var input = document.getElementById('customUsernameInput');
+    var val = input && input.value ? String(input.value).trim() : '';
+    if(!val){ alert('Please enter a display name first.'); return; }
+    var u = uid();
+    var currentSaved = (localStorage.getItem('journall_custom_username_' + u) || '').trim();
+    if(val === currentSaved){ alert('Your display name is already set to "' + val + '".'); return; }
+    var count = window.getNameChangesThisMonthCount();
+    if(count >= 2){ alert('⚠️ Name change limit reached!\n\nYou can only change your display name 2 times per month.\nYour next name change will be available on the 1st of next month.'); return; }
+    // Save to every key the app might read from
+    localStorage.setItem('journall_custom_username_' + u, val);
+    localStorage.setItem('journall_custom_username', val);
+    localStorage.setItem('journall_user_name_' + u, val);
+    localStorage.setItem('journall_user_name', val);
+    try{
+      var key = 'journall_name_changes_' + u;
+      var h = JSON.parse(localStorage.getItem(key) || '[]');
+      if(!Array.isArray(h)) h = [];
+      h.push({ date: new Date().toISOString(), name: val });
+      localStorage.setItem(key, JSON.stringify(h));
+    }catch(e){}
+    var remaining = Math.max(0, 2 - window.getNameChangesThisMonthCount());
+    if(typeof window.renderUserProfile === 'function') window.renderUserProfile();
+    if(typeof window.scheduleCloudSave === 'function') window.scheduleCloudSave();
+    alert('✓ Display name updated to "' + val + '"!\n\nName changes remaining this month: ' + remaining + ' of 2.');
+  };
+
+  // Intercept any "Save Profile Changes" button click regardless of onclick attribute
+  document.addEventListener('click', function(e){
+    var b = e.target.closest('button');
+    if(b && /save profile changes/i.test(b.textContent || '')){
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      window.saveCustomUsername();
+    }
+  }, true);
+
+  // Persist any pending startup name
+  try{
+    var pending = localStorage.getItem('journall_pending_startup_name');
+    if(pending){ localStorage.setItem('journall_custom_username_' + uid(), pending); localStorage.removeItem('journall_pending_startup_name'); }
+  }catch(e){}
+
+  // Refresh visible names on load
+  function refreshNames(){ if(typeof window.renderUserProfile === 'function') window.renderUserProfile(); }
+  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', refreshNames); else refreshNames();
 })();
 </script>
 
