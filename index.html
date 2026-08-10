@@ -3003,6 +3003,7 @@ tr:hover {
   will-change: transform, opacity !important;
 }
 
+
 .signin-brand-clean {
   display: flex !important;
   flex-direction: column !important;
@@ -15196,119 +15197,40 @@ body:not(.firebase-auth-required) #journallApp > .sidebar .nav button {
 }
 </style>
 
+<script>
+(function () {
+  // 1. Remove ALL old/duplicate circle elements left by previous versions
+  document.querySelectorAll('.cursor-green-spotlight, #cursorGreenSpotlight, #globalMouseSpotlight').forEach(function (el) { el.remove(); });
 
-<script id="journall-mouse-spotlight">
-(function() {
-  var spot = null;
+  // 2. Create exactly ONE circle
+  var dot = document.createElement('div');
+  dot.id = 'globalMouseSpotlight';
+  dot.className = 'cursor-green-spotlight';
+  document.body.appendChild(dot);
 
-  function initSpotlight() {
-    spot = document.getElementById('cursorGreenSpotlight');
-    if (!spot) {
-      // Create it if missing
-      spot = document.createElement('div');
-      spot.id = 'cursorGreenSpotlight';
-      spot.className = 'cursor-green-spotlight';
-      var gate = document.getElementById('firebaseAuthGate');
-      if (gate) gate.insertBefore(spot, gate.firstChild);
-    }
-  }
-
-  var rafId = null;
-  var mouseX = -9999, mouseY = -9999;
-  var curX = -9999, curY = -9999;
-  var visible = false;
   var hideTimer = null;
 
-  function lerp(a, b, t) { return a + (b - a) * t; }
+  // 3. Show + follow instantly while the mouse moves (no lag, no colors)
+  document.addEventListener('mousemove', function (e) {
+    dot.style.transform = 'translate3d(' + e.clientX + 'px, ' + e.clientY + 'px, 0)';
+    dot.style.opacity = '1';
 
-  function tick() {
-    rafId = requestAnimationFrame(tick);
-    if (!spot) return;
-
-    // Fast follow: smooth but very responsive
-    curX = lerp(curX, mouseX, 0.18);
-    curY = lerp(curY, mouseY, 0.18);
-
-    spot.style.transform = 'translate(' + (curX - 240) + 'px,' + (curY - 240) + 'px)';
-  }
-
-  function isLoginVisible() {
-    var gate = document.getElementById('firebaseAuthGate');
-    if (!gate) return false;
-    var card = gate.querySelector('.firebase-auth-card');
-    if (!card) return false;
-    if (gate.hidden || getComputedStyle(gate).display === 'none') return false;
-    return true;
-  }
-
-  document.addEventListener('mousemove', function(e) {
-    mouseX = e.clientX;
-    mouseY = e.clientY;
-
-    if (!isLoginVisible()) {
-      if (spot) spot.style.opacity = '0';
-      return;
-    }
-
-    if (!visible) {
-      if (!spot) initSpotlight();
-      if (spot) spot.style.opacity = '1';
-      visible = true;
-      if (!rafId) tick();
-    }
-
-    // Hide after 1.5s of no movement
+    // Hide when the mouse stops moving
     clearTimeout(hideTimer);
-    hideTimer = setTimeout(function() {
-      if (spot) spot.style.opacity = '0';
-      visible = false;
-    }, 1500);
-  });
+    hideTimer = setTimeout(function () { dot.style.opacity = '0'; }, 600);
+  }, { passive: true });
 
-  document.addEventListener('mouseleave', function() {
-    if (spot) spot.style.opacity = '0';
-    visible = false;
+  // 4. Hide when the mouse leaves the window
+  document.addEventListener('mouseleave', function () {
+    dot.style.opacity = '0';
     clearTimeout(hideTimer);
   });
 
-  // Wait for DOM
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initSpotlight);
-  } else {
-    initSpotlight();
-  }
-})();
-</script>
-
-<script>
-(function() {
-  // Small circle cursor element
-  let spotlight = document.getElementById('globalMouseSpotlight') || document.getElementById('cursorGreenSpotlight');
-  if (!spotlight) {
-    spotlight = document.createElement('div');
-    spotlight.id = 'globalMouseSpotlight';
-    spotlight.className = 'cursor-green-spotlight';
-    document.body.appendChild(spotlight);
-  }
-
-  let moveTimeout;
-
-  // Instant follow = perfectly smooth for a small circle (no lag)
-  document.addEventListener('mousemove', (e) => {
-    spotlight.style.transform = `translate3d(${e.clientX}px, ${e.clientY}px, 0)`;
-    spotlight.style.opacity = '1';
-
-    // Hide when mouse stops moving
-    clearTimeout(moveTimeout);
-    moveTimeout = setTimeout(() => {
-      spotlight.style.opacity = '0';
-    }, 800);
-  });
-
-  // Hide when mouse leaves the window
-  document.addEventListener('mouseleave', () => {
-    spotlight.style.opacity = '0';
-    clearTimeout(moveTimeout);
+  // 5. Safety check: remove any extra circles added by leftover code after page load
+  window.addEventListener('load', function () {
+    document.querySelectorAll('.cursor-green-spotlight').forEach(function (el) {
+      if (el !== dot) el.remove();
+    });
   });
 })();
 </script>
