@@ -243,4 +243,11 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    # Top-level safety net: the bridge must always receive valid JSON, never a
+    # raw traceback. Any crash at any point is converted into a clear error.
+    try:
+        main()
+    except SystemExit:
+        raise
+    except Exception as _e:
+        print(json.dumps({"error": f"Unexpected sync error: {type(_e).__name__}: {_e}"}))
