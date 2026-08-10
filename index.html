@@ -2986,17 +2986,19 @@ tr:hover {
   position: fixed !important;
   top: 0 !important;
   left: 0 !important;
-  width: 480px !important;
-  height: 480px !important;
-  margin-top: -240px !important;
-  margin-left: -240px !important;
+  width: 22px !important;
+  height: 22px !important;
+  margin-top: -11px !important;
+  margin-left: -11px !important;
   border-radius: 50% !important;
-  background: radial-gradient(circle at center, rgba(16, 185, 129, 0.75) 0%, rgba(34, 197, 94, 0.4) 35%, rgba(168, 85, 247, 0.15) 60%, transparent 75%) !important;
-  filter: blur(55px) !important;
+  background: transparent !important;
+  border: 2px solid rgba(255, 255, 255, 0.85) !important;
+  box-shadow: none !important;
+  filter: none !important;
   pointer-events: none !important;
   z-index: 99999 !important;
   opacity: 0;
-  transition: opacity 0.4s ease !important;
+  transition: opacity 0.25s ease !important;
   transform: translate3d(-1000px, -1000px, 0);
   will-change: transform, opacity !important;
 }
@@ -15280,8 +15282,8 @@ body:not(.firebase-auth-required) #journallApp > .sidebar .nav button {
 
 <script>
 (function() {
-  // Create the spotlight globally so it works on all pages
-  let spotlight = document.getElementById('globalMouseSpotlight');
+  // Small circle cursor element
+  let spotlight = document.getElementById('globalMouseSpotlight') || document.getElementById('cursorGreenSpotlight');
   if (!spotlight) {
     spotlight = document.createElement('div');
     spotlight.id = 'globalMouseSpotlight';
@@ -15289,36 +15291,19 @@ body:not(.firebase-auth-required) #journallApp > .sidebar .nav button {
     document.body.appendChild(spotlight);
   }
 
-  let targetX = -1000, targetY = -1000;
-  let currentX = -1000, currentY = -1000;
   let moveTimeout;
 
-  // Track mouse movement
+  // Instant follow = perfectly smooth for a small circle (no lag)
   document.addEventListener('mousemove', (e) => {
-    targetX = e.clientX;
-    targetY = e.clientY;
-
-    // Show colors instantly when moving
+    spotlight.style.transform = `translate3d(${e.clientX}px, ${e.clientY}px, 0)`;
     spotlight.style.opacity = '1';
 
-    // Reset timer to hide when idle
+    // Hide when mouse stops moving
     clearTimeout(moveTimeout);
     moveTimeout = setTimeout(() => {
       spotlight.style.opacity = '0';
     }, 800);
   });
-
-  // Smooth live animation loop using requestAnimationFrame
-  function animateSpotlight() {
-    // 0.15 controls the smoothness/glide effect
-    currentX += (targetX - currentX) * 0.15;
-    currentY += (targetY - currentY) * 0.15;
-
-    spotlight.style.transform = `translate3d(${currentX}px, ${currentY}px, 0)`;
-    requestAnimationFrame(animateSpotlight);
-  }
-
-  requestAnimationFrame(animateSpotlight);
 
   // Hide when mouse leaves the window
   document.addEventListener('mouseleave', () => {
