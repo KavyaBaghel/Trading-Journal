@@ -2996,7 +2996,7 @@ tr:hover {
   pointer-events: none !important;
   z-index: 5 !important;
   opacity: 0;
-  transition: opacity 0.3s ease, transform 0.05s linear !important;
+  transition: opacity 0.25s ease !important;
   transform: translate3d(-1000px, -1000px, 0) !important;
   will-change: transform, opacity !important;
 }
@@ -13636,14 +13636,7 @@ html.firebase-auth-required body{
   padding:clamp(32px,6vw,72px)!important;
   position:relative!important;
 }
-.signin-copy:before{
-  content:""!important;
-  position:absolute!important;
-  inset:28px!important;
-  border:1px solid rgba(255,255,255,.05)!important;
-  border-radius:24px!important;
-  pointer-events:none!important;
-}
+.signin-copy:before{display:none!important;content:none!important;}
 .signin-brand{
   gap:14px!important;
   margin-bottom:44px!important;
@@ -13654,8 +13647,8 @@ html.firebase-auth-required body{
   width:48px!important;
   height:48px!important;
   border-radius:14px!important;
-  background:#16181d!important;
-  border:1px solid rgba(255,255,255,.12)!important;
+  background:transparent!important;
+  border:none!important;
   box-shadow:none!important;
 }
 .signin-brand .brand-title{
@@ -15171,6 +15164,119 @@ body:not(.firebase-auth-required) #journallApp > .sidebar .nav button {
 </div>
 
 
+
+
+<style id="journall-pill-removal-final">
+/* ── FINAL: Remove pill/rectangle outline around logo on sign-in ── */
+.signin-copy::before,
+.signin-copy:before {
+  display: none !important;
+  content: none !important;
+  border: none !important;
+}
+.signin-brand .logo,
+.firebase-auth-card .signin-brand .logo,
+#firebaseAuthGate .signin-brand .logo,
+#firebaseAuthGate .logo,
+.signin-brand-clean,
+.signin-brand-clean *,
+.signin-symbol-wrapper {
+  background: transparent !important;
+  background-color: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  outline: none !important;
+}
+.signin-copy {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+</style>
+
+
+<script id="journall-mouse-spotlight">
+(function() {
+  var spot = null;
+
+  function initSpotlight() {
+    spot = document.getElementById('cursorGreenSpotlight');
+    if (!spot) {
+      // Create it if missing
+      spot = document.createElement('div');
+      spot.id = 'cursorGreenSpotlight';
+      spot.className = 'cursor-green-spotlight';
+      var gate = document.getElementById('firebaseAuthGate');
+      if (gate) gate.insertBefore(spot, gate.firstChild);
+    }
+  }
+
+  var rafId = null;
+  var mouseX = -9999, mouseY = -9999;
+  var curX = -9999, curY = -9999;
+  var visible = false;
+  var hideTimer = null;
+
+  function lerp(a, b, t) { return a + (b - a) * t; }
+
+  function tick() {
+    rafId = requestAnimationFrame(tick);
+    if (!spot) return;
+
+    // Fast follow: smooth but very responsive
+    curX = lerp(curX, mouseX, 0.18);
+    curY = lerp(curY, mouseY, 0.18);
+
+    spot.style.transform = 'translate(' + (curX - 240) + 'px,' + (curY - 240) + 'px)';
+  }
+
+  function isLoginVisible() {
+    var gate = document.getElementById('firebaseAuthGate');
+    if (!gate) return false;
+    var card = gate.querySelector('.firebase-auth-card');
+    if (!card) return false;
+    if (gate.hidden || getComputedStyle(gate).display === 'none') return false;
+    return true;
+  }
+
+  document.addEventListener('mousemove', function(e) {
+    mouseX = e.clientX;
+    mouseY = e.clientY;
+
+    if (!isLoginVisible()) {
+      if (spot) spot.style.opacity = '0';
+      return;
+    }
+
+    if (!visible) {
+      if (!spot) initSpotlight();
+      if (spot) spot.style.opacity = '1';
+      visible = true;
+      if (!rafId) tick();
+    }
+
+    // Hide after 1.5s of no movement
+    clearTimeout(hideTimer);
+    hideTimer = setTimeout(function() {
+      if (spot) spot.style.opacity = '0';
+      visible = false;
+    }, 1500);
+  });
+
+  document.addEventListener('mouseleave', function() {
+    if (spot) spot.style.opacity = '0';
+    visible = false;
+    clearTimeout(hideTimer);
+  });
+
+  // Wait for DOM
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initSpotlight);
+  } else {
+    initSpotlight();
+  }
+})();
+</script>
 
 </body>
 </html>
