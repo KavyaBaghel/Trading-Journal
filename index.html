@@ -10521,7 +10521,7 @@ document.querySelectorAll('.nav button').forEach(btn=>{
       const text = await callCloudAI('Reply with one short sentence confirming the website AI is connected.', 'chat');
       setStatus(`Cloud AI connected: ${text.slice(0,120)}`, 'good');
     }catch(err){
-      setStatus(`Cloud AI not connected yet. Deploy Cloudflare Worker and set GROQ_API_KEY. ${err?.message || err}`, 'bad');
+      setStatus(`Cloud AI not connected yet. Deploy Cloudflare Worker and set OPENROUTER_API_KEY. ${err?.message || err}`, 'bad');
     }
   };
 
@@ -15255,7 +15255,7 @@ body:not(.firebase-auth-required) #journallApp > .sidebar .nav button {
       var nb=document.createElement('button');
       nb.setAttribute('data-tab','upload');
       nb.type='button';
-      nb.innerHTML='📥 Upload Data <small>sync</small>';
+      nb.innerHTML='Upload Data <small>sync</small>';
       nav.appendChild(nb);
     }
 
@@ -15263,15 +15263,7 @@ body:not(.firebase-auth-required) #journallApp > .sidebar .nav button {
     if(!document.getElementById('upload')){
       var sec=document.createElement('section');
       sec.id='upload'; sec.className='section';
-      sec.innerHTML='<div class="card"><h2 style="margin:0 0 6px 0;">Upload Trading Data</h2>'+
-        '<p style="color:var(--muted);margin:0 0 16px 0;">Import MT5 / MatchTrader / cTrader history. Trades load straight into your dashboard, journal and analytics.</p>'+
-        '<div class="grid two"><button class="btn" id="uploadHtmlBtn" type="button">📄 MT5 / Broker HTML Report</button>'+
-        '<button class="btn" id="uploadCsvBtn" type="button">📊 CSV Export</button></div>'+
-        '<h3 style="margin:18px 0 10px 0;">Direct Broker Sync</h3>'+
-        '<div class="tabs-row"><button class="btn primary" id="syncMt5Btn" type="button">⚡ Sync MetaTrader 5 (Local)</button>'+
-        '<button class="btn" id="syncMatchTraderBtn" type="button">🔄 MatchTrader (Cloud)</button>'+
-        '<button class="btn" id="syncCTraderBtn" type="button">🔄 cTrader (Cloud)</button></div>'+
-        '<div id="uploadStatus" class="insight">Ready. Choose a file or a sync method.</div></div>';
+      sec.innerHTML='<div class="card">'+'<div style="display:flex;align-items:center;gap:10px;margin:0 0 6px 0;">'+'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>'+'<h2 style="margin:0;">Upload Trading Data</h2>'+'</div>'+'<p style="color:var(--muted);margin:0 0 16px 0;">Import MT5 / MatchTrader / cTrader history. Trades load straight into your dashboard, journal and analytics.</p>'+'<label for="brokerPlatformSelect" style="display:block;font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--faint);margin:0 0 6px 0;">Choose your trading platform</label>'+'<select id="brokerPlatformSelect" style="width:100%;padding:12px 14px;border-radius:14px;border:1px solid var(--border);background:var(--card2);color:var(--text);font-size:14px;font-weight:600;cursor:pointer;">'+'<option value="">— Select platform —</option>'+'<option value="mt5">MetaTrader 5</option>'+'<option value="matchtrader">MatchTrader</option>'+'<option value="ctrader">cTrader</option>'+'</select>'+'<div id="mt5Fields" hidden style="margin-top:14px;">'+'<p style="margin:0 0 6px 0;color:var(--muted);font-size:13px;">Syncs from your open MT5 terminal. Keep MT5 and the Journall local app running.</p>'+'<input id="mt5LoginInput" type="text" placeholder="MT5 account login (optional)" style="width:100%;padding:11px 12px;margin:5px 0;border-radius:12px;border:1px solid var(--border);background:var(--card2);color:var(--text);font-size:14px;box-sizing:border-box;">'+'<button class="btn primary" id="syncMt5Btn" type="button" style="width:100%;margin-top:8px;display:inline-flex;align-items:center;justify-content:center;gap:8px;">'+'<svg width="18" height="18" viewBox="0 0 32 32"><rect width="32" height="32" rx="7" fill="#0c3d2e"/><text x="16" y="21.5" font-family="Arial,Helvetica,sans-serif" font-size="11" font-weight="700" fill="#63f2b8" text-anchor="middle">MT5</text></svg>'+'MetaTrader 5 (Local)</button>'+'</div>'+'<div id="matchtraderFields" hidden style="margin-top:14px;">'+'<input id="mtUrlInput" type="text" placeholder="Platform URL (e.g. https://mtr-platform.fundingpips.com)" style="width:100%;padding:11px 12px;margin:5px 0;border-radius:12px;border:1px solid var(--border);background:var(--card2);color:var(--text);font-size:14px;box-sizing:border-box;">'+'<input id="mtEmailInput" type="email" placeholder="Email / login" style="width:100%;padding:11px 12px;margin:5px 0;border-radius:12px;border:1px solid var(--border);background:var(--card2);color:var(--text);font-size:14px;box-sizing:border-box;">'+'<input id="mtPasswordInput" type="password" placeholder="Password" style="width:100%;padding:11px 12px;margin:5px 0;border-radius:12px;border:1px solid var(--border);background:var(--card2);color:var(--text);font-size:14px;box-sizing:border-box;">'+'<label style="display:flex;gap:8px;align-items:center;color:var(--muted);font-size:13px;margin:6px 0 4px 0;"><input type="checkbox" id="mtRemember"> Remember on this device</label>'+'<button class="btn primary" id="syncMatchTraderBtn" type="button" style="width:100%;margin-top:4px;display:inline-flex;align-items:center;justify-content:center;gap:8px;">'+'<svg width="18" height="18" viewBox="0 0 32 32"><rect width="32" height="32" rx="7" fill="#123a8f"/><text x="16" y="22" font-family="Arial,Helvetica,sans-serif" font-size="15" font-weight="800" fill="#bcd3ff" text-anchor="middle">M</text></svg>'+'MatchTrader (Cloud)</button>'+'</div>'+'<div id="ctraderFields" hidden style="margin-top:14px;">'+'<input id="ctTokenInput" type="password" placeholder="cTrader Open API access token" style="width:100%;padding:11px 12px;margin:5px 0;border-radius:12px;border:1px solid var(--border);background:var(--card2);color:var(--text);font-size:14px;box-sizing:border-box;">'+'<input id="ctAccountInput" type="text" placeholder="Account ID (optional - auto-detected)" style="width:100%;padding:11px 12px;margin:5px 0;border-radius:12px;border:1px solid var(--border);background:var(--card2);color:var(--text);font-size:14px;box-sizing:border-box;">'+'<label style="display:flex;gap:8px;align-items:center;color:var(--muted);font-size:13px;margin:6px 0 4px 0;"><input type="checkbox" id="ctRemember"> Remember on this device</label>'+'<button class="btn primary" id="syncCTraderBtn" type="button" style="width:100%;margin-top:4px;display:inline-flex;align-items:center;justify-content:center;gap:8px;">'+'<svg width="18" height="18" viewBox="0 0 32 32"><rect width="32" height="32" rx="7" fill="#0b6d80"/><text x="16" y="22" font-family="Arial,Helvetica,sans-serif" font-size="15" font-weight="800" fill="#bdf0fa" text-anchor="middle">c</text></svg>'+'cTrader (Cloud)</button>'+'</div>'+'<div id="uploadStatus" class="insight" style="margin-top:14px;">Select your platform above, or import a file below.</div>'+'<h3 style="margin:18px 0 10px 0;">Or import a file</h3>'+'<div class="grid two">'+'<button class="btn" id="uploadHtmlBtn" type="button" style="display:inline-flex;align-items:center;justify-content:center;gap:8px;">'+'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>'+'MT5 / Broker HTML Report</button>'+'<button class="btn" id="uploadCsvBtn" type="button" style="display:inline-flex;align-items:center;justify-content:center;gap:8px;">'+'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="9" y1="4" x2="9" y2="20"/></svg>'+'CSV Export</button>'+'</div>'+'</div>';
       var main=document.querySelector('.main')||document.body;
       var first=main.querySelector('section.section');
       if(first) main.insertBefore(sec,first); else main.appendChild(sec);
@@ -15291,7 +15283,7 @@ body:not(.firebase-auth-required) #journallApp > .sidebar .nav button {
 
     /* ---------- load trades into the app ---------- */
     function loadTradesIntoApp(list,label){
-      if(!Array.isArray(list)||!list.length){ setStatus('⚠️ No trades found in '+label+'. Check the file format.'); return; }
+      if(!Array.isArray(list)||!list.length){ setStatus('<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#f87171" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> No trades found in '+label+'. Check the file format.'); return; }
       if(!Array.isArray(window.trades)) window.trades=[];
       var existing={}; trades.forEach(function(t){ existing[keyOf(t)]=1; });
       var added=0;
@@ -15304,7 +15296,7 @@ body:not(.firebase-auth-required) #journallApp > .sidebar .nav button {
       if(typeof syncStoredAccountBalanceWithTrades==='function') syncStoredAccountBalanceWithTrades(trades);
       if(typeof renderAll==='function') renderAll();
       if(typeof renderPropChallengeDashboard==='function') renderPropChallengeDashboard();
-      setStatus('<strong>'+label+':</strong> '+added+' new trades loaded ('+(list.length-added)+' duplicates skipped). Dashboard, journal and analytics updated ✅');
+      setStatus('<strong>'+label+':</strong> '+added+' new trades loaded ('+(list.length-added)+' duplicates skipped). Dashboard, journal and analytics updated.');
     }
 
     /* ---------- CSV parser ---------- */
@@ -15402,12 +15394,12 @@ body:not(.firebase-auth-required) #journallApp > .sidebar .nav button {
       return list;
     }
     function syncMT5(){
-      setStatus('⚡ Connecting to MetaTrader 5 via local server (port 8787)...');
+      setStatus('Connecting to MetaTrader 5 via local server (port 8787)...');
       var payload = JSON.stringify({ platform: 'mt5', days: 30 });
       var candidates = ['http://localhost:8787/api/sync-broker'];
       (function tryNext(i){
         if(i >= candidates.length){
-          setStatus('⚠️ MT5 sync failed. Make sure MetaTrader 5 is open, then launch <strong>Journall App.bat</strong> to start the local server.');
+          setStatus('<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#f87171" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> MT5 sync failed. Make sure MetaTrader 5 is open, then launch <strong>Journall App.bat</strong> to start the local server. On other devices use the file import below.');
           return;
         }
         fetch(candidates[i], {
@@ -15416,12 +15408,12 @@ body:not(.firebase-auth-required) #journallApp > .sidebar .nav button {
           body: payload,
           cache: 'no-store'
         }).then(function(r){ return r.json(); }).then(function(data){
-          if(data.error){ setStatus('⚠️ MT5 error: ' + data.error); return; }
+          if(data.error){ setStatus(String(data.error)); alert(String(data.error)); return; }
           var list = data.trades || (Array.isArray(data) ? data : []);
           if(list.length){
             loadTradesIntoApp(list, 'MetaTrader 5');
           } else {
-            setStatus('✅ MT5 connected — no new closed trades in the last 30 days.');
+            setStatus('MT5 connected — no new closed trades in the last 30 days.');
           }
         }).catch(function(){ tryNext(i+1); });
       })(0);
@@ -15429,7 +15421,7 @@ body:not(.firebase-auth-required) #journallApp > .sidebar .nav button {
 
     /* ---------- MatchTrader / cTrader cloud sync ---------- */
     function callBrokerSync(kind){
-      setStatus('🔄 Starting '+kind+' cloud sync...');
+      setStatus('Starting '+kind+' cloud sync...');
       var known = kind==='matchtrader'
         ? ['startMatchTraderSync','syncMatchTrader','matchTraderSync','startMatchtraderSync']
         : ['startCTraderSync','syncCTrader','cTraderSync','ctraderSync','startCtraderSync'];
@@ -15449,10 +15441,10 @@ body:not(.firebase-auth-required) #journallApp > .sidebar .nav button {
         if(go) go.click();
         return;
       }
-      setStatus('⚠️ No '+kind+' cloud sync function found in this build. Ask the agent to wire the cloudflare-worker sync endpoint into callBrokerSync().');
+      setStatus('<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#f87171" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> No '+kind+' cloud sync function found in this build.');
     }
 
-    setStatus('Ready. Choose a file or a sync method.');
+    setStatus('Select your platform above, or import a file below.');
   });
 })();
 </script>
