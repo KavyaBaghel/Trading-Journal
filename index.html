@@ -3759,6 +3759,7 @@ tr:hover {
       <button data-tab="goals">Goals</button>
       <button data-tab="ailab">AI Coach</button>
       <button data-tab="userprofile">User Profile</button>
+      <button data-tab="upload">📥 Upload Data <small>sync</small></button>
       <button class="nav-signout-btn" type="button" onclick="triggerJournalSignOut()">Sign Out</button>
     </div>
 
@@ -3785,6 +3786,30 @@ tr:hover {
 
 
     
+    <section id="upload" class="section">
+  <div class="card">
+    <h2 style="margin:0 0 6px 0;">Upload Trading Data</h2>
+    <p style="color:var(--muted);margin:0 0 20px 0;">Import MT5 / MatchTrader / cTrader history. Trades load straight into your dashboard, journal and analytics.</p>
+    <div class="grid two" style="margin-bottom:20px;">
+      <label class="file-picker-btn btn" style="display:block;text-align:center;cursor:pointer;padding:14px 16px;">
+        📄 MT5 / Broker HTML Report
+        <input type="file" id="uploadHtmlInput" accept=".html,.htm" hidden>
+      </label>
+      <label class="file-picker-btn btn" style="display:block;text-align:center;cursor:pointer;padding:14px 16px;">
+        📊 CSV Export
+        <input type="file" id="uploadCsvInput" accept=".csv,.txt" hidden>
+      </label>
+    </div>
+    <h3 style="margin:0 0 12px 0;">Direct Broker Sync</h3>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px;">
+      <button class="btn primary" id="uploadSyncMt5Btn" type="button">⚡ Sync MetaTrader 5 (Local)</button>
+      <button class="btn" id="uploadSyncMatchTraderBtn" type="button">🔄 MatchTrader (Cloud)</button>
+      <button class="btn" id="uploadSyncCTraderBtn" type="button">🔄 cTrader (Cloud)</button>
+    </div>
+    <div id="uploadTabStatus" class="insight" style="margin-top:8px;">Ready. Choose a file or a sync method.</div>
+  </div>
+</section>
+
     <section id="userprofile" class="section">
       <div class="card profile-card-hero">
         <div style="display:flex; align-items:center; gap:24px; flex-wrap:wrap;">
@@ -15231,6 +15256,120 @@ body:not(.firebase-auth-required) #journallApp > .sidebar .nav button {
     document.querySelectorAll('.cursor-green-spotlight').forEach(function (el) {
       if (el !== dot) el.remove();
     });
+  });
+})();
+</script>
+
+<script>
+(function(){
+  function setUploadStatus(msg){ var el=document.getElementById('uploadTabStatus'); if(el) el.innerHTML=msg; }
+  function toNum(v){ v=String(v==null?'':v).replace(/[^0-9eE+.-]/g,''); var n=parseFloat(v); return isFinite(n)?n:0; }
+  function keyOf(t){ return [t.date||'',t.time||'',t.symbol||'',t.side||'',t.volume||'',(Number(t.pnl)||0).toFixed(2)].join('|'); }
+
+  function loadTradesIntoApp(list, label){
+    if(!Array.isArray(list)||!list.length){ setUploadStatus('No trades found in '+label+'.'); return; }
+    if(!Array.isArray(window.trades)) window.trades=[];
+    var existing={}; window.trades.forEach(function(t){ existing[keyOf(t)]=1; });
+    var added=0;
+    list.forEach(function(t){
+      var n=(typeof normalizeImportedTrade==='function')?normalizeImportedTrade(t):t;
+      var k=keyOf(n);
+      if(!existing[k]){ window.trades.push(n); existing[k]=1; added++; }
+    });
+    if(typeof saveTrades==='function') saveTrades();
+    if(typeof renderAll==='function') renderAll();
+    setUploadStatus('<strong>'+label+':</strong> '+added+' new trades loaded ('+(list.length-added)+' duplicates skipped). Dashboard updated ✅');
+  }
+
+  function parseCSVUpload(str){
+    var lines=str.split(/\r?\n/).filter(function(l){return l.trim();});
+    if(lines.length<2) return [];
+    var delim=((lines[0].match(/;/g)||[]).length>(lines[0].match(/,/g)||[]).length)?';':',';
+    var header=lines[0].split(delim).map(function(h){return h.trim().toLowerCase().replace(/"/g,'');});
+    function idx(names){ return header.findIndex(function(h){ return names.some(function(n){ return h.indexOf(n)>-1; }); }); }
+    var c={ date:idx(['date','open time']), time:idx(['time']), symbol:idx(['symbol','market','instrument','pair']),
+      side:idx(['type','side','direction']), entry:idx(['open price','entry']), exit:idx(['close price','exit']),
+      sl:idx(['stop loss','s/l']), tp:idx(['take profit','t/p']), volume:idx(['volume','lot','size','qty']),
+      pnl:idx(['profit','pnl','p&l','net']), reason:idx(['comment','reason']) };
+    var out=[];
+    for(var i=1;i<lines.length;i++){
+      var r=lines[i].split(delim).map(function(x){return x.trim().replace(/^"|"$/g,'');});
+      if(r.length<3) continue;
+      var dateRaw=c.date>-1?r[c.date]:''; var timeRaw=c.time>-1?r[c.time]:'';
+      var m=String(dateRaw).match(/(\d{4})[.\/-](\d{2})[.\/-](\d{2})/);
+      if(m) dateRaw=m[1]+'-'+m[2]+'-'+m[3];
+      var sideRaw=c.side>-1?r[c.side].toLowerCase():'';
+      out.push({ date:dateRaw, time:timeRaw, symbol:(c.symbol>-1?r[c.symbol]:'UNKNOWN').toUpperCase(),
+        side:/sell|short|1/.test(sideRaw)?'SELL':'BUY',
+        entry:c.entry>-1?toNum(r[c.entry]):0, exit:c.exit>-1?toNum(r[c.exit]):0,
+        sl:c.sl>-1?toNum(r[c.sl]):0, tp:c.tp>-1?toNum(r[c.tp]):0,
+        volume:c.volume>-1?toNum(r[c.volume]):0.01, pnl:c.pnl>-1?toNum(r[c.pnl]):0,
+        reason:c.reason>-1?r[c.reason]:'', mistakes:[], notes:'' });
+    }
+    return out;
+  }
+
+  // File inputs
+  var csvInput=document.getElementById('uploadCsvInput');
+  if(csvInput) csvInput.addEventListener('change',function(e){
+    var f=e.target.files[0]; if(!f) return; setUploadStatus('Reading '+f.name+'...');
+    var r=new FileReader();
+    r.onload=function(){
+      // Try existing parser first, fall back to built-in
+      var list;
+      if(typeof parseMatchTraderCSV==='function'){ list=normalizeImportedTradeList(parseMatchTraderCSV(String(r.result))); }
+      else { list=parseCSVUpload(String(r.result)); }
+      loadTradesIntoApp(list, f.name);
+    };
+    r.readAsText(f);
+  });
+
+  var htmlInput=document.getElementById('uploadHtmlInput');
+  if(htmlInput) htmlInput.addEventListener('change',function(e){
+    var f=e.target.files[0]; if(!f) return; setUploadStatus('Reading '+f.name+'...');
+    var r=new FileReader();
+    r.onload=function(){
+      var list;
+      if(typeof parseMatchTraderHTML==='function'){ list=normalizeImportedTradeList(parseMatchTraderHTML(String(r.result))); }
+      else { list=[]; }
+      loadTradesIntoApp(list, f.name);
+    };
+    r.readAsText(f);
+  });
+
+  // MT5 local server sync (reuses existing endpoint)
+  var mt5Btn=document.getElementById('uploadSyncMt5Btn');
+  if(mt5Btn) mt5Btn.addEventListener('click',function(){
+    setUploadStatus('Contacting local MT5 server (localhost:3000)...');
+    fetch('http://localhost:3000/mt5/trades')
+      .then(function(r){return r.json();})
+      .then(function(data){
+        var list=Array.isArray(data)?data:(data&&Array.isArray(data.trades)?data.trades:[]);
+        if(!list.length){ setUploadStatus('MT5 server responded but returned no trades. Keep MT5 open and try again.'); return; }
+        if(typeof normalizeImportedTradeList==='function') list=normalizeImportedTradeList(list);
+        loadTradesIntoApp(list,'MetaTrader 5');
+      })
+      .catch(function(){
+        setUploadStatus('⚠️ Could not reach the local MT5 server. Run the local bridge with MT5 open, then try again.');
+      });
+  });
+
+  // MatchTrader / cTrader — delegate to existing startBrokerSync if available
+  var mtBtn=document.getElementById('uploadSyncMatchTraderBtn');
+  if(mtBtn) mtBtn.addEventListener('click',function(){
+    if(typeof window.startMatchTraderSync==='function') return window.startMatchTraderSync();
+    if(typeof window.startBrokerSync==='function') return window.startBrokerSync('matchtrader');
+    // Redirect to the uploadcsv tab which has the full broker sync UI
+    document.querySelector('[data-tab="uploadcsv"]')?.click();
+    setUploadStatus('Opening broker sync panel...');
+  });
+
+  var ctBtn=document.getElementById('uploadSyncCTraderBtn');
+  if(ctBtn) ctBtn.addEventListener('click',function(){
+    if(typeof window.startCTraderSync==='function') return window.startCTraderSync();
+    if(typeof window.startBrokerSync==='function') return window.startBrokerSync('ctrader');
+    document.querySelector('[data-tab="uploadcsv"]')?.click();
+    setUploadStatus('Opening broker sync panel...');
   });
 })();
 </script>
