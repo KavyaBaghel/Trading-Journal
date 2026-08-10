@@ -8124,7 +8124,7 @@ function showMt5TerminalInstallMessage(status, rawMessage=''){
     <div style="background:#050505;border:1px solid rgba(255,255,255,.12);border-left:3px solid #ef4444;border-radius:12px;padding:16px 18px;line-height:1.55;">
       <strong style="display:block;color:#fff;margin-bottom:8px;">${title}</strong>
       <div style="color:rgba(255,255,255,.82);font-size:13px;font-family:monospace;white-space:pre-wrap;word-break:break-word;background:rgba(255,255,255,.04);border-radius:8px;padding:10px 12px;margin-bottom:12px;">${safeMessage || 'Unknown error'}</div>
-      ${isImportErr ? `<div style="color:rgba(255,255,255,.55);font-size:12px;">Fix: open a terminal and run <code>py -3 -m pip install --force-reinstall --no-cache-dir MetaTrader5</code> then try again.</div>` : ''}
+      ${isImportErr ? `<div style="color:rgba(255,255,255,.55);font-size:12px;">Fix (easiest): download <code>Fix-MT5-Sync.bat</code> from your GitHub repo and double-click it — it installs the package automatically. Or open PowerShell and run <code>py -3 -m pip install --user --force-reinstall --no-cache-dir MetaTrader5 numpy</code>, then restart Journall App.bat and try again.</div>` : ''}
       ${isTerminalErr ? `<div style="color:rgba(255,255,255,.55);font-size:12px;">Make sure the MetaTrader 5 terminal is open and logged in, then click Sync again.</div>` : ''}
     </div>`;
 }
