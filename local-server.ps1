@@ -321,9 +321,35 @@ while ($true) {
         
         $pythonExe = Get-PythonExe
         $scriptPath = Join-Path $rootPath $scriptName
+        # Bulletproof resolution: the script must come from THIS server
+        # script's own folder, never a stale copy elsewhere on the PC.
+        if (-not (Test-Path -LiteralPath $scriptPath)) {
+          $scriptPath = Join-Path $PSScriptRoot $scriptName
+        }
+        if (-not (Test-Path -LiteralPath $scriptPath)) {
+          # Last resort: the newest copy anywhere near (repo root up to 3
+          # levels up, and known Journall folder names in the user profile).
+          $probeDir = $PSScriptRoot
+          for ($depth = 0; $depth -le 3; $depth++) {
+            foreach ($dir in @($probeDir, (Join-Path $probeDir '..'))) {
+              $candidate = Join-Path $dir $scriptName
+              if (Test-Path -LiteralPath $candidate) {
+                if (-not $scriptPath -or (-not (Test-Path -LiteralPath $scriptPath)) -or ((Get-Item $candidate).LastWriteTimeUtc -gt (Get-Item $scriptPath).LastWriteTimeUtc)) {
+                  $scriptPath = $candidate
+                }
+              }
+            }
+            $probeDir = Join-Path $probeDir '..'
+          }
+        }
         if (-not (Test-Path -LiteralPath $scriptPath)) {
           throw "Sync script not found: $scriptPath"
         }
+        try {
+          $syncLog = Join-Path $env:TEMP 'journall_sync.log'
+          Add-Content -LiteralPath $syncLog -Value "$(Get-Date -Format 'yyyy-MM-dd HH:mm:ss') USING $scriptPath (root=$rootPath)"
+        } catch {}
+
 
         $psi = [System.Diagnostics.ProcessStartInfo]::new()
         $launcherPath = $pythonExe
@@ -336,7 +362,7 @@ while ($true) {
           $psi.FileName = $launcherPath
           $psi.Arguments = "`"$scriptPath`""
         }
-        $psi.WorkingDirectory = $rootPath
+        $psi.WorkingDirectory = Split-Path -Parent $scriptPath
         $psi.RedirectStandardInput = $true
         $psi.RedirectStandardOutput = $true
         $psi.RedirectStandardError = $true
