@@ -3695,7 +3695,7 @@ tr:hover {
     </div>
 
     <div class="setup-section">
-      <div class="setup-section-label">Synced account</div><p id="accountSyncNote" class="account-sync-note">Account size and phase are configured here. Your current balance is automatically calculated and updated in real time from your synced trades.</p>
+      <div class="setup-section-label">Synced account</div><p id="accountSyncNote" class="account-sync-note">Account size and phase are configured here. Your current balance is automatically calculated and updated in real time from your synced trades.</p><input id="currentBalanceInput" type="number" min="0" step="1" style="display:none" aria-hidden="true">
       <div class="account-form-grid">
         <label>Initial account balance ($)<div class="stepper-control"><button type="button" class="stepper-btn minus" onclick="stepInput('accountSizeInput', -1, 'renderAccountSetupPreview')">−</button><input id="accountSizeInput" class="account-source-input" type="number" min="1" step="100" placeholder="Enter a value" oninput="renderAccountSetupPreview()"><button type="button" class="stepper-btn plus" onclick="stepInput('accountSizeInput', 1, 'renderAccountSetupPreview')">+</button></div></label>
         <label>Account phase<select id="accountPhaseInput" class="account-source-input" onchange="toggleFundedFields()"><option>Phase 1</option><option>Phase 2</option><option>Funded</option><option>Personal</option></select></label>
@@ -6581,7 +6581,8 @@ async function saveAccountSetup(){
   let accountSize, currentBalance, riskPercent, profitTarget, maxTradesPerDay, minRr, maxDailyLoss = null, maxDrawdown = null;
   try{
     accountSize = existingAccount?.accountSize || readRequiredNumber('accountSizeInput','Account size');
-    currentBalance = readRequiredNumber('currentBalanceInput','Current balance');
+    const cbRaw = String(document.getElementById('currentBalanceInput')?.value ?? '').trim();
+    currentBalance = Number.isFinite(Number(cbRaw)) && Number(cbRaw) > 0 ? Number(cbRaw) : accountSize;
     profitTarget = readRequiredNumber('profitTargetInput','Profit target');
     riskPercent = clampNumber(readRequiredNumber('riskPercentInput','Risk per trade'), 0.5, 2);
     maxTradesPerDay = readRequiredNumber('maxTradesInput','Max trades per day');
@@ -8232,11 +8233,15 @@ async function triggerBrokerSync(options = {}) {
           await new Promise(r => setTimeout(r, 1500));
         }
         try {
+          const attemptController = new AbortController();
+          const attemptTimer = window.setTimeout(() => attemptController.abort(), 30000);
           const res = await fetch(syncApiUrl, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
+            body: JSON.stringify(payload),
+            signal: attemptController.signal
           });
+          window.clearTimeout(attemptTimer);
           const data = await res.json().catch(() => ({}));
           if (res.ok && !data.error) {
             parsed = data.trades || [];
@@ -8258,7 +8263,16 @@ async function triggerBrokerSync(options = {}) {
       if (!backendSuccess && bridgeError) throw bridgeError;
     } catch(err) {
       if (platform === 'mt5') {
-        throw new Error(err.message || `The local desktop bridge is not running on your PC (http://localhost:8787).\n\nTo sync directly from MT5:\n1. Keep MetaTrader 5 open on this PC.\n2. Double-click 'Journall App.bat' to start the local bridge.\n3. Open the local Journall link and click Sync from MetaTrader 5 again.\n\nAlternatively, export your MT5 account history as an HTML report (right-click Account History -> Report -> Save as HTML) and upload it in the Upload CSV tab.`);
+      let hint = err.message || 'The local desktop bridge is not running on your PC (http://localhost:8787).';
+      const onHttps = window.location.protocol === 'https:';
+      if (onHttps && (err.name === 'TypeError' || /network|blocked|failed to fetch/i.test(err.message || ''))) {
+        hint = 'Browser security blocks this HTTPS page from reaching the local bridge (http://localhost:8787). ' +
+          'Open the local copy instead: run \'Journall App.bat\' (or local-server.ps1) and open http://localhost:8787/index.html in your browser, then sync there. ' +
+          '(Or use the \'Upload MT5 HTML Report\' option on this page, which works fully offline.)';
+      } else if (onHttps) {
+        hint += ' Note: this page is served over HTTPS; if the bridge keeps failing, open http://localhost:8787/index.html (served by the local bridge) and sync from there.';
+      }
+      throw new Error(hint);
       }
       if (platform === 'matchtrader' || platform === 'ctrader') {
         throw new Error(err.message || `The local desktop bridge is not running on your PC (http://localhost:8787).\n\nTo sync from ${pName}: double-click 'Journall App.bat' on this PC with MT5 / MatchTrader / cTrader available, then click Sync again.`);

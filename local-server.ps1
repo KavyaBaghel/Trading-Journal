@@ -308,7 +308,10 @@ while ($true) {
         
         $stdout = $proc.StandardOutput.ReadToEnd()
         $stderr = $proc.StandardError.ReadToEnd()
-        $proc.WaitForExit()
+        if (-not $proc.WaitForExit(120000)) {
+          $proc.Kill()
+          throw 'The sync script took too long (over 2 minutes) and was stopped. Close and reopen MetaTrader 5, then try again.'
+        }
         
         if ($proc.ExitCode -ne 0) {
           $errMsg = ""
