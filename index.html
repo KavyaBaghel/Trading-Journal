@@ -13,7 +13,8 @@
 <link rel="apple-touch-icon" href="assets/icon-192.png"/>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet"/>
 <title>Journall</title>
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script>
 document.querySelectorAll('.nav button').forEach(btn=>{
 btn.addEventListener('click', ()=>{
 document.querySelectorAll('.nav button').forEach(b=>b.classList.remove('active'));
@@ -661,10 +662,7 @@ function saveCustomUsername() {
 
   const count = getNameChangesThisMonthCount();
   if (count >= 2) {
-    alert('⚠️ Name change limit reached!
-
-You can only change your display name 2 times per month.
-Your next name change will be available on the 1st of next month.');
+    alert('Name change limit reached!\n\nYou can only change your display name 2 times per month.\nYour next name change will be available on the 1st of next month.');
     renderUserProfile();
     return;
   }
@@ -10647,10 +10645,22 @@ document.querySelectorAll('.nav button').forEach(btn=>{
       if (typeof initDraftAutoSync === 'function') initDraftAutoSync();
       if (typeof loadJournalDraft === 'function') loadJournalDraft();
       if (typeof loadPsychologyDraft === 'function') loadPsychologyDraft();
-      navigator.serviceWorker.register('./service-worker.js', { updateViaCache: 'none' })
+      navigator.serviceWorker.register('./service-worker.js?v=146', { updateViaCache: 'none' })
         .then(reg => {
-          // Force check for service worker updates on load
+          // Force check for service worker updates on load, immediately
           reg.update().catch(() => {});
+          // Skip-waiting so a new service worker takes control without
+          // waiting for other tabs to close.
+          if (reg.waiting) reg.waiting.postMessage({ type: 'SKIP_WAITING' });
+          reg.addEventListener('updatefound', () => {
+            const w = reg.installing;
+            if (!w) return;
+            w.addEventListener('statechange', () => {
+              if (w.state === 'installed' && navigator.serviceWorker.controller) {
+                w.postMessage({ type: 'SKIP_WAITING' });
+              }
+            });
+          });
         })
         .catch(() => {});
     });
