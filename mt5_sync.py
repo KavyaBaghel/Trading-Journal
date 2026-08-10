@@ -118,8 +118,11 @@ def main():
         print(json.dumps({"error": f"Could not connect to MetaTrader 5: {err_desc} (Code {err_code}). Ensure MT5 application is open and active on your PC."}))
         sys.exit(0)
 
-    from_date = datetime.datetime.now() - datetime.timedelta(days=days)
-    to_date = datetime.datetime.now() + datetime.timedelta(days=1)
+    # Use a 2-day future buffer so MT5 server time vs PC time differences
+    # never cut off the most recently closed trades.
+    now_local = datetime.datetime.now()
+    from_date = now_local - datetime.timedelta(days=days + 2)
+    to_date = now_local + datetime.timedelta(days=2)
 
     deals = mt5.history_deals_get(from_date, to_date)
     if deals is None:
@@ -127,6 +130,46 @@ def main():
         print(json.dumps({"error": f"Failed to fetch trade history from MT5: {err_desc} (Code {err_code})"}))
         mt5.shutdown()
         sys.exit(0)
+
+    # Fallback for terminals that truncate deal history: if the newest deal is
+    # older than 3 days, also pull closed history orders from the last days
+    # and merge any positions missing from the deal history.
+    extra_deals = []
+    if deals:
+        newest_ts = max(d.time for d in deals)
+        newest_dt = datetime.datetime.fromtimestamp(newest_ts)
+        if (now_local - newest_dt).total_seconds() > 3 * 24 * 3600:
+            try:
+                orders = mt5.history_orders_get(from_date, to_date)
+                if orders:
+                    seen_pids = set(d.position_id for d in deals)
+                    for o in orders:
+                        if o.state != 1 or o.position_id == 0:
+                            continue
+                        if o.position_id in seen_pids or o.time <= newest_ts:
+                            continue
+                        # Synthesize an exit deal from the closed order so the
+                        # position-grouping logic below can process it.
+                        extra_deals.append(type('Deal', (), {
+                            'ticket': o.ticket,
+                            'order': o.ticket,
+                            'position_id': o.position_id,
+                            'time': o.time,
+                            'time_msc': o.time_msc,
+                            'type': o.type,
+                            'entry': 1,  # close-out entry in deal terms
+                            'symbol': o.symbol,
+                            'volume': o.volume_current,
+                            'price': o.price_current,
+                            'profit': o.profit,
+                            'swap': o.swap,
+                            'commission': o.commission,
+                            'comment': o.comment or '',
+                        })())
+            except Exception:
+                pass
+
+    deals = list(deals) + extra_deals
 
     position_groups = {}
     for d in deals:
