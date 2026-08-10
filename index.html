@@ -2994,10 +2994,10 @@ tr:hover {
   background: radial-gradient(circle at center, rgba(16, 185, 129, 0.75) 0%, rgba(34, 197, 94, 0.4) 35%, rgba(168, 85, 247, 0.15) 60%, transparent 75%) !important;
   filter: blur(55px) !important;
   pointer-events: none !important;
-  z-index: 5 !important;
+  z-index: 99999 !important;
   opacity: 0;
-  transition: opacity 0.25s ease !important;
-  transform: translate3d(-1000px, -1000px, 0) !important;
+  transition: opacity 0.4s ease !important;
+  transform: translate3d(-1000px, -1000px, 0);
   will-change: transform, opacity !important;
 }
 
@@ -3632,7 +3632,7 @@ tr:hover {
   </div>
 </div>
 <div id="firebaseAuthGate" class="firebase-auth-gate show">
-<div id="cursorGreenSpotlight" class="cursor-green-spotlight"></div>
+
     <div id="firebaseAuthLoading" class="login-loading"><div class="spinner" aria-hidden="true"></div><p id="firebaseAuthLoadingText">Loading Journall...</p><button id="firebaseAuthRetryBtn" class="btn primary" type="button" hidden>Retry</button></div>
 <div class="firebase-auth-card journall-signin-card" hidden>
     <section class="signin-copy" aria-label="Journall overview">
@@ -15275,6 +15275,56 @@ body:not(.firebase-auth-required) #journallApp > .sidebar .nav button {
   } else {
     initSpotlight();
   }
+})();
+</script>
+
+<script>
+(function() {
+  // Create the spotlight globally so it works on all pages
+  let spotlight = document.getElementById('globalMouseSpotlight');
+  if (!spotlight) {
+    spotlight = document.createElement('div');
+    spotlight.id = 'globalMouseSpotlight';
+    spotlight.className = 'cursor-green-spotlight';
+    document.body.appendChild(spotlight);
+  }
+
+  let targetX = -1000, targetY = -1000;
+  let currentX = -1000, currentY = -1000;
+  let moveTimeout;
+
+  // Track mouse movement
+  document.addEventListener('mousemove', (e) => {
+    targetX = e.clientX;
+    targetY = e.clientY;
+
+    // Show colors instantly when moving
+    spotlight.style.opacity = '1';
+
+    // Reset timer to hide when idle
+    clearTimeout(moveTimeout);
+    moveTimeout = setTimeout(() => {
+      spotlight.style.opacity = '0';
+    }, 800);
+  });
+
+  // Smooth live animation loop using requestAnimationFrame
+  function animateSpotlight() {
+    // 0.15 controls the smoothness/glide effect
+    currentX += (targetX - currentX) * 0.15;
+    currentY += (targetY - currentY) * 0.15;
+
+    spotlight.style.transform = `translate3d(${currentX}px, ${currentY}px, 0)`;
+    requestAnimationFrame(animateSpotlight);
+  }
+
+  requestAnimationFrame(animateSpotlight);
+
+  // Hide when mouse leaves the window
+  document.addEventListener('mouseleave', () => {
+    spotlight.style.opacity = '0';
+    clearTimeout(moveTimeout);
+  });
 })();
 </script>
 
