@@ -5,7 +5,7 @@ import site
 import datetime
 import subprocess
 
-# Dynamically add user site-packages and AppData Python paths to sys.path
+# ── Dynamically add user site-packages so --user-installed packages are found ──
 try:
     user_site = site.getusersitepackages()
     if user_site and os.path.exists(user_site) and user_site not in sys.path:
@@ -15,30 +15,70 @@ except Exception:
 
 appdata = os.environ.get('APPDATA', '')
 localappdata = os.environ.get('LOCALAPPDATA', '')
-if appdata:
-    for py_ver in ['Python313', 'Python312', 'Python311', 'Python310', 'Python39']:
-        p = os.path.join(appdata, 'Python', py_ver, 'site-packages')
-        if os.path.exists(p) and p not in sys.path:
-            sys.path.insert(0, p)
-if localappdata:
-    for py_ver in ['Python313', 'Python312', 'Python311', 'Python310', 'Python39']:
-        p = os.path.join(localappdata, 'Programs', 'Python', py_ver, 'Lib', 'site-packages')
-        if os.path.exists(p) and p not in sys.path:
-            sys.path.insert(0, p)
+for base, subpath in [
+    (appdata,      os.path.join('Python', '{}', 'site-packages')),
+    (localappdata, os.path.join('Programs', 'Python', '{}', 'Lib', 'site-packages')),
+]:
+    if base:
+        for py_ver in ['Python313', 'Python312', 'Python311', 'Python310', 'Python39']:
+            p = os.path.join(base, subpath.format(py_ver))
+            if os.path.exists(p) and p not in sys.path:
+                sys.path.insert(0, p)
+
+# ── numpy check (MetaTrader5 depends on it) ──
+numpy_error = None
+try:
+    import numpy  # noqa: F401
+except Exception as _ne:
+    numpy_error = str(_ne)
+
+# ── MetaTrader5 import with auto-repair ──
+import_error = None
+mt5 = None
+
+def _try_import_mt5():
+    global mt5
+    import MetaTrader5 as _mt5
+    mt5 = _mt5
 
 try:
-    import MetaTrader5 as mt5
-except ImportError:
+    _try_import_mt5()
+except Exception as _ie:
+    import_error = str(_ie)
+    # Auto-repair: force-reinstall for the current interpreter
     try:
-        subprocess.check_call([sys.executable, "-m", "pip", "install", "--user", "MetaTrader5"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-        import MetaTrader5 as mt5
+        subprocess.run(
+            [sys.executable, "-m", "pip", "install",
+             "--user", "--force-reinstall", "--no-cache-dir", "MetaTrader5"],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+            timeout=120,
+        )
     except Exception:
-        try:
-            subprocess.check_call(["pip", "install", "--user", "MetaTrader5"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-            import MetaTrader5 as mt5
-        except Exception as err:
-            print(json.dumps({"error": f"MetaTrader5 Python library is missing. Please open Command Prompt on your PC and run: pip install MetaTrader5"}))
-            sys.exit(0)
+        pass
+    # Retry after repair
+    try:
+        _try_import_mt5()
+        import_error = None  # repair succeeded
+    except Exception as _ie2:
+        import_error = str(_ie2)
+
+if mt5 is None:
+    # Build a detailed, actionable error message
+    parts = [
+        f"MetaTrader5 import failed on Python {sys.version} ({sys.executable}): {import_error}"
+    ]
+    if numpy_error:
+        parts.append(
+            f"numpy also failed to import: {numpy_error}. "
+            f"Fix: py -3 -m pip install --force-reinstall \"numpy<2.4\""
+        )
+    parts.append(
+        f"Fix MetaTrader5: py -3 -m pip install --force-reinstall --no-cache-dir MetaTrader5"
+    )
+    print(json.dumps({"error": " | ".join(parts)}))
+    sys.exit(0)
+
 
 def main():
     input_data = {}
@@ -79,7 +119,7 @@ def main():
 
     from_date = datetime.datetime.now() - datetime.timedelta(days=days)
     to_date = datetime.datetime.now() + datetime.timedelta(days=1)
-    
+
     deals = mt5.history_deals_get(from_date, to_date)
     if deals is None:
         err_code, err_desc = mt5.last_error()
@@ -92,7 +132,7 @@ def main():
         pid = d.position_id
         if pid == 0:
             continue
-        
+
         symbol = d.symbol
         if not symbol or any(kw in symbol.lower() for kw in ["commission", "bonus", "deposit", "withdraw", "fee", "swap"]):
             continue
@@ -102,23 +142,23 @@ def main():
         position_groups[pid].append(d)
 
     reconstructed_trades = []
-    
+
     for pid, group in position_groups.items():
         group.sort(key=lambda x: x.time)
-        
+
         has_out = any(d.entry in [1, 2] for d in group)
         if not has_out:
             continue
 
         first_deal = group[0]
         last_deal = group[-1]
-        
+
         if first_deal.type not in [0, 1]:
             continue
 
         symbol = first_deal.symbol
         side = "BUY" if first_deal.type == 0 else "SELL"
-        
+
         tot_profit = sum(d.profit for d in group)
         tot_swap = sum(d.swap for d in group)
         tot_comm = sum(d.commission for d in group)
@@ -156,6 +196,7 @@ def main():
 
     mt5.shutdown()
     print(json.dumps({"ok": True, "trades": reconstructed_trades}))
+
 
 if __name__ == "__main__":
     main()

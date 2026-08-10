@@ -21,48 +21,57 @@ $listener = [System.Net.Sockets.TcpListener]::new($ipAddress, $Port)
 $listener.Start()
 
 function Get-PythonExe {
-  $localAppData = $env:LOCALAPPDATA
-  $progFiles = $env:ProgramFiles
-  $candidates = @(
-    "$localAppData\Programs\Python\Python313\python.exe",
-    "$localAppData\Programs\Python\Python312\python.exe",
-    "$localAppData\Programs\Python\Python311\python.exe",
-    "$localAppData\Programs\Python\Python310\python.exe",
-    "$progFiles\Python313\python.exe",
-    "$progFiles\Python312\python.exe",
-    "$progFiles\Python311\python.exe",
-    "$progFiles\Python310\python.exe",
-    'py.exe',
-    'python.exe'
-  )
-  foreach ($candidate in $candidates) {
-    try {
-      if ($candidate -like '*\*') {
-        if (Test-Path -LiteralPath $candidate) {
-          $logFile = [System.IO.Path]::GetTempFileName()
-          $p = Start-Process -FilePath $candidate -ArgumentList '-c', '"import MetaTrader5; print(1)"' -NoNewWindow -PassThru -Wait -RedirectStandardOutput $logFile -ErrorAction SilentlyContinue
-          $out = if (Test-Path $logFile) { Get-Content $logFile -Raw } else { '' }
-          Remove-Item $logFile -ErrorAction SilentlyContinue
-          if ($p.ExitCode -eq 0 -and $out.Trim() -eq '1') {
-            return $candidate
-          }
+  # ── Step 1: Use the Windows Py launcher to enumerate ALL installed interpreters ──
+  $allInterpreters = @()
+  try {
+    $pyLauncherOutput = & py -0p 2>$null
+    if ($LASTEXITCODE -eq 0 -and $pyLauncherOutput) {
+      foreach ($line in ($pyLauncherOutput -split "`n")) {
+        $line = $line.Trim()
+        # Format: "-3.13-64  C:\Users\...\Python313\python.exe" or similar
+        $m = [regex]::Match($line, '^\-[\d.]+(?:-\d+)?\s+(.+python\.exe)\s*$', 'IgnoreCase')
+        if ($m.Success) {
+          $path = $m.Groups[1].Value.Trim()
+          if (Test-Path -LiteralPath $path) { $allInterpreters += $path }
         }
       }
-    } catch {}
-  }
-  foreach ($candidate in $candidates) {
-    try {
-      if ($candidate -like '*\*') {
-        if (Test-Path -LiteralPath $candidate) { return $candidate }
-      } else {
-        $cmd = Get-Command $candidate -ErrorAction SilentlyContinue
-        if ($cmd -and $cmd.Source -notlike '*hermes*' -and $cmd.Source -notlike '*WindowsApps*') { return $cmd.Source }
-      }
-    } catch {}
-  }
-  return 'python.exe'
-}
+    }
+  } catch {}
 
+  # ── Step 2: Fall back to hardcoded candidate list if py launcher unavailable ──
+  if ($allInterpreters.Count -eq 0) {
+    $localAppData = $env:LOCALAPPDATA
+    $programFiles  = $env:ProgramFiles
+    $allInterpreters = @(
+      "$localAppData\Programs\Python\Python313\python.exe",
+      "$localAppData\Programs\Python\Python312\python.exe",
+      "$localAppData\Programs\Python\Python311\python.exe",
+      "$localAppData\Programs\Python\Python310\python.exe",
+      "$programFiles\Python313\python.exe",
+      "$programFiles\Python312\python.exe",
+      "$programFiles\Python311\python.exe",
+      "$programFiles\Python310\python.exe"
+    ) | Where-Object { Test-Path -LiteralPath $_ }
+  }
+
+  # ── Step 3: Test each interpreter for MetaTrader5 + numpy ──
+  foreach ($candidate in $allInterpreters) {
+    try {
+      $probe = & $candidate -c 'import MetaTrader5, numpy; print("ready")' 2>$null
+      if ($LASTEXITCODE -eq 0 -and $probe -match 'ready') { return $candidate }
+    } catch {}
+  }
+
+  # ── Step 4: If nothing passed the full test, try MetaTrader5 alone (numpy may still install) ──
+  foreach ($candidate in $allInterpreters) {
+    try {
+      $probe = & $candidate -c 'import MetaTrader5; print("mt5ok")' 2>$null
+      if ($LASTEXITCODE -eq 0 -and $probe -match 'mt5ok') { return $candidate }
+    } catch {}
+  }
+
+  throw 'No Python interpreter with MetaTrader5 installed was found. Open a terminal and run: py -3 -m pip install --force-reinstall --no-cache-dir MetaTrader5'
+}
 
 function Get-ContentType([string]$Path) {
   switch ([System.IO.Path]::GetExtension($Path).ToLowerInvariant()) {
@@ -276,10 +285,14 @@ while ($true) {
         }
 
         $psi = [System.Diagnostics.ProcessStartInfo]::new()
-        $psi.FileName = $pythonExe
-        if ([System.IO.Path]::GetFileName($pythonExe).ToLowerInvariant() -eq 'py.exe') {
+        $launcherPath = $pythonExe
+        if ([System.IO.Path]::GetFileName($launcherPath).ToLowerInvariant() -eq 'py.exe') {
+          $pyCommand = Get-Command 'py.exe' -ErrorAction Stop
+          $launcherPath = $pyCommand.Source
+          $psi.FileName = $launcherPath
           $psi.Arguments = "-3 `"$scriptPath`""
         } else {
+          $psi.FileName = $launcherPath
           $psi.Arguments = "`"$scriptPath`""
         }
         $psi.WorkingDirectory = $rootPath

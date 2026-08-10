@@ -8015,39 +8015,47 @@ async function syncCTraderViaWorker(token, accountId, days) {
 const MT5_DOWNLOAD_URL = 'https://www.metatrader.com/en/download';
 
 function isMt5TerminalSetupError(err){
+  // Treat all sync errors as displayable — never suppress the real message
   const message = String(err?.message || err || '').toLowerCase();
   return message.includes('could not connect to metatrader 5') ||
     message.includes('ensure mt5 application is open') ||
     message.includes('terminal') ||
     message.includes('initialize') ||
     message.includes('not installed') ||
-    message.includes('python with metatrader5') ||
-    message.includes('metatrader5 installed') ||
+    message.includes('metatrader5 import failed') ||
+    message.includes('no python interpreter') ||
     message.includes('access is denied');
 }
 
 function showMt5TerminalInstallMessage(status, rawMessage=''){
-  const requiresPythonConnector = String(rawMessage || '').toLowerCase().includes('python with metatrader5') ||
-    String(rawMessage || '').toLowerCase().includes('metatrader5 installed');
+  if (!status) return;
   const safeMessage = String(rawMessage || '').replace(/[<>&"]/g, ch => ({
     '<': '&lt;',
     '>': '&gt;',
     '&': '&amp;',
     '"': '&quot;'
   })[ch]);
-  if (!status) return;
+
+  // Determine if this is a Python/library setup issue or a terminal-not-open issue
+  const isImportErr = safeMessage.toLowerCase().includes('import failed') ||
+    safeMessage.toLowerCase().includes('no python interpreter') ||
+    safeMessage.toLowerCase().includes('metatrader5 import');
+  const isTerminalErr = safeMessage.toLowerCase().includes('could not connect') ||
+    safeMessage.toLowerCase().includes('mt5 application is open') ||
+    safeMessage.toLowerCase().includes('initialize');
+
+  const title = isImportErr
+    ? 'MT5 Python library error'
+    : isTerminalErr
+      ? 'MetaTrader 5 terminal is not connected'
+      : 'MT5 sync error';
+
   status.innerHTML = `
-    <div style="background:#050505;border:1px solid rgba(255,255,255,.12);border-left:3px solid #5e6ad2;border-radius:12px;padding:16px 18px;line-height:1.45;">
-      <strong style="display:block;color:#fff;margin-bottom:8px;">${requiresPythonConnector ? 'The desktop MT5 connector needs one-time setup.' : 'MetaTrader 5 terminal is required for direct MT5 sync.'}</strong>
-      <div style="color:rgba(255,255,255,.72);font-size:14px;margin-bottom:12px;">
-        ${requiresPythonConnector
-          ? 'Install Python 3.11 or 3.12, run <code>py -3 -m pip install MetaTrader5</code> once, then keep the MT5 terminal open and signed in before syncing.'
-          : 'Download the MT5 terminal from the web, install it, then log in using your MT5 account ID, password, and broker server. Keep MT5 open, then click Sync from MetaTrader 5 again.'}
-      </div>
-      ${safeMessage ? `<div style="color:rgba(255,255,255,.45);font-size:12px;margin-bottom:12px;">Details: ${safeMessage}</div>` : ''}
-      <button type="button" class="btn primary" onclick="window.open('${requiresPythonConnector ? 'https://www.python.org/downloads/windows/' : MT5_DOWNLOAD_URL}', '_blank', 'noopener,noreferrer')" style="margin:0;display:inline-flex;align-items:center;justify-content:center;">
-        ${requiresPythonConnector ? 'Download Python' : 'Download MT5 Terminal'}
-      </button>
+    <div style="background:#050505;border:1px solid rgba(255,255,255,.12);border-left:3px solid #ef4444;border-radius:12px;padding:16px 18px;line-height:1.55;">
+      <strong style="display:block;color:#fff;margin-bottom:8px;">${title}</strong>
+      <div style="color:rgba(255,255,255,.82);font-size:13px;font-family:monospace;white-space:pre-wrap;word-break:break-word;background:rgba(255,255,255,.04);border-radius:8px;padding:10px 12px;margin-bottom:12px;">${safeMessage || 'Unknown error'}</div>
+      ${isImportErr ? `<div style="color:rgba(255,255,255,.55);font-size:12px;">Fix: open a terminal and run <code>py -3 -m pip install --force-reinstall --no-cache-dir MetaTrader5</code> then try again.</div>` : ''}
+      ${isTerminalErr ? `<div style="color:rgba(255,255,255,.55);font-size:12px;">Make sure the MetaTrader 5 terminal is open and logged in, then click Sync again.</div>` : ''}
     </div>`;
 }
 async function triggerBrokerSync(options = {}) {
