@@ -4767,8 +4767,7 @@ function mergeStoredTradeSources(primary, secondary){
 function persistTradeStores(list){
   const clean = normalizeImportedTradeList(cleanDuplicateDeals(Array.isArray(list) ? list : []));
   trades = [...clean];
-  // tradingPageTrades is declared later in the file — only sync it once it exists.
-  if (typeof tradingPageTrades !== 'undefined') tradingPageTrades = [...clean];
+  tradingPageTrades = [...clean];
   localStorage.setItem(MAIN_TRADES_STORAGE_KEY, JSON.stringify(clean));
   localStorage.setItem(TRADING_PAGE_TRADES_STORAGE_KEY, JSON.stringify(clean));
   localStorage.setItem('myTrades', JSON.stringify(clean));
@@ -4781,11 +4780,12 @@ let trades = mergeStoredTradeSources(
   readStoredTradeList(TRADING_PAGE_TRADES_STORAGE_KEY),
   savedTrades
 );
+let tradingPageTrades = [];
 persistTradeStores(trades);
 
 let filtered = [...trades];
 let charts = {};
-let tradingPageTrades = [...trades];
+tradingPageTrades = [...trades];
 let journalPageEntries = JSON.parse(localStorage.getItem('krishna_journal_page_entries') || '[]');
 
 const fmt = n => signedMoney(n);
@@ -8216,8 +8216,21 @@ async function triggerBrokerSync(options = {}) {
     try {
       if (!canUseLocalBridge) throw new Error('Local desktop bridge is not available on this device.');
 
+      if (!canUseLocalBridge) throw new Error('Local desktop bridge is not available on this device.');
       let bridgeError = null;
-      for (const syncApiUrl of syncApiCandidates) {
+      // Build the full retry schedule: 2 warm-up attempts on the first
+      // candidate (the bridge may still be starting up), then each candidate
+      // URL, then one final retry on the first candidate after a longer wait.
+      const warmUpAttempts = [syncApiCandidates[0], syncApiCandidates[0]];
+      const finalRetryAttempts = [syncApiCandidates[0]];
+      const attemptUrls = warmUpAttempts.concat(syncApiCandidates, finalRetryAttempts);
+      let attemptIndex = 0;
+      for (const syncApiUrl of attemptUrls) {
+        attemptIndex += 1;
+        // Give the local bridge time to start or recover between attempts.
+        if (attemptIndex > 1) {
+          await new Promise(r => setTimeout(r, 1500));
+        }
         try {
           const res = await fetch(syncApiUrl, {
             method: 'POST',
@@ -8231,12 +8244,17 @@ async function triggerBrokerSync(options = {}) {
             bridgeError = null;
             break;
           }
-          bridgeError = new Error(data.error || `${res.status} ${res.statusText}`);
+          // The bridge answered but the sync script reported a problem.
+          // Keep this error even over a later network failure - it is the
+          // most informative failure we have.
+          const reportedError = data.error || `${res.status} ${res.statusText}`;
+          if (reportedError) bridgeError = new Error(reportedError);
         } catch (err) {
-          bridgeError = err;
+          // Network-level failure (bridge not running / unreachable).
+          // Never overwrite a reported server error with a network error.
+          if (!bridgeError) bridgeError = err;
         }
       }
-
       if (!backendSuccess && bridgeError) throw bridgeError;
     } catch(err) {
       if (platform === 'mt5') {
@@ -10206,7 +10224,7 @@ function renderJournalPage(){
   }).join('');
 }
 
-function renderAll(){applyFilters();renderSide();renderAnalyticsBars();renderMetrics();renderPropChallengeDashboard();if(document.getElementById('mistakeModalBackdrop')?.classList.contains('active')) renderMistakeDashboard();renderInsights();renderCharts();renderWidgets();renderReports();renderSetupPerformanceTracker();renderCalendar();renderHeatmap();renderGrid();renderGoals();renderProcess();renderTradingPage();renderJournalPage();renderPsychology();refreshSignedInProfile();}
+function renderAll(){applyFilters();renderSide();renderAnalyticsBars();renderMetrics();renderPropChallengeDashboard();if(document.getElementById('mistakeModalBackdrop')?.classList.contains('active')) renderMistakeDashboard();renderInsights();renderCharts();renderWidgets();renderReports();renderSetupPerformanceTracker();renderCalendar();renderHeatmap();renderGrid();renderGoals();renderProcess();renderTradingPage();renderJournalPage();renderPsychology();if(typeof refreshSignedInProfile==="function")refreshSignedInProfile();}
 
 
 function selectTab(tabId) {
@@ -10695,8 +10713,8 @@ window.openSignedInJournal = function(message){
     }, 700);
     if(typeof refreshSignedInProfile === 'function') {
       refreshSignedInProfile();
-      setTimeout(refreshSignedInProfile, 100);
-      setTimeout(refreshSignedInProfile, 500);
+      setTimeout(()=>{if(typeof refreshSignedInProfile==="function")refreshSignedInProfile();},100);
+      setTimeout(()=>{if(typeof refreshSignedInProfile==="function")refreshSignedInProfile();},500);
     }
     if(typeof ensureAccountOnboarding === 'function') ensureAccountOnboarding();
   };

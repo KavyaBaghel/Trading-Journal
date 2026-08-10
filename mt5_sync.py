@@ -47,15 +47,14 @@ except Exception as _ie:
     import_error = str(_ie)
     # Auto-repair: force-reinstall for the current interpreter
     try:
-        subprocess.run(
+        proc = subprocess.run(
             [sys.executable, "-m", "pip", "install",
              "--user", "--force-reinstall", "--no-cache-dir", "MetaTrader5"],
-            stdout=subprocess.DEVNULL,
-            stderr=subprocess.DEVNULL,
-            timeout=120,
+            capture_output=True, text=True, timeout=180,
         )
-    except Exception:
-        pass
+        repair_output = (proc.stdout or "") + (proc.stderr or "")
+    except Exception as _re:
+        repair_output = f"pip repair step failed: {_re}"
     # Retry after repair
     try:
         _try_import_mt5()
@@ -76,6 +75,8 @@ if mt5 is None:
     parts.append(
         f"Fix MetaTrader5: py -3 -m pip install --force-reinstall --no-cache-dir MetaTrader5"
     )
+    if repair_output:
+        parts.append(f"Repair log: {repair_output.strip()}")
     print(json.dumps({"error": " | ".join(parts)}))
     sys.exit(0)
 
@@ -108,9 +109,9 @@ def main():
         init_params["server"] = server
 
     if init_params:
-        initialized = mt5.initialize(**init_params)
+        initialized = mt5.initialize(timeout=30000, **init_params)
     else:
-        initialized = mt5.initialize()
+        initialized = mt5.initialize(timeout=30000)
 
     if not initialized:
         err_code, err_desc = mt5.last_error()
