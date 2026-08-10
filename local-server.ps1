@@ -70,7 +70,24 @@ function Get-PythonExe {
     } catch {}
   }
 
-  throw 'No Python interpreter with MetaTrader5 installed was found. Open a terminal and run: py -3 -m pip install --force-reinstall --no-cache-dir MetaTrader5'
+  # ── Step 5: No interpreter has MetaTrader5. Auto-repair: install it into
+  #          the newest available Python so sync works on the next attempt. ──
+  if ($allInterpreters.Count -gt 0) {
+    $chosen = $allInterpreters[0]
+    try {
+      $installLog = (& $chosen -m pip install --force-reinstall --no-cache-dir MetaTrader5 2>&1) -join ' '
+      $probe = & $chosen -c 'import MetaTrader5; print("mt5ok")' 2>$null
+      if ($LASTEXITCODE -eq 0 -and $probe -match 'mt5ok') { return $chosen }
+      # Installation ran but import still fails (e.g. Python too old, Windows only supported on 3.8+ x64).
+      throw ("MetaTrader5 package installed but still could not be imported: " + ($installLog -replace '"', ''))
+    } catch {
+      $msg = $_.Exception.Message
+      throw ("MetaTrader 5 sync needs the MetaTrader5 Python package. Automatic install failed: $msg. " +
+        "Open PowerShell and run: py -3 -m pip install --force-reinstall --no-cache-dir MetaTrader5 (requires Python 3.8+ 64-bit on Windows). " +
+        "Then run Journall App.bat again.")
+    }
+  }
+  throw 'No Python installation was found on this PC. MetaTrader 5 sync requires Python 3.8 or newer (64-bit Windows). Install Python from python.org, then run Journall App.bat again.'
 }
 
 function Get-ContentType([string]$Path) {
