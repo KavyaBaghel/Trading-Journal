@@ -131,43 +131,121 @@ def main():
         mt5.shutdown()
         sys.exit(0)
 
-    # Fallback for terminals that truncate deal history: if the newest deal is
-    # older than 3 days, also pull closed history orders from the last days
-    # and merge any positions missing from the deal history.
+    # ── Diagnostic log: what MT5 actually returned ──────────────────────
+    try:
+        _info = {
+            "count": len(deals) if deals is not None else -1,
+            "newest": max((d.time for d in deals), default=None),
+            "from": from_date.isoformat(),
+            "to": to_date.isoformat(),
+            "pcNow": now_local.isoformat(),
+        }
+        _log_file = os.path.join(os.environ.get("TEMP", "."), "journall_mt5_sync.log")
+        with open(_log_file, "a", encoding="utf-8") as _lf:
+            _lf.write(f"SYNC_START now={_info['pcNow']} from={_info['from']} to={_info['to']} deals={_info['count']} newest={_info['newest']}\n")
+    except Exception:
+        pass
+    # ── Always recover recent trades from the order history ─────────────
+    # Some MT5 terminals truncate deal history (which is why recent trades
+    # went missing). history_orders_get is more reliable, so we ALWAYS pull
+    # closed orders and merge any position missing from the deal history.
     extra_deals = []
     if deals:
-        newest_ts = max(d.time for d in deals)
-        newest_dt = datetime.datetime.fromtimestamp(newest_ts)
-        if (now_local - newest_dt).total_seconds() > 3 * 24 * 3600:
-            try:
-                orders = mt5.history_orders_get(from_date, to_date)
-                if orders:
-                    seen_pids = set(d.position_id for d in deals)
-                    for o in orders:
-                        if o.state != 1 or o.position_id == 0:
-                            continue
-                        if o.position_id in seen_pids or o.time <= newest_ts:
-                            continue
-                        # Synthesize an exit deal from the closed order so the
-                        # position-grouping logic below can process it.
-                        extra_deals.append(type('Deal', (), {
-                            'ticket': o.ticket,
-                            'order': o.ticket,
-                            'position_id': o.position_id,
-                            'time': o.time,
-                            'time_msc': o.time_msc,
-                            'type': o.type,
-                            'entry': 1,  # close-out entry in deal terms
-                            'symbol': o.symbol,
-                            'volume': o.volume_current,
-                            'price': o.price_current,
-                            'profit': o.profit,
-                            'swap': o.swap,
-                            'commission': o.commission,
-                            'comment': o.comment or '',
-                        })())
-            except Exception:
-                pass
+        deal_pids = set(d.position_id for d in deals)
+        # For positions present in deals, also merge in deals that the
+        # terminal truncated: pull the position's orders and fill missing
+        # entry/exit deals from them.
+        _recent_pids = set()
+        for d in deals:
+            if d.position_id and d.time >= now_local.timestamp() - 14 * 24 * 3600:
+                _recent_pids.add(d.position_id)
+    else:
+        deal_pids = set()
+        _recent_pids = set()
+    try:
+        orders = mt5.history_orders_get(from_date, to_date)
+        if orders:
+            # 1) Complete positions already in deal history: attach entry/exit
+            #    deals synthesized from their orders (keeps exact P&L).
+            _seen_order_pids = set()
+            for o in orders:
+                if o.state != 1 or o.position_id == 0:
+                    continue
+                if o.position_id not in deal_pids:
+                    continue
+                _seen_order_pids.add(o.position_id)
+                _entry = 0 if o.type in (0, 2) else 1  # 0 in=BUY,1 in=SELL,2 out=BUY,3 out=SELL
+                extra_deals.append(type('Deal', (), {
+                    'ticket': o.ticket,
+                    'order': o.ticket,
+                    'position_id': o.position_id,
+                    'time': o.time,
+                    'time_msc': o.time_msc,
+                    'type': o.type,
+                    'entry': _entry,
+                    'symbol': o.symbol,
+                    'volume': o.volume_current,
+                    'price': o.price_current,
+                    'profit': o.profit,
+                    'swap': o.swap,
+                    'commission': o.commission,
+                    'comment': o.comment or '',
+                })())
+            # 2) Fully missing positions (no deals at all): synthesize from
+            #    their open + close order pair.
+            _by_pid = {}
+            for o in orders:
+                if o.state != 1 or o.position_id == 0:
+                    continue
+                _by_pid.setdefault(o.position_id, []).append(o)
+            for pid, olist in _by_pid.items():
+                if pid in deal_pids:
+                    continue
+                _opens = [o for o in olist if o.type in (0, 1)]
+                _closes = [o for o in olist if o.type in (2, 3)]
+                if not _opens or not _closes:
+                    continue
+                _op = min(_opens, key=lambda x: x.time)
+                _cl = max(_closes, key=lambda x: x.time)
+                extra_deals.append(type('Deal', (), {
+                    'ticket': _op.ticket,
+                    'order': _op.ticket,
+                    'position_id': pid,
+                    'time': _op.time,
+                    'time_msc': _op.time_msc,
+                    'type': _op.type,
+                    'entry': 0,  # entry deal
+                    'symbol': _op.symbol,
+                    'volume': _op.volume_current,
+                    'price': _op.price_current,
+                    'profit': 0.0,
+                    'swap': 0.0,
+                    'commission': 0.0,
+                    'comment': _op.comment or '',
+                })())
+                extra_deals.append(type('Deal', (), {
+                    'ticket': _cl.ticket,
+                    'order': _cl.ticket,
+                    'position_id': pid,
+                    'time': _cl.time,
+                    'time_msc': _cl.time_msc,
+                    'type': _cl.type,
+                    'entry': 1,  # exit deal
+                    'symbol': _cl.symbol,
+                    'volume': _cl.volume_current,
+                    'price': _cl.price_current,
+                    'profit': _cl.profit,
+                    'swap': _cl.swap,
+                    'commission': _cl.commission,
+                    'comment': _cl.comment or '',
+                })())
+    except Exception as _ofe:
+        try:
+            _log_file = os.path.join(os.environ.get("TEMP", "."), "journall_mt5_sync.log")
+            with open(_log_file, "a", encoding="utf-8") as _lf:
+                _lf.write(f"ORDER_FALLBACK_ERROR {type(_ofe).__name__}: {_ofe}\n")
+        except Exception:
+            pass
 
     deals = list(deals) + extra_deals
 
