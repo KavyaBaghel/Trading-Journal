@@ -8579,11 +8579,11 @@ async function triggerBrokerSync(options = {}) {
       let hint = err.message || 'The local desktop bridge is not running on your PC (http://localhost:8787).';
       const onHttps = window.location.protocol === 'https:';
       if (onHttps && (err.name === 'TypeError' || /network|blocked|failed to fetch/i.test(err.message || ''))) {
-        hint = 'Browser security blocks this HTTPS page from reaching the local bridge (http://localhost:8787). ' +
-          'Open the local copy instead: run \'Journall App.bat\' (or local-server.ps1) and open http://localhost:8787/index.html in your browser, then sync there. ' +
-          '(Or use the \'Upload MT5 HTML Report\' option on this page, which works fully offline.)';
+        hint = '<strong>Security Block:</strong> This HTTPS page cannot reach the local bridge (http://localhost:8787).<br><br>' +
+          '<strong>Option 1 (Recommended):</strong> Open the local copy by running <code>Journall App.bat</code> and visiting <a href="http://localhost:8787/index.html" style="color:#4ade80;text-decoration:underline;">http://localhost:8787/index.html</a>.<br>' +
+          '<strong>Option 2 (Manual):</strong> Click <strong>Upload MT5 HTML Report</strong> below. In MT5: right-click History -> Report -> HTML.';
       } else if (onHttps) {
-        hint += ' Note: this page is served over HTTPS; if the bridge keeps failing, open http://localhost:8787/index.html (served by the local bridge) and sync from there.';
+        hint += '<br><br>Note: this page is served over HTTPS. If the bridge keeps failing, use the local URL: http://localhost:8787/index.html';
       }
       throw new Error(hint);
       }
@@ -8631,7 +8631,7 @@ async function triggerBrokerSync(options = {}) {
     persistTradeStores(tradingPageTrades);
 
     if (status) {
-      status.innerHTML = `<strong>Sync successful!</strong><br>Imported: ${parsed.length} trades from ${pName}.<br>Total journal trades: ${trades.length}.`;
+      status.innerHTML = `<strong style="color:#4ade80;">✓ Sync successful!</strong><br>Imported: ${parsed.length} trades from ${pName}.<br>Total journal trades: ${trades.length}.`;
     }
 
     ['q','session','side','mistake','result'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
