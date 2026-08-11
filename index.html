@@ -3624,7 +3624,122 @@ tr:hover {
   .top-profile-email { display: none !important; }
 }
 </style>
-</head>
+
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #09090b;
+            --card: #18181b;
+            --card-hover: #202023;
+            --primary: #8b5cf6;
+            --primary-glow: rgba(139, 92, 246, 0.1);
+            --border: rgba(255, 255, 255, 0.08);
+            --text-main: #e4e4e7;
+            --text-muted: #71717a;
+            --profit: #10b981;
+            --loss: #f43f5e;
+            --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+        }
+
+        /* Layout & Global Overrides */
+        body { 
+            background-color: var(--bg) !important; 
+            color: var(--text-main) !important; 
+            font-family: var(--font-sans) !important;
+        }
+        
+        .app-container { display: flex !important; height: 100vh !important; width: 100vw !important; overflow: hidden !important; }
+        
+        .sidebar {
+            width: 280px !important;
+            background: #050505 !important;
+            border-right: 1px solid var(--border) !important;
+            display: flex !important;
+            flex-direction: column !important;
+            padding: 2rem 1rem !important;
+            height: 100vh !important;
+            position: relative !important;
+            z-index: 20 !important;
+        }
+        .brand { display: flex !important; align-items: center !important; gap: 0.75rem !important; margin-bottom: 2.5rem !important; padding: 0 1rem !important; }
+        .logo-box {
+            width: 40px !important; height: 40px !important; background: var(--primary) !important;
+            border-radius: 12px !important; display: flex !important; align-items: center !important;
+            justify-content: center !important; color: white !important; font-weight: 900 !important;
+            box-shadow: 0 4px 12px var(--primary-glow) !important;
+        }
+        .brand-name { font-size: 1.25rem !important; font-weight: 700 !important; letter-spacing: -0.02em !important; color: white !important; }
+        
+        .nav-list { flex: 1 !important; list-style: none !important; overflow-y: auto !important; }
+        .nav-link {
+            display: flex !important; align-items: center !important; gap: 0.75rem !important;
+            padding: 0.75rem 1rem !important; border-radius: 12px !important;
+            color: var(--text-muted) !important; text-decoration: none !important;
+            font-weight: 500 !important; transition: all 0.2s !important;
+            background: transparent !important; border: none !important; width: 100% !important;
+            cursor: pointer !important; font-size: 0.9rem !important;
+            margin-bottom: 0.25rem !important;
+        }
+        .nav-link:hover { background: rgba(255,255,255,0.05) !important; color: white !important; }
+        .nav-link.active { background: var(--primary-glow) !important; color: var(--primary) !important; }
+        .nav-link i { width: 18px !important; height: 18px !important; }
+
+        .main-wrapper { flex: 1 !important; display: flex !important; flex-direction: column !important; background: radial-gradient(circle at top right, #101014, #09090b) !important; overflow: hidden !important; }
+        .header {
+            height: 80px !important; padding: 0 2rem !important; border-bottom: 1px solid var(--border) !important;
+            display: flex !important; align-items: center !important; justify-content: space-between !important;
+            background: rgba(9, 9, 11, 0.8) !important; backdrop-filter: blur(12px) !important;
+            z-index: 10 !important;
+        }
+        .page-title { font-size: 1.1rem !important; font-weight: 600 !important; color: var(--text-muted) !important; }
+        
+        .user-profile-chip {
+            display: flex !important; align-items: center !important; gap: 0.75rem !important;
+            padding: 0.4rem 0.5rem 0.4rem 1rem !important; border-radius: 99px !important;
+            background: var(--card) !important; border: 1px solid var(--border) !important;
+            cursor: pointer !important; transition: 0.2s !important;
+        }
+        .user-profile-chip:hover { background: var(--card-hover) !important; border-color: var(--text-muted) !important; }
+        .user-avatar { width: 32px !important; height: 32px !important; border-radius: 10px !important; object-fit: cover !important; }
+        .user-name { font-size: 0.85rem !important; font-weight: 600 !important; color: white !important; }
+
+        .content-area { flex: 1 !important; overflow-y: auto !important; padding: 2rem !important; }
+        .container { max-width: 1200px !important; margin: 0 auto !important; }
+
+        /* Glassmorphism & Modern Cards */
+        .card { 
+            background: var(--card) !important; 
+            border: 1px solid var(--border) !important; 
+            border-radius: 24px !important; 
+            padding: 1.5rem !important; 
+            backdrop-filter: blur(8px) !important;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.2) !important;
+            margin-bottom: 1.5rem !important;
+        }
+        .hero { 
+            background: var(--primary-glow) !important; 
+            border: 1px solid var(--primary) !important; 
+            border-radius: 24px !important; 
+            padding: 2rem !important;
+            margin-bottom: 2rem !important;
+        }
+        
+        /* Preserve login page layout */
+        .firebase-auth-gate { z-index: 1000 !important; }
+        
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 6px !important; }
+        ::-webkit-scrollbar-track { background: transparent !important; }
+        ::-webkit-scrollbar-thumb { background: var(--border) !important; border-radius: 10px !important; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--text-muted) !important; }
+
+        /* Hide original mobile elements that might clash */
+        .mobile-appbar { display: none !important; }
+        .floating-dock-container { display: none !important; }
+    </style>
+    </head>
 <body>
 <button id="androidInstallBtn" class="android-install-btn" type="button" hidden>Install Journall</button>
 <div id="firebaseAuthBar" class="firebase-auth-bar">
@@ -3732,51 +3847,56 @@ tr:hover {
     </div>
   </div>
 </div>
-<div id="journallApp" class="app" style="display: none;" hidden>
-  <div id="fixedTopRightProfile" class="fixed-top-right-profile" onclick="selectTab('userprofile')" title="Open User Profile">
-    <img id="topAvatarImg" class="top-avatar-img" src="https://lh3.googleusercontent.com/a/default-user" onerror="this.src='https://ui-avatars.com/api/?name=Trader&background=a855f7&color=fff'" alt="Trader Profile">
-    <div class="top-profile-details">
-      <div class="top-profile-name" id="topProfileName">krishna</div>
-    </div>
-  </div>
-  <aside class="sidebar">
-    <div class="brand"><div class="logo" aria-hidden="true"></div><div class="brand-text"><div class="brand-title">Journall</div><div class="brand-sub">Trading command center</div></div></div>
-    <div class="sidebar-profile-card" onclick="selectTab('userprofile')">
-      <img id="sidebarAvatarImg" class="sidebar-avatar-img" src="https://lh3.googleusercontent.com/a/default-user" onerror="this.src='https://ui-avatars.com/api/?name=Trader&background=a855f7&color=fff'" alt="User">
-      <div class="sidebar-profile-info">
-        <div class="sidebar-profile-name" id="sidebarProfileName">Trader</div>
-        <div class="sidebar-profile-email" id="sidebarProfileEmail">Signed in</div>
-      </div>
-    </div>
+<div id="journallApp" class="app-container" style="display: none;" hidden>
 
+        <aside class="sidebar">
+            <div class="brand">
+                <div class="logo-box">J</div>
+                <div class="brand-name">Journall</div>
+            </div>
 
-<div class="nav">
-      <button class="active" data-tab="tradingpage">Today's Summary</button>
-      <button data-tab="dashboard">Analytics</button>
-      <button data-tab="grid">Trades</button>
-      <button data-tab="journalpage">Journal</button>
-      <button data-tab="psychology">Psychology</button>
-      <button data-tab="calendar">Calendar</button>
-      <button data-tab="reports">Reports</button>
-      <button data-tab="widgets">Widgets</button>
-      <button data-tab="goals">Goals</button>
-      <button data-tab="ailab">AI Coach</button>
-      <button data-tab="userprofile">User Profile</button>
-      <button class="nav-signout-btn" type="button" onclick="triggerJournalSignOut()">Sign Out</button>
-    </div>
+            <nav class="nav-list nav">
+                <button class="nav-link active" data-tab="tradingpage"><i data-lucide="layout-dashboard"></i> Today</button>
+                <button class="nav-link" data-tab="dashboard"><i data-lucide="bar-chart-3"></i> Analytics</button>
+                <button class="nav-link" data-tab="grid"><i data-lucide="list"></i> Trades</button>
+                <button class="nav-link" data-tab="journalpage"><i data-lucide="book-open"></i> Journal</button>
+                <button class="nav-link" data-tab="psychology"><i data-lucide="brain"></i> Psychology</button>
+                <button class="nav-link" data-tab="calendar"><i data-lucide="calendar"></i> Calendar</button>
+                <button class="nav-link" data-tab="reports"><i data-lucide="file-text"></i> Reports</button>
+                <button class="nav-link" data-tab="widgets"><i data-lucide="layout"></i> Widgets</button>
+                <button class="nav-link" data-tab="goals"><i data-lucide="target"></i> Goals</button>
+                <button class="nav-link" data-tab="ailab"><i data-lucide="sparkles"></i> AI Coach</button>
+                <button class="nav-link" data-tab="userprofile"><i data-lucide="user"></i> Profile</button>
+            </nav>
 
-    <div class="sidebox">
-      <div class="sidebox-title">Daily Rules</div>
-      <div id="sideDailyRules"></div>
-      <div style="height:1px;background:rgba(212,175,55,.10);margin:12px 0"></div>
-      <div class="sidebox-title" style="margin-bottom:8px">Rule Breaks</div>
-      <div class="mini-stat"><span>Today Broken Rules</span><strong id="sideRuleBreaks">0</strong></div>
-      <div class="mini-stat"><span>Trades Journaled</span><strong id="sideJournaledTrades">0</strong></div><div class="mini-stat"><span>Trades Pending Journal</span><strong id="sidePendingJournalTrades">0</strong></div>
-    </div>
-  </aside>
+            <div style="margin-top: auto; padding-top: 2rem;">
+                <div style="background: rgba(255,255,255,0.03); padding: 1rem; border-radius: 16px; border: 1px solid var(--border); margin-bottom: 1rem;">
+                    <div style="font-size: 0.7rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 0.5rem;">Daily Guard</div>
+                    <div id="sideDailyRules" style="font-size: 0.8rem;"></div>
+                </div>
+                <button onclick="triggerJournalSignOut()" class="nav-link" style="color: var(--loss);"><i data-lucide="log-out"></i> Sign Out</button>
+            </div>
+        </aside>
+    
 
-  <main class="main">
-    <div class="top">
+        <div class="main-wrapper">
+            <header class="header">
+                <div class="page-title" id="activeTabTitle">Command Center</div>
+                
+                <div style="display: flex; align-items: center; gap: 1.5rem;">
+                    <div id="firebaseAuthBar" style="font-size: 0.75rem; color: var(--text-muted);">
+                        <span id="firebaseAuthStatus">Syncing...</span>
+                    </div>
+                    
+                    <div id="fixedTopRightProfile" onclick="selectTab('userprofile')" class="user-profile-chip">
+                        <span id="topProfileName" class="user-name">Trader</span>
+                        <img id="topAvatarImg" class="user-avatar" src="" onerror="this.src='https://ui-avatars.com/api/?name=Trader&background=8b5cf6&color=fff'">
+                    </div>
+                </div>
+            </header>
+            <main class="content-area">
+                <div class="container">
+        <div class="top">
       <div class="hero">
 
         <h1>Today's Summary</h1>
@@ -4527,8 +4647,7 @@ tr:hover {
   </div>
 </section>
 
-</main>
-</div>
+</div></main></div></div>
 
 
 <div id="dayTradesModalBackdrop" class="modal-backdrop" onclick="closeDayTradesModal(event)">
@@ -15812,5 +15931,43 @@ body:not(.firebase-auth-required) #journallApp > .sidebar .nav button {
 })();
 </script>
 
-</body>
+
+    <script>
+        // Initialize Lucide icons
+        if (window.lucide) lucide.createIcons();
+        
+        // Patch tab selection to update header and icons
+        const originalSelectTab = window.selectTab;
+        window.selectTab = function(tabId) {
+            if (typeof originalSelectTab === 'function') originalSelectTab(tabId);
+            const titleMap = {
+                'tradingpage': 'Today Summary',
+                'dashboard': 'Analytics Dashboard',
+                'grid': 'Trade History',
+                'journalpage': 'Trading Journal',
+                'psychology': 'Psychology Room',
+                'calendar': 'Trading Calendar',
+                'reports': 'Performance Reports',
+                'widgets': 'AI Widgets',
+                'goals': 'Trading Goals',
+                'ailab': 'AI Trading Coach',
+                'userprofile': 'User Profile'
+            };
+            const titleEl = document.getElementById('activeTabTitle');
+            if (titleEl) titleEl.textContent = titleMap[tabId] || 'Command Center';
+            if (window.lucide) lucide.createIcons();
+            
+            // Update active state in sidebar
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('data-tab') === tabId) link.classList.add('active');
+            });
+        };
+        
+        // Initial icon creation
+        document.addEventListener('DOMContentLoaded', () => {
+            if (window.lucide) lucide.createIcons();
+        });
+    </script>
+    </body>
 </html>
