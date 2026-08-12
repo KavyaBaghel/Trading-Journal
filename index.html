@@ -8081,7 +8081,7 @@ async function fetchWithCorsProxy(targetUrl, options = {}) {
     }
   }
 
-  throw new Error('MatchTrader sync failed. Please verify your platform URL (use the base platform domain, not the /app/trade page), your email, and password. You can also export your trade history CSV from MatchTrader and upload it in the Upload CSV tab below.');
+  throw new Error('MatchTrader sync failed. Please verify your platform URL (use the base platform domain, not the /app/trade page), your email, and password. You can also export your trade history CSV from MatchTrader and upload it in the Upload CSV tab below.' + (lastErr ? ' Technical detail: ' + (lastErr.message || String(lastErr)) : ''));
 }
 
 function addUniqueMatchTraderBase(list, value) {
@@ -8245,11 +8245,17 @@ async function syncMatchTraderWeb(url, email, password, days) {
 }
 
 async function syncCTraderWeb(token, accountId, days) {
+  const CORS_HINT = ' cTrader\'s API blocks direct browser access (CORS), so direct cloud sync never works from a webpage. Sign in with Google and the sync will run securely through the Journall backend instead.';
   let accId = accountId;
   if (!accId) {
-    const res = await fetch('https://openapi.ctrader.com/v2/accounts', {
-      headers: { 'Authorization': `Bearer ${token}` }
-    });
+    let res;
+    try {
+      res = await fetch('https://openapi.ctrader.com/v2/accounts', {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+    } catch (e) {
+      throw new Error('Could not reach cTrader from this browser.' + CORS_HINT + ' (Details: ' + (e.message || String(e)) + ')');
+    }
     const data = await res.json().catch(() => ({}));
     const accs = data.data || data.accounts || [];
     if (accs.length) accId = String(accs[0].accountId || accs[0].id || '');
@@ -8260,12 +8266,17 @@ async function syncCTraderWeb(token, accountId, days) {
   const fromDt = new Date(Date.now() - days * 86400000).getTime();
   const toDt = Date.now() + 86400000;
 
-  const res = await fetch(`https://openapi.ctrader.com/v2/accounts/${accId}/deals?from=${fromDt}&to=${toDt}`, {
-    headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/json' }
-  });
+  let res;
+  try {
+    res = await fetch(`https://openapi.ctrader.com/v2/accounts/${accId}/deals?from=${fromDt}&to=${toDt}`, {
+      headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/json' }
+    });
+  } catch (e) {
+    throw new Error('Could not reach cTrader from this browser.' + CORS_HINT + ' (Details: ' + (e.message || String(e)) + ')');
+  }
 
   const data = await res.json().catch(() => ({}));
-  if (!res.ok) throw new Error(data.description || data.error || `HTTP ${res.status}`);
+  if (!res.ok) throw new Error(data.description || data.error || `HTTP ${res.status}` + CORS_HINT);
 
   const deals = Array.isArray(data.deal) ? data.deal : (Array.isArray(data.deals) ? data.deals : []);
 
@@ -8534,12 +8545,18 @@ async function triggerBrokerSync(options = {}) {
     try {
       if (!canUseLocalBridge) throw new Error('Local desktop bridge is not available on this device.');
 
-      if (!canUseLocalBridge) throw new Error('Local desktop bridge is not available on this device.');
+      // Manual sync clears the session flag so retrying is always possible
+      // after a previous failure or a browser security block.
+      try { sessionStorage.removeItem('journall:auto-broker-sync-done'); } catch (_) {}
+
       let bridgeError = null;
-      // Build the full retry schedule: 2 warm-up attempts on the first
-      // candidate (the bridge may still be starting up), then each candidate
-      // URL, then one final retry on the first candidate after a longer wait.
-      const warmUpAttempts = [syncApiCandidates[0], syncApiCandidates[0]];
+      let firstNetworkError = null;
+      // Fail-fast retry schedule: ONE warm-up attempt (the bridge may still
+      // be starting up), then each candidate URL, then one final retry.
+      // If the very first attempt fails at the NETWORK level (bridge not
+      // running / HTTPS mixed-content block), give up immediately - no
+      // amount of retries can fix a blocked or missing bridge.
+      const warmUpAttempts = [syncApiCandidates[0]];
       const finalRetryAttempts = [syncApiCandidates[0]];
       const attemptUrls = warmUpAttempts.concat(syncApiCandidates, finalRetryAttempts);
       let attemptIndex = 0;
@@ -8551,7 +8568,7 @@ async function triggerBrokerSync(options = {}) {
         }
         try {
           const attemptController = new AbortController();
-          const attemptTimer = window.setTimeout(() => attemptController.abort(), 30000);
+          const attemptTimer = window.setTimeout(() => attemptController.abort(), 8000);
           const res = await fetch(syncApiUrl, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -8574,7 +8591,11 @@ async function triggerBrokerSync(options = {}) {
         } catch (err) {
           // Network-level failure (bridge not running / unreachable).
           // Never overwrite a reported server error with a network error.
+          if (!firstNetworkError) firstNetworkError = err;
           if (!bridgeError) bridgeError = err;
+          // Fail fast: on the first attempt, a network-level error means the
+          // bridge is clearly unreachable - retries cannot fix that, so stop.
+          if (attemptIndex === 1) break;
         }
       }
       if (!backendSuccess && bridgeError) throw bridgeError;
@@ -8589,6 +8610,10 @@ async function triggerBrokerSync(options = {}) {
       } else if (onHttps) {
         hint += '<br><br>Note: this page is served over HTTPS. If the bridge keeps failing, use the local URL: http://localhost:8787/index.html';
       }
+      // Show the explanation persistently in the sync status area immediately,
+      // so it is visible without dismissing the alert (Bug: HTTPS-block hint
+      // previously appeared only in an alert after a long retry hang).
+      if (status) status.innerHTML = hint.replace(/<br><br>/g, '<br>').replace(/<br>/g, '<br>');
       throw new Error(hint);
       }
       if (platform === 'matchtrader' || platform === 'ctrader') {
@@ -8609,7 +8634,17 @@ async function triggerBrokerSync(options = {}) {
           parsed = await syncCTraderViaWorker(settingsSnapshot.ctraderToken, settingsSnapshot.ctraderAccountId, settingsSnapshot.days);
         } catch (cloudErr) {
           if (isMobileBroker || !isLocalHost) throw cloudErr;
-          parsed = await syncCTraderWeb(settingsSnapshot.ctraderToken, settingsSnapshot.ctraderAccountId, settingsSnapshot.days);
+          try {
+            parsed = await syncCTraderWeb(settingsSnapshot.ctraderToken, settingsSnapshot.ctraderAccountId, settingsSnapshot.days);
+          } catch (directErr) {
+            // The direct browser path always fails - cTrader's OpenAPI does not
+            // allow browser CORS. Surface the real worker error, not the
+            // misleading network error from the dead fallback path.
+            const msg = String(cloudErr.message || String(cloudErr));
+            throw new Error(msg.includes('Sign in')
+              ? 'Sign in with Google first to use cTrader cloud sync. Cloud sync runs securely through the Journall backend and needs your signed-in session.'
+              : msg);
+          }
         }
       }
     }
