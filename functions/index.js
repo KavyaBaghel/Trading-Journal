@@ -5,14 +5,14 @@ const OpenAI = require("openai");
 
 admin.initializeApp();
 const db = admin.firestore();
-const groqKey = defineSecret("GROQ_API_KEY");
+const openRouterKey = defineSecret("OPENROUTER_API_KEY");
 const DAILY_LIMIT = 20;
 
 function todayKey() {
   return new Date().toISOString().slice(0, 10);
 }
 
-exports.aiCoach = onCall({ secrets: [groqKey], cors: true }, async (request) => {
+exports.aiCoach = onCall({ secrets: [openRouterKey], cors: true }, async (request) => {
   if (!request.auth) {
     throw new HttpsError("unauthenticated", "Sign in required.");
   }
@@ -33,12 +33,16 @@ exports.aiCoach = onCall({ secrets: [groqKey], cors: true }, async (request) => 
   }
 
   const client = new OpenAI({
-    apiKey: groqKey.value(),
-    baseURL: "https://api.groq.com/openai/v1"
+    apiKey: openRouterKey.value(),
+    baseURL: "https://openrouter.ai/api/v1",
+    defaultHeaders: {
+      "HTTP-Referer": "https://kavyabaghel.github.io",
+      "X-Title": "Journall"
+    }
   });
 
   const completion = await client.chat.completions.create({
-    model: "llama-3.1-8b-instant",
+    model: "openai/gpt-oss-120b:free",
     max_tokens: mode === "generation" ? 650 : 450,
     temperature: mode === "generation" ? 0.35 : 0.25,
     messages: [

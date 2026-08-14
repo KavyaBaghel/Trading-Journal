@@ -86,7 +86,7 @@ https://kavyabaghel.github.io/Trading-Journal/
 
 Import the GitHub repository and use the project root as the publish directory. No build command is required.
 
-The public website works for dashboard, journal, analytics, calendar, goals, and Google sign-in cloud sync. AI coaching uses the free Cloudflare Worker in `cloudflare-worker/` with the GROQ_API_KEY secret configured.
+The public website works for dashboard, journal, analytics, calendar, goals, and Google sign-in cloud sync. AI coaching uses the free Cloudflare Worker in `cloudflare-worker/` with the OPENROUTER_API_KEY secret configured.
 
 ## Firebase Sign-In Setup
 
@@ -141,7 +141,7 @@ npx wrangler login
 3. Store your Groq key as a Cloudflare secret:
 
 ```powershell
-npx wrangler secret put GROQ_API_KEY
+npx wrangler secret put OPENROUTER_API_KEY
 ```
 
 4. Deploy:

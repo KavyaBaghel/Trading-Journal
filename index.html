@@ -13,20 +13,8 @@
 <link rel="apple-touch-icon" href="assets/icon-192.png"/>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet"/>
 <title>Journall</title>
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js">
-document.querySelectorAll('.nav button').forEach(btn=>{
-btn.addEventListener('click', ()=>{
-document.querySelectorAll('.nav button').forEach(b=>b.classList.remove('active'));
-btn.classList.add('active');
-
-document.querySelectorAll('.section').forEach(sec=>sec.classList.remove('active'));
-
-const target = document.getElementById(btn.dataset.tab);
-if(target) target.classList.add('active');
-});
-});
-
-
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script>
 function getAIStats(){
   const data = Array.isArray(trades) ? trades : [];
   const total = data.length;
@@ -532,6 +520,39 @@ function rememberFirebaseUserProfile(user) {
   }
 }
 
+function refreshSignedInProfile() {
+  if (window.currentUser && window.currentUser.uid !== 'local_user') {
+    rememberFirebaseUserProfile(window.currentUser);
+  }
+  renderUserProfile();
+}
+
+function getNameChangeHistory() {
+  try {
+    var h = JSON.parse(localStorage.getItem('journall_name_changes_' + uid()) || localStorage.getItem('journall_name_change_history') || '[]');
+    return Array.isArray(h) ? h : [];
+  } catch (e) {
+    return [];
+  }
+}
+
+function getNameChangesThisMonthCount() {
+  var h = getNameChangeHistory();
+  var now = new Date();
+  return h.filter(function(x){
+    try {
+      var d = new Date(x.date || x);
+      return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+    } catch (e) { return false; }
+  }).length;
+}
+
+function recordNameChangeHistory(newName) {
+  var h = getNameChangeHistory();
+  h.push({ name: newName, date: new Date().toISOString() });
+  localStorage.setItem('journall_name_changes_' + uid(), JSON.stringify(h));
+}
+
 function renderUserProfile() {
   const user = window.currentUser || {};
   const userUid = user.uid || localStorage.getItem('journall_active_uid') || 'local';
@@ -661,10 +682,10 @@ function saveCustomUsername() {
 
   const count = getNameChangesThisMonthCount();
   if (count >= 2) {
-    alert('⚠️ Name change limit reached!
+    alert(`⚠️ Name change limit reached!
 
 You can only change your display name 2 times per month.
-Your next name change will be available on the 1st of next month.');
+Your next name change will be available on the 1st of next month.`);
     renderUserProfile();
     return;
   }
@@ -3698,6 +3719,7 @@ tr:hover {
       <div class="setup-section-label">Synced account</div><p id="accountSyncNote" class="account-sync-note">Account size and phase are configured here. Your current balance is automatically calculated and updated in real time from your synced trades.</p>
       <div class="account-form-grid">
         <label>Initial account balance ($)<div class="stepper-control"><button type="button" class="stepper-btn minus" onclick="stepInput('accountSizeInput', -1, 'renderAccountSetupPreview')">−</button><input id="accountSizeInput" class="account-source-input" type="number" min="1" step="100" placeholder="Enter a value" oninput="renderAccountSetupPreview()"><button type="button" class="stepper-btn plus" onclick="stepInput('accountSizeInput', 1, 'renderAccountSetupPreview')">+</button></div></label>
+        <label>Current balance ($)<div class="stepper-control"><button type="button" class="stepper-btn minus" onclick="stepInput('currentBalanceInput', -1, 'renderAccountSetupPreview')">−</button><input id="currentBalanceInput" class="account-source-input" type="number" min="0" step="100" placeholder="Enter a value" oninput="renderAccountSetupPreview()"><button type="button" class="stepper-btn plus" onclick="stepInput('currentBalanceInput', 1, 'renderAccountSetupPreview')">+</button></div></label>
         <label>Account phase<select id="accountPhaseInput" class="account-source-input" onchange="toggleFundedFields()"><option>Phase 1</option><option>Phase 2</option><option>Funded</option><option>Personal</option></select></label>
       </div>
     </div>
@@ -4615,10 +4637,17 @@ tr:hover {
                 console.info('MT5 auto-sync: no trades returned.');
                 return;
             }
-            if (typeof mergeImportedTrades === 'function' && Array.isArray(window.trades)) {
-                window.trades = mergeImportedTrades(window.trades, mt5Trades);
-                if (typeof persistTradeStores === 'function') persistTradeStores(window.trades);
+            if (typeof mergeImportedTrades === 'function' && typeof trades !== 'undefined' && Array.isArray(trades)) {
+                trades = mergeImportedTrades(trades, mt5Trades);
+                filtered = [...trades];
+                if (typeof tradingPageTrades !== 'undefined' && Array.isArray(tradingPageTrades)) {
+                    tradingPageTrades = mergeImportedTrades(tradingPageTrades, mt5Trades);
+                }
+                if (typeof saveTrades === 'function') saveTrades();
+                if (typeof persistTradeStores === 'function') persistTradeStores(trades);
                 if (typeof renderAll === 'function') renderAll();
+                if (typeof scheduleCloudSave === 'function') scheduleCloudSave();
+                window.trades = trades;
                 console.info('MT5 auto-sync: loaded ' + mt5Trades.length + ' trade(s).');
             }
         } catch (err) {
@@ -4767,7 +4796,6 @@ function mergeStoredTradeSources(primary, secondary){
 function persistTradeStores(list){
   const clean = normalizeImportedTradeList(cleanDuplicateDeals(Array.isArray(list) ? list : []));
   trades = [...clean];
-  // tradingPageTrades is declared later in the file — only sync it once it exists.
   if (typeof tradingPageTrades !== 'undefined') tradingPageTrades = [...clean];
   localStorage.setItem(MAIN_TRADES_STORAGE_KEY, JSON.stringify(clean));
   localStorage.setItem(TRADING_PAGE_TRADES_STORAGE_KEY, JSON.stringify(clean));
@@ -4781,11 +4809,11 @@ let trades = mergeStoredTradeSources(
   readStoredTradeList(TRADING_PAGE_TRADES_STORAGE_KEY),
   savedTrades
 );
+let filtered = [...trades];
+let tradingPageTrades = [...trades];
 persistTradeStores(trades);
 
-let filtered = [...trades];
 let charts = {};
-let tradingPageTrades = [...trades];
 let journalPageEntries = JSON.parse(localStorage.getItem('krishna_journal_page_entries') || '[]');
 
 const fmt = n => signedMoney(n);
@@ -6527,7 +6555,7 @@ function openAccountSetup(blocking=false){
   const existingAccount = getAccountConfig();
   const hasSyncedAccount = !!existingAccount;
   const config = existingAccount || {accountSize:'',phase:'Phase 1',profitTarget:'',profitTargetType:'percent',maxDailyLoss:'',maxDailyLossType:'percent',maxDrawdown:'',maxDrawdownType:'percent',currentBalance:'',riskPercent:'',maxTradesPerDay:'',minRr:'',phaseDeadline:'',userSetupCriteria:[]};
-  const liveBalance = existingAccount?.currentBalance ?? config.currentBalance;
+  const liveBalance = syncedCurrentBalance(config);
   const set = (id,value)=>{ const el=document.getElementById(id); if(el) el.value = value ?? ''; };
   set('accountSizeInput', config.accountSize ?? ''); set('currentBalanceInput', liveBalance ?? '');
   set('accountPhaseInput', config.phase || 'Phase 1'); set('profitTargetInput', config.profitTarget);
@@ -8100,36 +8128,20 @@ function isMt5TerminalSetupError(err){
 
 function showMt5TerminalInstallMessage(status, rawMessage=''){
   if (!status) return;
-  const safeMessage = String(rawMessage || '').replace(/[<>&"]/g, ch => ({
+  const safeMessage = String(rawMessage || 'Unknown MT5 sync error.').replace(/[<>&"]/g, ch => ({
     '<': '&lt;',
     '>': '&gt;',
     '&': '&amp;',
     '"': '&quot;'
   })[ch]);
-
-  // Determine if this is a Python/library setup issue or a terminal-not-open issue
-  const isImportErr = safeMessage.toLowerCase().includes('import failed') ||
-    safeMessage.toLowerCase().includes('no python interpreter') ||
-    safeMessage.toLowerCase().includes('metatrader5 import');
-  const isTerminalErr = safeMessage.toLowerCase().includes('could not connect') ||
-    safeMessage.toLowerCase().includes('mt5 application is open') ||
-    safeMessage.toLowerCase().includes('initialize');
-
-  const title = isImportErr
-    ? 'MT5 Python library error'
-    : isTerminalErr
-      ? 'MetaTrader 5 terminal is not connected'
-      : 'MT5 sync error';
-
+  const messageHtml = safeMessage.replace(/\r?\n/g, '<br>');
   status.innerHTML = `
     <div style="background:#050505;border:1px solid rgba(255,255,255,.12);border-left:3px solid #ef4444;border-radius:12px;padding:16px 18px;line-height:1.55;">
-      <strong style="display:block;color:#fff;margin-bottom:8px;">${title}</strong>
-      <div style="color:rgba(255,255,255,.82);font-size:13px;font-family:monospace;white-space:pre-wrap;word-break:break-word;background:rgba(255,255,255,.04);border-radius:8px;padding:10px 12px;margin-bottom:12px;">${safeMessage || 'Unknown error'}</div>
-      ${isImportErr ? `<div style="color:rgba(255,255,255,.55);font-size:12px;">Fix: open a terminal and run <code>py -3 -m pip install --force-reinstall --no-cache-dir MetaTrader5</code> then try again.</div>` : ''}
-      ${isTerminalErr ? `<div style="color:rgba(255,255,255,.55);font-size:12px;">Make sure the MetaTrader 5 terminal is open and logged in, then click Sync again.</div>` : ''}
+      <div style="color:rgba(255,255,255,.82);font-size:13px;font-family:monospace;white-space:pre-wrap;word-break:break-word;background:rgba(255,255,255,.04);border-radius:8px;padding:10px 12px;">${messageHtml}</div>
     </div>`;
 }
 async function triggerBrokerSync(options = {}) {
+  console.log('SYNC START');
   const platform = document.getElementById('brokerPlatformSelect')?.value || 'mt5';
   const status = document.getElementById('brokerSyncStatus');
   const btn = document.getElementById('btnBrokerSync');
@@ -8219,6 +8231,7 @@ async function triggerBrokerSync(options = {}) {
       let bridgeError = null;
       for (const syncApiUrl of syncApiCandidates) {
         try {
+          console.log('SYNC FETCH ABOUT TO RUN');
           const res = await fetch(syncApiUrl, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -8239,12 +8252,10 @@ async function triggerBrokerSync(options = {}) {
 
       if (!backendSuccess && bridgeError) throw bridgeError;
     } catch(err) {
-      if (platform === 'mt5') {
-        throw new Error(err.message || `The local desktop bridge is not running on your PC (http://localhost:8787).\n\nTo sync directly from MT5:\n1. Keep MetaTrader 5 open on this PC.\n2. Double-click 'Journall App.bat' to start the local bridge.\n3. Open the local Journall link and click Sync from MetaTrader 5 again.\n\nAlternatively, export your MT5 account history as an HTML report (right-click Account History -> Report -> Save as HTML) and upload it in the Upload CSV tab.`);
-      }
-      if (platform === 'matchtrader' || platform === 'ctrader') {
-        throw new Error(err.message || `The local desktop bridge is not running on your PC (http://localhost:8787).\n\nTo sync from ${pName}: double-click 'Journall App.bat' on this PC with MT5 / MatchTrader / cTrader available, then click Sync again.`);
-      }
+      console.log('SYNC ERROR', err);
+      // Preserve the bridge's diagnostic exactly. It identifies whether the
+      // issue is Python, the MetaTrader terminal, credentials, or the network.
+      throw err;
     }
 
     if (!backendSuccess) {
@@ -8301,7 +8312,7 @@ async function triggerBrokerSync(options = {}) {
     if (typeof scheduleCloudSave === 'function') scheduleCloudSave();
   } catch (err) {
     console.error(`${pName} sync failed:`, err);
-    if (platform === 'mt5' && isMt5TerminalSetupError(err)) {
+    if (platform === 'mt5') {
       showMt5TerminalInstallMessage(status, err.message || err);
     } else {
       if (status) status.innerHTML = `<strong style="color:var(--red);">Sync failed:</strong> ${err.message || err}`;
@@ -15438,7 +15449,7 @@ body:not(.firebase-auth-required) #journallApp > .sidebar .nav button {
     /* ---------- helpers ---------- */
     function setStatus(msg){ var el=document.getElementById('uploadStatus'); if(el) el.innerHTML=msg; }
     function toNum(v){ v=String(v==null?'':v).replace(/[^0-9eE+.-]/g,''); var n=parseFloat(v); return isFinite(n)?n:0; }
-    function keyOf(t){ return [t.date||'',t.time||'',t.symbol||'',t.side||'',t.volume||'',(Number(t.pnl)||0).toFixed(2)].join('|'); }
+    function keyOf(t){ return (typeof tradeImportKey === 'function') ? tradeImportKey(t) : [t.date||'',t.time||'',t.symbol||'',t.side||'',t.volume||'',(Number(t.pnl)||0).toFixed(2)].join('|'); }
 
     /* ---------- build NAV BUTTON if missing ---------- */
     var nav=document.querySelector('.nav');
@@ -15506,18 +15517,24 @@ body:not(.firebase-auth-required) #journallApp > .sidebar .nav button {
     function loadTradesIntoApp(list,label){
       if(!Array.isArray(list)||!list.length){ setStatus('⚠️ No trades found in '+label+'. Check the file format.'); return; }
       if(!Array.isArray(window.trades)) window.trades=[];
-      var existing={}; trades.forEach(function(t){ existing[keyOf(t)]=1; });
-      var added=0;
-      list.forEach(function(t){
-        var n=(typeof normalizeImportedTrade==='function')?normalizeImportedTrade(t):t;
-        var k=keyOf(n);
-        if(!existing[k]){ trades.push(n); existing[k]=1; added++; }
-      });
-      if(typeof saveTrades==='function') saveTrades();
+      var beforeCount = trades.length;
+      trades = (typeof mergeImportedTrades==='function')
+        ? mergeImportedTrades(trades, list)
+        : trades.concat(list.map(function(t){ return (typeof normalizeImportedTrade==='function') ? normalizeImportedTrade(t) : t; }));
+      trades = Array.isArray(trades) ? trades : [];
+      var added = Math.max(0, trades.length - beforeCount);
+      filtered = [...trades];
+      if (typeof tradingPageTrades !== 'undefined') tradingPageTrades = [...trades];
+      if(typeof persistTradeStores==='function') persistTradeStores(trades);
+      else if(typeof saveTrades==='function') saveTrades();
       if(typeof syncStoredAccountBalanceWithTrades==='function') syncStoredAccountBalanceWithTrades(trades);
+      if(typeof applyFilters==='function') applyFilters();
       if(typeof renderAll==='function') renderAll();
       if(typeof renderPropChallengeDashboard==='function') renderPropChallengeDashboard();
-      setStatus('<strong>'+label+':</strong> '+added+' new trades loaded ('+(list.length-added)+' duplicates skipped). Dashboard, journal and analytics updated ✅');
+      if(typeof renderCalendar==='function') renderCalendar();
+      if(typeof renderTradingPage==='function') renderTradingPage();
+      if(typeof renderJournalPage==='function') renderJournalPage();
+      setStatus('<strong>'+label+':</strong> '+added+' new trades loaded ('+Math.max(0, list.length-added)+' duplicates skipped). Dashboard, journal and analytics updated ✅');
     }
 
     /* ---------- CSV parser ---------- */
@@ -15699,14 +15716,7 @@ body:not(.firebase-auth-required) #journallApp > .sidebar .nav button {
   function uid(){ return (window.currentUser && window.currentUser.uid) || localStorage.getItem('journall_active_uid') || 'local'; }
 
   // Robust limit counter
-  window.getNameChangesThisMonthCount = function(){
-    try{
-      var h = JSON.parse(localStorage.getItem('journall_name_changes_' + uid()) || localStorage.getItem('journall_name_change_history') || '[]');
-      if(!Array.isArray(h)) return 0;
-      var now = new Date();
-      return h.filter(function(x){ try{ var d = new Date(x.date || x); return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear(); }catch(e){ return false; } }).length;
-    }catch(e){ return 0; }
-  };
+  window.getNameChangesThisMonthCount = getNameChangesThisMonthCount;
 
   // Robust name resolution: custom name always wins over Google name
   window.getActiveUserName = function(){

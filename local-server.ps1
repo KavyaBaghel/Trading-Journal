@@ -21,56 +21,95 @@ $listener = [System.Net.Sockets.TcpListener]::new($ipAddress, $Port)
 $listener.Start()
 
 function Get-PythonExe {
-  # ── Step 1: Use the Windows Py launcher to enumerate ALL installed interpreters ──
-  $allInterpreters = @()
+  $candidatePaths = New-Object System.Collections.Generic.List[string]
+  $seen = New-Object 'System.Collections.Generic.HashSet[string]' ([System.StringComparer]::OrdinalIgnoreCase)
+
+  function Add-Candidate([string]$Path) {
+    if ([string]::IsNullOrWhiteSpace($Path)) { return }
+    $candidate = $Path.Trim().Trim('"')
+    if (-not (Test-Path -LiteralPath $candidate)) { return }
+    if ($seen.Add($candidate)) {
+      [void]$candidatePaths.Add($candidate)
+    }
+  }
+
   try {
-    $pyLauncherOutput = & py -0p 2>$null
+    $pyLauncherOutput = & py -0p 2>&1
     if ($LASTEXITCODE -eq 0 -and $pyLauncherOutput) {
-      foreach ($line in ($pyLauncherOutput -split "`n")) {
+      foreach ($line in ($pyLauncherOutput -split "`r?`n")) {
         $line = $line.Trim()
-        # Format: "-3.13-64  C:\Users\...\Python313\python.exe" or similar
-        $m = [regex]::Match($line, '^\-[\d.]+(?:-\d+)?\s+(.+python\.exe)\s*$', 'IgnoreCase')
-        if ($m.Success) {
-          $path = $m.Groups[1].Value.Trim()
-          if (Test-Path -LiteralPath $path) { $allInterpreters += $path }
+        $matches = [regex]::Matches($line, '([A-Za-z]:\\.*?python\.exe)', 'IgnoreCase')
+        foreach ($match in $matches) {
+          Add-Candidate $match.Groups[1].Value
         }
       }
     }
   } catch {}
 
-  # ── Step 2: Fall back to hardcoded candidate list if py launcher unavailable ──
-  if ($allInterpreters.Count -eq 0) {
-    $localAppData = $env:LOCALAPPDATA
-    $programFiles  = $env:ProgramFiles
-    $allInterpreters = @(
-      "$localAppData\Programs\Python\Python313\python.exe",
-      "$localAppData\Programs\Python\Python312\python.exe",
-      "$localAppData\Programs\Python\Python311\python.exe",
-      "$localAppData\Programs\Python\Python310\python.exe",
-      "$programFiles\Python313\python.exe",
-      "$programFiles\Python312\python.exe",
-      "$programFiles\Python311\python.exe",
-      "$programFiles\Python310\python.exe"
-    ) | Where-Object { Test-Path -LiteralPath $_ }
+  try {
+    $pythonCmd = Get-Command python.exe -ErrorAction Stop | Select-Object -First 1
+    if ($pythonCmd) {
+      Add-Candidate $pythonCmd.Source
+      Add-Candidate $pythonCmd.Path
+    }
+  } catch {}
+
+  $localAppData = $env:LOCALAPPDATA
+  $programFiles = $env:ProgramFiles
+  $programFilesX86 = ${env:ProgramFiles(x86)}
+  @(
+    "$localAppData\Programs\Python\Python313\python.exe",
+    "$localAppData\Programs\Python\Python312\python.exe",
+    "$localAppData\Programs\Python\Python311\python.exe",
+    "$localAppData\Programs\Python\Python310\python.exe",
+    "$programFiles\Python313\python.exe",
+    "$programFiles\Python312\python.exe",
+    "$programFiles\Python311\python.exe",
+    "$programFiles\Python310\python.exe",
+    "$programFilesX86\Python313\python.exe",
+    "$programFilesX86\Python312\python.exe",
+    "$programFilesX86\Python311\python.exe",
+    "$programFilesX86\Python310\python.exe"
+  ) | ForEach-Object { Add-Candidate $_ }
+
+  if ($candidatePaths.Count -eq 0) {
+    throw 'No Python installation was found on this PC. MetaTrader 5 sync requires Python 3.8 or newer (64-bit Windows).'
   }
 
-  # ── Step 3: Test each interpreter for MetaTrader5 + numpy ──
-  foreach ($candidate in $allInterpreters) {
+  function Get-PythonVersion([string]$Path) {
     try {
-      $probe = & $candidate -c 'import MetaTrader5, numpy; print("ready")' 2>$null
-      if ($LASTEXITCODE -eq 0 -and $probe -match 'ready') { return $candidate }
+      $version = & $Path -c 'import sys; print(f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}")' 2>$null
+      if ($LASTEXITCODE -eq 0 -and $version) { return [version]($version | Select-Object -First 1) }
     } catch {}
+    return [version]'0.0.0'
   }
 
-  # ── Step 4: If nothing passed the full test, try MetaTrader5 alone (numpy may still install) ──
-  foreach ($candidate in $allInterpreters) {
-    try {
-      $probe = & $candidate -c 'import MetaTrader5; print("mt5ok")' 2>$null
-      if ($LASTEXITCODE -eq 0 -and $probe -match 'mt5ok') { return $candidate }
-    } catch {}
+  $ranked = @(
+    foreach ($candidate in $candidatePaths) {
+      [pscustomobject]@{
+        Path = $candidate
+        Version = Get-PythonVersion $candidate
+      }
+    }
+  ) | Sort-Object Version -Descending
+
+  if ($ranked.Count -gt 0) {
+    $probeErrors = @()
+    foreach ($item in $ranked) {
+      try {
+        $numpyProbe = & $item.Path -c 'import numpy; print(1)' 2>&1
+        if ($LASTEXITCODE -eq 0) {
+          $mt5Probe = & $item.Path -c 'import MetaTrader5 as mt5; print(1)' 2>&1
+          if ($LASTEXITCODE -eq 0 -and ($mt5Probe -join "`n") -match '1') {
+            return $item.Path
+          }
+        }
+      } catch {}
+    }
+    return $ranked[0].Path
   }
 
-  throw 'No Python interpreter with MetaTrader5 installed was found. Open a terminal and run: py -3 -m pip install --force-reinstall --no-cache-dir MetaTrader5'
+  throw 'No Python installation was found on this PC. MetaTrader 5 sync requires Python 3.8 or newer (64-bit Windows).'
 }
 
 function Get-ContentType([string]$Path) {
@@ -280,9 +319,35 @@ while ($true) {
         
         $pythonExe = Get-PythonExe
         $scriptPath = Join-Path $rootPath $scriptName
+        # Bulletproof resolution: the script must come from THIS server
+        # script's own folder, never a stale copy elsewhere on the PC.
+        if (-not (Test-Path -LiteralPath $scriptPath)) {
+          $scriptPath = Join-Path $PSScriptRoot $scriptName
+        }
+        if (-not (Test-Path -LiteralPath $scriptPath)) {
+          # Last resort: the newest copy anywhere near (repo root up to 3
+          # levels up, and known Journall folder names in the user profile).
+          $probeDir = $PSScriptRoot
+          for ($depth = 0; $depth -le 3; $depth++) {
+            foreach ($dir in @($probeDir, (Join-Path $probeDir '..'))) {
+              $candidate = Join-Path $dir $scriptName
+              if (Test-Path -LiteralPath $candidate) {
+                if (-not $scriptPath -or (-not (Test-Path -LiteralPath $scriptPath)) -or ((Get-Item $candidate).LastWriteTimeUtc -gt (Get-Item $scriptPath).LastWriteTimeUtc)) {
+                  $scriptPath = $candidate
+                }
+              }
+            }
+            $probeDir = Join-Path $probeDir '..'
+          }
+        }
         if (-not (Test-Path -LiteralPath $scriptPath)) {
           throw "Sync script not found: $scriptPath"
         }
+        try {
+          $syncLog = Join-Path $env:TEMP 'journall_sync.log'
+          Add-Content -LiteralPath $syncLog -Value "$(Get-Date -Format 'yyyy-MM-dd HH:mm:ss') USING $scriptPath (root=$rootPath)"
+        } catch {}
+
 
         $psi = [System.Diagnostics.ProcessStartInfo]::new()
         $launcherPath = $pythonExe
@@ -295,7 +360,7 @@ while ($true) {
           $psi.FileName = $launcherPath
           $psi.Arguments = "`"$scriptPath`""
         }
-        $psi.WorkingDirectory = $rootPath
+        $psi.WorkingDirectory = Split-Path -Parent $scriptPath
         $psi.RedirectStandardInput = $true
         $psi.RedirectStandardOutput = $true
         $psi.RedirectStandardError = $true
@@ -308,7 +373,10 @@ while ($true) {
         
         $stdout = $proc.StandardOutput.ReadToEnd()
         $stderr = $proc.StandardError.ReadToEnd()
-        $proc.WaitForExit()
+        if (-not $proc.WaitForExit(120000)) {
+          $proc.Kill()
+          throw 'The sync script took too long (over 2 minutes) and was stopped. Close and reopen MetaTrader 5, then try again.'
+        }
         
         if ($proc.ExitCode -ne 0) {
           $errMsg = ""

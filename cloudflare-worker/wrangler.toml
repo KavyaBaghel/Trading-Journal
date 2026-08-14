@@ -6,5 +6,5 @@ compatibility_date = "2026-07-19"
 FIREBASE_PROJECT_ID = "journal-trading-journal"
 FIREBASE_WEB_API_KEY = "AIzaSyDmnTyCBVnjha1gSurY2zbpocvSCjm6dY4"
 ALLOWED_ORIGIN = "https://kavyabaghel.github.io"
-GROQ_MODEL = "llama-3.1-8b-instant"
+OPENROUTER_MODEL = "openai/gpt-oss-120b:free"
 

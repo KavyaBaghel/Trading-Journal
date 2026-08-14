@@ -49,7 +49,8 @@ async function handleAiCoach(request, env, cors) {
 
   const { prompt = "", context = "", mode = "chat" } = await request.json().catch(() => ({}));
   if (!String(prompt).trim()) return json({ error: "Prompt is required." }, 400, cors);
-  if (!env.GROQ_API_KEY) return json({ error: "GROQ_API_KEY secret is not configured." }, 500, cors);
+  const aiKey = env.OPENROUTER_API_KEY || env.GROQ_API_KEY;
+  if (!aiKey) return json({ error: "OPENROUTER_API_KEY secret is not configured." }, 500, cors);
 
   // Groq's free tier rejects oversized requests before the model can answer.
   // Keep enough room for the system prompt and completion while preserving
@@ -63,14 +64,16 @@ async function handleAiCoach(request, env, cors) {
   const safePrompt = limitText(prompt, mode === "generation" ? 12000 : 5000);
   const safeContext = mode === "generation" ? "" : limitText(context, 10000);
 
-  const completion = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+  const completion = await fetch("https://openrouter.ai/api/v1/chat/completions", {
     method: "POST",
     headers: {
-      "Authorization": `Bearer ${env.GROQ_API_KEY}`,
-      "Content-Type": "application/json"
+      "Authorization": `Bearer ${aiKey}`,
+      "Content-Type": "application/json",
+      "HTTP-Referer": env.ALLOWED_ORIGIN || "https://kavyabaghel.github.io",
+      "X-Title": "Journall"
     },
     body: JSON.stringify({
-      model: env.GROQ_MODEL || "llama-3.1-8b-instant",
+      model: env.OPENROUTER_MODEL || env.GROQ_MODEL || "openai/gpt-oss-120b:free",
       max_tokens: mode === "generation" ? 500 : 450,
       temperature: mode === "generation" ? 0.35 : 0.25,
       messages: [
@@ -91,10 +94,10 @@ async function handleAiCoach(request, env, cors) {
 
   const data = await completion.json().catch(() => ({}));
   if (!completion.ok) {
-    return json({ error: data?.error?.message || `Groq returned ${completion.status}.` }, 502, cors);
+    return json({ error: data?.error?.message || `OpenRouter returned ${completion.status}.` }, 502, cors);
   }
   const text = data?.choices?.[0]?.message?.content || "";
-  if (!text.trim()) return json({ error: "Groq returned no response text." }, 502, cors);
+  if (!text.trim()) return json({ error: "OpenRouter returned no response text." }, 502, cors);
   return json({ text: text.trim() }, 200, cors);
 }
 
