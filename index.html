@@ -15,6 +15,19 @@
 <title>Journall</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <script>
+document.querySelectorAll('.nav button').forEach(btn=>{
+btn.addEventListener('click', ()=>{
+document.querySelectorAll('.nav button').forEach(b=>b.classList.remove('active'));
+btn.classList.add('active');
+
+document.querySelectorAll('.section').forEach(sec=>sec.classList.remove('active'));
+
+const target = document.getElementById(btn.dataset.tab);
+if(target) target.classList.add('active');
+});
+});
+
+
 function getAIStats(){
   const data = Array.isArray(trades) ? trades : [];
   const total = data.length;
@@ -3647,6 +3660,313 @@ tr:hover {
   .top-profile-email { display: none !important; }
 }
 </style>
+
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #09090b;
+            --card: #18181b;
+            --card-hover: #202023;
+            --primary: #8b5cf6;
+            --primary-glow: rgba(139, 92, 246, 0.1);
+            --border: rgba(255, 255, 255, 0.08);
+            --text-main: #e4e4e7;
+            --text-muted: #71717a;
+            --profit: #10b981;
+            --loss: #f43f5e;
+            --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+        }
+
+        /* Layout & Global Overrides */
+        body { 
+            background-color: var(--bg) !important; 
+            color: var(--text-main) !important; 
+            font-family: var(--font-sans) !important;
+        }
+        
+        .app-container { display: flex !important; height: 100vh !important; width: 100vw !important; overflow: hidden !important; }
+        
+        .sidebar {
+            width: 280px !important;
+            background: #050505 !important;
+            border-right: 1px solid var(--border) !important;
+            display: flex !important;
+            flex-direction: column !important;
+            padding: 2rem 1rem !important;
+            height: 100vh !important;
+            position: relative !important;
+            z-index: 20 !important;
+        }
+        .brand { display: flex !important; align-items: center !important; gap: 0.75rem !important; margin-bottom: 2.5rem !important; padding: 0 1rem !important; }
+        .logo-box {
+            width: 40px !important; height: 40px !important; background: var(--primary) !important;
+            border-radius: 12px !important; display: flex !important; align-items: center !important;
+            justify-content: center !important; color: white !important; font-weight: 900 !important;
+            box-shadow: 0 4px 12px var(--primary-glow) !important;
+        }
+        .brand-name { font-size: 1.25rem !important; font-weight: 700 !important; letter-spacing: -0.02em !important; color: white !important; }
+        
+        .nav-list { flex: 1 !important; list-style: none !important; overflow-y: auto !important; }
+        .nav-link {
+            display: flex !important; align-items: center !important; gap: 0.75rem !important;
+            padding: 0.75rem 1rem !important; border-radius: 12px !important;
+            color: var(--text-muted) !important; text-decoration: none !important;
+            font-weight: 500 !important; transition: all 0.2s !important;
+            background: transparent !important; border: none !important; width: 100% !important;
+            cursor: pointer !important; font-size: 0.9rem !important;
+            margin-bottom: 0.25rem !important;
+        }
+        .nav-link:hover { background: rgba(255,255,255,0.05) !important; color: white !important; }
+        .nav-link.active { background: var(--primary-glow) !important; color: var(--primary) !important; }
+        .nav-link i { width: 18px !important; height: 18px !important; }
+
+        .main-wrapper { flex: 1 !important; display: flex !important; flex-direction: column !important; background: radial-gradient(circle at top right, #101014, #09090b) !important; overflow: hidden !important; }
+        .header {
+            height: 80px !important; padding: 0 2rem !important; border-bottom: 1px solid var(--border) !important;
+            display: flex !important; align-items: center !important; justify-content: space-between !important;
+            background: rgba(9, 9, 11, 0.8) !important; backdrop-filter: blur(12px) !important;
+            z-index: 10 !important;
+        }
+        .page-title { font-size: 1.1rem !important; font-weight: 600 !important; color: var(--text-muted) !important; }
+        
+        .user-profile-chip {
+            display: flex !important; align-items: center !important; gap: 0.75rem !important;
+            padding: 0.4rem 0.5rem 0.4rem 1rem !important; border-radius: 99px !important;
+            background: var(--card) !important; border: 1px solid var(--border) !important;
+            cursor: pointer !important; transition: 0.2s !important;
+        }
+        .user-profile-chip:hover { background: var(--card-hover) !important; border-color: var(--text-muted) !important; }
+        .user-avatar { width: 32px !important; height: 32px !important; border-radius: 10px !important; object-fit: cover !important; }
+        .user-name { font-size: 0.85rem !important; font-weight: 600 !important; color: white !important; }
+
+        .content-area { flex: 1 !important; overflow-y: auto !important; padding: 2rem !important; }
+        .container { max-width: 1200px !important; margin: 0 auto !important; }
+
+        /* Glassmorphism & Modern Cards */
+        .card { 
+            background: var(--card) !important; 
+            border: 1px solid var(--border) !important; 
+            border-radius: 24px !important; 
+            padding: 1.5rem !important; 
+            backdrop-filter: blur(8px) !important;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.2) !important;
+            margin-bottom: 1.5rem !important;
+        }
+        .hero { 
+            background: var(--primary-glow) !important; 
+            border: 1px solid var(--primary) !important; 
+            border-radius: 24px !important; 
+            padding: 2rem !important;
+            margin-bottom: 2rem !important;
+        }
+        
+        /* Preserve login page layout */
+        .firebase-auth-gate { z-index: 1000 !important; }
+        
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 6px !important; }
+        ::-webkit-scrollbar-track { background: transparent !important; }
+        ::-webkit-scrollbar-thumb { background: var(--border) !important; border-radius: 10px !important; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--text-muted) !important; }
+
+        /* Hide original mobile elements that might clash */
+        .mobile-appbar { display: none !important; }
+        .floating-dock-container { display: none !important; }
+    </style>
+    
+    <style id="journall-premium-styles">
+        :root {
+            --bg-obsidian: #080808;
+            --bg-surface: rgba(18, 18, 20, 0.4);
+            --bg-surface-hover: rgba(25, 25, 28, 0.6);
+            --accent-primary: #a855f7;
+            --accent-secondary: #6366f1;
+            --accent-gradient: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            --border-hairline: rgba(255, 255, 255, 0.05);
+            --border-active: rgba(168, 85, 247, 0.3);
+            --text-main: #f8f8f8;
+            --text-dim: #a1a1aa;
+            --text-ghost: #52525b;
+            --spring-easing: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            --smooth-easing: cubic-bezier(0.4, 0, 0.2, 1);
+            --radius-xl: 24px;
+            --radius-lg: 16px;
+        }
+
+        body {
+            background-color: var(--bg-obsidian) !important;
+            color: var(--text-main) !important;
+            font-feature-settings: "cv02", "cv03", "cv04", "cv11" !important;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Motion.dev Inspired Transitions */
+        .section {
+            opacity: 0;
+            transform: translateY(10px);
+            transition: opacity 0.5s var(--smooth-easing), transform 0.5s var(--smooth-easing);
+            display: none;
+        }
+
+        .section.active {
+            display: block !important;
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Sidebar Refinement - Kokonut/Manus Style */
+        .sidebar {
+            width: 80px;
+            transition: width 0.4s var(--smooth-easing) !important;
+            overflow: hidden;
+            background: rgba(8, 8, 8, 0.8) !important;
+            border-right: 1px solid var(--border-hairline) !important;
+        }
+
+        .sidebar:hover {
+            width: 260px;
+        }
+
+        .nav-link {
+            justify-content: flex-start;
+            padding: 0.85rem !important;
+            margin: 0.25rem 0;
+            white-space: nowrap;
+            border-radius: var(--radius-lg) !important;
+            transition: background 0.2s ease, color 0.2s ease, transform 0.2s var(--spring-easing) !important;
+        }
+
+        .nav-link:hover {
+            transform: translateX(4px);
+            background: var(--bg-surface-hover) !important;
+        }
+
+        .nav-link.active {
+            background: var(--accent-gradient) !important;
+            color: white !important;
+            box-shadow: 0 4px 15px rgba(168, 85, 247, 0.2);
+        }
+
+        .nav-link i {
+            min-width: 24px;
+            margin-right: 16px;
+        }
+
+        .brand-name {
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .sidebar:hover .brand-name {
+            opacity: 1;
+        }
+
+        /* Bento Card Enhancements - Nklit Style */
+        .bento-card {
+            background: var(--bg-surface) !important;
+            border: 1px solid var(--border-hairline) !important;
+            border-radius: var(--radius-xl) !important;
+            backdrop-filter: blur(20px) !important;
+            box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.02);
+        }
+
+        .bento-card:hover {
+            background: var(--bg-surface-hover) !important;
+            border-color: var(--border-active) !important;
+            transform: scale(1.01) translateY(-2px);
+        }
+
+        .card-label {
+            color: var(--text-ghost) !important;
+            font-weight: 700 !important;
+            letter-spacing: 0.1em !important;
+        }
+
+        /* Header - Manus Style */
+        .header {
+            background: rgba(8, 8, 8, 0.4) !important;
+            backdrop-filter: blur(10px) !important;
+            border-bottom: 1px solid var(--border-hairline) !important;
+            padding: 0 3rem !important;
+        }
+
+        .user-profile-chip {
+            background: var(--bg-surface) !important;
+            border: 1px solid var(--border-hairline) !important;
+            border-radius: 9999px !important;
+            padding: 4px 12px !important;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .user-profile-chip:hover {
+            background: var(--bg-surface-hover) !important;
+            border-color: var(--border-active) !important;
+        }
+
+        /* AI Coach - Chat Interface Refinement */
+        .ai-msg {
+            border-radius: 18px !important;
+            padding: 1rem 1.25rem !important;
+            max-width: 85%;
+            margin-bottom: 1rem !important;
+            animation: slideIn 0.3s var(--smooth-easing);
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .ai-msg.bot {
+            background: var(--bg-surface) !important;
+            border: 1px solid var(--border-hairline) !important;
+            color: var(--text-main) !important;
+        }
+
+        .ai-msg.user {
+            background: var(--accent-gradient) !important;
+            color: white !important;
+            margin-left: auto;
+        }
+
+        /* Buttons - Pill Shape */
+        .btn {
+            border-radius: 9999px !important;
+            padding: 0.6rem 1.5rem !important;
+            font-weight: 600 !important;
+            letter-spacing: -0.01em !important;
+            transition: all 0.2s var(--smooth-easing) !important;
+        }
+
+        .btn.primary {
+            background: var(--accent-gradient) !important;
+            border: none !important;
+        }
+
+        .btn:active {
+            transform: scale(0.96);
+        }
+
+        /* Shiny Text - Refined */
+        .shiny-text {
+            background: linear-gradient(to right, #fff 20%, #a855f7 50%, #fff 80%);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: shine 4s linear infinite;
+        }
+
+        @keyframes shine {
+            to { background-position: 200% center; }
+        }
+    </style>
+
 </head>
 <body>
 <button id="androidInstallBtn" class="android-install-btn" type="button" hidden>Install Journall</button>
@@ -3756,51 +4076,60 @@ tr:hover {
     </div>
   </div>
 </div>
-<div id="journallApp" class="app" style="display: none;" hidden>
-  <div id="fixedTopRightProfile" class="fixed-top-right-profile" onclick="selectTab('userprofile')" title="Open User Profile">
-    <img id="topAvatarImg" class="top-avatar-img" src="https://lh3.googleusercontent.com/a/default-user" onerror="this.src='https://ui-avatars.com/api/?name=Trader&background=a855f7&color=fff'" alt="Trader Profile">
-    <div class="top-profile-details">
-      <div class="top-profile-name" id="topProfileName">krishna</div>
-    </div>
-  </div>
-  <aside class="sidebar">
-    <div class="brand"><div class="logo" aria-hidden="true"></div><div class="brand-text"><div class="brand-title">Journall</div><div class="brand-sub">Trading command center</div></div></div>
-    <div class="sidebar-profile-card" onclick="selectTab('userprofile')">
-      <img id="sidebarAvatarImg" class="sidebar-avatar-img" src="https://lh3.googleusercontent.com/a/default-user" onerror="this.src='https://ui-avatars.com/api/?name=Trader&background=a855f7&color=fff'" alt="User">
-      <div class="sidebar-profile-info">
-        <div class="sidebar-profile-name" id="sidebarProfileName">Trader</div>
-        <div class="sidebar-profile-email" id="sidebarProfileEmail">Signed in</div>
-      </div>
-    </div>
+<div id="journallApp" class="app-container" style="display: none;" hidden>
 
+        
+        <aside class="sidebar">
+            <div class="brand" style="padding: 1.5rem 1rem;">
+                <div class="logo-box" style="min-width: 36px;">J</div>
+                <div class="brand-name" style="margin-left: 12px; font-weight: 800; font-size: 1.2rem;">JOURNALL</div>
+            </div>
 
-<div class="nav">
-      <button class="active" data-tab="tradingpage">Today's Summary</button>
-      <button data-tab="dashboard">Analytics</button>
-      <button data-tab="grid">Trades</button>
-      <button data-tab="journalpage">Journal</button>
-      <button data-tab="psychology">Psychology</button>
-      <button data-tab="calendar">Calendar</button>
-      <button data-tab="reports">Reports</button>
-      <button data-tab="widgets">Widgets</button>
-      <button data-tab="goals">Goals</button>
-      <button data-tab="ailab">AI Coach</button>
-      <button data-tab="userprofile">User Profile</button>
-      <button class="nav-signout-btn" type="button" onclick="triggerJournalSignOut()">Sign Out</button>
-    </div>
+            <nav class="nav-list nav" style="padding: 0 0.75rem;">
+                <button class="nav-link active" data-tab="tradingpage"><i data-lucide="layout-dashboard"></i> <span class="brand-name">Today's Summary</span></button>
+                <button class="nav-link" data-tab="dashboard"><i data-lucide="bar-chart-3"></i> <span class="brand-name">Analytics</span></button>
+                <button class="nav-link" data-tab="grid"><i data-lucide="list"></i> <span class="brand-name">Trades</span></button>
+                <button class="nav-link" data-tab="journalpage"><i data-lucide="book-open"></i> <span class="brand-name">Journal</span></button>
+                <button class="nav-link" data-tab="psychology"><i data-lucide="brain"></i> <span class="brand-name">Psychology</span></button>
+                <button class="nav-link" data-tab="calendar"><i data-lucide="calendar"></i> <span class="brand-name">Calendar</span></button>
+                <button class="nav-link" data-tab="reports"><i data-lucide="file-text"></i> <span class="brand-name">Reports</span></button>
+                <button class="nav-link" data-tab="widgets"><i data-lucide="layout"></i> <span class="brand-name">Widgets</span></button>
+                <button class="nav-link" data-tab="goals"><i data-lucide="target"></i> <span class="brand-name">Goals</span></button>
+                <button class="nav-link" data-tab="ailab"><i data-lucide="sparkles"></i> <span class="brand-name">AI Coach</span></button>
+                <button class="nav-link" data-tab="userprofile"><i data-lucide="user"></i> <span class="brand-name">User Profile</span></button>
+            </nav>
 
-    <div class="sidebox">
-      <div class="sidebox-title">Daily Rules</div>
-      <div id="sideDailyRules"></div>
-      <div style="height:1px;background:rgba(212,175,55,.10);margin:12px 0"></div>
-      <div class="sidebox-title" style="margin-bottom:8px">Rule Breaks</div>
-      <div class="mini-stat"><span>Today Broken Rules</span><strong id="sideRuleBreaks">0</strong></div>
-      <div class="mini-stat"><span>Trades Journaled</span><strong id="sideJournaledTrades">0</strong></div><div class="mini-stat"><span>Trades Pending Journal</span><strong id="sidePendingJournalTrades">0</strong></div>
-    </div>
-  </aside>
+            <div style="margin-top: auto; padding: 1rem 0.75rem;">
+                <button onclick="triggerJournalSignOut()" class="nav-link" style="color: var(--loss);"><i data-lucide="log-out"></i> <span class="brand-name">Sign Out</span></button>
+            </div>
+        </aside>
 
-  <main class="main">
-    <div class="top">
+    
+
+        <div class="main-wrapper">
+            <header class="header">
+                <div class="page-title" id="activeTabTitle" style="min-width: 150px;">Command Center</div>
+                <div style="flex: 1; max-width: 400px; margin: 0 2rem; position: relative;">
+                    <i data-lucide="search" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); width: 16px; color: var(--text-ghost);"></i>
+                    <input type="text" placeholder="Search trades, rules, or AI insights..." 
+                           style="width: 100%; background: var(--bg-surface); border: 1px solid var(--border-hairline); border-radius: 9999px; padding: 8px 12px 8px 40px; color: white; font-size: 0.85rem;">
+                </div>
+
+                
+                <div style="display: flex; align-items: center; gap: 1.5rem;">
+                    <div id="firebaseAuthBar" style="font-size: 0.75rem; color: var(--text-muted);">
+                        <span id="firebaseAuthStatus">Syncing...</span>
+                    </div>
+                    
+                    <div id="fixedTopRightProfile" onclick="selectTab('userprofile')" class="user-profile-chip">
+                        <span id="topProfileName" class="user-name">Trader</span>
+                        <img id="topAvatarImg" class="user-avatar" src="" onerror="this.src='https://ui-avatars.com/api/?name=Trader&background=8b5cf6&color=fff'">
+                    </div>
+                </div>
+            </header>
+            <main class="content-area">
+                <div class="container">
+        <div class="top">
       <div class="hero">
 
         <h1>Today's Summary</h1>
@@ -3815,6 +4144,10 @@ tr:hover {
     
 
     <section id="userprofile" class="section">
+      <div class="hero" style="margin-bottom: 24px;">
+        <h1>User Profile</h1>
+        <span class="hero-tag">AI-powered &bull; Trade review</span>
+      </div>
       <div class="card profile-card-hero">
         <div style="display:flex; align-items:center; gap:24px; flex-wrap:wrap;">
           <div class="avatar-upload-container" style="position:relative; cursor:pointer;" onclick="document.getElementById('customAvatarInput').click()" title="Click to change profile picture">
@@ -3824,7 +4157,7 @@ tr:hover {
           </div>
           <div style="flex:1;">
             <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
-              <h2 style="margin:0; font-size:26px; color:#fff;" id="userProfileName">krishna</h2>
+              <h2 style="margin:0; font-size:26px; color:#fff;" id="userProfileName">Kavya</h2>
               <span class="badge" style="background:rgba(34,197,94,0.15); color:#4ade80; border:1px solid rgba(34,197,94,0.3); padding:4px 12px; border-radius:9999px; font-size:11px; font-weight:700;">✓ GOOGLE ACCOUNT AUTHORIZED</span>
             </div>
             <p style="margin:6px 0 0 0; font-size:15px; color:#94a3b8;" id="userProfileEmail">krishnacnjack@gmail.com</p>
@@ -4551,8 +4884,7 @@ tr:hover {
   </div>
 </section>
 
-</main>
-</div>
+</div></main></div></div>
 
 
 <div id="dayTradesModalBackdrop" class="modal-backdrop" onclick="closeDayTradesModal(event)">
@@ -6609,7 +6941,8 @@ async function saveAccountSetup(){
   let accountSize, currentBalance, riskPercent, profitTarget, maxTradesPerDay, minRr, maxDailyLoss = null, maxDrawdown = null;
   try{
     accountSize = existingAccount?.accountSize || readRequiredNumber('accountSizeInput','Account size');
-    currentBalance = readRequiredNumber('currentBalanceInput','Current balance');
+    const cbRaw = String(document.getElementById('currentBalanceInput')?.value ?? '').trim();
+    currentBalance = Number.isFinite(Number(cbRaw)) && Number(cbRaw) > 0 ? Number(cbRaw) : accountSize;
     profitTarget = readRequiredNumber('profitTargetInput','Profit target');
     riskPercent = clampNumber(readRequiredNumber('riskPercentInput','Risk per trade'), 0.5, 2);
     maxTradesPerDay = readRequiredNumber('maxTradesInput','Max trades per day');
@@ -7791,7 +8124,7 @@ async function fetchWithCorsProxy(targetUrl, options = {}) {
     }
   }
 
-  throw new Error('MatchTrader sync failed. Please verify your platform URL (use the base platform domain, not the /app/trade page), your email, and password. You can also export your trade history CSV from MatchTrader and upload it in the Upload CSV tab below.');
+  throw new Error('MatchTrader sync failed. Please verify your platform URL (use the base platform domain, not the /app/trade page), your email, and password. You can also export your trade history CSV from MatchTrader and upload it in the Upload CSV tab below.' + (lastErr ? ' Technical detail: ' + (lastErr.message || String(lastErr)) : ''));
 }
 
 function addUniqueMatchTraderBase(list, value) {
@@ -7955,11 +8288,17 @@ async function syncMatchTraderWeb(url, email, password, days) {
 }
 
 async function syncCTraderWeb(token, accountId, days) {
+  const CORS_HINT = ' cTrader\'s API blocks direct browser access (CORS), so direct cloud sync never works from a webpage. Sign in with Google and the sync will run securely through the Journall backend instead.';
   let accId = accountId;
   if (!accId) {
-    const res = await fetch('https://openapi.ctrader.com/v2/accounts', {
-      headers: { 'Authorization': `Bearer ${token}` }
-    });
+    let res;
+    try {
+      res = await fetch('https://openapi.ctrader.com/v2/accounts', {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+    } catch (e) {
+      throw new Error('Could not reach cTrader from this browser.' + CORS_HINT + ' (Details: ' + (e.message || String(e)) + ')');
+    }
     const data = await res.json().catch(() => ({}));
     const accs = data.data || data.accounts || [];
     if (accs.length) accId = String(accs[0].accountId || accs[0].id || '');
@@ -7970,12 +8309,17 @@ async function syncCTraderWeb(token, accountId, days) {
   const fromDt = new Date(Date.now() - days * 86400000).getTime();
   const toDt = Date.now() + 86400000;
 
-  const res = await fetch(`https://openapi.ctrader.com/v2/accounts/${accId}/deals?from=${fromDt}&to=${toDt}`, {
-    headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/json' }
-  });
+  let res;
+  try {
+    res = await fetch(`https://openapi.ctrader.com/v2/accounts/${accId}/deals?from=${fromDt}&to=${toDt}`, {
+      headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/json' }
+    });
+  } catch (e) {
+    throw new Error('Could not reach cTrader from this browser.' + CORS_HINT + ' (Details: ' + (e.message || String(e)) + ')');
+  }
 
   const data = await res.json().catch(() => ({}));
-  if (!res.ok) throw new Error(data.description || data.error || `HTTP ${res.status}`);
+  if (!res.ok) throw new Error(data.description || data.error || `HTTP ${res.status}` + CORS_HINT);
 
   const deals = Array.isArray(data.deal) ? data.deal : (Array.isArray(data.deals) ? data.deals : []);
 
@@ -8228,15 +8572,37 @@ async function triggerBrokerSync(options = {}) {
     try {
       if (!canUseLocalBridge) throw new Error('Local desktop bridge is not available on this device.');
 
+      // Manual sync clears the session flag so retrying is always possible
+      // after a previous failure or a browser security block.
+      try { sessionStorage.removeItem('journall:auto-broker-sync-done'); } catch (_) {}
+
       let bridgeError = null;
-      for (const syncApiUrl of syncApiCandidates) {
+      let firstNetworkError = null;
+      // Fail-fast retry schedule: ONE warm-up attempt (the bridge may still
+      // be starting up), then each candidate URL, then one final retry.
+      // If the very first attempt fails at the NETWORK level (bridge not
+      // running / HTTPS mixed-content block), give up immediately - no
+      // amount of retries can fix a blocked or missing bridge.
+      const warmUpAttempts = [syncApiCandidates[0]];
+      const finalRetryAttempts = [syncApiCandidates[0]];
+      const attemptUrls = warmUpAttempts.concat(syncApiCandidates, finalRetryAttempts);
+      let attemptIndex = 0;
+      for (const syncApiUrl of attemptUrls) {
+        attemptIndex += 1;
+        // Give the local bridge time to start or recover between attempts.
+        if (attemptIndex > 1) {
+          await new Promise(r => setTimeout(r, 1500));
+        }
         try {
-          console.log('SYNC FETCH ABOUT TO RUN');
+          const attemptController = new AbortController();
+          const attemptTimer = window.setTimeout(() => attemptController.abort(), 8000);
           const res = await fetch(syncApiUrl, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
+            body: JSON.stringify(payload),
+            signal: attemptController.signal
           });
+          window.clearTimeout(attemptTimer);
           const data = await res.json().catch(() => ({}));
           if (res.ok && !data.error) {
             parsed = data.trades || [];
@@ -8244,18 +8610,42 @@ async function triggerBrokerSync(options = {}) {
             bridgeError = null;
             break;
           }
-          bridgeError = new Error(data.error || `${res.status} ${res.statusText}`);
+          // The bridge answered but the sync script reported a problem.
+          // Keep this error even over a later network failure - it is the
+          // most informative failure we have.
+          const reportedError = data.error || `${res.status} ${res.statusText}`;
+          if (reportedError) bridgeError = new Error(reportedError);
         } catch (err) {
-          bridgeError = err;
+          // Network-level failure (bridge not running / unreachable).
+          // Never overwrite a reported server error with a network error.
+          if (!firstNetworkError) firstNetworkError = err;
+          if (!bridgeError) bridgeError = err;
+          // Fail fast: on the first attempt, a network-level error means the
+          // bridge is clearly unreachable - retries cannot fix that, so stop.
+          if (attemptIndex === 1) break;
         }
       }
-
       if (!backendSuccess && bridgeError) throw bridgeError;
     } catch(err) {
-      console.log('SYNC ERROR', err);
-      // Preserve the bridge's diagnostic exactly. It identifies whether the
-      // issue is Python, the MetaTrader terminal, credentials, or the network.
-      throw err;
+      if (platform === 'mt5') {
+      let hint = err.message || 'The local desktop bridge is not running on your PC (http://localhost:8787).';
+      const onHttps = window.location.protocol === 'https:';
+      if (onHttps && (err.name === 'TypeError' || /network|blocked|failed to fetch/i.test(err.message || ''))) {
+        hint = '<strong>Security Block:</strong> This HTTPS page cannot reach the local bridge (http://localhost:8787).<br><br>' +
+          '<strong>Option 1 (Recommended):</strong> Open the local copy by running <code>Journall App.bat</code> and visiting <a href="http://localhost:8787/index.html" style="color:#4ade80;text-decoration:underline;">http://localhost:8787/index.html</a>.<br>' +
+          '<strong>Option 2 (Manual):</strong> Click <strong>Upload MT5 HTML Report</strong> below. In MT5: right-click History -> Report -> HTML.';
+      } else if (onHttps) {
+        hint += '<br><br>Note: this page is served over HTTPS. If the bridge keeps failing, use the local URL: http://localhost:8787/index.html';
+      }
+      // Show the explanation persistently in the sync status area immediately,
+      // so it is visible without dismissing the alert (Bug: HTTPS-block hint
+      // previously appeared only in an alert after a long retry hang).
+      if (status) status.innerHTML = hint.replace(/<br><br>/g, '<br>').replace(/<br>/g, '<br>');
+      throw new Error(hint);
+      }
+      if (platform === 'matchtrader' || platform === 'ctrader') {
+        throw new Error(err.message || `The local desktop bridge is not running on your PC (http://localhost:8787).\n\nTo sync from ${pName}: double-click 'Journall App.bat' on this PC with MT5 / MatchTrader / cTrader available, then click Sync again.`);
+      }
     }
 
     if (!backendSuccess) {
@@ -8271,7 +8661,17 @@ async function triggerBrokerSync(options = {}) {
           parsed = await syncCTraderViaWorker(settingsSnapshot.ctraderToken, settingsSnapshot.ctraderAccountId, settingsSnapshot.days);
         } catch (cloudErr) {
           if (isMobileBroker || !isLocalHost) throw cloudErr;
-          parsed = await syncCTraderWeb(settingsSnapshot.ctraderToken, settingsSnapshot.ctraderAccountId, settingsSnapshot.days);
+          try {
+            parsed = await syncCTraderWeb(settingsSnapshot.ctraderToken, settingsSnapshot.ctraderAccountId, settingsSnapshot.days);
+          } catch (directErr) {
+            // The direct browser path always fails - cTrader's OpenAPI does not
+            // allow browser CORS. Surface the real worker error, not the
+            // misleading network error from the dead fallback path.
+            const msg = String(cloudErr.message || String(cloudErr));
+            throw new Error(msg.includes('Sign in')
+              ? 'Sign in with Google first to use cTrader cloud sync. Cloud sync runs securely through the Journall backend and needs your signed-in session.'
+              : msg);
+          }
         }
       }
     }
@@ -8297,7 +8697,7 @@ async function triggerBrokerSync(options = {}) {
     persistTradeStores(tradingPageTrades);
 
     if (status) {
-      status.innerHTML = `<strong>Sync successful!</strong><br>Imported: ${parsed.length} trades from ${pName}.<br>Total journal trades: ${trades.length}.`;
+      status.innerHTML = `<strong style="color:#4ade80;">✓ Sync successful!</strong><br>Imported: ${parsed.length} trades from ${pName}.<br>Total journal trades: ${trades.length}.`;
     }
 
     ['q','session','side','mistake','result'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
@@ -10217,7 +10617,7 @@ function renderJournalPage(){
   }).join('');
 }
 
-function renderAll(){applyFilters();renderSide();renderAnalyticsBars();renderMetrics();renderPropChallengeDashboard();if(document.getElementById('mistakeModalBackdrop')?.classList.contains('active')) renderMistakeDashboard();renderInsights();renderCharts();renderWidgets();renderReports();renderSetupPerformanceTracker();renderCalendar();renderHeatmap();renderGrid();renderGoals();renderProcess();renderTradingPage();renderJournalPage();renderPsychology();refreshSignedInProfile();}
+function renderAll(){applyFilters();renderSide();renderAnalyticsBars();renderMetrics();renderPropChallengeDashboard();if(document.getElementById('mistakeModalBackdrop')?.classList.contains('active')) renderMistakeDashboard();renderInsights();renderCharts();renderWidgets();renderReports();renderSetupPerformanceTracker();renderCalendar();renderHeatmap();renderGrid();renderGoals();renderProcess();renderTradingPage();renderJournalPage();renderPsychology();if(typeof refreshSignedInProfile==="function")refreshSignedInProfile();}
 
 
 function selectTab(tabId) {
@@ -10626,10 +11026,22 @@ document.querySelectorAll('.nav button').forEach(btn=>{
       if (typeof initDraftAutoSync === 'function') initDraftAutoSync();
       if (typeof loadJournalDraft === 'function') loadJournalDraft();
       if (typeof loadPsychologyDraft === 'function') loadPsychologyDraft();
-      navigator.serviceWorker.register('./service-worker.js', { updateViaCache: 'none' })
+      navigator.serviceWorker.register('./service-worker.js?v=146', { updateViaCache: 'none' })
         .then(reg => {
-          // Force check for service worker updates on load
+          // Force check for service worker updates on load, immediately
           reg.update().catch(() => {});
+          // Skip-waiting so a new service worker takes control without
+          // waiting for other tabs to close.
+          if (reg.waiting) reg.waiting.postMessage({ type: 'SKIP_WAITING' });
+          reg.addEventListener('updatefound', () => {
+            const w = reg.installing;
+            if (!w) return;
+            w.addEventListener('statechange', () => {
+              if (w.state === 'installed' && navigator.serviceWorker.controller) {
+                w.postMessage({ type: 'SKIP_WAITING' });
+              }
+            });
+          });
         })
         .catch(() => {});
     });
@@ -10706,8 +11118,8 @@ window.openSignedInJournal = function(message){
     }, 700);
     if(typeof refreshSignedInProfile === 'function') {
       refreshSignedInProfile();
-      setTimeout(refreshSignedInProfile, 100);
-      setTimeout(refreshSignedInProfile, 500);
+      setTimeout(()=>{if(typeof refreshSignedInProfile==="function")refreshSignedInProfile();},100);
+      setTimeout(()=>{if(typeof refreshSignedInProfile==="function")refreshSignedInProfile();},500);
     }
     if(typeof ensureAccountOnboarding === 'function') ensureAccountOnboarding();
   };
@@ -11035,6 +11447,10 @@ async function saveCloudState(){
   const { doc, getDoc, setDoc, serverTimestamp } = await import(`https://www.gstatic.com/firebasejs/${firebaseSdkVersion}/firebase-firestore.js`);
   const ref = doc(firestoreDb, 'users', window.currentUser.uid, 'journallState', 'main');
   const snap = await getDoc(ref);
+  // Always merge BOTH directions - never let one side's values replace the
+  // other's. This protects trade lists when a fresh/empty device signs in:
+  // mergeSyncedStorageMaps unions arrays by position id instead of picking
+  // the last writer's copy.
   const mergedStorage = mergeSyncedStorageMaps(snap.exists() ? (snap.data()?.storage || {}) : {}, collectLocalState());
   const stamp = serverTimestamp();
   await setDoc(ref, {
@@ -11184,6 +11600,8 @@ async function loadCloudState(){
   const snap = await getDoc(ref);
   const remoteStorage = snap.exists() && snap.data()?.storage ? snap.data().storage : {};
   const localStorageSnapshot = collectLocalState();
+  // Merge BOTH directions on sign-in so a fresh empty device inherits the
+  // cloud copy and the cloud never loses trades held on the local device.
   const mergedStorage = mergeSyncedStorageMaps(remoteStorage, localStorageSnapshot);
   if(!syncedStorageMapsEqual(remoteStorage, mergedStorage) || (!snap.exists() && hasMeaningfulLocalState())){
     const stamp = serverTimestamp();
@@ -15780,5 +16198,43 @@ body:not(.firebase-auth-required) #journallApp > .sidebar .nav button {
 })();
 </script>
 
-</body>
+
+    <script>
+        // Initialize Lucide icons
+        if (window.lucide) lucide.createIcons();
+        
+        // Patch tab selection to update header and icons
+        const originalSelectTab = window.selectTab;
+        window.selectTab = function(tabId) {
+            if (typeof originalSelectTab === 'function') originalSelectTab(tabId);
+            const titleMap = {
+                'tradingpage': "Today's Summary",
+                'dashboard': 'Analytics',
+                'grid': 'Trades',
+                'journalpage': 'Journal',
+                'psychology': 'Psychology',
+                'calendar': 'Calendar',
+                'reports': 'Reports',
+                'widgets': 'Widgets',
+                'goals': 'Goals',
+                'ailab': 'AI Coach',
+                'userprofile': 'User Profile'
+            };
+            const titleEl = document.getElementById('activeTabTitle');
+            if (titleEl) titleEl.textContent = titleMap[tabId] || 'Command Center';
+            if (window.lucide) lucide.createIcons();
+            
+            // Update active state in sidebar
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('data-tab') === tabId) link.classList.add('active');
+            });
+        };
+        
+        // Initial icon creation
+        document.addEventListener('DOMContentLoaded', () => {
+            if (window.lucide) lucide.createIcons();
+        });
+    </script>
+    </body>
 </html>

@@ -109,7 +109,48 @@ function Get-PythonExe {
     return $ranked[0].Path
   }
 
-  throw 'No Python installation was found on this PC. MetaTrader 5 sync requires Python 3.8 or newer (64-bit Windows).'
+  # ── Step 5: No interpreter has MetaTrader5. Auto-repair: install it into
+  #          the newest available Python so sync works on the next attempt. ──
+  if ($allInterpreters.Count -gt 0) {
+    $chosen = $allInterpreters[0]
+    # Try several ways to run pip in case `-m pip` fails for this interpreter
+    # (missing pip, user-site permissions, etc.).
+    $pipCommands = @(
+      @($chosen, '-m', 'pip', 'install', '--user', '--force-reinstall', '--no-cache-dir', 'MetaTrader5', 'numpy'),
+      @($chosen, '-m', 'pip', 'install', '--force-reinstall', '--no-cache-dir', 'MetaTrader5', 'numpy')
+    )
+    $installOk = $false
+    $installLog = ''
+    foreach ($cmd in $pipCommands) {
+      try {
+        $proc = New-Object System.Diagnostics.Process
+        $proc.StartInfo.FileName = $cmd[0]
+        $proc.StartInfo.Arguments = ($cmd[1..($cmd.Length - 1)] -join ' ')
+        $proc.StartInfo.RedirectStandardOutput = $true
+        $proc.StartInfo.RedirectStandardError = $true
+        $proc.StartInfo.UseShellExecute = $false
+        $proc.StartInfo.CreateNoWindow = $true
+        [void]$proc.Start()
+        $installLog = $proc.StandardOutput.ReadToEnd() + $proc.StandardError.ReadToEnd()
+        $proc.WaitForExit(300000)
+        if ($proc.ExitCode -eq 0) { $installOk = $true; break }
+      } catch {
+        $installLog = "$(if ($installLog) { $installLog + ' | ' })$($_.Exception.Message)"
+      }
+    }
+    $logFile = Join-Path ([System.IO.Path]::GetTempPath()) 'journall_mt5_install.log'
+    try { $installLog | Out-File -LiteralPath $logFile -Encoding utf8 } catch {}
+    $probe = & $chosen -c 'import MetaTrader5; print("mt5ok")' 2>$null
+    if ($LASTEXITCODE -eq 0 -and $probe -match 'mt5ok') { return $chosen }
+    $fixTip = "Easy fix: double-click 'Fix-MT5-Sync.bat' in your Journall folder (it installs the package step by step with clear instructions), or open PowerShell and run: py -3 -m pip install --user --force-reinstall --no-cache-dir MetaTrader5 numpy. The detailed install log was saved to: $logFile. "
+    if (-not $installOk) {
+      throw ("MetaTrader 5 sync needs the MetaTrader5 Python package and the automatic install failed: $installLog. " + $fixTip + "(requires Python 3.8+ 64-bit on Windows). Then restart Journall App.bat and sync again.")
+    }
+    throw ("MetaTrader5 package installed but still could not be imported: $installLog. " +
+      "The MetaTrader5 package works only with 64-bit Python 3.8+ on Windows. " +
+      $fixTip + "Reinstall Python 3.12 (64-bit) from python.org if the error persists, then restart Journall App.bat.")
+  }
+  throw 'No Python installation was found on this PC. MetaTrader 5 sync requires Python 3.8 or newer (64-bit Windows). Install Python from python.org (tick "Add python.exe to PATH"), then run Journall App.bat again.'
 }
 
 function Get-ContentType([string]$Path) {
