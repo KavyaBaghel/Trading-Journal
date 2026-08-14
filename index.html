@@ -16233,8 +16233,11 @@ body:not(.firebase-auth-required) #journallApp > .sidebar .nav button {
         
         // Initial icon creation
         document.addEventListener('DOMContentLoaded', () => {
-            if (window.lucide) lucide.createIcons();
-        });
+    if (window.lucide) lucide.createIcons();
+    if (typeof window.selectTab === 'function') {
+        window.selectTab('tradingpage');
+    }
+});
     </script>
     </body>
 </html>
