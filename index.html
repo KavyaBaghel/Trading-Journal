@@ -3660,6 +3660,12 @@ tr:hover {
   .top-profile-email { display: none !important; }
 }
 </style>
+<style>
+.fixed-top-right-profile { position: fixed !important; top: 16px !important; right: 24px !important; z-index: 99999 !important; display: flex !important; align-items: center !important; gap: 10px !important; padding: 6px 14px 6px 8px !important; background: rgba(15, 23, 42, 0.88) !important; backdrop-filter: blur(14px) !important; border-radius: 9999px !important; cursor: pointer !important; transition: all 0.2s ease !important; }
+.fixed-top-right-profile:hover { background: rgba(30, 41, 59, 0.95) !important; transform: translateY(-1px) !important; }
+.top-avatar-img { width: 34px !important; height: 34px !important; border-radius: 50% !important; }
+@media (max-width: 820px) { .fixed-top-right-profile { top: 10px !important; right: 12px !important; padding: 4px 10px 4px 6px !important; } }
+</style>
 
     <script src="https://unpkg.com/lucide@latest"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
@@ -4077,6 +4083,12 @@ tr:hover {
   </div>
 </div>
 <div id="journallApp" class="app-container" style="display: none;" hidden>
+    <div id="fixedTopRightProfile" class="fixed-top-right-profile" onclick="selectTab('userprofile')" title="Open User Profile">
+      <img id="topAvatarImg" class="top-avatar-img" src="" onerror="this.src='https://ui-avatars.com/api/?name=Trader&background=8b5cf6&color=fff'" alt="Trader Profile">
+      <div class="top-profile-details">
+        <div class="top-profile-name" id="topProfileName">Trader</div>
+      </div>
+    </div>
 
         
         <aside class="sidebar">
@@ -4099,6 +4111,16 @@ tr:hover {
                 <button class="nav-link" data-tab="userprofile"><i data-lucide="user"></i> <span class="brand-name">User Profile</span></button>
             </nav>
 
+            <div class="sidebox">
+              <div class="sidebox-title">Daily Rules</div>
+              <div id="sideDailyRules"></div>
+              <div style="height:1px;background:rgba(212,175,55,.10);margin:12px 0"></div>
+              <div class="sidebox-title" style="margin-bottom:8px">Rule Breaks</div>
+              <div class="mini-stat"><span>Today Broken Rules</span><strong id="sideRuleBreaks">0</strong></div>
+              <div class="mini-stat"><span>Trades Journaled</span><strong id="sideJournaledTrades">0</strong></div>
+              <div class="mini-stat"><span>Trades Pending Journal</span><strong id="sidePendingJournalTrades">0</strong></div>
+            </div>
+
             <div style="margin-top: auto; padding: 1rem 0.75rem;">
                 <button onclick="triggerJournalSignOut()" class="nav-link" style="color: var(--loss);"><i data-lucide="log-out"></i> <span class="brand-name">Sign Out</span></button>
             </div>
@@ -4107,26 +4129,9 @@ tr:hover {
     
 
         <div class="main-wrapper">
-            <header class="header">
-                <div class="page-title" id="activeTabTitle" style="min-width: 150px;">Command Center</div>
-                <div style="flex: 1; max-width: 400px; margin: 0 2rem; position: relative;">
-                    <i data-lucide="search" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); width: 16px; color: var(--text-ghost);"></i>
-                    <input type="text" placeholder="Search trades, rules, or AI insights..." 
-                           style="width: 100%; background: var(--bg-surface); border: 1px solid var(--border-hairline); border-radius: 9999px; padding: 8px 12px 8px 40px; color: white; font-size: 0.85rem;">
-                </div>
-
-                
-                <div style="display: flex; align-items: center; gap: 1.5rem;">
-                    <div id="firebaseAuthBar" style="font-size: 0.75rem; color: var(--text-muted);">
-                        <span id="firebaseAuthStatus">Syncing...</span>
-                    </div>
-                    
-                    <div id="fixedTopRightProfile" onclick="selectTab('userprofile')" class="user-profile-chip">
-                        <span id="topProfileName" class="user-name">Trader</span>
-                        <img id="topAvatarImg" class="user-avatar" src="" onerror="this.src='https://ui-avatars.com/api/?name=Trader&background=8b5cf6&color=fff'">
-                    </div>
-                </div>
-            </header>
+            <div id="firebaseAuthBar" style="font-size: 0.75rem; color: var(--text-muted);">
+                <span id="firebaseAuthStatus">Syncing...</span>
+            </div>
             <main class="content-area">
                 <div class="container">
         <div class="top">
