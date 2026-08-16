@@ -3459,7 +3459,18 @@ tr:hover {
         .nav-link.active { background: var(--primary-glow) !important; color: var(--primary) !important; }
         .nav-link i { width: 18px !important; height: 18px !important; }
 
-        .main-wrapper { flex: 1 !important; display: flex !important; flex-direction: column !important; background: radial-gradient(circle at top right, #101014, #09090b) !important; overflow: hidden !important; }
+        .main-wrapper {
+            flex: 1 !important;
+            display: flex !important;
+            flex-direction: column !important;
+            background:
+              radial-gradient(circle, rgba(73,79,223,.12) 0 1px, transparent 1.6px),
+              radial-gradient(circle, rgba(255,255,255,.05) 0 1px, transparent 1.6px),
+              radial-gradient(circle at top right, #101014, #09090b) !important;
+            background-size: 26px 26px, 52px 52px, 100% 100% !important;
+            background-position: 0 0, 13px 13px, 0 0 !important;
+            overflow: hidden !important;
+        }
         .header {
             height: 80px !important; padding: 0 2rem !important; border-bottom: 1px solid var(--border) !important;
             display: flex !important; align-items: center !important; justify-content: space-between !important;
@@ -3480,6 +3491,9 @@ tr:hover {
 
         .content-area { flex: 1 !important; overflow-y: auto !important; padding: 2rem !important; }
         .container { max-width: 1200px !important; margin: 0 auto !important; }
+        .container:has(#tradingpage.section.active) {
+            max-width: 100% !important;
+        }
 
         /* Glassmorphism & Modern Cards */
         .card { 
@@ -12270,12 +12284,6 @@ body:not(.firebase-auth-required) #journallApp > .main > *{
 }
 #tradingpage{
   position:relative!important;
-  background-color:#0b0c10!important;
-  background-image:
-    radial-gradient(circle, rgba(73,79,223,.12) 0 1px, transparent 1.6px),
-    radial-gradient(circle, rgba(255,255,255,.05) 0 1px, transparent 1.6px)!important;
-  background-size:26px 26px, 52px 52px!important;
-  background-position:0 0, 13px 13px!important;
 }
 #tradingpage > .grid.two,
 .grid.two{
