@@ -11031,7 +11031,7 @@ document.querySelectorAll('.nav button').forEach(btn=>{
       if (typeof initDraftAutoSync === 'function') initDraftAutoSync();
       if (typeof loadJournalDraft === 'function') loadJournalDraft();
       if (typeof loadPsychologyDraft === 'function') loadPsychologyDraft();
-      navigator.serviceWorker.register('./service-worker.js?v=146', { updateViaCache: 'none' })
+      navigator.serviceWorker.register('./service-worker.js?v=148', { updateViaCache: 'none' })
         .then(reg => {
           // Force check for service worker updates on load, immediately
           reg.update().catch(() => {});

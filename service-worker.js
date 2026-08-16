@@ -1,4 +1,4 @@
-const CACHE_NAME = 'journall-android-pwa-v147';
+const CACHE_NAME = 'journall-android-pwa-v148';
 const APP_SHELL = [
   './manifest.webmanifest',
   './assets/icon-192.png',
@@ -26,23 +26,14 @@ self.addEventListener('activate', event => {
 
 self.addEventListener('fetch', event => {
   if (event.request.method !== 'GET') return;
-  event.respondWith(
-    fetch(event.request)
-      .then(response => {
-        if (response && response.status === 200) {
-          const responseClone = response.clone();
-          caches.open(CACHE_NAME).then(cache => cache.put(event.request, responseClone));
-        }
-        return response;
-      })
-      .catch(() => caches.match(event.request))
-  );
-  // Never serve a stale index.html: the main page is fetched fresh every
-  // time so code updates are never blocked by the service worker cache.
+
   const url = event.request.url.split('?')[0].split('#')[0];
   const isIndexHtml = url.endsWith('/index.html') ||
     url.endsWith('/Trading-Journal/') || url.endsWith('/Trading-Journal');
+
   if (isIndexHtml) {
+    // Never serve a stale index.html: always fetch fresh so code updates
+    // are never blocked by the service worker cache.
     event.respondWith(
       fetch(event.request, { cache: 'no-store' })
         .then(response => {
@@ -56,4 +47,16 @@ self.addEventListener('fetch', event => {
     );
     return;
   }
+
+  event.respondWith(
+    fetch(event.request)
+      .then(response => {
+        if (response && response.status === 200) {
+          const responseClone = response.clone();
+          caches.open(CACHE_NAME).then(cache => cache.put(event.request, responseClone));
+        }
+        return response;
+      })
+      .catch(() => caches.match(event.request))
+  );
 });
