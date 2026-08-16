@@ -3512,6 +3512,9 @@ tr:hover {
             padding: 2rem !important;
             margin-bottom: 2rem !important;
         }
+        .top .hero.tab-hidden {
+            display: none !important;
+        }
         
         /* Preserve login page layout */
         .firebase-auth-gate { z-index: 1000 !important; }
@@ -10378,6 +10381,8 @@ function selectTab(tabId) {
   });
 
   const activeBtn = document.querySelector(`.nav button[data-tab="${tabId}"]`);
+  const shellHero = document.querySelector('.top > .hero');
+  if (shellHero) shellHero.classList.toggle('tab-hidden', tabId !== 'tradingpage');
   if (activeBtn) {
     updateHeroTitle(activeBtn.textContent.trim());
     const mobSub = document.getElementById('mobileActiveTab');
