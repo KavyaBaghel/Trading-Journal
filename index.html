@@ -753,11 +753,6 @@ body{
 button,input,select,textarea{font-family:inherit}
 
 .app{display:grid;grid-template-columns:275px 1fr;min-height:100vh}
-.sidebar{
-  position:sticky;top:0;height:100vh;overflow:auto;padding:20px;
-  background:linear-gradient(180deg,rgba(16,21,33,.98),rgba(8,11,17,.96));
-  border-right:1px solid var(--border)
-}
 .brand{display:flex;align-items:center;gap:12px;margin-bottom:24px}
 .logo{width:44px;height:44px;border-radius:16px;background:linear-gradient(135deg,var(--blue),var(--green));box-shadow:0 18px 34px rgba(113,230,170,.18)}
 .brand-title{font-family:var(--mono);font-weight:800;letter-spacing:.08em}
@@ -1245,42 +1240,6 @@ canvas{display:block;width:100%!important;height:100%!important}
 }
 
 @media(max-width:1400px){.metrics{grid-template-columns:repeat(4,1fr)}.widget-grid{grid-template-columns:repeat(2,1fr)}}
-@media(min-width:821px) and (max-width:1050px){
-  .app{grid-template-columns:86px minmax(0,1fr)!important}
-  .sidebar{
-    position:sticky!important;
-    top:0!important;
-    height:100vh!important;
-    padding:12px 8px!important;
-    overflow:auto!important;
-  }
-  .brand{
-    justify-content:center!important;
-    margin:0 0 14px!important;
-    padding:8px 0 12px!important;
-  }
-  .brand > div:not(.logo),.sidebox{display:none!important}
-  .nav{
-    display:flex!important;
-    flex-direction:column!important;
-    gap:7px!important;
-  }
-  .nav button{
-    min-width:0!important;
-    min-height:54px!important;
-    justify-content:center!important;
-    text-align:center!important;
-    padding:8px 6px!important;
-    font-size:11px!important;
-    line-height:1.1!important;
-    white-space:normal!important;
-    border-radius:14px!important;
-  }
-  .main{padding:18px!important}
-  .top{display:flex!important}
-  .hero{padding:18px!important}
-}
-@media(max-width:1050px){.app{grid-template-columns:1fr}.sidebar{position:relative;height:auto}.two,.three,.four,.builder-grid{grid-template-columns:1fr}.top{flex-direction:column}.quick-actions{flex-direction:row;flex-wrap:wrap}}
 @media(max-width:700px){.main{padding:16px}.metrics{grid-template-columns:repeat(2,1fr)}.widget-grid{grid-template-columns:1fr}.widget.big{grid-column:span 1}.hero h1{font-size:25px}}
 
 
@@ -1312,12 +1271,6 @@ body{
     linear-gradient(180deg,#14131a 0%,#1a1824 50%,#14131a 100%)!important;
 
   color:var(--text)!important;
-}
-
-.sidebar{
-  background:rgba(20,19,26,.98)!important;
-  border-right:1px solid var(--border)!important;
-  backdrop-filter:blur(14px);
 }
 
 .logo{
@@ -1795,8 +1748,7 @@ td{
   color:var(--faint);
   margin-top:2px;
 }
-body.modal-open .main,
-body.modal-open .sidebar{
+body.modal-open .main{
   filter:blur(3px);
   pointer-events:none;
   user-select:none;
@@ -2479,7 +2431,7 @@ body.modal-open .sidebar{
 /* ===== GLOBAL OVERRIDES ===== */
 
 /* Fix any white/light backgrounds */
-body, html, .app, .sidebar, .main, .section, .card,
+body, html, .app, .main, .section, .card,
 .nav button, .brand, .logo, .hero, .quick-actions, .btn,
 .filter, .filter input, .filter select, .sync-status, .empty-chart,
 .upload-sync-box, .csv-only-box, .journal-form-actions, .ai-chat-box,
@@ -2497,7 +2449,7 @@ body, html, .app, .sidebar, .main, .section, .card,
 }
 
 /* Fix text colors on dark backgrounds */
-body, .app, .sidebar, .main, .section, .card, .nav button,
+body, .app, .main, .section, .card, .nav button,
 .brand, .hero, .quick-actions, .btn, .filter, .sync-status,
 .empty-chart, .upload-sync-box, .csv-only-box, .journal-form-actions,
 .ai-chat-box, .ai-msg, .widget, .goal-card, .table-wrap, table,
@@ -2710,87 +2662,6 @@ tr:hover {
 
 #journallApp #commandCenter.command-center {
   margin-top: 0 !important;
-}
-
-
-/* JOURNALL_BRAND_AND_LOGO_ALIGNMENT_FIX */
-.sidebar .brand {
-  display: flex !important;
-  align-items: center !important;
-  gap: 12px !important;
-  padding: 14px 16px !important;
-  margin-bottom: 18px !important;
-  background: rgba(255, 255, 255, 0.03) !important;
-  border: 1px solid rgba(255, 255, 255, 0.08) !important;
-  border-radius: 16px !important;
-  width: 100% !important;
-  box-sizing: border-box !important;
-}
-
-.sidebar .logo {
-  width: 38px !important;
-  height: 38px !important;
-  min-width: 38px !important;
-  min-height: 38px !important;
-  border-radius: 12px !important;
-  background: linear-gradient(135deg, #1e1b4b, #0f172a) !important;
-  border: 1px solid rgba(168, 85, 247, 0.35) !important;
-  display: grid !important;
-  place-items: center !important;
-  position: relative !important;
-  box-shadow: 0 4px 16px rgba(168, 85, 247, 0.25) !important;
-  flex-shrink: 0 !important;
-}
-
-.sidebar .logo::before {
-  content: "J" !important;
-  color: #ffffff !important;
-  font-family: Inter, -apple-system, sans-serif !important;
-  font-size: 19px !important;
-  font-weight: 800 !important;
-  line-height: 1 !important;
-}
-
-.sidebar .logo::after {
-  content: "" !important;
-  position: absolute !important;
-  width: 18px !important;
-  height: 2.5px !important;
-  right: 6px !important;
-  bottom: 9px !important;
-  background: #22c55e !important;
-  border-radius: 999px !important;
-  transform: rotate(-25deg) !important;
-  box-shadow: 0 0 8px rgba(34, 197, 94, 0.8) !important;
-}
-
-.sidebar .brand-text {
-  display: flex !important;
-  flex-direction: column !important;
-  justify-content: center !important;
-  overflow: hidden !important;
-}
-
-.sidebar .brand-title {
-  font-family: Inter, -apple-system, sans-serif !important;
-  font-size: 16px !important;
-  font-weight: 700 !important;
-  color: #ffffff !important;
-  line-height: 1.2 !important;
-  letter-spacing: -0.01em !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  white-space: nowrap !important;
-}
-
-.sidebar .brand-sub {
-  font-family: Inter, -apple-system, sans-serif !important;
-  font-size: 11px !important;
-  font-weight: 400 !important;
-  color: #94a3b8 !important;
-  line-height: 1.2 !important;
-  margin-top: 3px !important;
-  white-space: nowrap !important;
 }
 
 
@@ -3309,50 +3180,6 @@ tr:hover {
 }
 </style>
 <style>
-/* --- USER PROFILE SECTION STYLES --- */
-.sidebar-profile-card {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 12px 14px;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 12px;
-  margin: 12px 0 16px 0;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-.sidebar-profile-card:hover {
-  background: rgba(168, 85, 247, 0.12);
-  border-color: rgba(168, 85, 247, 0.3);
-}
-.sidebar-avatar-img {
-  width: 38px;
-  height: 38px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 2px solid #a855f7;
-  flex-shrink: 0;
-}
-.sidebar-profile-info {
-  overflow: hidden;
-}
-.sidebar-profile-name {
-  font-size: 13px;
-  font-weight: 700;
-  color: #fff;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.sidebar-profile-email {
-  font-size: 11px;
-  color: #94a3b8;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
 .profile-card-hero {
   background: linear-gradient(135deg, rgba(30, 41, 59, 0.8), rgba(15, 23, 42, 0.95));
   border: 1px solid rgba(168, 85, 247, 0.3);
@@ -3442,22 +3269,6 @@ tr:hover {
   }
 
   /* Sticky Glassmorphic Bottom Navigation Dock */
-  .sidebar {
-    position: fixed !important;
-    left: 0 !important;
-    right: 0 !important;
-    bottom: 0 !important;
-    top: auto !important;
-    z-index: 100 !important;
-    width: 100% !important;
-    height: auto !important;
-    padding: 8px 8px calc(8px + env(safe-area-inset-bottom)) 8px !important;
-    background: rgba(13, 14, 17, 0.94) !important;
-    backdrop-filter: blur(16px) !important;
-    border-top: 1px solid rgba(255, 255, 255, 0.1) !important;
-    overflow: hidden !important;
-  }
-
   .nav {
     display: flex !important;
     flex-direction: row !important;
@@ -3593,78 +3404,8 @@ tr:hover {
   line-height: 1.2;
 }
 
-/* Remove old sidebar card if present */
-.sidebar-profile-card { display: none !important; }
 </style>
 <style>
-/* --- PERMANENT FIXED FLOATING TOP-RIGHT PROFILE WIDGET --- */
-.fixed-top-right-profile {
-  position: fixed !important;
-  top: 16px !important;
-  right: 24px !important;
-  z-index: 99999 !important;
-  display: flex !important;
-  align-items: center !important;
-  gap: 10px !important;
-  padding: 6px 14px 6px 8px !important;
-  background: rgba(15, 23, 42, 0.88) !important;
-  backdrop-filter: blur(14px) !important;
-  -webkit-backdrop-filter: blur(14px) !important;
-  border: 1px solid rgba(168, 85, 247, 0.4) !important;
-  border-radius: 9999px !important;
-  cursor: pointer !important;
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5) !important;
-  transition: all 0.2s ease !important;
-}
-
-.fixed-top-right-profile:hover {
-  background: rgba(30, 41, 59, 0.95) !important;
-  border-color: rgba(168, 85, 247, 0.7) !important;
-  box-shadow: 0 10px 30px rgba(168, 85, 247, 0.4) !important;
-  transform: translateY(-1px) !important;
-}
-
-.top-avatar-img {
-  width: 34px !important;
-  height: 34px !important;
-  border-radius: 50% !important;
-  object-fit: cover !important;
-  border: 2px solid #a855f7 !important;
-}
-
-.top-profile-details {
-  display: flex !important;
-  flex-direction: column !important;
-  justify-content: center !important;
-}
-
-.top-profile-name {
-  font-size: 13px !important;
-  font-weight: 700 !important;
-  color: #fff !important;
-  line-height: 1.2 !important;
-}
-
-.top-profile-email {
-  font-size: 11px !important;
-  color: #94a3b8 !important;
-  line-height: 1.2 !important;
-}
-
-@media (max-width: 820px) {
-  .fixed-top-right-profile {
-    top: 10px !important;
-    right: 12px !important;
-    padding: 4px 10px 4px 6px !important;
-  }
-  .top-profile-email { display: none !important; }
-}
-</style>
-<style>
-.fixed-top-right-profile { position: fixed !important; top: 16px !important; right: 24px !important; z-index: 99999 !important; display: flex !important; align-items: center !important; gap: 10px !important; padding: 6px 14px 6px 8px !important; background: rgba(15, 23, 42, 0.88) !important; backdrop-filter: blur(14px) !important; border-radius: 9999px !important; cursor: pointer !important; transition: all 0.2s ease !important; }
-.fixed-top-right-profile:hover { background: rgba(30, 41, 59, 0.95) !important; transform: translateY(-1px) !important; }
-.top-avatar-img { width: 34px !important; height: 34px !important; border-radius: 50% !important; }
-@media (max-width: 820px) { .fixed-top-right-profile { top: 10px !important; right: 12px !important; padding: 4px 10px 4px 6px !important; } }
 </style>
 
     <script src="https://unpkg.com/lucide@latest"></script>
@@ -3694,17 +3435,6 @@ tr:hover {
         
         .app-container { display: flex !important; height: 100vh !important; width: 100vw !important; overflow: hidden !important; }
         
-        .sidebar {
-            width: 280px !important;
-            background: #050505 !important;
-            border-right: 1px solid var(--border) !important;
-            display: flex !important;
-            flex-direction: column !important;
-            padding: 2rem 1rem !important;
-            height: 100vh !important;
-            position: relative !important;
-            z-index: 20 !important;
-        }
         .brand { display: flex !important; align-items: center !important; gap: 0.75rem !important; margin-bottom: 2.5rem !important; padding: 0 1rem !important; }
         .logo-box {
             width: 40px !important; height: 40px !important; background: var(--primary) !important;
@@ -3823,18 +3553,6 @@ tr:hover {
         }
 
         /* Sidebar Refinement - Kokonut/Manus Style */
-        .sidebar {
-            width: 80px;
-            transition: width 0.4s var(--smooth-easing) !important;
-            overflow: hidden;
-            background: rgba(8, 8, 8, 0.8) !important;
-            border-right: 1px solid var(--border-hairline) !important;
-        }
-
-        .sidebar:hover {
-            width: 260px;
-        }
-
         .nav-link {
             justify-content: flex-start;
             padding: 0.85rem !important;
@@ -3863,10 +3581,6 @@ tr:hover {
         .brand-name {
             opacity: 0;
             transition: opacity 0.3s ease;
-        }
-
-        .sidebar:hover .brand-name {
-            opacity: 1;
         }
 
         /* Bento Card Enhancements - Nklit Style */
@@ -11976,7 +11690,6 @@ body{background-image:none!important}
 body::before,body::after,.hero::before,.hero::after,.card::before,.journal-main-card::before,.calendar-premium-card::before,.psychology-hero::after,.widget.interactive::before{display:none!important}
 *,*::before,*::after{box-shadow:none!important;text-shadow:none!important}
 .app,.main{background:var(--canvas)!important;color:var(--ink)!important}
-.sidebar{background:var(--canvas)!important;border-right:1px solid var(--hairline)!important;box-shadow:none!important;backdrop-filter:none!important}
 .brand{border-bottom:1px solid var(--hairline)!important}
 .logo{width:36px!important;height:36px!important;min-width:36px!important;border-radius:var(--rounded-md)!important;background:var(--surface-2)!important;background-image:none!important;border:1px solid var(--hairline-strong)!important;color:var(--ink)!important;display:grid!important;place-items:center!important;position:relative!important;overflow:hidden!important}
 .logo::before{content:"J"!important;color:var(--ink)!important;background:transparent!important;font-family:Inter,"Helvetica Neue",Arial,sans-serif!important;font-size:18px!important;font-weight:600!important;line-height:1!important}
@@ -12025,9 +11738,6 @@ textarea{border-radius:24px!important}input::placeholder,textarea::placeholder{c
 .firebase-auth-card{opacity:1!important;transform:scale(1)!important;transform-origin:center!important;transition:opacity var(--dur-modal) var(--ease-spring),transform var(--dur-modal) var(--ease-spring)!important}
 .firebase-auth-gate:not(.show) .firebase-auth-card{opacity:0!important;transform:scale(.96)!important}
 ::-webkit-scrollbar{width:10px;height:10px}::-webkit-scrollbar-track{background:var(--canvas)!important}::-webkit-scrollbar-thumb{background:var(--hairline)!important;border-radius:9999px!important;border:2px solid var(--canvas)!important}*{scrollbar-width:thin;scrollbar-color:var(--hairline) var(--canvas)}
-@media(min-width:821px) and (max-width:1050px){.app{grid-template-columns:92px minmax(0,1fr)!important}.sidebar{position:sticky!important;top:0!important;height:100vh!important;padding:12px 8px!important}.brand>div:not(.logo),.sidebox{display:none!important}.nav{display:flex!important;flex-direction:column!important}.nav button{justify-content:center!important;text-align:center!important;border-radius:var(--rounded-md)!important;padding:10px 8px!important}.main{padding:18px!important}}
-@media(max-width:1050px){.app{grid-template-columns:1fr}.sidebar{position:relative;height:auto}.two,.three,.four,.builder-grid{grid-template-columns:1fr}.top{flex-direction:column}.quick-actions{flex-direction:row;flex-wrap:wrap}}
-@media(max-width:820px){body{background:var(--canvas)!important;padding:calc(62px + env(safe-area-inset-top)) 0 calc(82px + env(safe-area-inset-bottom))!important}.mobile-appbar{display:flex;background:var(--canvas)!important;border-bottom:1px solid var(--hairline)!important}.sidebar{position:fixed!important;left:0!important;right:0!important;bottom:0!important;top:auto!important;z-index:95!important;width:100%!important;height:auto!important;padding:8px 8px calc(8px + env(safe-area-inset-bottom))!important;border-top:1px solid var(--hairline)!important;background:var(--canvas)!important;overflow:hidden!important}.brand,.sidebox{display:none!important}.nav{display:flex!important;flex-direction:row!important;gap:8px!important;overflow-x:auto!important}.nav button{flex:0 0 auto!important;min-width:88px!important;justify-content:center!important;text-align:center!important}.main{padding:12px!important}.top{display:none!important}.grid,.two,.three,.four,.builder-grid,.ai-lab-grid,.journal-page-layout{grid-template-columns:1fr!important}.metrics,.today-metrics,.goal-card-grid,.ai-score{grid-template-columns:repeat(2,minmax(0,1fr))!important}.card,.goal-card,.widget,.saved-journal-card{padding:13px!important}.value,.goal-card-value,.metric-value,.ai-score-value{font-size:20px!important}.chart{height:230px!important}.hero h1{font-size:24px!important}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}
 
 /* LINEAR_GLOBAL_LAYOUT_SECTION */
@@ -12057,14 +11767,6 @@ body:not(.firebase-auth-required) > .mobile-appbar{
 #journallApp[hidden]{
   display:none!important;
 }
-#journallApp > .sidebar{
-  position:fixed!important;
-  inset:0 auto 0 0!important;
-  width:220px!important;
-  height:100vh!important;
-  flex:0 0 220px!important;
-  overflow-y:auto!important;
-}
 #journallApp > .main{
   flex:1 1 auto!important;
   width:calc(100% - 220px)!important;
@@ -12093,23 +11795,6 @@ body:not(.firebase-auth-required) #journallApp.app{
   min-height:100vh!important;
   overflow:hidden!important;
   background:#010102!important;
-}
-body:not(.firebase-auth-required) #journallApp > .sidebar{
-  display:flex!important;
-  flex-direction:column!important;
-  position:relative!important;
-  inset:auto!important;
-  z-index:10!important;
-  width:220px!important;
-  min-width:220px!important;
-  max-width:220px!important;
-  height:100vh!important;
-  flex:0 0 220px!important;
-  padding:16px 0 0!important;
-  overflow-y:auto!important;
-  overflow-x:hidden!important;
-  background:#0d0e11!important;
-  border-right:1px solid #23252a!important;
 }
 body:not(.firebase-auth-required) #journallApp > .main{
   flex:1 1 auto!important;
@@ -12381,77 +12066,6 @@ body:not(.firebase-auth-required) #journallApp.app{
   max-width:100vw!important;
   overflow:hidden!important;
   background:#000000!important;
-}
-body:not(.firebase-auth-required) #journallApp > .sidebar{
-  width:260px!important;
-  min-width:260px!important;
-  max-width:260px!important;
-  flex:0 0 260px!important;
-  flex-shrink:0!important;
-  height:100vh!important;
-  background:#0a0a0a!important;
-  border-right:1px solid rgba(255,255,255,.12)!important;
-  display:flex!important;
-  flex-direction:column!important;
-  position:relative!important;
-  inset:auto!important;
-  overflow-y:auto!important;
-  overflow-x:hidden!important;
-  padding:8px 0 0!important;
-}
-body:not(.firebase-auth-required) #journallApp > .sidebar .brand{
-  height:64px!important;
-  min-height:64px!important;
-  padding:0 20px!important;
-  display:flex!important;
-  align-items:center!important;
-  gap:12px!important;
-  color:#ffffff!important;
-  border-bottom:1px solid rgba(255,255,255,.12)!important;
-  margin:0 0 8px!important;
-}
-body:not(.firebase-auth-required) #journallApp > .sidebar .brand-title{
-  font-size:16px!important;
-  font-weight:600!important;
-  color:#ffffff!important;
-  letter-spacing:-.32px!important;
-}
-body:not(.firebase-auth-required) #journallApp > .sidebar .brand-sub{
-  color:rgba(255,255,255,.72)!important;
-  font-size:12px!important;
-}
-body:not(.firebase-auth-required) #journallApp > .sidebar .nav{
-  display:flex!important;
-  flex-direction:column!important;
-  gap:0!important;
-  padding:0!important;
-  overflow:visible!important;
-}
-body:not(.firebase-auth-required) #journallApp > .sidebar .nav button{
-  padding:11px 16px!important;
-  margin:2px 8px!important;
-  border-radius:var(--r-pill)!important;
-  font-size:14px!important;
-  font-weight:600!important;
-  color:rgba(255,255,255,.72)!important;
-  background:transparent!important;
-  border:none!important;
-  cursor:pointer!important;
-  white-space:nowrap!important;
-  text-align:left!important;
-  width:calc(100% - 16px)!important;
-  display:block!important;
-  min-width:0!important;
-  letter-spacing:.16px!important;
-  transition:background var(--dur-instant) var(--ease-out),color var(--dur-instant) var(--ease-out)!important;
-}
-body:not(.firebase-auth-required) #journallApp > .sidebar .nav button:hover{
-  background:rgba(255,255,255,.08)!important;
-  color:#ffffff!important;
-}
-body:not(.firebase-auth-required) #journallApp > .sidebar .nav button.active{
-  background:#494fdf!important;
-  color:#ffffff!important;
 }
 body:not(.firebase-auth-required) #journallApp > .main{
   flex:1 1 auto!important;
@@ -12875,12 +12489,6 @@ p{
   }
 }
 @media (max-width:900px){
-  body:not(.firebase-auth-required) #journallApp > .sidebar{
-    width:200px!important;
-    min-width:200px!important;
-    max-width:200px!important;
-    flex-basis:200px!important;
-  }
   body:not(.firebase-auth-required) #journallApp > .main{
     padding:20px!important;
   }
@@ -12892,14 +12500,6 @@ p{
   .grid.metrics.today-metrics,
   .today-metrics{
     grid-template-columns:repeat(2,1fr)!important;
-  }
-}
-@media (max-width:600px){
-  body:not(.firebase-auth-required) #journallApp > .sidebar{
-    display:none!important;
-  }
-  body:not(.firebase-auth-required) #journallApp > .main{
-    padding:16px!important;
   }
 }
 @media (min-width:1600px){
@@ -13053,37 +12653,6 @@ p{
   font-weight: 600 !important;
 }
 
-/* 6. NAV ITEMS */
-body:not(.firebase-auth-required) #journallApp > .sidebar .nav button,
-body:not(.firebase-auth-required) #journallApp > .sidebar .nav [data-tab] {
-  padding: 10px 16px !important;
-  margin: 2px 8px !important;
-  border-radius: 9999px !important;
-  font-size: 14px !important;
-  font-weight: 600 !important;
-  color: rgba(255,255,255,0.6) !important;
-  background: transparent !important;
-  border: none !important;
-  cursor: pointer !important;
-  white-space: nowrap !important;
-  text-align: left !important;
-  width: calc(100% - 16px) !important;
-  display: block !important;
-  transition: background 100ms, color 100ms !important;
-}
-
-body:not(.firebase-auth-required) #journallApp > .sidebar .nav button:hover,
-body:not(.firebase-auth-required) #journallApp > .sidebar .nav [data-tab]:hover {
-  background: rgba(255,255,255,0.08) !important;
-  color: #ffffff !important;
-}
-
-body:not(.firebase-auth-required) #journallApp > .sidebar .nav button.active,
-body:not(.firebase-auth-required) #journallApp > .sidebar .nav [data-tab].active {
-  background: #494fdf !important;
-  color: #ffffff !important;
-}
-
 /* 7. CALENDAR DOTS */
 #journallApp .calendar-dot.red {
   background: #e23b4a !important;
@@ -13141,60 +12710,6 @@ body:not(.firebase-auth-required) #journallApp > .sidebar .nav [data-tab].active
   gap: 8px !important;
   flex-wrap: wrap !important;
   margin-bottom: 20px !important;
-}
-
-/* Mobile nav override */
-@media (max-width: 820px) {
-  body:not(.firebase-auth-required) #journallApp > .sidebar {
-    display: flex !important;
-    position: fixed !important;
-    left: 0 !important;
-    right: 0 !important;
-    bottom: 0 !important;
-    top: auto !important;
-    z-index: 9999 !important;
-    width: 100% !important;
-    max-width: 100% !important;
-    min-width: 100% !important;
-    height: 60px !important;
-    background: #0d0e11 !important;
-    border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
-    border-right: none !important;
-    padding: 6px 8px calc(6px + env(safe-area-inset-bottom)) !important;
-    overflow: hidden !important;
-    flex-direction: row !important;
-    align-items: center !important;
-  }
-  body:not(.firebase-auth-required) #journallApp > .sidebar .brand {
-    display: none !important;
-  }
-  body:not(.firebase-auth-required) #journallApp > .main {
-    padding-bottom: 80px !important;
-  }
-  body:not(.firebase-auth-required) #journallApp > .sidebar .nav {
-    flex-direction: row !important;
-    overflow-x: auto !important;
-    overflow-y: hidden !important;
-    flex-wrap: nowrap !important;
-    padding: 0 4px !important;
-    gap: 8px !important;
-    width: 100% !important;
-    -webkit-overflow-scrolling: touch !important;
-    scrollbar-width: none !important;
-  }
-  body:not(.firebase-auth-required) #journallApp > .sidebar .nav::-webkit-scrollbar {
-    display: none !important;
-  }
-  body:not(.firebase-auth-required) #journallApp > .sidebar .nav button,
-  body:not(.firebase-auth-required) #journallApp > .sidebar .nav [data-tab] {
-    width: auto !important;
-    min-width: 88px !important;
-    display: inline-block !important;
-    flex: 0 0 auto !important;
-    text-align: center !important;
-    margin: 0 !important;
-    padding: 10px 14px !important;
-  }
 }
 
 /* JOURNALL_ONE_PASS_EXACT_SELECTOR_REPAIR */
@@ -14781,17 +14296,6 @@ input{
   box-shadow: 0 8px 24px rgba(73, 79, 223, 0.15), 0 0 10px rgba(73, 79, 223, 0.05) !important;
 }
 
-/* 6. Navigation items active transitions */
-body:not(.firebase-auth-required) #journallApp > .sidebar .nav button {
-  border-radius: var(--rounded-md) !important;
-  transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1) !important;
-}
-
-body:not(.firebase-auth-required) #journallApp > .sidebar .nav button.active {
-  background: linear-gradient(90deg, #494fdf, #656bff) !important;
-  box-shadow: 0 4px 12px rgba(73, 79, 223, 0.35) !important;
-}
-
 /* 7. Checklist / Grid Items scale */
 .checklist-item, .widget, .insight {
   border: 1px solid rgba(255,255,255,0.05) !important;
@@ -14799,35 +14303,6 @@ body:not(.firebase-auth-required) #journallApp > .sidebar .nav button.active {
 }
 .checklist-item:hover, .widget:hover {
   border-color: rgba(255,255,255,0.1) !important;
-}
-
-/* 8. Sign Out Sidebar / Mobile Nav styling */
-@media (min-width: 821px) {
-  body:not(.firebase-auth-required) #journallApp > .sidebar .nav {
-    height: calc(100vh - 100px) !important;
-    display: flex !important;
-    flex-direction: column !important;
-  }
-  .nav-signout-btn {
-    margin-top: auto !important;
-    color: #f87171 !important;
-    border: 1px dashed rgba(248, 113, 113, 0.2) !important;
-    background: rgba(248, 113, 113, 0.02) !important;
-    transition: all 0.25s cubic-bezier(0.25, 0.8, 0.25, 1) !important;
-  }
-  .nav-signout-btn:hover {
-    background: rgba(248, 113, 113, 0.1) !important;
-    border-color: rgba(248, 113, 113, 0.45) !important;
-    color: #ff9999 !important;
-    box-shadow: 0 4px 15px rgba(248, 113, 113, 0.15) !important;
-  }
-}
-@media (max-width: 820px) {
-  .nav-signout-btn {
-    color: #f87171 !important;
-    border: 1px solid rgba(248, 113, 113, 0.15) !important;
-    background: rgba(248, 113, 113, 0.04) !important;
-  }
 }
 
 /* 9. Brand & Logo Sharp Box Removal & Glowing Logo Upgrade */
@@ -14869,20 +14344,6 @@ body:not(.firebase-auth-required) #journallApp > .sidebar .nav button.active {
 }
 @keyframes spin-mini {
   to { transform: rotate(360deg); }
-}
-
-body:not(.firebase-auth-required) #journallApp > .sidebar .brand {
-  border-bottom: none !important;
-  margin-bottom: 12px !important;
-}
-@media (min-width: 821px) and (max-width: 1050px) {
-  body:not(.firebase-auth-required) #journallApp > .sidebar .brand {
-    border-bottom: none !important;
-    padding: 0 !important;
-    display: flex !important;
-    justify-content: center !important;
-    align-items: center !important;
-  }
 }
 
 /* 10. Custom Input Stepper Controls */
@@ -15083,16 +14544,6 @@ body:not(.firebase-auth-required) #journallApp > .sidebar .brand {
   margin: 24px 0 !important;
 }
 
-/* Relaxed Sidebar navigation items */
-body:not(.firebase-auth-required) #journallApp > .sidebar .nav {
-  gap: 8px !important;
-}
-
-body:not(.firebase-auth-required) #journallApp > .sidebar .nav button {
-  padding: 12px 18px !important;
-  margin: 0 8px !important;
-}
-
 /* Let sections and page rows have slightly more margin */
 #journallApp .section {
   padding-bottom: 40px !important;
@@ -15128,24 +14579,6 @@ body:not(.firebase-auth-required) #journallApp > .sidebar .nav button {
   word-wrap: break-word !important;
   overflow-wrap: break-word !important;
   white-space: normal !important;
-}
-
-/* Enable text wrapping on tablet sidebar views to fit text within the 92px width */
-@media (min-width: 821px) and (max-width: 1050px) {
-  body:not(.firebase-auth-required) #journallApp > .sidebar .nav button {
-    text-align: center !important;
-    font-size: 11px !important;
-    padding: 10px 4px !important;
-    margin: 4px auto !important;
-    width: calc(100% - 8px) !important;
-    min-height: 44px !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    white-space: normal !important;
-    line-height: 1.2 !important;
-    border-radius: 8px !important;
-  }
 }
 
 /* 13. Chart Width Constraints (Prevent over-stretching on wide screens) */
@@ -15432,11 +14865,6 @@ body:not(.firebase-auth-required) #journallApp > .sidebar .nav button {
   transform: scale(1.45) !important;
 }
 
-/* Sidebar Logo Adjustment */
-#journallApp > .sidebar .logo {
-  margin: 0 !important;
-}
-
 /* Live Logo Heartbeat Pulse (Animates brightness/neon glow opacity) */
 @keyframes logo-live-pulse {
   0% {
@@ -15472,11 +14900,6 @@ body:not(.firebase-auth-required) #journallApp > .sidebar .nav button {
   display: block !important; /* Show globally */
 }
 
-/* Hide duplicate vertical nav links in the sidebar globally */
-#journallApp > .sidebar .nav {
-  display: none !important;
-}
-
 /* Hide mobile header appbar globally since we have the dock */
 .mobile-appbar {
   display: none !important;
@@ -15490,15 +14913,6 @@ body:not(.firebase-auth-required) #journallApp > .sidebar .nav button {
 @media (min-width: 1025px) {
   #journallApp.app {
     grid-template-columns: 200px 1fr !important; /* Slimmer, cleaner sidebar */
-  }
-}
-
-@media (max-width: 1024px) {
-  #journallApp > .sidebar {
-    display: none !important;
-  }
-  #journallApp.app {
-    grid-template-columns: 1fr !important;
   }
 }
 
@@ -15702,54 +15116,6 @@ body:not(.firebase-auth-required) #journallApp > .sidebar .nav button {
 /* Slightly enlarge the sign-in logo and give the card breathing room for the headline */
 #firebaseAuthGate .firebase-auth-card { padding: 44px 38px !important; }
 .signin-brand .logo { transform: scale(1.5) !important; }
-/* Sidebar nav: show the vertical nav again with icons on wide screens */
-@media (min-width: 1280px) {
-  #journallApp > .sidebar .nav {
-    display: flex !important;
-    flex-direction: column !important;
-    gap: 0 !important;
-    padding: 0 0 8px !important;
-  }
-  #journallApp > .sidebar .nav button {
-    padding: 11px 16px !important;
-    margin: 2px 8px !important;
-    border-radius: var(--r-pill) !important;
-    font-size: 14px !important;
-    font-weight: 600 !important;
-    color: rgba(255,255,255,.72) !important;
-    background: transparent !important;
-    border: none !important;
-    cursor: pointer !important;
-    white-space: nowrap !important;
-    text-align: left !important;
-    width: calc(100% - 16px) !important;
-    min-width: 0 !important;
-    transition: background var(--dur-instant) var(--ease-out), color var(--dur-instant) var(--ease-out) !important;
-  }
-  #journallApp > .sidebar .nav button:hover {
-    background: rgba(255,255,255,.08) !important;
-    color: #ffffff !important;
-  }
-  #journallApp > .sidebar .nav button.active {
-    background: #494fdf !important;
-    color: #ffffff !important;
-  }
-  .nav-signout-btn {
-    color: rgba(255,255,255,.45) !important;
-    margin-top: 6px !important;
-  }
-  .nav-signout-btn:hover {
-    color: #ffffff !important;
-    background: rgba(226,59,74,.14) !important;
-  }
-  /* Give the sidebar room for the nav list */
-  body:not(.firebase-auth-required) #journallApp > .sidebar {
-    width: 250px !important;
-    min-width: 250px !important;
-    max-width: 250px !important;
-    flex: 0 0 250px !important;
-  }
-}
 /* Hero header: softer gradient edge and a subtle left accent bar */
 .hero, .top .hero {
   border-left: 3px solid #494fdf !important;
@@ -16244,5 +15610,267 @@ body:not(.firebase-auth-required) #journallApp > .sidebar .nav button {
     }
 });
     </script>
+    <style id="sidebar-redesign">
+body:not(.firebase-auth-required) #journallApp > .sidebar{
+  display:flex!important;
+  flex-direction:column!important;
+  position:relative!important;
+  inset:auto!important;
+  width:220px!important;
+  min-width:220px!important;
+  max-width:220px!important;
+  height:100vh!important;
+  flex:0 0 220px!important;
+  padding:16px 0 0!important;
+  overflow-y:auto!important;
+  overflow-x:hidden!important;
+  background:var(--canvas)!important;
+  border-right:1px solid var(--hairline)!important;
+  box-shadow:none!important;
+  backdrop-filter:none!important;
+}
+
+body:not(.firebase-auth-required) #journallApp > .sidebar .brand{
+  display:flex!important;
+  align-items:center!important;
+  gap:12px!important;
+  padding:0 20px 14px!important;
+  margin:0 0 8px!important;
+  border-bottom:1px solid var(--hairline)!important;
+}
+
+body:not(.firebase-auth-required) #journallApp > .sidebar .logo{
+  width:38px!important;
+  height:38px!important;
+  min-width:38px!important;
+  min-height:38px!important;
+  border-radius:12px!important;
+  background:linear-gradient(135deg,var(--surface-2),var(--card))!important;
+  border:1px solid var(--hairline-strong)!important;
+  display:grid!important;
+  place-items:center!important;
+  position:relative!important;
+  flex-shrink:0!important;
+  box-shadow:0 10px 24px rgba(0,0,0,.22)!important;
+}
+
+body:not(.firebase-auth-required) #journallApp > .sidebar .logo::before{
+  content:"J"!important;
+  color:var(--ink)!important;
+  font-family:Inter,"Helvetica Neue",Arial,sans-serif!important;
+  font-size:18px!important;
+  font-weight:700!important;
+  line-height:1!important;
+}
+
+body:not(.firebase-auth-required) #journallApp > .sidebar .logo::after{
+  content:""!important;
+  position:absolute!important;
+  left:50%!important;
+  bottom:7px!important;
+  width:16px!important;
+  height:2px!important;
+  transform:translateX(-50%) rotate(-18deg)!important;
+  background:var(--gold)!important;
+  border-radius:999px!important;
+  box-shadow:0 0 10px rgba(212,175,55,.45)!important;
+}
+
+body:not(.firebase-auth-required) #journallApp > .sidebar .brand-text{
+  display:flex!important;
+  flex-direction:column!important;
+  justify-content:center!important;
+  overflow:hidden!important;
+}
+
+body:not(.firebase-auth-required) #journallApp > .sidebar .brand-title{
+  color:var(--ink)!important;
+  font-family:Inter,"Helvetica Neue",Arial,sans-serif!important;
+  font-size:16px!important;
+  font-weight:700!important;
+  line-height:1.2!important;
+  letter-spacing:-.01em!important;
+  white-space:nowrap!important;
+}
+
+body:not(.firebase-auth-required) #journallApp > .sidebar .brand-sub{
+  color:var(--muted)!important;
+  font-family:Inter,"Helvetica Neue",Arial,sans-serif!important;
+  font-size:11px!important;
+  line-height:1.2!important;
+  margin-top:3px!important;
+  white-space:nowrap!important;
+}
+
+body:not(.firebase-auth-required) #journallApp > .sidebar .nav{
+  display:flex!important;
+  flex-direction:column!important;
+  gap:0!important;
+  padding:0!important;
+  overflow:visible!important;
+}
+
+body:not(.firebase-auth-required) #journallApp > .sidebar .nav button,
+body:not(.firebase-auth-required) #journallApp > .sidebar .nav [data-tab]{
+  padding:11px 16px!important;
+  margin:2px 8px!important;
+  border-radius:var(--r-pill)!important;
+  font-size:14px!important;
+  font-weight:600!important;
+  color:rgba(255,255,255,.72)!important;
+  background:transparent!important;
+  border:none!important;
+  cursor:pointer!important;
+  white-space:nowrap!important;
+  text-align:left!important;
+  width:calc(100% - 16px)!important;
+  display:block!important;
+  min-width:0!important;
+  letter-spacing:.16px!important;
+  transition:background var(--dur-instant) var(--ease-out),color var(--dur-instant) var(--ease-out),transform var(--dur-instant) var(--ease-out),box-shadow var(--dur-instant) var(--ease-out)!important;
+}
+
+body:not(.firebase-auth-required) #journallApp > .sidebar .nav button:hover,
+body:not(.firebase-auth-required) #journallApp > .sidebar .nav [data-tab]:hover{
+  background:rgba(212,175,55,.10)!important;
+  color:#fff7df!important;
+}
+
+body:not(.firebase-auth-required) #journallApp > .sidebar .nav button.active,
+body:not(.firebase-auth-required) #journallApp > .sidebar .nav [data-tab].active{
+  background:linear-gradient(90deg,rgba(212,175,55,.22),rgba(212,175,55,.10))!important;
+  color:#fff8e1!important;
+  box-shadow:inset 3px 0 0 var(--gold)!important;
+}
+
+@media (min-width: 821px){
+  .nav-signout-btn{
+    margin-top:auto!important;
+    color:#f87171!important;
+    border:1px dashed rgba(248, 113, 113, 0.2)!important;
+    background:rgba(248, 113, 113, 0.02)!important;
+    transition:all 0.25s cubic-bezier(0.25, 0.8, 0.25, 1)!important;
+  }
+
+  .nav-signout-btn:hover{
+    background:rgba(248, 113, 113, 0.1)!important;
+    border-color:rgba(248, 113, 113, 0.45)!important;
+    color:#ff9999!important;
+    box-shadow:0 4px 15px rgba(248, 113, 113, 0.15)!important;
+  }
+}
+
+.fixed-top-right-profile{
+  position:fixed!important;
+  top:16px!important;
+  right:24px!important;
+  z-index:99999!important;
+  display:flex!important;
+  align-items:center!important;
+  gap:10px!important;
+  padding:6px 14px 6px 8px!important;
+  background:rgba(10,12,16,.88)!important;
+  backdrop-filter:blur(14px)!important;
+  -webkit-backdrop-filter:blur(14px)!important;
+  border:1px solid rgba(255,255,255,.08)!important;
+  border-radius:9999px!important;
+  cursor:pointer!important;
+  box-shadow:0 14px 32px rgba(0,0,0,.35)!important;
+  transition:transform .2s ease,box-shadow .2s ease,background .2s ease,border-color .2s ease!important;
+}
+
+.fixed-top-right-profile:hover{
+  background:rgba(18,20,26,.96)!important;
+  border-color:rgba(212,175,55,.38)!important;
+  box-shadow:0 16px 36px rgba(0,0,0,.42),0 0 0 1px rgba(212,175,55,.10)!important;
+  transform:translateY(-1px)!important;
+}
+
+.top-avatar-img{
+  width:34px!important;
+  height:34px!important;
+  border-radius:50%!important;
+  object-fit:cover!important;
+  border:1px solid rgba(212,175,55,.45)!important;
+  flex-shrink:0!important;
+  box-shadow:0 0 0 2px rgba(0,0,0,.18)!important;
+}
+
+.top-profile-details{
+  display:flex!important;
+  flex-direction:column!important;
+  justify-content:center!important;
+  min-width:0!important;
+}
+
+.top-profile-name{
+  color:#fff!important;
+  font-size:13px!important;
+  font-weight:700!important;
+  line-height:1.2!important;
+  white-space:nowrap!important;
+}
+
+.top-profile-email{
+  color:rgba(255,255,255,.62)!important;
+  font-size:11px!important;
+  line-height:1.2!important;
+  white-space:nowrap!important;
+}
+
+@media (max-width: 820px){
+  .fixed-top-right-profile{
+    top:10px!important;
+    right:12px!important;
+    padding:4px 10px 4px 6px!important;
+  }
+
+  .top-profile-email{
+    display:none!important;
+  }
+
+  body:not(.firebase-auth-required) #journallApp > .sidebar{
+    width:100%!important;
+    min-width:100%!important;
+    max-width:100%!important;
+  }
+
+  body:not(.firebase-auth-required) #journallApp > .sidebar .brand{
+    padding:0 16px 12px!important;
+  }
+
+  body:not(.firebase-auth-required) #journallApp > .sidebar .nav{
+    flex-direction:row!important;
+    overflow-x:auto!important;
+    overflow-y:hidden!important;
+    flex-wrap:nowrap!important;
+    gap:8px!important;
+    width:100%!important;
+    padding:0 4px!important;
+    -webkit-overflow-scrolling:touch!important;
+    scrollbar-width:none!important;
+  }
+
+  body:not(.firebase-auth-required) #journallApp > .sidebar .nav::-webkit-scrollbar{
+    display:none!important;
+  }
+
+  body:not(.firebase-auth-required) #journallApp > .sidebar .nav button,
+  body:not(.firebase-auth-required) #journallApp > .sidebar .nav [data-tab]{
+    width:auto!important;
+    min-width:88px!important;
+    flex:0 0 auto!important;
+    text-align:center!important;
+    margin:0!important;
+    padding:10px 14px!important;
+  }
+
+  .nav-signout-btn{
+    color:#f87171!important;
+    border:1px solid rgba(248, 113, 113, 0.15)!important;
+    background:rgba(248, 113, 113, 0.04)!important;
+  }
+}
+    </style>
     </body>
 </html>
