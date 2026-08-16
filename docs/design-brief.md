@@ -4,40 +4,49 @@
 The locked visual direction for the full redesign. Every page-level Codex prompt should reference this so the aesthetic stays consistent across all 12 pages instead of drifting per session.
 
 ## Reference quality bar (not to copy directly — hit this tier of polish)
-Aceternity UI (ui.aceternity.com), Reactbits, Motion.dev, Kokonut UI, Uiverse, Refero Design (styles.refero.design), V0 templates, Manus.im — referenced for component polish, motion quality, and layout craft.
+Linear and TradingView define the layout and density standard. Additional component/micro-interaction references: Reactbits, Uiverse, Refero Design (styles.refero.design), Aceternity UI (ui.aceternity.com), Motion.dev (for animation principles), Kokonut UI, Nklit UI, and Manus.im. Use these for hover states, transitions, and subtle motion polish, not for overall layout.
 
 ## Core aesthetic
 Dark, premium, slightly technical product feel — a financial terminal, not a generic AI-startup landing page.
 
 - **Base:** near-black background
-- **Accent:** amber/gold, used sparingly — one confident accent color, not a rainbow. Chosen deliberately because this is a gold (XAUUSD) trading journal — the color ties directly to the product's subject matter. Do NOT use purple/violet — it reads as generic "AI-generated" and was explicitly rejected.
-- **Terminal-window motif** somewhere in the shell/hero — fits a trading tool's identity
-- **Bento grid layout** for dashboard/feature sections
-- **Colored left-stripe accents** on cards or nav items (using the amber accent)
-- **Dot-grid texture + subtle radial glow** in hero/background areas — used sparingly, not on every page/section
-- **Glassmorphism/liquid-glass panels** for elevated surfaces (modals, cards that need to stand out)
-- **Soft corner radius, real drop shadows** for depth (not flat/flush design)
-- **Micro-interactions:** hover states, animated arrows, subtle icon accents on lucide icons
-- **Checkmark bullets** for feature/checklist-style lists
-- **Copy style:** em dashes, "it's not X, it's Y" style microcopy where it earns its place — used sparingly, not forced everywhere
+- **Accent:** amber/gold only, used sparingly. No purple/violet, no rainbow coloring, no neon colors, no harsh or basic pastel gradients.
+- **Terminal-window motif** somewhere in the shell or hero, but keep it understated and functional.
+- **Bento grid layout** for dashboard and feature sections.
+- **Colored left-stripe accents** on cards or nav items, using the amber accent.
+- **Dot-grid texture + subtle radial glow** in hero/background areas, used sparingly.
+- **Glassmorphism/liquid-glass panels** for elevated surfaces such as modals and priority cards.
+- **Soft corner radius, real drop shadows** for depth.
+- **Hover micro-interactions and subtle transitions** inspired by modern component libraries and motion systems.
+- **Lucide icons** stay in use where already present.
+- **Typography:** Inter is already acceptable. Geist or Space Grotesk are also acceptable if they fit the terminal feel better, but choose intentionally and keep the decision consistent.
 
 ## Hard avoid (reads as cheap/templated)
 - Purple/violet as an accent color
-- Fake testimonials, fake/placeholder product demo screenshots
-- Skeleton loaders
-- Neon colors, rainbow gradients, harsh/unrefined gradients, basic pastel palettes
+- Harsh/loud gradients, rainbow coloring, neon colors, or basic pastel color schemes
 - Pure white backgrounds
-- Generic cookie-cutter 3-pricing-tier layout (not applicable here anyway — no payment flow)
-- ToS/privacy-policy boilerplate sections (not applicable — internal tool)
+- Fake testimonials
+- Fake or placeholder product demos/screenshots
+- Three feature cards in a row as a marketing pattern
+- Three pricing tiers or pricing-table layouts
+- Emojis in UI copy
+- Em dashes in UI copy
+- "It's not X, it's Y" copy patterns
+- Checkmark bullet lists used as generic decoration
+- Sparkle icons or animated arrows used as generic decoration
+- Skeleton loaders
+- TOS/privacy boilerplate pages or sections
 
 ## Technical stack constraint (IMPORTANT — read before executing any redesign prompt)
-The app is a single index.html file, vanilla JS, no build step, no bundler. shadcn/ui (React) and Framer Motion (npm package) are NOT directly usable without a full React migration, which is out of scope for this redesign (see decisions.md for why this was ruled out).
+The app is a single index.html file, vanilla JS, no build step, no bundler. No new external dependencies of any kind should be introduced for this redesign.
 
-Instead, hit the same visual tier with build-step-free equivalents:
-- **Tailwind CSS via CDN** — utility classes, no build needed
-- **Hand-styled "shadcn-style" components** — recreate that visual language (soft radius, subtle borders, glass panels) directly in Tailwind/CSS, without the actual shadcn React package
-- **Motion (formerly Motion One)** via CDN — same creators as Framer Motion, same physics-based animation quality, vanilla JS version, no build step required
-- **lucide** (already in use in this file via `lucide.createIcons()`) — NOT `lucide-react`, since there's no React here
+Use hand-written CSS and the existing custom-property system already in the file (`--canvas`, `--gold`, `--card`, `--hairline`, `--surface-2`, etc.), plus vanilla JS only where needed for interaction polish.
+
+Allowed:
+- **Hand-styled components** — recreate the desired visual language directly in CSS, without adding framework or component dependencies
+- **lucide** (already in use in this file via `lucide.createIcons()`) — not `lucide-react`, since there's no React here
+
+For motion, use plain CSS transitions/keyframes and minimal vanilla JS patterns such as `IntersectionObserver` for staggered reveals. Do not add Tailwind, Motion, or any other new library.
 
 ## Animation priorities
 Two tiers, both matter since this is a daily-use dashboard, not a landing page:
