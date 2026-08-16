@@ -3491,7 +3491,7 @@ tr:hover {
 
         .content-area { flex: 1 !important; overflow-y: auto !important; padding: 2rem !important; }
         .container { max-width: 1200px !important; margin: 0 auto !important; }
-        .container:has(#tradingpage.section.active) {
+        .container:has(.section.active) {
             max-width: 100% !important;
         }
 
@@ -14712,6 +14712,10 @@ input{
 #journallApp .builder-grid,
 #journallApp .widget-grid {
   gap: 24px !important;
+}
+
+#journallApp .grid + .grid {
+  margin-top: 28px !important;
 }
 
 @media (max-width: 820px) {
