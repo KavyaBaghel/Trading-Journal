@@ -13769,6 +13769,12 @@ main,
       btn.classList.remove('active');
     });
 
+    if(typeof renderJournalPage === 'function') renderJournalPage();
+    if(typeof renderPsychology === 'function') renderPsychology();
+    if(typeof renderSetupPerformanceTracker === 'function') renderSetupPerformanceTracker();
+    if(typeof renderPropChallengeDashboard === 'function') renderPropChallengeDashboard();
+    if(typeof renderCalendar === 'function') renderCalendar();
+
     root.querySelectorAll('.section').forEach(function(section){
       section.classList.toggle('active', section.id === tab);
     });
@@ -13785,16 +13791,11 @@ main,
       var activeBtn = root.querySelector('.nav button[data-tab="' + tab + '"]');
       updateHeroTitle(activeBtn ? activeBtn.textContent.trim() : 'Journall');
     }
-    setTimeout(function(){
+    requestAnimationFrame(function(){
       if(typeof renderCharts === 'function') renderCharts();
       if(typeof renderTradingPage === 'function') renderTradingPage();
-      if(typeof renderJournalPage === 'function') renderJournalPage();
-      if(typeof renderPsychology === 'function') renderPsychology();
-      if(typeof renderSetupPerformanceTracker === 'function') renderSetupPerformanceTracker();
-      if(typeof renderPropChallengeDashboard === 'function') renderPropChallengeDashboard();
-      if(typeof renderCalendar === 'function') renderCalendar();
       if(typeof resizeChartsSoon === 'function') resizeChartsSoon();
-    }, 80);
+    });
   }
   window.showJournallTab = showJournallTab;
 
