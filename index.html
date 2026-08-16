@@ -12359,6 +12359,79 @@ body:not(.firebase-auth-required) #journallApp > .main > *{
   gap:6px!important;
   transition:transform var(--dur-base) var(--ease-out)!important;
 }
+
+#tradingpage > .grid.two:first-of-type > .card{
+  position:relative!important;
+  overflow:hidden!important;
+  background:linear-gradient(180deg,rgba(22,24,33,.78),rgba(12,14,20,.84))!important;
+  border:1px solid rgba(73,79,223,.18)!important;
+  border-left:3px solid var(--gold)!important;
+  border-radius:18px!important;
+  box-shadow:0 14px 34px rgba(0,0,0,.28)!important;
+  backdrop-filter:blur(14px) saturate(120%)!important;
+  -webkit-backdrop-filter:blur(14px) saturate(120%)!important;
+}
+#tradingpage > .grid.two:first-of-type > .card::before{
+  content:""!important;
+  position:absolute!important;
+  inset:0!important;
+  pointer-events:none!important;
+  background:radial-gradient(circle at top left,rgba(73,79,223,.12),transparent 44%)!important;
+  opacity:.9!important;
+}
+#tradingpage > .grid.two:first-of-type > .card:hover{
+  transform:translateY(-2px)!important;
+  box-shadow:0 18px 40px rgba(0,0,0,.34)!important;
+  border-color:rgba(73,79,223,.28)!important;
+}
+#tradingpage > .grid.two:first-of-type > .card > *{
+  position:relative!important;
+  z-index:1!important;
+}
+#tradingpage > .grid.two:first-of-type > .card:first-child{
+  background:linear-gradient(180deg,rgba(18,20,28,.84),rgba(11,13,19,.9))!important;
+}
+#tradingpage > .grid.two:first-of-type > .card:first-child .sync-status{
+  border-left-color:var(--gold)!important;
+  background:rgba(255,255,255,.02)!important;
+}
+#tradingpage > .grid.two:first-of-type > .card:has(#todayMetrics){
+  box-shadow:0 14px 34px rgba(0,0,0,.26), inset 0 1px 0 rgba(255,255,255,.03)!important;
+}
+#tradingpage > .grid.two:nth-of-type(2) > .card{
+  position:relative!important;
+  overflow:hidden!important;
+  background:linear-gradient(180deg,rgba(22,24,33,.74),rgba(12,14,20,.82))!important;
+  border:1px solid rgba(73,79,223,.16)!important;
+  border-radius:18px!important;
+  box-shadow:0 14px 34px rgba(0,0,0,.26)!important;
+  backdrop-filter:blur(14px) saturate(120%)!important;
+  -webkit-backdrop-filter:blur(14px) saturate(120%)!important;
+}
+#tradingpage > .grid.two:nth-of-type(2) > .card::before{
+  content:""!important;
+  position:absolute!important;
+  inset:0!important;
+  pointer-events:none!important;
+  background:radial-gradient(circle at top left,rgba(73,79,223,.1),transparent 42%)!important;
+  opacity:.9!important;
+}
+#tradingpage > .grid.two:nth-of-type(2) > .card:hover{
+  transform:translateY(-2px)!important;
+  box-shadow:0 18px 40px rgba(0,0,0,.3)!important;
+  border-color:rgba(73,79,223,.26)!important;
+}
+#tradingpage > .grid.two:nth-of-type(2) > .card > *{
+  position:relative!important;
+  z-index:1!important;
+}
+#tradingpage > .grid.two:nth-of-type(2) > .card .chart.tall,
+#tradingpage > .grid.two:nth-of-type(2) > .card .insights{
+  margin-top:12px!important;
+}
+#tradingpage > .grid.two:nth-of-type(2) > .card .insights{
+  min-height:260px!important;
+}
 #todayMetrics .card:hover{
   transform:translateY(-2px)!important;
 }
