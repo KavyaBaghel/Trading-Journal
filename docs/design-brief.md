@@ -1,59 +1,54 @@
-# design-brief.md
-
-## Purpose
-The locked visual direction for the full redesign. Every page-level Codex prompt should reference this so the aesthetic stays consistent across all 12 pages instead of drifting per session.
-
-## Reference quality bar (not to copy directly — hit this tier of polish)
-Linear and TradingView define the layout and density standard. Additional component/micro-interaction references: Reactbits, Uiverse, Refero Design (styles.refero.design), Aceternity UI (ui.aceternity.com), Motion.dev (for animation principles), Kokonut UI, Nklit UI, and Manus.im. Use these for hover states, transitions, and subtle motion polish, not for overall layout.
+# Design Brief v2 — Purple/Black Direction (supersedes v1 gold direction)
 
 ## Core aesthetic
-Dark, premium, slightly technical product feel — a financial terminal, not a generic AI-startup landing page.
+Dark, premium, technical product feel — a financial terminal, not a generic
+AI-startup landing page. Dark mode only for now; light mode is a future,
+separate pass.
 
-- **Base:** near-black background
-- **Accent:** amber/gold only, used sparingly. No purple/violet, no rainbow coloring, no neon colors, no harsh or basic pastel gradients.
-- **Terminal-window motif** somewhere in the shell or hero, but keep it understated and functional.
-- **Bento grid layout** for dashboard and feature sections.
-- **Colored left-stripe accents** on cards or nav items, using the amber accent.
-- **Dot-grid texture + subtle radial glow** in hero/background areas, used sparingly.
-- **Glassmorphism/liquid-glass panels** for elevated surfaces such as modals and priority cards.
-- **Soft corner radius, real drop shadows** for depth.
-- **Hover micro-interactions and subtle transitions** inspired by modern component libraries and motion systems.
-- **Lucide icons** stay in use where already present.
-- **Typography:** Inter is already acceptable. Geist or Space Grotesk are also acceptable if they fit the terminal feel better, but choose intentionally and keep the decision consistent.
+- **Base:** black background
+- **Accent:** #494fdf (purple) only, used sparingly — one confident accent
+  color, not a rainbow
+- **Typography:** Geist, for its geometric/technical feel
+- **Terminal-window motif** somewhere in the shell/hero
+- **Bento grid layout** for dashboard/feature sections
+- **Colored left-stripe accents** on cards/nav items, using the purple accent
+- **Dot-grid texture + subtle radial glow**, used sparingly (hero/background
+  areas only, not every section)
+- **Glassmorphism/liquid-glass panels** for elevated surfaces (modals,
+  standout cards)
+- **Soft corner radius, real drop shadows** for depth
+- **Hover micro-interactions**: subtle, fast lift/fade — not rich
+  spring-based animation
+- **Lucide icons** stay in use, no change
 
-## Hard avoid (reads as cheap/templated)
-- Purple/violet as an accent color
-- Harsh/loud gradients, rainbow coloring, neon colors, or basic pastel color schemes
+## Reference sites (visual inspiration only — this app has no build step,
+no React, no npm — everything must be hand-coded in vanilla CSS/JS)
+- Motion.dev — animation principles/timing, recreate via CSS transitions
+- Reactbits — component motion patterns
+- Uiverse.io — the ONE source with directly copy-pasteable plain CSS/HTML;
+  can be adapted closer to as-is
+- Refero Design (styles.refero.design) — layout/spacing rhythm
+- Aceternity UI — bento grids, hero glow, terminal motifs
+- Kokonut UI — component polish reference
+- Bklit UI — chart/data-viz styling reference
+- Manus.im — overall polish tier reference
+
+## Hard avoid
+- Purple as the ONLY accent is fine, but no additional harsh/loud gradients
+- Rainbow coloring, neon colors
 - Pure white backgrounds
 - Fake testimonials
-- Fake or placeholder product demos/screenshots
-- Three feature cards in a row as a marketing pattern
-- Three pricing tiers or pricing-table layouts
+- Fake/placeholder product demo screenshots
+- 3-pricing-tier layouts
+- 3-feature-cards-in-a-row marketing pattern
 - Emojis in UI copy
 - Em dashes in UI copy
-- "It's not X, it's Y" copy patterns
-- Checkmark bullet lists used as generic decoration
-- Sparkle icons or animated arrows used as generic decoration
+- Checkmark bullet lists as generic decoration
+- Sparkle icons or animated arrows as generic decoration
 - Skeleton loaders
-- TOS/privacy boilerplate pages or sections
+- TOS/privacy boilerplate sections
 
-## Technical stack constraint (IMPORTANT — read before executing any redesign prompt)
-The app is a single index.html file, vanilla JS, no build step, no bundler. No new external dependencies of any kind should be introduced for this redesign.
-
-Use hand-written CSS and the existing custom-property system already in the file (`--canvas`, `--gold`, `--card`, `--hairline`, `--surface-2`, etc.), plus vanilla JS only where needed for interaction polish.
-
-Allowed:
-- **Hand-styled components** — recreate the desired visual language directly in CSS, without adding framework or component dependencies
-- **lucide** (already in use in this file via `lucide.createIcons()`) — not `lucide-react`, since there's no React here
-
-For motion, use plain CSS transitions/keyframes and minimal vanilla JS patterns such as `IntersectionObserver` for staggered reveals. Do not add Tailwind, Motion, or any other new library.
-
-## Animation priorities
-Two tiers, both matter since this is a daily-use dashboard, not a landing page:
-1. **Micro-interactions** (higher frequency, used constantly): hover states, smooth tab/page transitions, number count-ups on stat changes, button/card feedback on interaction
-2. **Entrance/reveal animations** (lower frequency, used for polish): cards fading/sliding in on page load, staggered reveals for grids — used tastefully, not on literally everything, so it doesn't feel like a landing-page gimmick during daily trading use
-
-## What stays untouched
-- All logic — see preserve-ids.md for the full list of IDs/data-attributes that must not change
-- The login page — already good, explicitly out of scope for this redesign
-- Data model / field names — see data-model.md
+## Technical stack constraint
+Single index.html file, vanilla JS, no build step, no bundler, no new
+external dependencies. Hand-written CSS using the existing custom-property
+system. Lucide via lucide.createIcons() only (not lucide-react).
