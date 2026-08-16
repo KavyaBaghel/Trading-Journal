@@ -3056,7 +3056,7 @@ tr:hover {
   text-transform: uppercase;
 }
 .live-status-pill.ready { background: rgba(34, 197, 94, 0.15); color: #4ade80; border: 1px solid rgba(34, 197, 94, 0.3); }
-.live-status-pill.warning { background: rgba(234, 179, 8, 0.15); color: #facc15; border: 1px solid rgba(234, 179, 8, 0.3); }
+.live-status-pill.warning { background: rgba(107, 79, 214, 0.15); color: #c7b8ff; border: 1px solid rgba(107, 79, 214, 0.3); }
 .live-status-pill.lockout { background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3); }
 
 .live-metrics-grid {
@@ -9215,7 +9215,7 @@ function renderPostSessionText(text){
     let borderStyle = '';
     if (/verdict/i.test(title)) borderStyle = 'border-left-color: #22c55e !important;'; // green
     else if (/mistake/i.test(title)) borderStyle = 'border-left-color: #ef4444 !important;'; // red
-    else if (/decision/i.test(title)) borderStyle = 'border-left-color: #f59e0b !important;'; // orange
+    else if (/decision/i.test(title)) borderStyle = 'border-left-color: #6b4fd6 !important;'; // purple
     else if (/risk/i.test(title)) borderStyle = 'border-left-color: #3b82f6 !important;'; // blue
     else if (/rule|tomorrow/i.test(title)) borderStyle = 'border-left-color: #a855f7 !important;'; // purple
 
@@ -10497,7 +10497,7 @@ function renderAISnapshot(){
     </div>
     <div class="ai-score-card">
       <div class="ai-score-label">Win Rate</div>
-      <div class="ai-score-value ${s.wr>=50?'green':'amber'}">${Math.round(Number(s.wr) || 0)}%</div>
+      <div class="ai-score-value ${s.wr>=50?'green':'purple'}">${Math.round(Number(s.wr) || 0)}%</div>
     </div>
     <div class="ai-score-card">
       <div class="ai-score-label">Net P&L</div>
@@ -10505,7 +10505,7 @@ function renderAISnapshot(){
     </div>
     <div class="ai-score-card">
       <div class="ai-score-label">Main Leak</div>
-      <div class="ai-score-value amber" style="font-size:18px">${mainLeak}</div>
+      <div class="ai-score-value purple" style="font-size:18px">${mainLeak}</div>
     </div>
   `;
 }
