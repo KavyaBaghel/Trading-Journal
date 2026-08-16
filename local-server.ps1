@@ -1,0 +1,488 @@
+param(
+  [Parameter(Mandatory=$true)]
+  [string]$Root,
+
+  [string]$ListenHost = '127.0.0.1',
+
+  [int]$Port = 8787
+)
+
+$ErrorActionPreference = 'Stop'
+
+$rootPath = [System.IO.Path]::GetFullPath($Root)
+$ipAddress = if ($ListenHost -eq '0.0.0.0' -or $ListenHost -eq '*') {
+  [System.Net.IPAddress]::Any
+} elseif ($ListenHost -eq '127.0.0.1' -or $ListenHost -eq 'localhost') {
+  [System.Net.IPAddress]::Loopback
+} else {
+  [System.Net.IPAddress]::Parse($ListenHost)
+}
+$listener = [System.Net.Sockets.TcpListener]::new($ipAddress, $Port)
+$listener.Start()
+
+function Get-PythonExe {
+  $candidatePaths = New-Object System.Collections.Generic.List[string]
+  $seen = New-Object 'System.Collections.Generic.HashSet[string]' ([System.StringComparer]::OrdinalIgnoreCase)
+
+  function Add-Candidate([string]$Path) {
+    if ([string]::IsNullOrWhiteSpace($Path)) { return }
+    $candidate = $Path.Trim().Trim('"')
+    if (-not (Test-Path -LiteralPath $candidate)) { return }
+    if ($seen.Add($candidate)) {
+      [void]$candidatePaths.Add($candidate)
+    }
+  }
+
+  try {
+    $pyLauncherOutput = & py -0p 2>&1
+    if ($LASTEXITCODE -eq 0 -and $pyLauncherOutput) {
+      foreach ($line in ($pyLauncherOutput -split "`r?`n")) {
+        $line = $line.Trim()
+        $matches = [regex]::Matches($line, '([A-Za-z]:\\.*?python\.exe)', 'IgnoreCase')
+        foreach ($match in $matches) {
+          Add-Candidate $match.Groups[1].Value
+        }
+      }
+    }
+  } catch {}
+
+  try {
+    $pythonCmd = Get-Command python.exe -ErrorAction Stop | Select-Object -First 1
+    if ($pythonCmd) {
+      Add-Candidate $pythonCmd.Source
+      Add-Candidate $pythonCmd.Path
+    }
+  } catch {}
+
+  $localAppData = $env:LOCALAPPDATA
+  $programFiles = $env:ProgramFiles
+  $programFilesX86 = ${env:ProgramFiles(x86)}
+  @(
+    "$localAppData\Programs\Python\Python313\python.exe",
+    "$localAppData\Programs\Python\Python312\python.exe",
+    "$localAppData\Programs\Python\Python311\python.exe",
+    "$localAppData\Programs\Python\Python310\python.exe",
+    "$programFiles\Python313\python.exe",
+    "$programFiles\Python312\python.exe",
+    "$programFiles\Python311\python.exe",
+    "$programFiles\Python310\python.exe",
+    "$programFilesX86\Python313\python.exe",
+    "$programFilesX86\Python312\python.exe",
+    "$programFilesX86\Python311\python.exe",
+    "$programFilesX86\Python310\python.exe"
+  ) | ForEach-Object { Add-Candidate $_ }
+
+  if ($candidatePaths.Count -eq 0) {
+    throw 'No Python installation was found on this PC. MetaTrader 5 sync requires Python 3.8 or newer (64-bit Windows).'
+  }
+
+  function Get-PythonVersion([string]$Path) {
+    try {
+      $version = & $Path -c 'import sys; print(f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}")' 2>$null
+      if ($LASTEXITCODE -eq 0 -and $version) { return [version]($version | Select-Object -First 1) }
+    } catch {}
+    return [version]'0.0.0'
+  }
+
+  $ranked = @(
+    foreach ($candidate in $candidatePaths) {
+      [pscustomobject]@{
+        Path = $candidate
+        Version = Get-PythonVersion $candidate
+      }
+    }
+  ) | Sort-Object Version -Descending
+
+  if ($ranked.Count -gt 0) {
+    $probeErrors = @()
+    foreach ($item in $ranked) {
+      try {
+        $numpyProbe = & $item.Path -c 'import numpy; print(1)' 2>&1
+        if ($LASTEXITCODE -eq 0) {
+          $mt5Probe = & $item.Path -c 'import MetaTrader5 as mt5; print(1)' 2>&1
+          if ($LASTEXITCODE -eq 0 -and ($mt5Probe -join "`n") -match '1') {
+            return $item.Path
+          }
+        }
+      } catch {}
+    }
+    return $ranked[0].Path
+  }
+
+  # ── Step 5: No interpreter has MetaTrader5. Auto-repair: install it into
+  #          the newest available Python so sync works on the next attempt. ──
+  if ($allInterpreters.Count -gt 0) {
+    $chosen = $allInterpreters[0]
+    # Try several ways to run pip in case `-m pip` fails for this interpreter
+    # (missing pip, user-site permissions, etc.).
+    $pipCommands = @(
+      @($chosen, '-m', 'pip', 'install', '--user', '--force-reinstall', '--no-cache-dir', 'MetaTrader5', 'numpy'),
+      @($chosen, '-m', 'pip', 'install', '--force-reinstall', '--no-cache-dir', 'MetaTrader5', 'numpy')
+    )
+    $installOk = $false
+    $installLog = ''
+    foreach ($cmd in $pipCommands) {
+      try {
+        $proc = New-Object System.Diagnostics.Process
+        $proc.StartInfo.FileName = $cmd[0]
+        $proc.StartInfo.Arguments = ($cmd[1..($cmd.Length - 1)] -join ' ')
+        $proc.StartInfo.RedirectStandardOutput = $true
+        $proc.StartInfo.RedirectStandardError = $true
+        $proc.StartInfo.UseShellExecute = $false
+        $proc.StartInfo.CreateNoWindow = $true
+        [void]$proc.Start()
+        $installLog = $proc.StandardOutput.ReadToEnd() + $proc.StandardError.ReadToEnd()
+        $proc.WaitForExit(300000)
+        if ($proc.ExitCode -eq 0) { $installOk = $true; break }
+      } catch {
+        $installLog = "$(if ($installLog) { $installLog + ' | ' })$($_.Exception.Message)"
+      }
+    }
+    $logFile = Join-Path ([System.IO.Path]::GetTempPath()) 'journall_mt5_install.log'
+    try { $installLog | Out-File -LiteralPath $logFile -Encoding utf8 } catch {}
+    $probe = & $chosen -c 'import MetaTrader5; print("mt5ok")' 2>$null
+    if ($LASTEXITCODE -eq 0 -and $probe -match 'mt5ok') { return $chosen }
+    $fixTip = "Easy fix: double-click 'Fix-MT5-Sync.bat' in your Journall folder (it installs the package step by step with clear instructions), or open PowerShell and run: py -3 -m pip install --user --force-reinstall --no-cache-dir MetaTrader5 numpy. The detailed install log was saved to: $logFile. "
+    if (-not $installOk) {
+      throw ("MetaTrader 5 sync needs the MetaTrader5 Python package and the automatic install failed: $installLog. " + $fixTip + "(requires Python 3.8+ 64-bit on Windows). Then restart Journall App.bat and sync again.")
+    }
+    throw ("MetaTrader5 package installed but still could not be imported: $installLog. " +
+      "The MetaTrader5 package works only with 64-bit Python 3.8+ on Windows. " +
+      $fixTip + "Reinstall Python 3.12 (64-bit) from python.org if the error persists, then restart Journall App.bat.")
+  }
+  throw 'No Python installation was found on this PC. MetaTrader 5 sync requires Python 3.8 or newer (64-bit Windows). Install Python from python.org (tick "Add python.exe to PATH"), then run Journall App.bat again.'
+}
+
+function Get-ContentType([string]$Path) {
+  switch ([System.IO.Path]::GetExtension($Path).ToLowerInvariant()) {
+    '.html' { 'text/html; charset=utf-8'; break }
+    '.css' { 'text/css; charset=utf-8'; break }
+    '.js' { 'text/javascript; charset=utf-8'; break }
+    '.json' { 'application/json; charset=utf-8'; break }
+    '.webmanifest' { 'application/manifest+json; charset=utf-8'; break }
+    '.png' { 'image/png'; break }
+    '.jpg' { 'image/jpeg'; break }
+    '.jpeg' { 'image/jpeg'; break }
+    default { 'application/octet-stream' }
+  }
+}
+
+function Send-Response($Stream, [int]$Status, [string]$StatusText, [byte[]]$Body, [string]$ContentType) {
+  $headers = @(
+    "HTTP/1.1 $Status $StatusText",
+    "Content-Type: $ContentType",
+    "Content-Length: $($Body.Length)",
+    "Access-Control-Allow-Origin: *",
+    "Access-Control-Allow-Methods: GET, POST, OPTIONS",
+    "Access-Control-Allow-Headers: Content-Type, Authorization",
+    "Cache-Control: no-store",
+    "Connection: close",
+    '',
+    ''
+  ) -join "`r`n"
+  $headerBytes = [System.Text.Encoding]::UTF8.GetBytes($headers)
+  $Stream.Write($headerBytes, 0, $headerBytes.Length)
+  if ($Body.Length) {
+    $Stream.Write($Body, 0, $Body.Length)
+  }
+}
+
+function Invoke-OllamaProxy($Stream, [string]$Method, [string]$RawPath, [byte[]]$BodyBytes) {
+  if ($Method -eq 'OPTIONS') {
+    Send-Response $Stream 204 'No Content' ([byte[]]::new(0)) 'text/plain; charset=utf-8'
+    return
+  }
+
+  if ($Method -ne 'GET' -and $Method -ne 'POST') {
+    $body = [System.Text.Encoding]::UTF8.GetBytes('Method not allowed')
+    Send-Response $Stream 405 'Method Not Allowed' $body 'text/plain; charset=utf-8'
+    return
+  }
+
+  $targetPath = $RawPath -replace '^/ollama', ''
+  if ([string]::IsNullOrWhiteSpace($targetPath)) { $targetPath = '/' }
+  $targetUrl = "http://127.0.0.1:11434$targetPath"
+
+  try {
+    $request = [System.Net.HttpWebRequest]::Create($targetUrl)
+    $request.Method = $Method
+    $request.Timeout = 120000
+    $request.ReadWriteTimeout = 120000
+    $request.ContentType = 'application/json'
+
+    if ($Method -eq 'POST') {
+      $request.ContentLength = $BodyBytes.Length
+      $requestStream = $request.GetRequestStream()
+      $requestStream.Write($BodyBytes, 0, $BodyBytes.Length)
+      $requestStream.Close()
+    }
+
+    $response = $request.GetResponse()
+    try {
+      $responseStream = $response.GetResponseStream()
+      $memory = [System.IO.MemoryStream]::new()
+      $responseStream.CopyTo($memory)
+      Send-Response $Stream ([int]$response.StatusCode) $response.StatusDescription $memory.ToArray() 'application/json; charset=utf-8'
+    } finally {
+      $response.Close()
+    }
+  } catch [System.Net.WebException] {
+    $err = $_.Exception
+    if ($err.Response) {
+      $statusCode = [int]$err.Response.StatusCode
+      $statusText = $err.Response.StatusDescription
+      $responseStream = $err.Response.GetResponseStream()
+      $memory = [System.IO.MemoryStream]::new()
+      if ($responseStream) { $responseStream.CopyTo($memory) }
+      Send-Response $Stream $statusCode $statusText $memory.ToArray() 'application/json; charset=utf-8'
+      $err.Response.Close()
+    } else {
+      $body = [System.Text.Encoding]::UTF8.GetBytes("{`"error`":`"Ollama proxy failed: $($err.Message)`"}")
+      Send-Response $Stream 502 'Bad Gateway' $body 'application/json; charset=utf-8'
+    }
+  } catch {
+    $body = [System.Text.Encoding]::UTF8.GetBytes("{`"error`":`"Ollama proxy failed: $($_.Exception.Message)`"}")
+    Send-Response $Stream 502 'Bad Gateway' $body 'application/json; charset=utf-8'
+  }
+}
+
+function Invoke-LocalProxy($Stream, [string]$Method, [string]$RawPath, [byte[]]$BodyBytes, [string]$Prefix, [string]$TargetBase, [string]$Name) {
+  if ($Method -eq 'OPTIONS') {
+    Send-Response $Stream 204 'No Content' ([byte[]]::new(0)) 'text/plain; charset=utf-8'
+    return
+  }
+
+  if ($Method -ne 'GET' -and $Method -ne 'POST') {
+    $body = [System.Text.Encoding]::UTF8.GetBytes('Method not allowed')
+    Send-Response $Stream 405 'Method Not Allowed' $body 'text/plain; charset=utf-8'
+    return
+  }
+
+  $targetPath = $RawPath -replace "^/$Prefix", ''
+  if ([string]::IsNullOrWhiteSpace($targetPath)) { $targetPath = '/' }
+  $targetUrl = "$TargetBase$targetPath"
+
+  try {
+    $request = [System.Net.HttpWebRequest]::Create($targetUrl)
+    $request.Method = $Method
+    $request.Timeout = 180000
+    $request.ReadWriteTimeout = 180000
+    $request.ContentType = 'application/json'
+
+    if ($Method -eq 'POST') {
+      $request.ContentLength = $BodyBytes.Length
+      $requestStream = $request.GetRequestStream()
+      $requestStream.Write($BodyBytes, 0, $BodyBytes.Length)
+      $requestStream.Close()
+    }
+
+    $response = $request.GetResponse()
+    try {
+      $responseStream = $response.GetResponseStream()
+      $memory = [System.IO.MemoryStream]::new()
+      $responseStream.CopyTo($memory)
+      Send-Response $Stream ([int]$response.StatusCode) $response.StatusDescription $memory.ToArray() 'application/json; charset=utf-8'
+    } finally {
+      $response.Close()
+    }
+  } catch [System.Net.WebException] {
+    $err = $_.Exception
+    if ($err.Response) {
+      $statusCode = [int]$err.Response.StatusCode
+      $statusText = $err.Response.StatusDescription
+      $responseStream = $err.Response.GetResponseStream()
+      $memory = [System.IO.MemoryStream]::new()
+      if ($responseStream) { $responseStream.CopyTo($memory) }
+      Send-Response $Stream $statusCode $statusText $memory.ToArray() 'application/json; charset=utf-8'
+      $err.Response.Close()
+    } else {
+      $body = [System.Text.Encoding]::UTF8.GetBytes("{`"error`":`"$Name proxy failed: $($err.Message)`"}")
+      Send-Response $Stream 502 'Bad Gateway' $body 'application/json; charset=utf-8'
+    }
+  } catch {
+    $body = [System.Text.Encoding]::UTF8.GetBytes("{`"error`":`"$Name proxy failed: $($_.Exception.Message)`"}")
+    Send-Response $Stream 502 'Bad Gateway' $body 'application/json; charset=utf-8'
+  }
+}
+
+while ($true) {
+  $client = $listener.AcceptTcpClient()
+  try {
+    $stream = $client.GetStream()
+    $stream.ReadTimeout = 2000
+    $stream.WriteTimeout = 5000
+    $buffer = New-Object byte[] 4096
+    $read = $stream.Read($buffer, 0, $buffer.Length)
+    if ($read -le 0) { continue }
+
+    $request = [System.Text.Encoding]::ASCII.GetString($buffer, 0, $read)
+    $headerEnd = $request.IndexOf("`r`n`r`n")
+    $headerBytesLength = if ($headerEnd -ge 0) { $headerEnd + 4 } else { $read }
+    $requestLine = ($request -split "`r?`n")[0]
+    $parts = $requestLine -split ' '
+    $method = $parts[0]
+    $rawPath = if ($parts.Length -gt 1) { $parts[1] } else { '/' }
+
+    $contentLength = 0
+    foreach ($line in ($request -split "`r?`n")) {
+      if ($line -match '^Content-Length:\s*(\d+)') {
+        $contentLength = [int]$matches[1]
+        break
+      }
+    }
+
+    $bodyBytes = [byte[]]::new($contentLength)
+    $alreadyReadBodyLength = [Math]::Max(0, $read - $headerBytesLength)
+    if ($alreadyReadBodyLength -gt 0 -and $contentLength -gt 0) {
+      [Array]::Copy($buffer, $headerBytesLength, $bodyBytes, 0, [Math]::Min($alreadyReadBodyLength, $contentLength))
+    }
+    $bodyOffset = [Math]::Min($alreadyReadBodyLength, $contentLength)
+    while ($bodyOffset -lt $contentLength) {
+      $chunkRead = $stream.Read($bodyBytes, $bodyOffset, $contentLength - $bodyOffset)
+      if ($chunkRead -le 0) { break }
+      $bodyOffset += $chunkRead
+    }
+
+    if ($rawPath -eq '/api/sync-broker' -or $rawPath -eq '/api/sync-mt5') {
+      if ($method -eq 'OPTIONS') {
+        Send-Response $stream 204 'No Content' ([byte[]]::new(0)) 'text/plain; charset=utf-8'
+        continue
+      }
+      try {
+        $reqText = [System.Text.Encoding]::UTF8.GetString($bodyBytes)
+        
+        $scriptName = "mt5_sync.py"
+        if ($reqText -match '"platform"\s*:\s*"matchtrader"') {
+          $scriptName = "matchtrader_sync.py"
+        } elseif ($reqText -match '"platform"\s*:\s*"ctrader"') {
+          $scriptName = "ctrader_sync.py"
+        }
+        
+        $pythonExe = Get-PythonExe
+        $scriptPath = Join-Path $rootPath $scriptName
+        # Bulletproof resolution: the script must come from THIS server
+        # script's own folder, never a stale copy elsewhere on the PC.
+        if (-not (Test-Path -LiteralPath $scriptPath)) {
+          $scriptPath = Join-Path $PSScriptRoot $scriptName
+        }
+        if (-not (Test-Path -LiteralPath $scriptPath)) {
+          # Last resort: the newest copy anywhere near (repo root up to 3
+          # levels up, and known Journall folder names in the user profile).
+          $probeDir = $PSScriptRoot
+          for ($depth = 0; $depth -le 3; $depth++) {
+            foreach ($dir in @($probeDir, (Join-Path $probeDir '..'))) {
+              $candidate = Join-Path $dir $scriptName
+              if (Test-Path -LiteralPath $candidate) {
+                if (-not $scriptPath -or (-not (Test-Path -LiteralPath $scriptPath)) -or ((Get-Item $candidate).LastWriteTimeUtc -gt (Get-Item $scriptPath).LastWriteTimeUtc)) {
+                  $scriptPath = $candidate
+                }
+              }
+            }
+            $probeDir = Join-Path $probeDir '..'
+          }
+        }
+        if (-not (Test-Path -LiteralPath $scriptPath)) {
+          throw "Sync script not found: $scriptPath"
+        }
+        try {
+          $syncLog = Join-Path $env:TEMP 'journall_sync.log'
+          Add-Content -LiteralPath $syncLog -Value "$(Get-Date -Format 'yyyy-MM-dd HH:mm:ss') USING $scriptPath (root=$rootPath)"
+        } catch {}
+
+
+        $psi = [System.Diagnostics.ProcessStartInfo]::new()
+        $launcherPath = $pythonExe
+        if ([System.IO.Path]::GetFileName($launcherPath).ToLowerInvariant() -eq 'py.exe') {
+          $pyCommand = Get-Command 'py.exe' -ErrorAction Stop
+          $launcherPath = $pyCommand.Source
+          $psi.FileName = $launcherPath
+          $psi.Arguments = "-3 `"$scriptPath`""
+        } else {
+          $psi.FileName = $launcherPath
+          $psi.Arguments = "`"$scriptPath`""
+        }
+        $psi.WorkingDirectory = Split-Path -Parent $scriptPath
+        $psi.RedirectStandardInput = $true
+        $psi.RedirectStandardOutput = $true
+        $psi.RedirectStandardError = $true
+        $psi.UseShellExecute = $false
+        $psi.CreateNoWindow = $true
+        
+        $proc = [System.Diagnostics.Process]::Start($psi)
+        $proc.StandardInput.Write($reqText)
+        $proc.StandardInput.Close()
+        
+        $stdout = $proc.StandardOutput.ReadToEnd()
+        $stderr = $proc.StandardError.ReadToEnd()
+        if (-not $proc.WaitForExit(120000)) {
+          $proc.Kill()
+          throw 'The sync script took too long (over 2 minutes) and was stopped. Close and reopen MetaTrader 5, then try again.'
+        }
+        
+        if ($proc.ExitCode -ne 0) {
+          $errMsg = ""
+          if ($stdout -and $stdout -match '"error"\s*:\s*"(.*?)"') {
+            $errMsg = $matches[1]
+          } elseif ($stderr) {
+            $errMsg = $stderr
+          } else {
+            $errMsg = $stdout
+          }
+          if ([string]::IsNullOrWhiteSpace($errMsg)) { $errMsg = "Python exited with code $($proc.ExitCode)" }
+          $body = [System.Text.Encoding]::UTF8.GetBytes("{`"error`":`"$($errMsg -replace '"', '\"' -replace "`r?`n", ' ' )`"}")
+          Send-Response $stream 500 'Internal Server Error' $body 'application/json; charset=utf-8'
+        } else {
+          $body = [System.Text.Encoding]::UTF8.GetBytes($stdout)
+          Send-Response $stream 200 'OK' $body 'application/json; charset=utf-8'
+        }
+      } catch {
+        $body = [System.Text.Encoding]::UTF8.GetBytes("{`"error`":`"Sync failed: $($_.Exception.Message -replace '"', '\"')`"}")
+        Send-Response $stream 500 'Internal Server Error' $body 'application/json; charset=utf-8'
+      }
+      continue
+    }
+
+    if ($rawPath -like '/ollama/*') {
+      Invoke-OllamaProxy $stream $method $rawPath $bodyBytes
+      continue
+    }
+
+    if ($rawPath -like '/rag/*') {
+      Invoke-LocalProxy $stream $method $rawPath $bodyBytes 'rag' 'http://127.0.0.1:8790' 'RAG'
+      continue
+    }
+
+    if ($method -ne 'GET' -and $method -ne 'HEAD') {
+      $body = [System.Text.Encoding]::UTF8.GetBytes('Method not allowed')
+      Send-Response $stream 405 'Method Not Allowed' $body 'text/plain; charset=utf-8'
+      continue
+    }
+
+    $pathOnly = ($rawPath -split '\?')[0]
+    $relative = [System.Uri]::UnescapeDataString($pathOnly.TrimStart('/')).Replace('/', [System.IO.Path]::DirectorySeparatorChar)
+    if ([string]::IsNullOrWhiteSpace($relative)) { $relative = 'index.html' }
+
+    $fullPath = [System.IO.Path]::GetFullPath((Join-Path $rootPath $relative))
+    if (-not $fullPath.StartsWith($rootPath, [System.StringComparison]::OrdinalIgnoreCase)) {
+      $body = [System.Text.Encoding]::UTF8.GetBytes('Forbidden')
+      Send-Response $stream 403 'Forbidden' $body 'text/plain; charset=utf-8'
+      continue
+    }
+
+    if (-not (Test-Path -LiteralPath $fullPath -PathType Leaf)) {
+      $body = [System.Text.Encoding]::UTF8.GetBytes('Not found')
+      Send-Response $stream 404 'Not Found' $body 'text/plain; charset=utf-8'
+      continue
+    }
+
+    $bodyBytes = if ($method -eq 'HEAD') { [byte[]]::new(0) } else { [System.IO.File]::ReadAllBytes($fullPath) }
+    Send-Response $stream 200 'OK' $bodyBytes (Get-ContentType $fullPath)
+  } catch {
+    try {
+      $body = [System.Text.Encoding]::UTF8.GetBytes('Server error')
+      Send-Response $stream 500 'Internal Server Error' $body 'text/plain; charset=utf-8'
+    } catch {}
+  } finally {
+    $client.Close()
+  }
+}

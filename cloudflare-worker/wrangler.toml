@@ -1,0 +1,10 @@
+﻿name = "journall"
+main = "src/worker.js"
+compatibility_date = "2026-07-19"
+
+[vars]
+FIREBASE_PROJECT_ID = "journal-trading-journal"
+FIREBASE_WEB_API_KEY = "AIzaSyDmnTyCBVnjha1gSurY2zbpocvSCjm6dY4"
+ALLOWED_ORIGIN = "https://kavyabaghel.github.io"
+OPENROUTER_MODEL = "openai/gpt-oss-120b:free"
+
