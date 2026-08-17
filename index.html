@@ -10191,18 +10191,12 @@ function updateHeroTitle(label){
   if(title) title.textContent = label || 'Journall';
 }
 
-document.querySelectorAll('.nav button').forEach(btn=>btn.addEventListener('click',()=>{document.querySelectorAll('.nav button').forEach(b=>b.classList.remove('active'));btn.classList.add('active');document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));const section=document.getElementById(btn.dataset.tab); if(section) section.classList.add('active');updateHeroTitle(btn.textContent.trim());setTimeout(()=>{renderCharts();renderTradingPage();renderJournalPage();renderPsychology();renderUserProfile();renderSetupPerformanceTracker();renderPropChallengeDashboard();renderCalendar();resizeChartsSoon();},80);}));
 function syncMobileActiveTab(){
   const active = document.querySelector('.nav button.active');
   const label = document.getElementById('mobileActiveTab');
   if(label && active) label.textContent = active.textContent.trim();
   if(active) updateHeroTitle(active.textContent.trim());
 }
-document.querySelectorAll('.nav button').forEach(btn => {
-  btn.addEventListener('click', () => {
-    selectTab(btn.dataset.tab);
-  });
-});
 function openHashTab(){
   const tab = String(location.hash || '').replace('#','').trim();
   if(!tab) return;
@@ -13568,11 +13562,13 @@ main,
       var activeBtn = root.querySelector('.nav button[data-tab="' + tab + '"]');
       updateHeroTitle(activeBtn ? activeBtn.textContent.trim() : 'Journall');
     }
-    requestAnimationFrame(function(){
-      if(typeof renderCharts === 'function') renderCharts();
-      if(typeof renderTradingPage === 'function') renderTradingPage();
-      if(typeof resizeChartsSoon === 'function') resizeChartsSoon();
-    });
+    if(tab === 'dashboard' || tab === 'tradingpage'){
+      requestAnimationFrame(function(){
+        if(typeof renderCharts === 'function') renderCharts();
+        if(typeof renderTradingPage === 'function') renderTradingPage();
+        if(typeof resizeChartsSoon === 'function') resizeChartsSoon();
+      });
+    }
   }
   window.showJournallTab = showJournallTab;
 
