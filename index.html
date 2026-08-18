@@ -11524,8 +11524,8 @@ textarea{border-radius:24px!important}input::placeholder,textarea::placeholder{c
 /* Emil Kowalski motion layer: fast, subtle, purposeful. */
 .card,.hero,.sidebox,.goal-card,.widget,.saved-journal-card,.analytics-bar-card,.cmd-card,.ai-score-card,.calendar-summary-card,.journal-main-card,.coach-card,.mistake-box,.mistake-modal-section,.mistake-row,.day-trade-card{transition:transform var(--dur-base) var(--ease-out),border-color var(--dur-base) var(--ease-out),opacity var(--dur-fast) var(--ease-out)!important}
 .card:hover,.goal-card:hover,.widget:hover,.saved-journal-card:hover,.cmd-card:hover,.analytics-bar-card:hover,.calendar-summary-card:hover,.day-trade-card:hover{transform:translateY(-2px)!important;border-color:var(--hairline-strong)!important}
+.section.active{animation:none!important;opacity:1!important;transform:translateY(0)!important;transition:opacity var(--dur-enter) var(--ease-out),transform var(--dur-enter) var(--ease-out)!important}
 .section:not(.active){opacity:0!important;transform:translateY(6px)!important}
-.section.active{opacity:1!important;transform:translateY(0)!important;animation:journall-page-enter var(--dur-enter) var(--ease-out)!important}
 .ai-msg{opacity:1!important;transform:translateY(0)!important;transition:opacity var(--dur-enter) var(--ease-out),transform var(--dur-enter) var(--ease-out)!important}
 .ai-chat-box .ai-msg:nth-last-child(1){transition-delay:0ms!important}
 .ai-chat-box .ai-msg:nth-last-child(2){transition-delay:40ms!important}
@@ -11980,6 +11980,9 @@ body:not(.firebase-auth-required) #journallApp > .main > *{
   margin-left:auto!important;
   margin-right:auto!important;
 }
+.section.active{
+  animation:pageEnter var(--dur-enter) var(--ease-out)!important;
+}
 .hero,
 .top .hero{
   background:#16181a!important;
@@ -12432,6 +12435,10 @@ p{
 }
 ::-webkit-scrollbar-thumb:hover{
   background:rgba(255,255,255,.24)!important;
+}
+@keyframes pageEnter{
+  from{opacity:0;transform:translateY(6px)}
+  to{opacity:1;transform:translateY(0)}
 }
 @keyframes msgEnter{
   from{opacity:0;transform:translateY(8px)}
@@ -13326,6 +13333,12 @@ main,
   opacity: 0 !important;
   transform: none !important;
 }
+#journallApp .section.active {
+  display: block;
+  visibility: visible !important;
+  opacity: 1 !important;
+  transform: none !important;
+}
 #journallApp #commandCenter .cmd-card,
 #journallApp .command-center .cmd-card {
   display: flex !important;
@@ -13434,6 +13447,11 @@ main,
 }
 #journallApp .section.active canvas,
 #journallApp .section.active .chart {
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+#journallApp .section.active {
   display: block !important;
   visibility: visible !important;
   opacity: 1 !important;
