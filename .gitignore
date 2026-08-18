@@ -14,3 +14,7 @@ build/
 coverage/
 AGENTS.md
 CLAUDE.md
+
+.wrangler/
+.serena/
+local-backup-before-pull/
