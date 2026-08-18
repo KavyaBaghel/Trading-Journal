@@ -10153,15 +10153,6 @@ function selectTab(tabId) {
   sections.forEach(sec => {
     const isMatch = sec.id === tabId;
     sec.classList.toggle('active', isMatch);
-    if (isMatch) {
-      sec.style.display = 'block';
-      sec.style.visibility = 'visible';
-      sec.style.opacity = '1';
-    } else {
-      sec.style.display = 'none';
-      sec.style.visibility = 'hidden';
-      sec.style.opacity = '0';
-    }
   });
 
   const activeBtn = document.querySelector(`.nav button[data-tab="${tabId}"]`);
