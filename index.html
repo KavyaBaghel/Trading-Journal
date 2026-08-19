@@ -593,7 +593,7 @@ button,input,select,textarea{font-family:inherit}
 .three{grid-template-columns:repeat(3,1fr)}
 .four{grid-template-columns:repeat(4,1fr)}
 
-.widget-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+.widget-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:var(--space-4)}
 .widget{min-height:155px}
 .widget.big{grid-column:span 2;min-height:330px}
 .widget.tall{grid-row:span 2}
@@ -731,7 +731,7 @@ tr:hover td{background:rgba(255,255,255,.028)}
 .heatcell{height:31px;border-radius:10px;background:rgba(255,255,255,.035);border:1px solid var(--border);font-size:10px;color:var(--faint);display:flex;align-items:center;justify-content:center}
 .heatlabel{justify-content:flex-start;padding-left:10px;min-width:90px}
 
-.builder-grid{display:grid;grid-template-columns:260px 1fr;gap:16px}
+.builder-grid{display:grid;grid-template-columns:260px 1fr;gap:var(--space-4)}
 .widget-list{display:flex;flex-direction:column;gap:9px}
 .widget-list button{text-align:left}
 
@@ -11666,8 +11666,8 @@ body:not(.firebase-auth-required) #journallApp > .main > *{
   display:flex!important;
   justify-content:space-between!important;
   align-items:center!important;
-  gap:20px!important;
-  padding:14px 20px!important;
+  gap:var(--space-6)!important;
+  padding:var(--space-4) var(--space-6)!important;
   margin:0!important;
   min-height:0!important;
   background:#0d0e11!important;
@@ -11729,9 +11729,9 @@ body:not(.firebase-auth-required) #journallApp > .main > *{
   flex-direction:column!important;
   justify-content:space-between!important;
   align-items:flex-start!important;
-  gap:10px!important;
+  gap:var(--space-3)!important;
   min-height:112px!important;
-  padding:16px 16px 16px 18px!important;
+  padding:var(--space-4)!important;
   margin:0!important;
   border:1px solid var(--hairline)!important;
   border-left:4px solid var(--accent-purple)!important;
@@ -12019,7 +12019,7 @@ body:not(.firebase-auth-required) #journallApp > .main > *{
   display:flex!important;
   justify-content:space-between!important;
   align-items:center!important;
-  padding:14px 20px!important;
+  padding:var(--space-4) var(--space-6)!important;
   margin:0!important;
   border:0!important;
   border-bottom:1px solid rgba(255,255,255,.08)!important;
@@ -13343,8 +13343,8 @@ main,
   display: flex !important;
   justify-content: space-between !important;
   align-items: center !important;
-  gap: 18px !important;
-  padding: 14px 20px !important;
+  gap: var(--space-4) !important;
+  padding: var(--space-4) var(--space-6) !important;
 }
 #journallApp #commandCenter .cmd-label,
 #journallApp .command-center .cmd-label {
