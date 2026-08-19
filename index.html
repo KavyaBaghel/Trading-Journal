@@ -8116,7 +8116,7 @@ async function triggerBrokerSync(options = {}) {
         }
         try {
           const attemptController = new AbortController();
-          const attemptTimer = window.setTimeout(() => attemptController.abort(), 8000);
+          const attemptTimer = window.setTimeout(() => attemptController.abort(), 45000);
           const res = await fetch(syncApiUrl, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },

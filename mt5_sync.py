@@ -15,15 +15,15 @@ except Exception:
 
 appdata = os.environ.get('APPDATA', '')
 localappdata = os.environ.get('LOCALAPPDATA', '')
+current_py_ver = f"Python{sys.version_info.major}{sys.version_info.minor}"
 for base, subpath in [
-    (appdata,      os.path.join('Python', '{}', 'site-packages')),
-    (localappdata, os.path.join('Programs', 'Python', '{}', 'Lib', 'site-packages')),
+    (appdata,      os.path.join('Python', current_py_ver, 'site-packages')),
+    (localappdata, os.path.join('Programs', 'Python', current_py_ver, 'Lib', 'site-packages')),
 ]:
     if base:
-        for py_ver in ['Python313', 'Python312', 'Python311', 'Python310', 'Python39']:
-            p = os.path.join(base, subpath.format(py_ver))
-            if os.path.exists(p) and p not in sys.path:
-                sys.path.insert(0, p)
+        p = os.path.join(base, subpath)
+        if os.path.exists(p) and p not in sys.path:
+            sys.path.insert(0, p)
 
 # ── numpy check (MetaTrader5 depends on it) ──
 numpy_error = None
