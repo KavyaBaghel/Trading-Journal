@@ -1386,6 +1386,256 @@ td{
 .calendar-mini-bar .negative{
   background:var(--red);
 }
+.calendar-shell{
+  display:flex;
+  flex-direction:column;
+  gap:var(--space-6);
+  overflow:hidden;
+}
+.calendar-topbar{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+  align-items:center;
+  gap:var(--space-4);
+}
+.calendar-year-heading .label{
+  color:var(--faint);
+  font-family:var(--mono);
+  font-size:10px;
+  letter-spacing:.14em;
+  text-transform:uppercase;
+}
+.calendar-year-heading h2{
+  margin:var(--space-1) 0 0;
+  font-size:42px;
+  line-height:1;
+  letter-spacing:-.06em;
+}
+.calendar-year-nav{
+  justify-self:end;
+  display:flex;
+  align-items:center;
+  gap:var(--space-2);
+}
+.calendar-year-nav .btn{
+  min-width:44px;
+  justify-content:center;
+}
+.calendar-kpi-grid{
+  display:grid;
+  grid-template-columns:repeat(6,minmax(0,1fr));
+  gap:var(--space-3);
+}
+.calendar-kpi-card{
+  background:linear-gradient(180deg,rgba(255,255,255,.04),rgba(255,255,255,.02))!important;
+  border:1px solid var(--hairline)!important;
+  border-radius:18px;
+  padding:var(--space-4);
+  box-shadow:0 18px 34px rgba(0,0,0,.18);
+}
+.calendar-kpi-label{
+  color:var(--faint);
+  font-family:var(--mono);
+  font-size:10px;
+  letter-spacing:.14em;
+  text-transform:uppercase;
+}
+.calendar-kpi-value{
+  margin-top:var(--space-2);
+  font-size:26px;
+  line-height:1.05;
+  font-weight:900;
+  letter-spacing:-.04em;
+}
+.calendar-kpi-sub{
+  margin-top:var(--space-2);
+  color:var(--muted);
+  font-size:12px;
+  line-height:1.45;
+}
+.calendar-kpi-badges{
+  display:flex;
+  gap:8px;
+  margin-top:10px;
+  flex-wrap:wrap;
+}
+.calendar-pill{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  border-radius:999px;
+  padding:5px 10px;
+  background:rgba(255,255,255,.04);
+  color:var(--muted);
+  font-size:11px;
+}
+.calendar-pill .dot{
+  width:7px;
+  height:7px;
+  border-radius:50%;
+}
+.calendar-month-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+  gap:var(--space-4);
+}
+.calendar-month-card{
+  position:relative;
+  display:flex;
+  flex-direction:column;
+  gap:var(--space-3);
+  padding:var(--space-4);
+  border-radius:22px;
+  border:1px solid var(--hairline);
+  background:linear-gradient(180deg,rgba(255,255,255,.035),rgba(255,255,255,.018))!important;
+  box-shadow:0 18px 38px rgba(0,0,0,.20);
+}
+.calendar-month-card.is-active{
+  border-color:var(--primary)!important;
+  box-shadow:0 18px 38px rgba(0,0,0,.20), inset 0 0 0 1px rgba(73,79,223,.10);
+}
+.calendar-month-head{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:var(--space-3);
+}
+.calendar-month-name{
+  font-size:28px;
+  line-height:1;
+  font-weight:900;
+  letter-spacing:-.05em;
+}
+.calendar-month-badge{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  border-radius:999px;
+  padding:6px 10px;
+  font-size:11px;
+  color:var(--muted);
+  background:rgba(255,255,255,.04);
+  white-space:nowrap;
+}
+.calendar-month-profit-label{
+  color:var(--faint);
+  font-family:var(--mono);
+  font-size:10px;
+  letter-spacing:.14em;
+  text-transform:uppercase;
+}
+.calendar-month-profit{
+  font-size:28px;
+  line-height:1.05;
+  font-weight:900;
+  letter-spacing:-.04em;
+}
+.calendar-sparkline{
+  width:100%;
+  height:68px;
+  display:block;
+}
+.calendar-sparkline .baseline{
+  stroke:rgba(255,255,255,.08);
+  stroke-width:1;
+}
+.calendar-sparkline .revenue-line{
+  fill:none;
+  stroke:var(--green);
+  stroke-width:2.2;
+  stroke-linecap:round;
+  stroke-linejoin:round;
+}
+.calendar-sparkline .expense-line{
+  fill:none;
+  stroke:var(--red);
+  stroke-width:2.2;
+  stroke-linecap:round;
+  stroke-linejoin:round;
+}
+.calendar-month-stats{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:var(--space-2);
+}
+.calendar-stat{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:var(--space-2);
+  padding:10px 12px;
+  border-radius:14px;
+  background:rgba(255,255,255,.03);
+}
+.calendar-stat .left{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  color:var(--muted);
+  font-size:12px;
+}
+.calendar-stat .dot{
+  width:8px;
+  height:8px;
+  border-radius:50%;
+}
+.calendar-stat .val{
+  font-weight:800;
+  white-space:nowrap;
+}
+.calendar-month-list{
+  display:grid;
+  gap:8px;
+  padding-top:var(--space-1);
+  border-top:1px solid var(--hairline);
+}
+.calendar-month-list-item{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:var(--space-2);
+  font-size:12px;
+  color:var(--muted);
+}
+.calendar-month-list-item .count-wrap{
+  display:flex;
+  flex-direction:column;
+  align-items:flex-end;
+  gap:3px;
+}
+.calendar-month-list-item strong{
+  color:var(--ink);
+  font-size:14px;
+}
+.calendar-month-list-item small{
+  color:var(--faint);
+  font-size:10px;
+  line-height:1.3;
+  text-align:right;
+}
+@media(max-width:1280px){
+  .calendar-kpi-grid{
+    grid-template-columns:repeat(3,minmax(0,1fr));
+  }
+}
+@media(max-width:900px){
+  .calendar-topbar{
+    grid-template-columns:1fr auto;
+  }
+  .calendar-kpi-grid{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+  }
+}
+@media(max-width:640px){
+  .calendar-kpi-grid,
+  .calendar-month-stats{
+    grid-template-columns:1fr;
+  }
+  .calendar-month-name,
+  .calendar-month-profit{
+    font-size:24px;
+  }
+}
 @media(max-width:1050px){
   .calendar-hero{
     flex-direction:column;
@@ -3734,6 +3984,23 @@ tr:hover {
 
     <div id="calendarGrid" class="calendar enhanced-calendar"></div>
   </div>
+
+  <div class="card calendar-shell">
+    <div class="calendar-topbar">
+      <div class="calendar-year-heading">
+        <div class="label">Trading Year</div>
+        <h2 id="calendarYearLabel">2026</h2>
+      </div>
+      <div class="calendar-year-nav">
+        <button class="btn" type="button" onclick="changeCalendarYear(-1)" aria-label="Previous year">&larr;</button>
+        <button class="btn primary" type="button" onclick="goCalendarYearToday()">Current Year</button>
+        <button class="btn" type="button" onclick="changeCalendarYear(1)" aria-label="Next year">&rarr;</button>
+      </div>
+    </div>
+
+    <div id="calendarKpis" class="calendar-kpi-grid"></div>
+    <div id="calendarMonths" class="calendar-month-grid"></div>
+  </div>
 </section>
 
 
@@ -5844,89 +6111,17 @@ function clearAIReports(){
   renderInsights();
 }
 
-function renderCalendar(){
+function renderCalendarDayGrid(){
   const calEl = document.getElementById('calendarGrid');
-  if(!filtered.length){ if(calEl) calEl.innerHTML='<div class="insight">No trades yet. Upload your CSV to map calendar performance.</div>'; return; }
-  const data=filtered; const pnl={}, count={};
-  data.forEach(t=>{pnl[t.date]=(pnl[t.date]||0)+t.pnl; count[t.date]=(count[t.date]||0)+1;});
-  const dates=Object.keys(pnl).sort(); if(!dates.length) return;
-  const first=new Date(dates[0]), last=new Date(dates[dates.length-1]);
-  const start=new Date(first); start.setDate(first.getDate()-((first.getDay()+6)%7));
-  const end=new Date(last); end.setDate(last.getDate()+(6-((last.getDay()+6)%7)));
-  let html=['Mon','Tue','Wed','Thu','Fri'].map(x=>`<div class="dayhead">${x}</div>`).join('');
-  for(let d=new Date(start); d<=end; d.setDate(d.getDate()+1)){
-    const dayOfWeek = d.getDay();
-    if(dayOfWeek === 0 || dayOfWeek === 6) continue;
-    const iso=d.toISOString().slice(0,10), p=pnl[iso]||0, c=count[iso]||0;
-    html+=`<div class="day ${c?'':'empty'}"><div class="day-num">${d.getDate()}</div><div class="day-pnl ${c?pnlClass(p):'neutral'}">${c?fmt(p):'-'}</div><div class="day-meta">${c?c+' trades':'No trades'}</div></div>`;
-  }
-  document.getElementById('calendarGrid').innerHTML=html;
-}
-
-
-let calendarViewDate = new Date();
-
-function setupCalendarSelectors(){
-  const monthSel = document.getElementById('calendarMonthSelect');
-  const yearSel = document.getElementById('calendarYearSelect');
-  if(!monthSel || !yearSel) return;
-
-  const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-
-  if(!monthSel.dataset.ready){
-    monthSel.innerHTML = months.map((m,i)=>`<option value="${i}">${m}</option>`).join('');
-    monthSel.dataset.ready = '1';
-  }
-
-  if(!yearSel.dataset.ready){
-    const years = new Set();
-    trades.forEach(t=>{
-      if(t.date){
-        const y = Number(String(t.date).slice(0,4));
-        if(y) years.add(y);
-      }
-    });
-
-    const nowYear = new Date().getFullYear();
-    for(let y=nowYear-3; y<=nowYear+2; y++) years.add(y);
-
-    yearSel.innerHTML = [...years].sort((a,b)=>a-b).map(y=>`<option value="${y}">${y}</option>`).join('');
-    yearSel.dataset.ready = '1';
-  }
-
-  monthSel.value = calendarViewDate.getMonth();
-  yearSel.value = calendarViewDate.getFullYear();
-}
-
-function changeCalendarMonth(delta){
-  calendarViewDate = new Date(calendarViewDate.getFullYear(), calendarViewDate.getMonth() + delta, 1);
-  renderCalendar();
-}
-
-function goCalendarToday(){
-  calendarViewDate = new Date();
-  renderCalendar();
-}
-
-function jumpCalendarMonth(){
-  const monthSel = document.getElementById('calendarMonthSelect');
-  const yearSel = document.getElementById('calendarYearSelect');
-  if(!monthSel || !yearSel) return;
-  calendarViewDate = new Date(Number(yearSel.value), Number(monthSel.value), 1);
-  renderCalendar();
-}
-
-function renderCalendar(){
-  const grid = document.getElementById('calendarGrid');
   const title = document.getElementById('calendarTitle');
   const summary = document.getElementById('calendarSummary');
-  if(!grid) return;
+  if(!calEl) return;
 
   setupCalendarSelectors();
 
-  const year = calendarViewDate.getFullYear();
-  const month = calendarViewDate.getMonth();
-  const monthName = calendarViewDate.toLocaleString('en-US',{month:'long'});
+  const year = calendarDayViewDate.getFullYear();
+  const month = calendarDayViewDate.getMonth();
+  const monthName = calendarDayViewDate.toLocaleString('en-US',{month:'long'});
 
   if(title) title.textContent = `${monthName} ${year}`;
 
@@ -5972,14 +6167,11 @@ function renderCalendar(){
   }
   const firstDay = firstVisibleDay <= totalDays ? (new Date(year, month, firstVisibleDay).getDay() + 6) % 7 : 0;
 
-  let out = weekdays.map(d=>`<div class="calendar-head">${d}</div>`).join('');
+  let html = weekdays.map(d=>`<div class="dayhead">${d}</div>`).join('');
 
   for(let i=0;i<firstDay;i++){
-    out += `<div class="calendar-day empty"></div>`;
+    html += `<div class="day empty"></div>`;
   }
-
-  // Fixed calendar scaling: full bar = $50
-  const maxAbsDayPnl = 50;
 
   for(let day=1; day<=totalDays; day++){
     const dateObj = new Date(year, month, day);
@@ -5997,10 +6189,10 @@ function renderCalendar(){
     const winCount = arr.filter(t=>tradeResult(t.pnl)==='profit').length;
     const lossCount = arr.filter(t=>tradeResult(t.pnl)==='loss').length;
     const beCount = arr.filter(t=>tradeResult(t.pnl)==='breakeven').length;
-    const barWidth = Math.min(100, Math.round(Math.abs(pnl) / maxAbsDayPnl * 100));
+    const barWidth = Math.min(100, Math.round(Math.abs(pnl) / 50 * 100));
 
-    out += `
-      <div class="calendar-day ${cls} ${arr.length ? 'clickable' : ''}" title="${dateKey} | ${arr.length} trades | ${fmt(pnl)}" ${arr.length ? `onclick="openCalendarDayTrades('${dateKey}')"` : ''}>
+    html += `
+      <div class="day ${cls} ${arr.length ? 'clickable' : ''}" title="${dateKey} | ${arr.length} trades | ${fmt(pnl)}" ${arr.length ? `onclick="openCalendarDayTrades('${dateKey}')"` : ''}>
         <div class="calendar-date-row">
           <div class="calendar-date">${day}</div>
           <div class="calendar-weekday-small">${weekdays[weekdayIndex]}</div>
@@ -6021,7 +6213,254 @@ function renderCalendar(){
     `;
   }
 
-  grid.innerHTML = out;
+  calEl.innerHTML = html;
+}
+
+
+let calendarDayViewDate = new Date();
+let calendarViewDate = new Date();
+
+function setupCalendarSelectors(){
+  const monthSel = document.getElementById('calendarMonthSelect');
+  const yearSel = document.getElementById('calendarYearSelect');
+  if(!monthSel || !yearSel) return;
+
+  const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+
+  if(!monthSel.dataset.ready){
+    monthSel.innerHTML = months.map((m,i)=>`<option value="${i}">${m}</option>`).join('');
+    monthSel.dataset.ready = '1';
+  }
+
+  if(!yearSel.dataset.ready){
+    const years = new Set();
+    trades.forEach(t=>{
+      if(t.date){
+        const y = Number(String(t.date).slice(0,4));
+        if(y) years.add(y);
+      }
+    });
+
+    const nowYear = new Date().getFullYear();
+    for(let y=nowYear-3; y<=nowYear+2; y++) years.add(y);
+
+    yearSel.innerHTML = [...years].sort((a,b)=>a-b).map(y=>`<option value="${y}">${y}</option>`).join('');
+    yearSel.dataset.ready = '1';
+  }
+
+  monthSel.value = calendarDayViewDate.getMonth();
+  yearSel.value = calendarDayViewDate.getFullYear();
+}
+
+function changeCalendarMonth(delta){
+  calendarDayViewDate = new Date(calendarDayViewDate.getFullYear(), calendarDayViewDate.getMonth() + delta, 1);
+  renderCalendarDayGrid();
+}
+
+function changeCalendarYear(delta){
+  calendarViewDate = new Date(calendarViewDate.getFullYear() + delta, calendarViewDate.getMonth(), 1);
+  renderCalendar();
+}
+
+function goCalendarToday(){
+  calendarDayViewDate = new Date();
+  renderCalendarDayGrid();
+}
+
+function goCalendarYearToday(){
+  calendarViewDate = new Date();
+  renderCalendar();
+}
+
+function jumpCalendarMonth(){
+  const monthSel = document.getElementById('calendarMonthSelect');
+  const yearSel = document.getElementById('calendarYearSelect');
+  if(!monthSel || !yearSel) return;
+  calendarDayViewDate = new Date(Number(yearSel.value), Number(monthSel.value), 1);
+  renderCalendarDayGrid();
+}
+
+function buildCalendarSparkline(monthTrades, year, month){
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const revenue = Array(daysInMonth).fill(0);
+  const expenses = Array(daysInMonth).fill(0);
+  monthTrades.forEach(t=>{
+    if(!t || !t.date) return;
+    const d = new Date(String(t.date) + 'T00:00:00');
+    if(Number.isNaN(d.getTime()) || d.getFullYear() !== year || d.getMonth() !== month) return;
+    const idx = d.getDate() - 1;
+    const pnl = Number(t.pnl) || 0;
+    if(pnl > 0) revenue[idx] += pnl;
+    else if(pnl < 0) expenses[idx] += Math.abs(pnl);
+  });
+  const maxValue = Math.max(1, ...revenue, ...expenses);
+  const width = 240;
+  const height = 68;
+  const padX = 4;
+  const padY = 6;
+  const usableW = width - padX * 2;
+  const usableH = height - padY * 2;
+  const step = daysInMonth > 1 ? usableW / (daysInMonth - 1) : 0;
+  const toPoints = series => series.map((value, idx)=>{
+    const x = padX + idx * step;
+    const y = padY + usableH - ((value / maxValue) * usableH);
+    return `${x.toFixed(1)},${y.toFixed(1)}`;
+  }).join(' ');
+  return `
+    <svg class="calendar-sparkline" viewBox="0 0 ${width} ${height}" preserveAspectRatio="none" aria-hidden="true">
+      <line class="baseline" x1="0" y1="${height - 8}" x2="${width}" y2="${height - 8}"></line>
+      <polyline class="expense-line" points="${toPoints(expenses)}"></polyline>
+      <polyline class="revenue-line" points="${toPoints(revenue)}"></polyline>
+    </svg>
+  `;
+}
+
+function buildCalendarMetricCard(label, value, subline, valueClass=''){
+  return `
+    <div class="calendar-kpi-card">
+      <div class="calendar-kpi-label">${escapeHtml(label)}</div>
+      <div class="calendar-kpi-value ${valueClass}">${value}</div>
+      <div class="calendar-kpi-sub">${subline}</div>
+    </div>
+  `;
+}
+
+function renderCalendar(){
+  const yearLabel = document.getElementById('calendarYearLabel');
+  const kpiGrid = document.getElementById('calendarKpis');
+  const monthsGrid = document.getElementById('calendarMonths');
+  if(!kpiGrid || !monthsGrid) return;
+
+  const year = calendarViewDate.getFullYear();
+  if(yearLabel) yearLabel.textContent = String(year);
+
+  const yearTrades = filtered.filter(t=>{
+    if(!t || !t.date) return false;
+    const d = new Date(String(t.date) + 'T00:00:00');
+    return !Number.isNaN(d.getTime()) && d.getFullYear() === year;
+  });
+
+  const yearWins = yearTrades.filter(t=>tradeResult(Number(t.pnl)||0)==='profit');
+  const yearLosses = yearTrades.filter(t=>tradeResult(Number(t.pnl)||0)==='loss');
+  const yearBreakevens = yearTrades.filter(t=>tradeResult(Number(t.pnl)||0)==='breakeven');
+  const yearRevenue = yearTrades.reduce((sum,t)=>sum + Math.max(0, Number(t.pnl)||0), 0);
+  const yearExpenses = Math.abs(yearTrades.reduce((sum,t)=>sum + Math.min(0, Number(t.pnl)||0), 0));
+  const yearNet = yearTrades.reduce((sum,t)=>sum + (Number(t.pnl)||0), 0);
+  const yearMargin = yearRevenue ? yearNet / yearRevenue * 100 : 0;
+  const yearAccepted = yearWins.length;
+  const yearRejected = yearLosses.length;
+  const yearProjected = yearBreakevens.length;
+
+  const kpis = [
+    {
+      label:'Revenue',
+      value:`${fmt(yearRevenue)}`,
+      sub:`Net ${fmt(yearNet)} &bull; VAT $0.00`,
+      extra:''
+    },
+    {
+      label:'Expenses',
+      value:`${fmt(yearExpenses)}`,
+      sub:`${yearLosses.length} expenses`,
+      extra:''
+    },
+    {
+      label:'Profit',
+      value:`${fmt(yearNet)}`,
+      sub:`${pct(yearMargin)} margin`,
+      extra: yearNet >= 0 ? 'green' : 'red'
+    },
+    {
+      label:'Invoices',
+      value:`${yearTrades.length}`,
+      sub:'Created this year',
+      extra:''
+    },
+    {
+      label:'Quotes',
+      value:`${yearAccepted + yearRejected}`,
+      sub:`Accepted ${yearAccepted} &bull; Rejected ${yearRejected}`,
+      extra:''
+    },
+    {
+      label:'Proposals',
+      value:`${yearProjected + yearRejected}`,
+      sub:`Accepted ${yearProjected} &bull; Rejected ${yearRejected}`,
+      extra:''
+    }
+  ];
+
+  kpiGrid.innerHTML = kpis.map(item=>buildCalendarMetricCard(item.label, item.value, item.sub, item.extra)).join('');
+
+  const today = new Date();
+  const activeMonthIndex = year === today.getFullYear()
+    ? today.getMonth()
+    : (()=>{
+        let last = -1;
+        for(let i=11;i>=0;i--){
+          if(yearTrades.some(t=>{
+            const d = new Date(String(t.date) + 'T00:00:00');
+            return !Number.isNaN(d.getTime()) && d.getFullYear() === year && d.getMonth() === i;
+          })){
+            last = i;
+            break;
+          }
+        }
+        return last;
+      })();
+
+  const monthNames = Array.from({length:12},(_,i)=>new Date(year,i,1).toLocaleString('en-US',{month:'long'}));
+  const monthData = monthNames.map((name, month)=>{
+    const trades = yearTrades.filter(t=>{
+      const d = new Date(String(t.date) + 'T00:00:00');
+      return !Number.isNaN(d.getTime()) && d.getMonth() === month;
+    });
+    const pnl = trades.reduce((sum,t)=>sum + (Number(t.pnl)||0), 0);
+    const revenue = trades.reduce((sum,t)=>sum + Math.max(0, Number(t.pnl)||0), 0);
+    const expenses = Math.abs(trades.reduce((sum,t)=>sum + Math.min(0, Number(t.pnl)||0), 0));
+    const wins = trades.filter(t=>tradeResult(Number(t.pnl)||0)==='profit').length;
+    const losses = trades.filter(t=>tradeResult(Number(t.pnl)||0)==='loss').length;
+    const breakevens = trades.filter(t=>tradeResult(Number(t.pnl)||0)==='breakeven').length;
+    return {name, month, trades, pnl, revenue, expenses, wins, losses, breakevens};
+  }).filter(item=>item.trades.length);
+
+  if(!monthData.length){
+    monthsGrid.innerHTML = `<div class="insight">No trades yet for ${year}. Upload CSV to populate the year dashboard.</div>`;
+    return;
+  }
+
+  monthsGrid.innerHTML = monthData.map(item=>{
+    const highlight = item.month === activeMonthIndex ? 'is-active' : '';
+    const spark = buildCalendarSparkline(item.trades, year, item.month);
+    return `
+      <div class="calendar-month-card ${highlight}">
+        <div class="calendar-month-head">
+          <div>
+            <div class="calendar-month-name">${escapeHtml(item.name)}</div>
+            <div class="calendar-month-profit-label">PROFIT</div>
+            <div class="calendar-month-profit ${pnlClass(item.pnl)}">${fmt(item.pnl)}</div>
+          </div>
+          <div class="calendar-month-badge">${item.trades.length} activity</div>
+        </div>
+        ${spark}
+        <div class="calendar-month-stats">
+          <div class="calendar-stat">
+            <div class="left"><span class="dot" style="background:var(--green)"></span>Revenue</div>
+            <div class="val ${item.revenue >= 0 ? 'green' : ''}">${fmt(item.revenue)}</div>
+          </div>
+          <div class="calendar-stat">
+            <div class="left"><span class="dot" style="background:var(--red)"></span>Expenses</div>
+            <div class="val ${item.expenses > 0 ? 'red' : ''}">${fmt(item.expenses)}</div>
+          </div>
+        </div>
+        <div class="calendar-month-list">
+          <div class="calendar-month-list-item"><span>Invoices</span><div class="count-wrap"><strong>${item.trades.length}</strong></div></div>
+          <div class="calendar-month-list-item"><span>Quotes</span><div class="count-wrap"><strong>${item.wins}</strong><small>Accepted ${item.wins} / Rejected ${item.losses}</small></div></div>
+          <div class="calendar-month-list-item"><span>Proposals</span><div class="count-wrap"><strong>${item.breakevens}</strong><small>Accepted ${item.breakevens} / Rejected ${item.losses}</small></div></div>
+        </div>
+      </div>
+    `;
+  }).join('');
 }
 
 function renderHeatmap(){
@@ -9963,7 +10402,7 @@ function renderJournalPage(){
   }).join('');
 }
 
-function renderAll(){applyFilters();renderSide();renderAnalyticsBars();renderMetrics();renderPropChallengeDashboard();if(document.getElementById('mistakeModalBackdrop')?.classList.contains('active')) renderMistakeDashboard();renderInsights();renderCharts();renderWidgets();renderReports();renderSetupPerformanceTracker();renderCalendar();renderHeatmap();renderGrid();renderGoals();renderProcess();renderTradingPage();renderJournalPage();renderPsychology();if(typeof refreshSignedInProfile==="function")refreshSignedInProfile();}
+function renderAll(){applyFilters();renderSide();renderAnalyticsBars();renderMetrics();renderPropChallengeDashboard();if(document.getElementById('mistakeModalBackdrop')?.classList.contains('active')) renderMistakeDashboard();renderInsights();renderCharts();renderWidgets();renderReports();renderSetupPerformanceTracker();renderCalendarDayGrid();renderCalendar();renderHeatmap();renderGrid();renderGoals();renderProcess();renderTradingPage();renderJournalPage();renderPsychology();if(typeof refreshSignedInProfile==="function")refreshSignedInProfile();}
 
 
 function selectTab(tabId) {
@@ -13395,6 +13834,7 @@ main,
     if(typeof renderPsychology === 'function') renderPsychology();
     if(typeof renderSetupPerformanceTracker === 'function') renderSetupPerformanceTracker();
     if(typeof renderPropChallengeDashboard === 'function') renderPropChallengeDashboard();
+    if(typeof renderCalendarDayGrid === 'function') renderCalendarDayGrid();
     if(typeof renderCalendar === 'function') renderCalendar();
 
     root.querySelectorAll('.section').forEach(function(section){
@@ -13412,6 +13852,10 @@ main,
     if(typeof updateHeroTitle === 'function'){
       var activeBtn = root.querySelector('.nav button[data-tab="' + tab + '"]');
       updateHeroTitle(activeBtn ? activeBtn.textContent.trim() : 'Journall');
+    }
+    if(tab === 'calendar'){
+      if(typeof renderCalendarDayGrid === 'function') renderCalendarDayGrid();
+      if(typeof renderCalendar === 'function') renderCalendar();
     }
     if(tab === 'dashboard' || tab === 'tradingpage'){
       requestAnimationFrame(function(){
