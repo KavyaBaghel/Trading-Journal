@@ -3497,6 +3497,7 @@ tr:hover {
             flex: 1 !important;
             display: flex !important;
             flex-direction: column !important;
+            margin-left: 72px !important;
             background:
               radial-gradient(circle, rgba(73,79,223,.12) 0 1px, transparent 1.6px),
               radial-gradient(circle, rgba(255,255,255,.05) 0 1px, transparent 1.6px),
@@ -3916,6 +3917,16 @@ tr:hover {
         <div class="card"><div class="panel-title"><h3>Trade Heatmap</h3><span>weekday x hour</span></div><div class="heatmap-scroll" tabindex="0" aria-label="Trade heatmap. Scroll horizontally to view all 24 hours."><div id="heatmap" class="heatmap"></div></div></div>
         <div class="card"><div class="panel-title"><h3>Back-to-back Re-entry Map</h3><span>revenge clusters</span></div><div class="chart tall"><canvas id="b2bChart"></canvas></div></div>
       </div>
+      <div class="grid four" style="margin-top:16px">
+        <div class="card"><div class="panel-title"><h3>Weekday P&L</h3><span>day edge</span></div><div class="chart"><canvas id="weekdayChart"></canvas></div></div>
+        <div class="card"><div class="panel-title"><h3>Duration</h3><span>hold time</span></div><div class="chart"><canvas id="durationChart"></canvas></div></div>
+        <div class="card"><div class="panel-title"><h3>Lot Size</h3><span>risk sizing</span></div><div class="chart"><canvas id="lotChart"></canvas></div></div>
+        <div class="card"><div class="panel-title"><h3>Exit Reason</h3><span>User/SL/TP</span></div><div class="chart"><canvas id="reasonChart"></canvas></div></div>
+      </div>
+      <div class="card" style="margin-top:16px">
+        <div class="panel-title"><h3>Setup Performance Tracker</h3><span>from saved journals</span></div>
+        <div id="setupPerformanceTracker"></div>
+      </div>
     </section>
 
     <section id="widgets" class="section">
@@ -3931,12 +3942,6 @@ tr:hover {
     </section>
 
     <section id="reports" class="section">
-      <div class="grid four">
-        <div class="card"><div class="panel-title"><h3>Weekday P&L</h3><span>day edge</span></div><div class="chart"><canvas id="weekdayChart"></canvas></div></div>
-        <div class="card"><div class="panel-title"><h3>Duration</h3><span>hold time</span></div><div class="chart"><canvas id="durationChart"></canvas></div></div>
-        <div class="card"><div class="panel-title"><h3>Lot Size</h3><span>risk sizing</span></div><div class="chart"><canvas id="lotChart"></canvas></div></div>
-        <div class="card"><div class="panel-title"><h3>Exit Reason</h3><span>User/SL/TP</span></div><div class="chart"><canvas id="reasonChart"></canvas></div></div>
-      </div>
       <div class="card" style="margin-top:16px">
         <div class="panel-title">
           <h3>AI Report Cards</h3>
@@ -3948,10 +3953,6 @@ tr:hover {
         </div>
         <div id="aiReportStatus" class="sub">AI reports use the secure AI assistant.</div>
         <div class="grid three" id="reportCards" style="margin-top:12px"></div>
-      </div>
-      <div class="card" style="margin-top:16px">
-        <div class="panel-title"><h3>Setup Performance Tracker</h3><span>from saved journals</span></div>
-        <div id="setupPerformanceTracker"></div>
       </div>
     </section>
 
@@ -4055,9 +4056,8 @@ tr:hover {
 
       <div class="grid two">
         <div class="card">
-          <div class="panel-title"><h3>Trading Page Sync</h3><span>today only</span></div>
-          <p class="sub">Today's trades are filtered from the CSV uploaded in the Upload CSV tab.</p>
-          <div class="sync-status" id="syncStatus">No trading page uploaded yet.</div>
+          <div class="panel-title"><h3>Streak Tracker</h3><span>today only</span></div>
+          <div class="sync-status streak-tracker" id="syncStatus">No trades yet today</div>
         </div>
 
         <div class="card">
@@ -4811,6 +4811,82 @@ function resultBadgeClass(n){
   if(r === 'profit') return 'win';
   if(r === 'loss') return 'loss';
   return 'breakeven';
+}
+
+function renderStreakTracker(todayTrades){
+  const status = document.getElementById('syncStatus');
+  if(!status) return;
+
+  const ordered = (typeof sorted === 'function' ? sorted(Array.isArray(todayTrades) ? todayTrades : []) : [...(Array.isArray(todayTrades) ? todayTrades : [])])
+    .filter(t => t && t.date === todayISTDate());
+
+  if(!ordered.length){
+    status.innerHTML = `<div style="padding:2px 0;color:var(--muted);text-align:center">No trades yet today</div>`;
+    return;
+  }
+
+  const results = ordered.map(t => tradeResult(Number(t.pnl) || 0));
+
+  const currentType = results[results.length - 1];
+  let currentCount = 0;
+  if(currentType === 'profit' || currentType === 'loss'){
+    for(let i = results.length - 1; i >= 0; i--){
+      if(results[i] !== currentType) break;
+      currentCount++;
+    }
+  }
+
+  let winRun = 0;
+  let lossRun = 0;
+  let bestWin = 0;
+  let bestLoss = 0;
+  results.forEach(result => {
+    if(result === 'profit'){
+      winRun++;
+      lossRun = 0;
+    } else if(result === 'loss'){
+      lossRun++;
+      winRun = 0;
+    } else {
+      winRun = 0;
+      lossRun = 0;
+    }
+    bestWin = Math.max(bestWin, winRun);
+    bestLoss = Math.max(bestLoss, lossRun);
+  });
+
+  const streakLabel = currentCount > 1 && (currentType === 'profit' || currentType === 'loss')
+    ? `${currentCount}${currentType === 'profit' ? 'W' : 'L'}`
+    : '—';
+
+  const bestLabel = bestWin ? `${bestWin}W` : '—';
+  const worstLabel = bestLoss ? `${bestLoss}L` : '—';
+
+  let note = '';
+  if(currentCount >= 3 && currentType === 'loss'){
+    note = `${currentCount} losses in a row — consider a short break before the next trade.`;
+  } else if(currentCount >= 3 && currentType === 'profit'){
+    note = `${currentCount} wins in a row — stay disciplined, don't oversize the next trade.`;
+  }
+
+  status.innerHTML = `
+    <div class="streak-tracker-wrap">
+      <div class="streak-grid">
+        <div class="streak-stat">
+          <div class="streak-label">Current Streak</div>
+          <div class="streak-value ${currentType === 'loss' && currentCount > 1 ? 'red' : currentType === 'profit' && currentCount > 1 ? 'green' : 'neutral'}">${streakLabel}</div>
+        </div>
+        <div class="streak-stat">
+          <div class="streak-label">Longest Streak Today</div>
+          <div class="streak-substats">
+            <div><span class="streak-sub-label">Best:</span> <strong class="${bestWin ? 'green' : 'neutral'}">${bestLabel}</strong></div>
+            <div><span class="streak-sub-label">Worst:</span> <strong class="${bestLoss ? 'red' : 'neutral'}">${worstLabel}</strong></div>
+          </div>
+        </div>
+      </div>
+      ${note ? `<div class="streak-note">${note}</div>` : ''}
+    </div>
+  `;
 }
 
 function signedMoney(n){
@@ -8737,10 +8813,7 @@ function renderTradingPage(){
   const countEl = document.getElementById('todayTradeCount');
   if(countEl) countEl.textContent = todayTrades.length + ' trades';
 
-  const status = document.getElementById('syncStatus');
-  if(status && !tradingPageTrades.length){
-    status.textContent = 'No trading page uploaded yet.';
-  }
+  renderStreakTracker(todayTrades);
 
   renderTodayMetrics(todayTrades);
   renderCommandCenter(todayTrades);
@@ -11917,6 +11990,59 @@ body:not(.firebase-auth-required) #journallApp > .main > *{
   color:#62666d!important;
   font-size:14px!important;
   text-align:center!important;
+}
+#syncStatus.streak-tracker{
+  background:transparent!important;
+  border:0!important;
+  padding:0!important;
+  color:var(--ink)!important;
+  text-align:left!important;
+}
+#syncStatus.streak-tracker .streak-grid{
+  display:grid!important;
+  grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  gap:12px!important;
+  margin-top:14px!important;
+}
+#syncStatus.streak-tracker .streak-stat{
+  background:rgba(255,255,255,.03)!important;
+  border:1px solid rgba(255,255,255,.08)!important;
+  border-radius:12px!important;
+  padding:12px!important;
+}
+#syncStatus.streak-tracker .streak-label{
+  color:var(--muted)!important;
+  font-size:11px!important;
+  font-weight:700!important;
+  letter-spacing:.08em!important;
+  text-transform:uppercase!important;
+  margin-bottom:6px!important;
+}
+#syncStatus.streak-tracker .streak-value{
+  font-size:30px!important;
+  font-weight:800!important;
+  line-height:1!important;
+}
+#syncStatus.streak-tracker .streak-substats{
+  display:flex!important;
+  flex-direction:column!important;
+  gap:6px!important;
+}
+#syncStatus.streak-tracker .streak-substats strong{
+  font-size:14px!important;
+}
+#syncStatus.streak-tracker .streak-sub-label{
+  color:var(--muted)!important;
+}
+#syncStatus.streak-tracker .streak-note{
+  margin-top:12px!important;
+  padding:10px 12px!important;
+  border-radius:10px!important;
+  background:rgba(255,255,255,.03)!important;
+  border:1px solid rgba(255,255,255,.06)!important;
+  color:var(--muted)!important;
+  font-size:13px!important;
+  line-height:1.45!important;
 }
 #commandCenter.command-center{
   display:block!important;
@@ -15883,24 +16009,43 @@ input{
     }
 });
     </script>
-    <style id="sidebar-redesign">
+<style id="sidebar-redesign">
 body:not(.firebase-auth-required) #journallApp > .sidebar{
   display:flex!important;
   flex-direction:column!important;
-  position:relative!important;
-  inset:auto!important;
-  width:220px!important;
-  min-width:220px!important;
-  max-width:220px!important;
+  position:fixed!important;
+  inset:0 auto 0 0!important;
+  width:72px!important;
+  min-width:72px!important;
+  max-width:72px!important;
   height:100vh!important;
-  flex:0 0 220px!important;
-  padding:16px 0 0!important;
+  flex:0 0 72px!important;
+  padding:16px 0 12px!important;
   overflow-y:auto!important;
   overflow-x:hidden!important;
   background:var(--canvas)!important;
   border-right:1px solid var(--hairline)!important;
-  box-shadow:none!important;
+  box-shadow:0 18px 40px rgba(0,0,0,.22)!important;
   backdrop-filter:none!important;
+  z-index:50!important;
+  transition:width 180ms ease, max-width 180ms ease, min-width 180ms ease, box-shadow 180ms ease, background 180ms ease!important;
+  scrollbar-width:none!important;
+}
+
+body:not(.firebase-auth-required) #journallApp > .sidebar::-webkit-scrollbar{
+  display:none!important;
+}
+
+body:not(.firebase-auth-required) #journallApp > .sidebar:hover{
+  width:240px!important;
+  min-width:240px!important;
+  max-width:240px!important;
+  flex-basis:240px!important;
+  box-shadow:0 24px 56px rgba(0,0,0,.32)!important;
+}
+
+body:not(.firebase-auth-required) #journallApp.app{
+  grid-template-columns:72px 1fr!important;
 }
 
 body:not(.firebase-auth-required) #journallApp > .sidebar .brand{
@@ -15908,8 +16053,8 @@ body:not(.firebase-auth-required) #journallApp > .sidebar .brand{
   flex-direction:column!important;
   align-items:center!important;
   gap:8px!important;
-  padding:0 20px 14px!important;
-  margin:0 0 8px!important;
+  padding:0 12px 14px!important;
+  margin:0 0 10px!important;
   border-bottom:1px solid var(--hairline)!important;
   text-align:center!important;
 }
@@ -15951,12 +16096,18 @@ body:not(.firebase-auth-required) #journallApp > .sidebar .logo::after{
   box-shadow:0 0 10px rgba(73,79,223,.45)!important;
 }
 
-body:not(.firebase-auth-required) #journallApp > .sidebar .brand-text{
+body:not(.firebase-auth-required) #journallApp > .sidebar .brand-text,
+body:not(.firebase-auth-required) #journallApp > .sidebar .brand-name{
   display:flex!important;
   flex-direction:column!important;
   justify-content:center!important;
-  overflow:hidden!important;
   align-items:center!important;
+  overflow:hidden!important;
+  max-width:0!important;
+  opacity:0!important;
+  transform:translateX(-8px)!important;
+  transition:max-width 180ms ease, opacity 180ms ease, transform 180ms ease!important;
+  white-space:nowrap!important;
 }
 
 body:not(.firebase-auth-required) #journallApp > .sidebar .brand-title{
@@ -15978,17 +16129,28 @@ body:not(.firebase-auth-required) #journallApp > .sidebar .brand-sub{
   white-space:nowrap!important;
 }
 
+body:not(.firebase-auth-required) #journallApp > .sidebar:hover .brand-text,
+body:not(.firebase-auth-required) #journallApp > .sidebar:hover .brand-name{
+  max-width:140px!important;
+  opacity:1!important;
+  transform:translateX(0)!important;
+}
+
 body:not(.firebase-auth-required) #journallApp > .sidebar .nav{
   display:flex!important;
   flex-direction:column!important;
   gap:0!important;
-  padding:0!important;
+  padding:0 0 6px!important;
   overflow:visible!important;
 }
 
 body:not(.firebase-auth-required) #journallApp > .sidebar .nav button,
 body:not(.firebase-auth-required) #journallApp > .sidebar .nav [data-tab]{
-  padding:11px 16px!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:0!important;
+  padding:11px 12px!important;
   margin:2px 8px!important;
   border-radius:var(--r-pill)!important;
   font-size:14px!important;
@@ -16000,21 +16162,37 @@ body:not(.firebase-auth-required) #journallApp > .sidebar .nav [data-tab]{
   white-space:nowrap!important;
   text-align:left!important;
   width:calc(100% - 16px)!important;
-  display:block!important;
   min-width:0!important;
   letter-spacing:.16px!important;
-  transition:background var(--dur-instant) var(--ease-out),color var(--dur-instant) var(--ease-out),transform var(--dur-instant) var(--ease-out),box-shadow var(--dur-instant) var(--ease-out)!important;
+  transition:background var(--dur-instant) var(--ease-out),color var(--dur-instant) var(--ease-out),transform var(--dur-instant) var(--ease-out),box-shadow var(--dur-instant) var(--ease-out),padding var(--dur-instant) var(--ease-out),justify-content var(--dur-instant) var(--ease-out)!important;
 }
 
-body:not(.firebase-auth-required) #journallApp > .sidebar .nav button,
-body:not(.firebase-auth-required) #journallApp > .sidebar .nav [data-tab]{
-  gap:12px!important;
+body:not(.firebase-auth-required) #journallApp > .sidebar .nav button > re-icon,
+body:not(.firebase-auth-required) #journallApp > .sidebar .nav [data-tab] > re-icon,
+body:not(.firebase-auth-required) #journallApp > .sidebar .nav button > i,
+body:not(.firebase-auth-required) #journallApp > .sidebar .nav [data-tab] > i,
+body:not(.firebase-auth-required) #journallApp > .sidebar .nav button > svg,
+body:not(.firebase-auth-required) #journallApp > .sidebar .nav [data-tab] > svg{
+  flex:0 0 24px!important;
+  width:24px!important;
+  min-width:24px!important;
+  display:inline-flex!important;
+  align-items:center!important;
+  justify-content:center!important;
 }
 
 body:not(.firebase-auth-required) #journallApp > .sidebar .nav button:hover,
 body:not(.firebase-auth-required) #journallApp > .sidebar .nav [data-tab]:hover{
   background:rgba(255,255,255,.04)!important;
   color:#f5f5f7!important;
+}
+
+body:not(.firebase-auth-required) #journallApp > .sidebar:hover .nav button,
+body:not(.firebase-auth-required) #journallApp > .sidebar:hover .nav [data-tab]{
+  justify-content:flex-start!important;
+  padding-left:16px!important;
+  padding-right:16px!important;
+  gap:12px!important;
 }
 
 body:not(.firebase-auth-required) #journallApp > .sidebar .nav button.active,
@@ -16025,8 +16203,51 @@ body:not(.firebase-auth-required) #journallApp > .sidebar .nav [data-tab].active
 }
 
 .nav-label{
+  display:inline-block!important;
+  max-width:160px!important;
   opacity:1!important;
   color:inherit!important;
+  overflow:hidden!important;
+  transition:max-width 180ms ease,opacity 180ms ease,transform 180ms ease!important;
+}
+
+body:not(.firebase-auth-required) #journallApp > .sidebar .nav .nav-label{
+  max-width:0!important;
+  opacity:0!important;
+  transform:translateX(-6px)!important;
+}
+
+body:not(.firebase-auth-required) #journallApp > .sidebar:hover .nav .nav-label{
+  max-width:180px!important;
+  opacity:1!important;
+  transform:translateX(0)!important;
+}
+
+body:not(.firebase-auth-required) #journallApp > .sidebar .sidebox{
+  margin-top:12px!important;
+  padding:0 8px!important;
+  max-height:0!important;
+  opacity:0!important;
+  overflow:hidden!important;
+  transform:translateY(-6px)!important;
+  transition:max-height 180ms ease,opacity 180ms ease,transform 180ms ease,padding 180ms ease!important;
+  pointer-events:none!important;
+}
+
+body:not(.firebase-auth-required) #journallApp > .sidebar:hover .sidebox{
+  max-height:240px!important;
+  opacity:1!important;
+  transform:translateY(0)!important;
+  padding:0 8px!important;
+  pointer-events:auto!important;
+}
+
+body:not(.firebase-auth-required) #journallApp > .sidebar .sidebox-title{
+  transition:opacity 180ms ease,transform 180ms ease,max-height 180ms ease!important;
+}
+
+body:not(.firebase-auth-required) #journallApp > .sidebar .sidebox *{
+  transition:opacity 180ms ease,transform 180ms ease,max-height 180ms ease!important;
 }
 
 @media (min-width: 821px){
@@ -16116,13 +16337,24 @@ body:not(.firebase-auth-required) #journallApp > .sidebar .nav [data-tab].active
   }
 
   body:not(.firebase-auth-required) #journallApp > .sidebar{
+    position:relative!important;
+    inset:auto!important;
     width:100%!important;
     min-width:100%!important;
     max-width:100%!important;
+    flex-basis:auto!important;
   }
 
   body:not(.firebase-auth-required) #journallApp > .sidebar .brand{
     padding:0 16px 12px!important;
+  }
+
+  body:not(.firebase-auth-required) #journallApp.app{
+    grid-template-columns:1fr!important;
+  }
+
+  .main-wrapper{
+    margin-left:0!important;
   }
 
   body:not(.firebase-auth-required) #journallApp > .sidebar .nav{
@@ -16149,6 +16381,19 @@ body:not(.firebase-auth-required) #journallApp > .sidebar .nav [data-tab].active
     text-align:center!important;
     margin:0!important;
     padding:10px 14px!important;
+  }
+
+  body:not(.firebase-auth-required) #journallApp > .sidebar .nav .nav-label{
+    max-width:none!important;
+    opacity:1!important;
+    transform:none!important;
+  }
+
+  body:not(.firebase-auth-required) #journallApp > .sidebar .sidebox{
+    max-height:none!important;
+    opacity:1!important;
+    transform:none!important;
+    pointer-events:auto!important;
   }
 
   .nav-signout-btn{
