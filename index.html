@@ -3187,6 +3187,7 @@ tr:hover {
 </style>
 
     <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://unpkg.com/reicon/cdn/reicon.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -3229,7 +3230,7 @@ tr:hover {
         
         .nav-list { flex: 1 !important; list-style: none !important; overflow-y: auto !important; }
         .nav-link {
-            display: flex !important; align-items: center !important; justify-content: flex-start !important; gap: 0 !important;
+            display: flex !important; align-items: center !important; justify-content: flex-start !important; gap: 12px !important;
             padding: 0.75rem 1rem !important; border-radius: 12px !important;
             color: var(--text-muted) !important; text-decoration: none !important;
             font-weight: 500 !important; transition: all 0.2s !important;
@@ -3445,17 +3446,17 @@ tr:hover {
             </div>
 
             <nav class="nav-list nav" style="padding: 0 0.75rem;">
-                <button class="nav-link active" data-tab="tradingpage"><span class="nav-label">Today's Summary</span></button>
-                <button class="nav-link" data-tab="dashboard"><span class="nav-label">Analytics</span></button>
-                <button class="nav-link" data-tab="grid"><span class="nav-label">Trades</span></button>
-                <button class="nav-link" data-tab="journalpage"><span class="nav-label">Journal</span></button>
-                <button class="nav-link" data-tab="psychology"><span class="nav-label">Psychology</span></button>
-                <button class="nav-link" data-tab="calendar"><span class="nav-label">Calendar</span></button>
-                <button class="nav-link" data-tab="reports"><span class="nav-label">Reports</span></button>
-                <button class="nav-link" data-tab="widgets"><span class="nav-label">Widgets</span></button>
-                <button class="nav-link" data-tab="goals"><span class="nav-label">Goals</span></button>
-                <button class="nav-link" data-tab="ailab"><span class="nav-label">AI Coach</span></button>
-                <button class="nav-link" data-tab="userprofile"><span class="nav-label">User Profile</span></button>
+                <button class="nav-link active" data-tab="tradingpage"><re-icon icon="layout" weight="outline" size="20"></re-icon><span class="nav-label">Today's Summary</span></button>
+                <button class="nav-link" data-tab="dashboard"><re-icon icon="chart-bar" weight="outline" size="20"></re-icon><span class="nav-label">Analytics</span></button>
+                <button class="nav-link" data-tab="grid"><re-icon icon="transfer-h" weight="outline" size="20"></re-icon><span class="nav-label">Trades</span></button>
+                <button class="nav-link" data-tab="journalpage"><re-icon icon="book-open" weight="outline" size="20"></re-icon><span class="nav-label">Journal</span></button>
+                <button class="nav-link" data-tab="psychology"><re-icon icon="meditation" weight="outline" size="20"></re-icon><span class="nav-label">Psychology</span></button>
+                <button class="nav-link" data-tab="calendar"><re-icon icon="calendar" weight="outline" size="20"></re-icon><span class="nav-label">Calendar</span></button>
+                <button class="nav-link" data-tab="reports"><re-icon icon="file-text" weight="outline" size="20"></re-icon><span class="nav-label">Reports</span></button>
+                <button class="nav-link" data-tab="widgets"><re-icon icon="widget" weight="outline" size="20"></re-icon><span class="nav-label">Widgets</span></button>
+                <button class="nav-link" data-tab="goals"><re-icon icon="target" weight="outline" size="20"></re-icon><span class="nav-label">Goals</span></button>
+                <button class="nav-link" data-tab="ailab"><re-icon icon="sparkles" weight="outline" size="20"></re-icon><span class="nav-label">AI Coach</span></button>
+                <button class="nav-link" data-tab="userprofile"><re-icon icon="user-circle" weight="outline" size="20"></re-icon><span class="nav-label">User Profile</span></button>
             </nav>
 
             <div class="sidebox">
@@ -15075,7 +15076,7 @@ input{
       var nb=document.createElement('button');
       nb.setAttribute('data-tab','upload');
       nb.type='button';
-      nb.innerHTML='📥 Upload Data <small>sync</small>';
+      nb.innerHTML='<re-icon icon="file-up" weight="outline" size="20"></re-icon><span class="nav-label">Upload Data <small>sync</small></span>';
       nav.appendChild(nb);
     } else if (nav && hasModernUploadTab) {
       /* The real Upload Data tab is uploadcsv — add a legacy nav alias only if one
@@ -15085,7 +15086,7 @@ input{
         var mb=document.createElement('button');
         mb.setAttribute('data-tab','uploadcsv');
         mb.type='button';
-        mb.innerHTML='📥 Upload Data <small>sync</small>';
+        mb.innerHTML='<re-icon icon="file-up" weight="outline" size="20"></re-icon><span class="nav-label">Upload Data <small>sync</small></span>';
         nav.appendChild(mb);
       }
     }
@@ -15559,6 +15560,11 @@ body:not(.firebase-auth-required) #journallApp > .sidebar .nav [data-tab]{
   min-width:0!important;
   letter-spacing:.16px!important;
   transition:background var(--dur-instant) var(--ease-out),color var(--dur-instant) var(--ease-out),transform var(--dur-instant) var(--ease-out),box-shadow var(--dur-instant) var(--ease-out)!important;
+}
+
+body:not(.firebase-auth-required) #journallApp > .sidebar .nav button,
+body:not(.firebase-auth-required) #journallApp > .sidebar .nav [data-tab]{
+  gap:12px!important;
 }
 
 body:not(.firebase-auth-required) #journallApp > .sidebar .nav button:hover,
