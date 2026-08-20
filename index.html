@@ -3942,18 +3942,6 @@ tr:hover {
     </section>
 
     <section id="reports" class="section">
-      <div class="card" style="margin-top:16px">
-        <div class="panel-title">
-          <h3>AI Report Cards</h3>
-          <span>AI generated</span>
-        </div>
-        <div class="journal-form-actions" style="margin-bottom:12px">
-          <button class="btn primary" onclick="generateAIReports()">Generate AI Report</button>
-          <button class="btn" onclick="clearAIReports()">Clear</button>
-        </div>
-        <div id="aiReportStatus" class="sub">AI reports use the secure AI assistant.</div>
-        <div class="grid three" id="reportCards" style="margin-top:12px"></div>
-      </div>
     </section>
 
 
@@ -4454,11 +4442,11 @@ tr:hover {
 
 
 <section id="ailab" class="section">
-  <div class="ai-lab-grid">
-    <div class="card">
-      <div class="panel-title">
-        <h3>AI Trading Coach</h3>
-        <span>AI-powered trade review</span>
+    <div class="ai-lab-grid">
+      <div class="card">
+        <div class="panel-title">
+          <h3>AI Trading Coach</h3>
+          <span>AI-powered trade review</span>
       </div>
 
       <div class="ai-chip-row">
@@ -4481,20 +4469,32 @@ tr:hover {
       </div>
     </div>
 
-    <div class="card">
-      <div class="panel-title">
-        <h3>AI Snapshot</h3>
-        <span>auto score</span>
-      </div>
+      <div class="card">
+        <div class="panel-title">
+          <h3>AI Snapshot</h3>
+          <span>auto score</span>
+        </div>
 
       <div id="aiSnapshot" class="ai-score"></div>
 
-      <div class="insights" style="margin-top:14px">
-        <div class="insight good"><strong>Best Use:</strong> Use this after every trading day to find one mistake to fix tomorrow.</div>
-        <div class="insight warn"><strong>Note:</strong> AI Coach runs through a secure cloud backend. Users do not need Ollama or any local model installed.</div>
+        <div class="insights" style="margin-top:14px">
+          <div class="insight good"><strong>Best Use:</strong> Use this after every trading day to find one mistake to fix tomorrow.</div>
+          <div class="insight warn"><strong>Note:</strong> AI Coach runs through a secure cloud backend. Users do not need Ollama or any local model installed.</div>
+        </div>
       </div>
     </div>
-  </div>
+    <div class="card" style="margin-top:16px">
+      <div class="panel-title">
+        <h3>AI Report Cards</h3>
+        <span>AI generated</span>
+      </div>
+      <div class="journal-form-actions" style="margin-bottom:12px">
+        <button class="btn primary" onclick="generateAIReports()">Generate AI Report</button>
+        <button class="btn" onclick="clearAIReports()">Clear</button>
+      </div>
+      <div id="aiReportStatus" class="sub">AI reports use the secure AI assistant.</div>
+      <div class="grid three" id="reportCards" style="margin-top:12px"></div>
+    </div>
 </section>
 
 </div></main></div></div>
