@@ -3471,7 +3471,7 @@ tr:hover {
         
         .brand { display: flex !important; flex-direction: column !important; align-items: center !important; gap: 0.45rem !important; margin-bottom: 2.5rem !important; padding: 0 1rem !important; text-align: center !important; }
         .logo-box {
-            width: 40px !important; height: 40px !important; background: var(--primary) !important;
+            width: 40px !important; height: 40px !important; background: var(--canvas) !important;
             border-radius: 12px !important; display: flex !important; align-items: center !important;
             justify-content: center !important; color: white !important; font-weight: 900 !important;
             box-shadow: 0 0 0 1px rgba(255,255,255,0.10), 0 0 22px rgba(73,79,223,0.55), 0 0 44px rgba(73,79,223,0.30) !important;
@@ -4052,8 +4052,8 @@ tr:hover {
 
       <div class="grid two">
         <div class="card">
-          <div class="panel-title"><h3>Streak Tracker</h3><span>today only</span></div>
-          <div class="sync-status streak-tracker" id="syncStatus">No trades yet today</div>
+          <div class="panel-title"><h3>Risk/Reward</h3><span>today only</span></div>
+          <div class="sync-status streak-tracker" id="syncStatus">Not enough data</div>
         </div>
 
         <div class="card">
@@ -4829,70 +4829,46 @@ function renderStreakTracker(todayTrades){
     .filter(t => t && t.date === todayISTDate());
 
   if(!ordered.length){
-    status.innerHTML = `<div style="padding:2px 0;color:var(--muted);text-align:center">No trades yet today</div>`;
+    status.innerHTML = `<div style="padding:2px 0;color:var(--muted);text-align:center">Not enough data</div>`;
     return;
   }
 
-  const results = ordered.map(t => tradeResult(Number(t.pnl) || 0));
+  const rrRows = ordered
+    .map(t => {
+      const rr = typeof tradePlannedRr === 'function' ? Number(tradePlannedRr(t)) : NaN;
+      return Number.isFinite(rr) && rr > 0 ? {trade:t, rr} : null;
+    })
+    .filter(Boolean);
 
-  const currentType = results[results.length - 1];
-  let currentCount = 0;
-  if(currentType === 'profit' || currentType === 'loss'){
-    for(let i = results.length - 1; i >= 0; i--){
-      if(results[i] !== currentType) break;
-      currentCount++;
-    }
+  if(!rrRows.length){
+    status.innerHTML = `<div style="padding:2px 0;color:var(--muted);text-align:center">R:R not tracked</div>`;
+    return;
   }
 
-  let winRun = 0;
-  let lossRun = 0;
-  let bestWin = 0;
-  let bestLoss = 0;
-  results.forEach(result => {
-    if(result === 'profit'){
-      winRun++;
-      lossRun = 0;
-    } else if(result === 'loss'){
-      lossRun++;
-      winRun = 0;
-    } else {
-      winRun = 0;
-      lossRun = 0;
-    }
-    bestWin = Math.max(bestWin, winRun);
-    bestLoss = Math.max(bestLoss, lossRun);
-  });
-
-  const streakLabel = currentCount > 1 && (currentType === 'profit' || currentType === 'loss')
-    ? `${currentCount}${currentType === 'profit' ? 'W' : 'L'}`
-    : '—';
-
-  const bestLabel = bestWin ? `${bestWin}W` : '—';
-  const worstLabel = bestLoss ? `${bestLoss}L` : '—';
-
-  let note = '';
-  if(currentCount >= 3 && currentType === 'loss'){
-    note = `${currentCount} losses in a row — consider a short break before the next trade.`;
-  } else if(currentCount >= 3 && currentType === 'profit'){
-    note = `${currentCount} wins in a row — stay disciplined, don't oversize the next trade.`;
-  }
+  const avgRr = rrRows.reduce((sum, item) => sum + item.rr, 0) / rrRows.length;
+  const bestTrade = rrRows.reduce((best, item) => !best || item.rr > best.rr ? item : best, null);
+  const worstTrade = rrRows.reduce((worst, item) => !worst || item.rr < worst.rr ? item : worst, null);
+  const rrText = rr => Number.isFinite(rr) ? `${rr.toFixed(2)}:1` : '—';
+  const avgClass = avgRr >= 2 ? 'green' : avgRr >= 1 ? 'neutral' : 'red';
+  const bestClass = bestTrade && bestTrade.rr >= 2 ? 'green' : 'neutral';
+  const worstClass = worstTrade && worstTrade.rr >= 1 ? 'neutral' : 'red';
 
   status.innerHTML = `
     <div class="streak-tracker-wrap">
       <div class="streak-grid">
         <div class="streak-stat">
-          <div class="streak-label">Current Streak</div>
-          <div class="streak-value ${currentType === 'loss' && currentCount > 1 ? 'red' : currentType === 'profit' && currentCount > 1 ? 'green' : 'neutral'}">${streakLabel}</div>
+          <div class="streak-label">Average R:R</div>
+          <div class="streak-value ${avgClass}">${rrText(avgRr)}</div>
         </div>
         <div class="streak-stat">
-          <div class="streak-label">Longest Streak Today</div>
+          <div class="streak-label">Best / Worst Today</div>
           <div class="streak-substats">
-            <div><span class="streak-sub-label">Best:</span> <strong class="${bestWin ? 'green' : 'neutral'}">${bestLabel}</strong></div>
-            <div><span class="streak-sub-label">Worst:</span> <strong class="${bestLoss ? 'red' : 'neutral'}">${worstLabel}</strong></div>
+            <div><span class="streak-sub-label">Best:</span> <strong class="${bestClass}">${rrText(bestTrade?.rr)}</strong></div>
+            <div><span class="streak-sub-label">Worst:</span> <strong class="${worstClass}">${rrText(worstTrade?.rr)}</strong></div>
           </div>
         </div>
       </div>
-      ${note ? `<div class="streak-note">${note}</div>` : ''}
+      <div class="streak-note">Derived from today's trades where planned risk and reward values are available.</div>
     </div>
   `;
 }
@@ -12305,6 +12281,15 @@ body:not(.firebase-auth-required) #journallApp > .main > *{
   padding:0!important;
   min-height:0!important;
 }
+#tradingpage #commandCenter .cmd-value.cmd-action{
+  white-space:normal!important;
+  overflow-wrap:anywhere!important;
+  word-break:break-word!important;
+  line-height:1.35!important;
+}
+#tradingpage #commandCenter .cmd-card:has(#cmdStatus){
+  justify-content:center!important;
+}
 #tradingpage #commandCenter .cmd-card.psych-reminder-card{
   border-left-color:color-mix(in srgb, var(--accent-purple) 70%, #ffffff 30%)!important;
   background:linear-gradient(180deg, color-mix(in srgb, var(--card) 88%, #ffffff 12%), color-mix(in srgb, var(--surface-2) 90%, #ffffff 10%))!important;
@@ -16235,6 +16220,8 @@ body:not(.firebase-auth-required) #journallApp > .sidebar .logo-box{
   display:flex!important;
   align-items:center!important;
   justify-content:center!important;
+  background:var(--canvas)!important;
+  background-color:var(--canvas)!important;
 }
 
 body:not(.firebase-auth-required) #journallApp > .sidebar .logo-box .sidebar-logo-mark{
