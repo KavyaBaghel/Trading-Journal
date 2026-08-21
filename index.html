@@ -18,13 +18,7 @@
 <script>
 document.querySelectorAll('.nav button').forEach(btn=>{
 btn.addEventListener('click', ()=>{
-document.querySelectorAll('.nav button').forEach(b=>b.classList.remove('active'));
-btn.classList.add('active');
-
-document.querySelectorAll('.section').forEach(sec=>sec.classList.remove('active'));
-
-const target = document.getElementById(btn.dataset.tab);
-if(target) target.classList.add('active');
+if(typeof selectTab === 'function') selectTab(btn.dataset.tab);
 });
 });
 
@@ -3579,7 +3573,6 @@ tr:hover {
       <div class="setup-section-label">Synced account</div><p id="accountSyncNote" class="account-sync-note">Account size and phase are configured here. Your current balance is automatically calculated and updated in real time from your synced trades.</p>
       <div class="account-form-grid">
         <label>Initial account balance ($)<div class="stepper-control"><button type="button" class="stepper-btn minus" onclick="stepInput('accountSizeInput', -1, 'renderAccountSetupPreview')">−</button><input id="accountSizeInput" class="account-source-input" type="number" min="1" step="100" placeholder="Enter a value" oninput="renderAccountSetupPreview()"><button type="button" class="stepper-btn plus" onclick="stepInput('accountSizeInput', 1, 'renderAccountSetupPreview')">+</button></div></label>
-        <label>Current balance ($)<div class="stepper-control"><button type="button" class="stepper-btn minus" onclick="stepInput('currentBalanceInput', -1, 'renderAccountSetupPreview')">−</button><input id="currentBalanceInput" class="account-source-input" type="number" min="0" step="100" placeholder="Enter a value" oninput="renderAccountSetupPreview()"><button type="button" class="stepper-btn plus" onclick="stepInput('currentBalanceInput', 1, 'renderAccountSetupPreview')">+</button></div></label>
         <label>Account phase<select id="accountPhaseInput" class="account-source-input" onchange="toggleFundedFields()"><option>Phase 1</option><option>Phase 2</option><option>Funded</option><option>Personal</option></select></label>
       </div>
     </div>
@@ -6496,7 +6489,6 @@ function getAccountConfig(){
       maxDailyLossType:raw.maxDailyLossType || 'percent',
       maxDrawdown:raw.maxDrawdown === '' || raw.maxDrawdown == null ? null : Number(raw.maxDrawdown),
       maxDrawdownType:raw.maxDrawdownType || 'percent',
-      currentBalance:Number(raw.currentBalance) || Number(raw.accountSize),
       riskPercent:clampNumber(raw.riskPercent || DEFAULT_RISK_PERCENT, 0.5, 2),
       maxTradesPerDay:raw.maxTradesPerDay === '' || raw.maxTradesPerDay == null ? null : Number(raw.maxTradesPerDay),
       minRr:raw.minRr === '' || raw.minRr == null ? null : Number(raw.minRr),
@@ -6513,33 +6505,14 @@ function uploadedTradePnl(data=trades){
 }
 function syncedCurrentBalance(config, data=trades){
   if(!config) return 0;
-  const manualBalance = Number(config.currentBalance);
-  if(Number.isFinite(manualBalance) && manualBalance > 0) return manualBalance;
   const accountSize = Number(config.accountSize) || 0;
   const list = Array.isArray(data) ? data : [];
-  if(list.length) return accountSize + uploadedTradePnl(list);
-  return accountSize;
-}
-function syncStoredAccountBalanceWithTrades(data=trades){
-  const list = Array.isArray(data) ? data : [];
-  if(!list.length) return;
-  try{
-    const raw = JSON.parse(localStorage.getItem(ACCOUNT_CONFIG_KEY) || 'null');
-    const savedBalance = Number(raw?.currentBalance);
-    if(raw && Number.isFinite(savedBalance) && savedBalance > 0) return;
-    if(!raw || !Number(raw.accountSize)) return;
-    const nextBalance = Number((Number(raw.accountSize) + uploadedTradePnl(list)).toFixed(2));
-    if(Number.isFinite(nextBalance) && nextBalance > 0 && Math.abs((Number(raw.currentBalance) || 0) - nextBalance) >= 0.01){
-      raw.currentBalance = nextBalance;
-      localStorage.setItem(ACCOUNT_CONFIG_KEY, JSON.stringify(raw));
-    }
-  }catch{}
+  return accountSize + uploadedTradePnl(list);
 }
 function accountMetrics(data=trades){
   const config = getAccountConfig();
   if(!config) return null;
   const allTrades = Array.isArray(data) ? data : [];
-  if(allTrades === trades) syncStoredAccountBalanceWithTrades(allTrades);
   const s = stats(allTrades);
   const today = todayDateKey();
   const todayTrades = sorted(allTrades).filter(t=>t.date === today);
@@ -6689,14 +6662,14 @@ function openAccountSetup(blocking=false){
   const gate = document.getElementById('accountOnboardingGate');
   const existingAccount = getAccountConfig();
   const hasSyncedAccount = !!existingAccount;
-  const config = existingAccount || {accountSize:'',phase:'Phase 1',profitTarget:'',profitTargetType:'percent',maxDailyLoss:'',maxDailyLossType:'percent',maxDrawdown:'',maxDrawdownType:'percent',currentBalance:'',riskPercent:'',maxTradesPerDay:'',minRr:'',phaseDeadline:'',userSetupCriteria:[]};
+  const config = existingAccount || {accountSize:'',phase:'Phase 1',profitTarget:'',profitTargetType:'percent',maxDailyLoss:'',maxDailyLossType:'percent',maxDrawdown:'',maxDrawdownType:'percent',riskPercent:'',maxTradesPerDay:'',minRr:'',phaseDeadline:'',userSetupCriteria:[]};
   const liveBalance = syncedCurrentBalance(config);
   const set = (id,value)=>{ const el=document.getElementById(id); if(el) el.value = value ?? ''; };
-  set('accountSizeInput', config.accountSize ?? ''); set('currentBalanceInput', liveBalance ?? '');
+  set('accountSizeInput', config.accountSize ?? '');
   set('accountPhaseInput', config.phase || 'Phase 1'); set('profitTargetInput', config.profitTarget);
   const syncNote = document.getElementById('accountSyncNote');
   if(syncNote) syncNote.textContent = hasSyncedAccount
-    ? 'Account size, current balance, and phase are synced with your uploaded trades. Only the rules below are editable here.'
+    ? 'Account size and phase are synced with your uploaded trades. Only the rules below are editable here.'
     : 'Enter your account details once. They will be reused automatically by the Trading Dashboard.';
   const elSize = document.getElementById('accountSizeInput');
   if(elSize){ elSize.readOnly = hasSyncedAccount; elSize.setAttribute('aria-readonly', String(hasSyncedAccount)); }
@@ -6741,11 +6714,9 @@ async function saveAccountSetup(){
     if(raw === '' || !Number.isFinite(value) || value <= min) throw new Error(`${label} is required.`);
     return value;
   };
-  let accountSize, currentBalance, riskPercent, profitTarget, maxTradesPerDay, minRr, maxDailyLoss = null, maxDrawdown = null;
+  let accountSize, riskPercent, profitTarget, maxTradesPerDay, minRr, maxDailyLoss = null, maxDrawdown = null;
   try{
     accountSize = existingAccount?.accountSize || readRequiredNumber('accountSizeInput','Account size');
-    const cbRaw = String(document.getElementById('currentBalanceInput')?.value ?? '').trim();
-    currentBalance = Number.isFinite(Number(cbRaw)) && Number(cbRaw) > 0 ? Number(cbRaw) : accountSize;
     profitTarget = readRequiredNumber('profitTargetInput','Profit target');
     riskPercent = clampNumber(readRequiredNumber('riskPercentInput','Risk per trade'), 0.5, 2);
     maxTradesPerDay = readRequiredNumber('maxTradesInput','Max trades per day');
@@ -6756,7 +6727,7 @@ async function saveAccountSetup(){
     if(msg) msg.textContent = error.message;
     return;
   }
-  const config = {accountSize,phase,profitTarget,profitTargetType:document.getElementById('profitTargetType')?.value || 'percent',maxDailyLoss,maxDailyLossType:document.getElementById('maxDailyLossType')?.value || 'percent',maxDrawdown,maxDrawdownType:document.getElementById('maxDrawdownType')?.value || 'percent',currentBalance,riskPercent,maxTradesPerDay,minRr,phaseDeadline:document.getElementById('phaseDeadlineInput')?.value || '',userSetupCriteria:readSetupCriteriaRows(),startDate:getAccountConfig()?.startDate || new Date().toISOString().slice(0,10)};
+  const config = {accountSize,phase,profitTarget,profitTargetType:document.getElementById('profitTargetType')?.value || 'percent',maxDailyLoss,maxDailyLossType:document.getElementById('maxDailyLossType')?.value || 'percent',maxDrawdown,maxDrawdownType:document.getElementById('maxDrawdownType')?.value || 'percent',riskPercent,maxTradesPerDay,minRr,phaseDeadline:document.getElementById('phaseDeadlineInput')?.value || '',userSetupCriteria:readSetupCriteriaRows(),startDate:getAccountConfig()?.startDate || new Date().toISOString().slice(0,10)};
   localStorage.setItem(ACCOUNT_CONFIG_KEY, JSON.stringify(config));
   if(typeof window.journallSaveAccountSetupDoc === 'function'){
     try{
@@ -14069,6 +14040,8 @@ main,
       var activeBtn = root.querySelector('.nav button[data-tab="' + tab + '"]');
       updateHeroTitle(activeBtn ? activeBtn.textContent.trim() : 'Journall');
     }
+    var shellHero = root.querySelector('.top > .hero');
+    if(shellHero) shellHero.classList.toggle('tab-hidden', tab !== 'tradingpage' && tab !== 'uploadcsv');
     if(tab === 'calendar'){
       if(typeof renderCalendarDayGrid === 'function') renderCalendarDayGrid();
       if(typeof renderCalendar === 'function') renderCalendar();
