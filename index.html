@@ -213,7 +213,7 @@ function renderLiveTraderControllerMarkup(metrics) {
     <div class="live-controller-card">
       <div class="live-controller-header">
         <div>
-          <span style="font-size:11px; font-weight:700; color:#a855f7; text-transform:uppercase; letter-spacing:0.05em;">Live Trader Guard</span>
+          <span style="font-size:11px; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:0.05em;">Live Trader Guard</span>
           <h3 style="margin:2px 0 0 0; font-size:20px; color:#fff;">Session Controller</h3>
         </div>
         <div class="live-status-pill ${statusCls}">${statusText}</div>
@@ -222,7 +222,7 @@ function renderLiveTraderControllerMarkup(metrics) {
       <div class="live-metrics-grid">
         <div class="live-metric-box">
           <div class="live-metric-label">Daily Loss Room</div>
-          <div class="live-metric-val ${m.maxDailyLossRemaining <= 0 ? 'red' : 'green'}">${m.maxDailyLossRemaining == null ? 'Unlimited' : '$' + m.maxDailyLossRemaining.toFixed(2)}</div>
+          <div class="live-metric-val ${m.maxDailyLossRemaining == null ? 'neutral' : (m.maxDailyLossRemaining <= 0 ? 'neutral' : 'neutral')}">${m.maxDailyLossRemaining == null ? 'Unlimited' : '$' + m.maxDailyLossRemaining.toFixed(2)}</div>
         </div>
         <div class="live-metric-box">
           <div class="live-metric-label">Trades Taken Today</div>
@@ -230,11 +230,11 @@ function renderLiveTraderControllerMarkup(metrics) {
         </div>
         <div class="live-metric-box">
           <div class="live-metric-label">Today P&L</div>
-          <div class="live-metric-val ${pnlClass(m.todayPnl)}">$${m.todayPnl.toFixed(2)}</div>
+          <div class="live-metric-val neutral">$${m.todayPnl.toFixed(2)}</div>
         </div>
         <div class="live-metric-box">
           <div class="live-metric-label">Mind Check</div>
-          <div class="live-metric-val green">${typeof isMindCheckComplete === 'function' && isMindCheckComplete() ? '100% Ready' : 'Pending'}</div>
+          <div class="live-metric-val neutral">${typeof isMindCheckComplete === 'function' && isMindCheckComplete() ? '100% Ready' : 'Pending'}</div>
         </div>
       </div>
 
@@ -3007,8 +3007,8 @@ tr:hover {
 </style><style>
 /* --- LIVE TRADER CONTROLLER & UNJOURNALED TRADES BANNER STYLES --- */
 .unjournaled-banner {
-  background: linear-gradient(135deg, rgba(30, 41, 59, 0.7), rgba(15, 23, 42, 0.9));
-  border: 1px solid rgba(99, 102, 241, 0.3);
+  background: var(--canvas);
+  border: 1px solid var(--hairline);
   border-radius: 16px;
   padding: 20px 24px;
   margin-bottom: 24px;
@@ -3016,7 +3016,7 @@ tr:hover {
   align-items: center;
   justify-content: space-between;
   gap: 20px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.28);
   position: relative;
   overflow: hidden;
 }
@@ -3024,7 +3024,7 @@ tr:hover {
   content: '';
   position: absolute;
   top: 0; left: 0; right: 0; height: 2px;
-  background: linear-gradient(90deg, #6366f1, #a855f7, #ec4899);
+  background: linear-gradient(90deg, rgba(73,79,223,.08), rgba(73,79,223,.36), rgba(73,79,223,.08));
 }
 .unjournaled-banner-left {
   flex: 1;
@@ -3037,9 +3037,9 @@ tr:hover {
   font-weight: 700;
   letter-spacing: 0.05em;
   text-transform: uppercase;
-  color: #a855f7;
-  background: rgba(168, 85, 247, 0.12);
-  border: 1px solid rgba(168, 85, 247, 0.3);
+  color: var(--ink);
+  background: rgba(73, 79, 223, 0.12);
+  border: 1px solid rgba(73, 79, 223, 0.24);
   padding: 4px 10px;
   border-radius: 9999px;
   margin-bottom: 8px;
@@ -3058,12 +3058,12 @@ tr:hover {
 
 /* Live Trader Controller Hub */
 .live-controller-card {
-  background: linear-gradient(135deg, rgba(15, 23, 42, 0.8), rgba(30, 41, 59, 0.6));
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--canvas);
+  border: 1px solid var(--hairline);
   border-radius: 16px;
   padding: 24px;
   margin-bottom: 24px;
-  box-shadow: 0 12px 32px rgba(0,0,0,0.3);
+  box-shadow: 0 12px 30px rgba(0,0,0,0.28);
 }
 .live-controller-header {
   display: flex;
@@ -3082,9 +3082,9 @@ tr:hover {
   letter-spacing: 0.04em;
   text-transform: uppercase;
 }
-.live-status-pill.ready { background: rgba(34, 197, 94, 0.15); color: #4ade80; border: 1px solid rgba(34, 197, 94, 0.3); }
-.live-status-pill.warning { background: rgba(107, 79, 214, 0.15); color: #c7b8ff; border: 1px solid rgba(107, 79, 214, 0.3); }
-.live-status-pill.lockout { background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3); }
+.live-status-pill.ready { background: rgba(255, 255, 255, 0.05); color: var(--muted); border: 1px solid var(--hairline); }
+.live-status-pill.warning { background: rgba(73, 79, 223, 0.10); color: var(--ink); border: 1px solid rgba(73, 79, 223, 0.20); }
+.live-status-pill.lockout { background: rgba(73, 79, 223, 0.16); color: var(--ink); border: 1px solid rgba(73, 79, 223, 0.28); }
 
 .live-metrics-grid {
   display: grid;
@@ -3098,8 +3098,13 @@ tr:hover {
   border-radius: 12px;
   padding: 14px 16px;
 }
-.live-metric-label { font-size: 11px; color: #94a3b8; text-transform: uppercase; margin-bottom: 4px; }
+.live-metric-label { font-size: 11px; color: var(--muted); text-transform: uppercase; margin-bottom: 4px; }
 .live-metric-val { font-size: 18px; font-weight: 700; color: #fff; }
+.live-controller-card .live-metric-val.green,
+.live-controller-card .live-metric-val.red,
+.live-controller-card .live-metric-val.neutral {
+  color: var(--muted) !important;
+}
 
 .live-action-bar {
   display: flex;
@@ -3687,11 +3692,10 @@ tr:hover {
         <aside class="sidebar">
             <div class="brand" style="padding: 1.5rem 1rem;">
                 <div class="logo-box" style="min-width: 36px;" aria-label="Journall logo" title="Journall">
-                    <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" focusable="false">
-                        <path d="M4 15.5l4.4-4.4 3.1 3.1 5.4-7.2 3.1 2.2" fill="none" stroke="white" stroke-width="2.7" stroke-linecap="round" stroke-linejoin="round"/>
-                        <path d="M19.4 9.7l1.3.9" fill="none" stroke="#e9e7ff" stroke-width="2.7" stroke-linecap="round"/>
-                        <circle cx="20.7" cy="10.6" r="1.45" fill="#ffffff"/>
-                    </svg>
+                    <div class="signin-symbol-wrapper sidebar-logo-mark" aria-hidden="true">
+                        <span class="signin-symbol-j">J</span>
+                        <span class="signin-symbol-slash"></span>
+                    </div>
                 </div>
                 <div class="brand-name" style="margin-left: 12px; font-weight: 800; font-size: 1.2rem;">JOURNALL</div>
             </div>
@@ -6924,7 +6928,7 @@ function renderPropChallengeDashboard(){
     bannerHtml = `
       <div class="unjournaled-banner">
         <div class="unjournaled-banner-left">
-          <div class="unjournaled-badge">ðŸ“ ${unjournaledCount} TRADES AWAITING JOURNAL</div>
+          <div class="unjournaled-badge">${unjournaledCount} TRADES AWAITING JOURNAL</div>
           <h3>${unjournaledCount} Trades Left to Journal</h3>
           <p>Complete your setup tags, rule checks, and lessons for newly synced trades to build your discipline score.</p>
         </div>
@@ -16205,6 +16209,57 @@ body:not(.firebase-auth-required) #journallApp > .sidebar .brand{
   text-align:center!important;
 }
 
+body:not(.firebase-auth-required) #journallApp > .sidebar:not(:hover) .brand{
+  width:56px!important;
+  min-width:56px!important;
+  max-width:56px!important;
+  padding:8px 8px 10px!important;
+  margin:0 auto 10px!important;
+  overflow:hidden!important;
+}
+
+body:not(.firebase-auth-required) #journallApp > .sidebar:not(:hover) .brand-name{
+  max-width:0!important;
+  height:0!important;
+  padding:0!important;
+  margin:0!important;
+  overflow:hidden!important;
+  opacity:0!important;
+  transform:translateY(-6px)!important;
+  pointer-events:none!important;
+}
+
+body:not(.firebase-auth-required) #journallApp > .sidebar .logo-box{
+  width:40px!important;
+  height:40px!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+}
+
+body:not(.firebase-auth-required) #journallApp > .sidebar .logo-box .sidebar-logo-mark{
+  width:28px!important;
+  height:28px!important;
+  margin-bottom:0!important;
+  transform:scale(.9)!important;
+  transform-origin:center!important;
+}
+
+body:not(.firebase-auth-required) #journallApp > .sidebar .logo-box .signin-symbol-j{
+  font-size:22px!important;
+  color:#6366f1!important;
+  text-shadow:0 0 16px rgba(99,102,241,.8)!important;
+}
+
+body:not(.firebase-auth-required) #journallApp > .sidebar .logo-box .signin-symbol-slash{
+  width:18px!important;
+  height:2px!important;
+  right:4px!important;
+  bottom:5px!important;
+  background:#10b981!important;
+  box-shadow:0 0 14px rgba(16,185,129,.95), 0 0 28px rgba(16,185,129,.6)!important;
+}
+
 body:not(.firebase-auth-required) #journallApp > .sidebar .logo{
   width:38px!important;
   height:38px!important;
@@ -16280,6 +16335,13 @@ body:not(.firebase-auth-required) #journallApp > .sidebar:hover .brand-name{
   max-width:140px!important;
   opacity:1!important;
   transform:translateX(0)!important;
+}
+
+body:not(.firebase-auth-required) #journallApp > .sidebar:hover .brand-name{
+  height:auto!important;
+  margin-left:0!important;
+  padding:0!important;
+  pointer-events:auto!important;
 }
 
 body:not(.firebase-auth-required) #journallApp > .sidebar .nav{
