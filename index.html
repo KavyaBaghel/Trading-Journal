@@ -6898,10 +6898,103 @@ async function generateAIPropGoals(force=false){
   finally{ aiPropGoalGenerating = false; }
 }
 function clearAIPropGoals(){ Object.keys(localStorage).filter(k=>k.startsWith('krishna_ai_prop_goals_')).forEach(k=>localStorage.removeItem(k)); renderGoals(); generateAIPropGoals(true); }
+function buildGoalsAnalyticsMarkup(m){
+  const s = m?.s || stats([]);
+  const totalTrades = Number(s.total) || 0;
+  const avgPnl = totalTrades ? Number(s.pnl) / totalTrades : 0;
+  const avgWin = Number(s.avgWin) || 0;
+  const avgLoss = Number(s.avgLoss) || 0;
+  const lossAbs = Math.abs(avgLoss);
+  const today = new Date(todayDateKey() + 'T00:00:00');
+  const ordered = sorted(trades || []);
+  const firstTrade = ordered[0];
+  const firstTradeDate = firstTrade?.date ? new Date(firstTrade.date + 'T00:00:00') : null;
+  const elapsedDays = firstTradeDate && !isNaN(firstTradeDate) ? Math.max(1, Math.ceil((today - firstTradeDate) / 86400000) + 1) : null;
+  const tradesPerDay = elapsedDays ? totalTrades / elapsedDays : null;
+  const remainingDays = Number(m?.daysRemaining);
+  const targetRemaining = Math.max(0, Number(m?.remainingToTarget) || 0);
+  const maxDailyLossRemaining = Number(m?.maxDailyLossRemaining);
+  const maxDrawdownRemaining = Number(m?.maxDrawdownRemaining);
+  const dailyLossBudget = Number.isFinite(maxDailyLossRemaining) ? maxDailyLossRemaining : (Number(m?.maxDailyLossAmount) || 0);
+  const windowTrades = remainingDays && tradesPerDay ? Math.max(1, Math.round(tradesPerDay * remainingDays)) : null;
+  const budgetWindowTrades = (dailyLossBudget > 0 && lossAbs > 0) ? Math.max(1, Math.round(dailyLossBudget / lossAbs)) : null;
+
+  const formatMoney = value => Number.isFinite(value) ? moneyPlain(value) : '—';
+
+  const tradesToTarget = avgPnl > 0 ? Math.ceil(targetRemaining / avgPnl) : null;
+
+  const requiredWinRateForWindow = (windowCount) => {
+    if(!windowCount || !Number.isFinite(windowCount) || windowCount <= 0) return null;
+    if(targetRemaining <= 0) return 0;
+    if(avgWin <= 0 || lossAbs <= 0) return null;
+    const neededWins = (targetRemaining + windowCount * lossAbs) / (avgWin + lossAbs);
+    return clampNumber(neededWins / windowCount * 100, 0, 100);
+  };
+
+  const requiredWinRate = remainingDays && windowTrades
+    ? requiredWinRateForWindow(windowTrades)
+    : budgetWindowTrades
+      ? requiredWinRateForWindow(budgetWindowTrades)
+      : null;
+
+  const currentWinRate = Number(s.wr) || 0;
+  const paceWindowTrades = remainingDays && windowTrades ? windowTrades : budgetWindowTrades;
+  const actualTradesPerDay = tradesPerDay;
+  const requiredTradesPerDay = remainingDays && tradesToTarget != null ? tradesToTarget / Math.max(1, remainingDays) : null;
+  const paceAhead = actualTradesPerDay != null && requiredTradesPerDay != null ? actualTradesPerDay >= requiredTradesPerDay : null;
+  const paceText = remainingDays
+    ? (paceAhead == null
+      ? 'Pace check unavailable.'
+      : `${paceAhead ? 'Ahead of pace' : 'Behind pace'} · ${actualTradesPerDay.toFixed(1)} trades/day now vs ${requiredTradesPerDay.toFixed(1)} needed.`)
+    : 'No deadline set, so pace is shown against your current trade flow.';
+
+  const fastestTrades = tradesToTarget;
+  const fastestDays = actualTradesPerDay && tradesToTarget != null ? tradesToTarget / actualTradesPerDay : null;
+
+  const safeRiskCandidates = [
+    targetRemaining > 0 && tradesToTarget ? targetRemaining / tradesToTarget : null,
+    Number.isFinite(maxDailyLossRemaining) ? maxDailyLossRemaining : null,
+    Number.isFinite(maxDrawdownRemaining) ? maxDrawdownRemaining : null,
+    remainingDays ? targetRemaining / Math.max(1, remainingDays) : null
+  ].filter(v => Number.isFinite(v) && v > 0);
+  const safeRisk = safeRiskCandidates.length ? Math.min(...safeRiskCandidates) : null;
+
+  return `
+    <div class="goal-card-grid">
+      <div class="goal-card">
+        <div class="goal-card-label">Trades to Target</div>
+        <div class="goal-card-value ${tradesToTarget == null ? 'neutral' : 'green'}">${tradesToTarget == null ? 'Not on pace' : `${tradesToTarget} trades`}</div>
+        <div class="goal-card-sub">${tradesToTarget == null ? 'Average P&L per trade is flat or negative.' : `Avg trade P&L ${formatMoney(avgPnl)}. Target remaining ${formatMoney(targetRemaining)}.`}</div>
+      </div>
+      <div class="goal-card">
+        <div class="goal-card-label">Win Rate Gap</div>
+        <div class="goal-card-value ${requiredWinRate == null ? 'neutral' : (requiredWinRate <= currentWinRate ? 'green' : 'amber')}">
+          ${requiredWinRate == null ? 'Need more data' : `Current: ${Math.round(currentWinRate)}% · Needed: ${Math.round(requiredWinRate)}%`}
+        </div>
+        <div class="goal-card-sub">${remainingDays ? `Window uses ${paceWindowTrades || 0} estimated trades over ${remainingDays} day${remainingDays === 1 ? '' : 's'}.` : `Budget window uses ${budgetWindowTrades || 0} trades from remaining daily-loss-room.`}</div>
+      </div>
+      <div class="goal-card">
+        <div class="goal-card-label">Suggested Risk per Trade</div>
+        <div class="goal-card-value ${safeRisk == null ? 'neutral' : 'green'}">${safeRisk == null ? 'Not enough data' : formatMoney(safeRisk)}</div>
+        <div class="goal-card-sub">${safeRisk == null ? 'Need trade history plus an active account setup.' : `Based on remaining target ${formatMoney(targetRemaining)}, daily room ${formatMoney(dailyLossBudget)}, and drawdown buffer ${formatMoney(Number.isFinite(maxDrawdownRemaining) ? maxDrawdownRemaining : Number(m?.maxDrawdownAmount) || 0)}.`}</div>
+      </div>
+      <div class="goal-card">
+        <div class="goal-card-label">Pace Tracker</div>
+        <div class="goal-card-value ${paceAhead == null ? 'neutral' : (paceAhead ? 'green' : 'red')}">${paceAhead == null ? 'No deadline' : paceAhead ? 'Ahead' : 'Behind'}</div>
+        <div class="goal-card-sub">${paceText}</div>
+      </div>
+      <div class="goal-card">
+        <div class="goal-card-label">Fastest Path Estimate</div>
+        <div class="goal-card-value ${fastestTrades == null ? 'neutral' : 'green'}">${fastestTrades == null ? 'Not enough data' : `${fastestTrades} trades`}</div>
+        <div class="goal-card-sub">${fastestTrades == null ? 'Need positive average trade P&L to project completion.' : `${fastestDays != null ? `${fastestDays.toFixed(1)} days · ` : ''}Assumes current win rate ${Math.round(currentWinRate)}% and average trade size hold steady.`}</div>
+      </div>
+    </div>
+  `;
+}
 function renderGoals(){
   const goalsBox=document.getElementById('goalsBox'), propBox=document.getElementById('propBox'); if(!goalsBox || !propBox) return;
   const m=accountMetrics(trades || []); if(!m){ goalsBox.innerHTML=accountSetupEmptyMarkup(); propBox.innerHTML='<div class="insight warn"><strong>Account setup needed.</strong><br>Complete onboarding before AI creates phase goals.</div>'; return; }
-  goalsBox.innerHTML = '';
+  goalsBox.innerHTML = buildGoalsAnalyticsMarkup(m);
   const cached=localStorage.getItem(propGoalStorageKey());
   if(cached){ propBox.innerHTML=renderPropGoalText(cached); const status=document.getElementById('propGoalStatus'); if(status) status.textContent='AI goals are current for this account and trade data.'; }
   else{ propBox.innerHTML='<div class="insight warn"><strong>AI goals pending.</strong><br>AI will create goals and rules from your account setup.</div>'; generateAIPropGoals(false); }
