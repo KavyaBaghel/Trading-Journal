@@ -6915,11 +6915,16 @@ function buildGoalsAnalyticsMarkup(m){
   const targetRemaining = Math.max(0, Number(m?.remainingToTarget) || 0);
   const maxDailyLossRemaining = Number(m?.maxDailyLossRemaining);
   const maxDrawdownRemaining = Number(m?.maxDrawdownRemaining);
+  const targetBalance = Number(m?.targetBalance) || 0;
+  const startBalance = Number(m?.startBalance) || 0;
+  const currentBalance = Number(m?.currentBalance) || 0;
   const dailyLossBudget = Number.isFinite(maxDailyLossRemaining) ? maxDailyLossRemaining : (Number(m?.maxDailyLossAmount) || 0);
   const windowTrades = remainingDays && tradesPerDay ? Math.max(1, Math.round(tradesPerDay * remainingDays)) : null;
   const budgetWindowTrades = (dailyLossBudget > 0 && lossAbs > 0) ? Math.max(1, Math.round(dailyLossBudget / lossAbs)) : null;
 
   const formatMoney = value => Number.isFinite(value) ? moneyPlain(value) : '—';
+  const formatPct = value => Number.isFinite(value) ? `${value.toFixed(1)}%` : '—';
+  const formatDate = value => Number.isFinite(value?.getTime?.()) ? value.toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' }) : '—';
 
   const tradesToTarget = avgPnl > 0 ? Math.ceil(targetRemaining / avgPnl) : null;
 
@@ -6950,6 +6955,9 @@ function buildGoalsAnalyticsMarkup(m){
 
   const fastestTrades = tradesToTarget;
   const fastestDays = actualTradesPerDay && tradesToTarget != null ? tradesToTarget / actualTradesPerDay : null;
+  const projectedCompletionDate = fastestDays != null
+    ? new Date(today.getTime() + Math.max(0, fastestDays) * 86400000)
+    : null;
 
   const safeRiskCandidates = [
     targetRemaining > 0 && tradesToTarget ? targetRemaining / tradesToTarget : null,
@@ -6965,6 +6973,10 @@ function buildGoalsAnalyticsMarkup(m){
         <div class="goal-card-label">Trades to Target</div>
         <div class="goal-card-value ${tradesToTarget == null ? 'neutral' : 'green'}">${tradesToTarget == null ? 'Not on pace' : `${tradesToTarget} trades`}</div>
         <div class="goal-card-sub">${tradesToTarget == null ? 'Average P&L per trade is flat or negative.' : `Avg trade P&L ${formatMoney(avgPnl)}. Target remaining ${formatMoney(targetRemaining)}.`}</div>
+        <div class="goal-breakdown" style="margin-top:10px">
+          <div class="mini-stat"><span>Progress so far</span><strong>${targetBalance > startBalance ? formatPct(Math.max(0, (currentBalance - startBalance) / (targetBalance - startBalance) * 100)) : '—'}</strong></div>
+          <div class="mini-stat"><span>Avg win / Avg loss</span><strong>${avgWin || avgLoss ? `${formatMoney(avgWin)} / ${formatMoney(avgLoss)}` : '—'}</strong></div>
+        </div>
       </div>
       <div class="goal-card">
         <div class="goal-card-label">Win Rate Gap</div>
@@ -6972,21 +6984,38 @@ function buildGoalsAnalyticsMarkup(m){
           ${requiredWinRate == null ? 'Need more data' : `Current: ${Math.round(currentWinRate)}% · Needed: ${Math.round(requiredWinRate)}%`}
         </div>
         <div class="goal-card-sub">${remainingDays ? `Window uses ${paceWindowTrades || 0} estimated trades over ${remainingDays} day${remainingDays === 1 ? '' : 's'}.` : `Budget window uses ${budgetWindowTrades || 0} trades from remaining daily-loss-room.`}</div>
+        <div class="goal-breakdown" style="margin-top:10px">
+          <div class="mini-stat"><span>Avg win / Avg loss</span><strong>${avgWin || avgLoss ? `${formatMoney(avgWin)} / ${formatMoney(avgLoss)}` : '—'}</strong></div>
+          <div class="mini-stat"><span>Estimated trades left</span><strong>${paceWindowTrades != null ? `${paceWindowTrades}` : '—'}</strong></div>
+        </div>
       </div>
       <div class="goal-card">
         <div class="goal-card-label">Suggested Risk per Trade</div>
         <div class="goal-card-value ${safeRisk == null ? 'neutral' : 'green'}">${safeRisk == null ? 'Not enough data' : formatMoney(safeRisk)}</div>
         <div class="goal-card-sub">${safeRisk == null ? 'Need trade history plus an active account setup.' : `Based on remaining target ${formatMoney(targetRemaining)}, daily room ${formatMoney(dailyLossBudget)}, and drawdown buffer ${formatMoney(Number.isFinite(maxDrawdownRemaining) ? maxDrawdownRemaining : Number(m?.maxDrawdownAmount) || 0)}.`}</div>
+        <div class="goal-breakdown" style="margin-top:10px">
+          <div class="mini-stat"><span>Target-pace</span><strong>${formatMoney(targetRemaining > 0 && tradesToTarget ? targetRemaining / tradesToTarget : null)}</strong></div>
+          <div class="mini-stat"><span>Daily-loss-room</span><strong>${formatMoney(Number.isFinite(maxDailyLossRemaining) ? maxDailyLossRemaining : null)}</strong></div>
+          <div class="mini-stat"><span>Drawdown buffer</span><strong>${formatMoney(Number.isFinite(maxDrawdownRemaining) ? maxDrawdownRemaining : null)}</strong></div>
+        </div>
       </div>
       <div class="goal-card">
         <div class="goal-card-label">Pace Tracker</div>
         <div class="goal-card-value ${paceAhead == null ? 'neutral' : (paceAhead ? 'green' : 'red')}">${paceAhead == null ? 'No deadline' : paceAhead ? 'Ahead' : 'Behind'}</div>
         <div class="goal-card-sub">${paceText}</div>
+        <div class="goal-breakdown" style="margin-top:10px">
+          <div class="mini-stat"><span>Actual trades so far</span><strong>${totalTrades || '—'}</strong></div>
+          <div class="mini-stat"><span>Required total trades</span><strong>${tradesToTarget != null ? tradesToTarget : '—'}</strong></div>
+          <div class="mini-stat"><span>Days remaining</span><strong>${remainingDays != null && Number.isFinite(remainingDays) ? remainingDays : '—'}</strong></div>
+        </div>
       </div>
       <div class="goal-card">
         <div class="goal-card-label">Fastest Path Estimate</div>
         <div class="goal-card-value ${fastestTrades == null ? 'neutral' : 'green'}">${fastestTrades == null ? 'Not enough data' : `${fastestTrades} trades`}</div>
         <div class="goal-card-sub">${fastestTrades == null ? 'Need positive average trade P&L to project completion.' : `${fastestDays != null ? `${fastestDays.toFixed(1)} days · ` : ''}Assumes current win rate ${Math.round(currentWinRate)}% and average trade size hold steady.`}</div>
+        <div class="goal-breakdown" style="margin-top:10px">
+          <div class="mini-stat"><span>Projected completion</span><strong>${formatDate(projectedCompletionDate)}</strong></div>
+        </div>
       </div>
     </div>
   `;
