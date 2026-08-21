@@ -3703,7 +3703,7 @@ tr:hover {
                 <button class="nav-link" data-tab="journalpage"><re-icon icon="book-open" weight="outline" size="20"></re-icon><span class="nav-label">Journal</span></button>
                 <button class="nav-link" data-tab="psychology"><re-icon icon="meditation" weight="outline" size="20"></re-icon><span class="nav-label">Psychology</span></button>
                 <button class="nav-link" data-tab="calendar"><re-icon icon="calendar" weight="outline" size="20"></re-icon><span class="nav-label">Calendar</span></button>
-                <button class="nav-link" data-tab="reports"><re-icon icon="file-text" weight="outline" size="20"></re-icon><span class="nav-label">Reports</span></button>
+                <button class="nav-link" data-tab="accountsettings"><re-icon icon="settings" weight="outline" size="20"></re-icon><span class="nav-label">Account Settings</span></button>
                 <button class="nav-link" data-tab="widgets"><re-icon icon="widget" weight="outline" size="20"></re-icon><span class="nav-label">Widgets</span></button>
                 <button class="nav-link" data-tab="goals"><re-icon icon="target" weight="outline" size="20"></re-icon><span class="nav-label">Goals</span></button>
                 <button class="nav-link" data-tab="ailab"><re-icon icon="sparkles" weight="outline" size="20"></re-icon><span class="nav-label">AI Coach</span></button>
@@ -3893,10 +3893,6 @@ tr:hover {
 
 
     <section id="dashboard" class="section">
-      <div class="card" style="margin-bottom:16px">
-        <div class="panel-title"><h3>Trading Dashboard</h3><span>account setup</span></div>
-        <div id="propChallengeDashboard"></div>
-      </div>
       <div id="analyticsBars" class="analytics-bars"></div>
       <div class="grid metrics" id="metrics"></div>
       <div class="grid three performance-pies">
@@ -3929,6 +3925,13 @@ tr:hover {
       </div>
     </section>
 
+    <section id="accountsettings" class="section">
+      <div class="card" style="margin-bottom:16px">
+        <div class="panel-title"><h3>Trading Dashboard</h3><span>account setup</span></div>
+        <div id="propChallengeDashboard"></div>
+      </div>
+    </section>
+
     <section id="widgets" class="section">
       <div class="card">
         <div class="panel-title"><h3>AI Widgets</h3><span>AI generated</span></div>
@@ -3940,10 +3943,6 @@ tr:hover {
         <div class="widget-grid" id="widgetGrid"></div>
       </div>
     </section>
-
-    <section id="reports" class="section">
-    </section>
-
 
 <section id="calendar" class="section">
   <div class="card calendar-premium-card">
@@ -4542,7 +4541,7 @@ tr:hover {
         <button class="dock-btn" data-tab="journalpage">Journal</button>
         <button class="dock-btn" data-tab="psychology">Psychology</button>
         <button class="dock-btn" data-tab="calendar">Calendar</button>
-        <button class="dock-btn" data-tab="reports">Reports</button>
+        <button class="dock-btn" data-tab="accountsettings">Account Settings</button>
         <button class="dock-btn" data-tab="widgets">Widgets</button>
         <button class="dock-btn" data-tab="goals">Goals</button>
         <button class="dock-btn" data-tab="ailab">AI Coach</button>
@@ -6065,32 +6064,6 @@ function renderAIReportText(text){
       </div>
     `;
   }).join('');
-}
-
-function renderReports(){
-  if(!filtered.length){
-    document.getElementById('reportCards').innerHTML = `
-      <div class="insight empty"><strong>No AI report yet</strong><br>Upload CSV, then generate the AI report.</div>`;
-    const status = document.getElementById('aiReportStatus');
-    if(status) status.textContent = 'Upload trades first.';
-    return;
-  }
-  const cached = localStorage.getItem(aiReportStorageKey('main'));
-  const status = document.getElementById('aiReportStatus');
-  if(cached){
-    if(isBadAIReport(cached)){
-      localStorage.removeItem(aiReportStorageKey('main'));
-      localStorage.removeItem(aiReportStorageKey('dashboard'));
-      document.getElementById('reportCards').innerHTML = renderRuleBasedDashboardInsights();
-      if(status) status.textContent = 'Old AI report was cleared because it explained the data format instead of coaching from it. Generate a fresh report.';
-      return;
-    }
-    document.getElementById('reportCards').innerHTML = renderAIReportText(cached);
-    if(status) status.textContent = 'AI report loaded from local cache. Regenerate after changing filters or importing new trades.';
-    return;
-  }
-  document.getElementById('reportCards').innerHTML = '<div class="insight warn"><strong>AI report not generated.</strong><br>Click Generate AI Report. AI will read the current filtered trades and produce the report cards.</div>';
-  if(status) status.textContent = 'Ready for AI.';
 }
 
 function setupPerformanceRows(){
@@ -10475,7 +10448,7 @@ function renderJournalPage(){
   }).join('');
 }
 
-function renderAll(){applyFilters();renderSide();renderAnalyticsBars();renderMetrics();renderPropChallengeDashboard();if(document.getElementById('mistakeModalBackdrop')?.classList.contains('active')) renderMistakeDashboard();renderInsights();renderCharts();renderWidgets();renderReports();renderSetupPerformanceTracker();renderCalendarDayGrid();renderCalendar();renderHeatmap();renderGrid();renderGoals();renderProcess();renderTradingPage();renderJournalPage();renderPsychology();if(typeof refreshSignedInProfile==="function")refreshSignedInProfile();}
+function renderAll(){applyFilters();renderSide();renderAnalyticsBars();renderMetrics();renderPropChallengeDashboard();if(document.getElementById('mistakeModalBackdrop')?.classList.contains('active')) renderMistakeDashboard();renderInsights();renderCharts();renderWidgets();renderSetupPerformanceTracker();renderCalendarDayGrid();renderCalendar();renderHeatmap();renderGrid();renderGoals();renderProcess();renderTradingPage();renderJournalPage();renderPsychology();if(typeof refreshSignedInProfile==="function")refreshSignedInProfile();}
 
 
 function selectTab(tabId) {
@@ -13997,7 +13970,7 @@ main,
     if(!btn || btn.closest('.journal-result-tabs') || btn.closest('.account-onboarding-actions') || btn.classList.contains('mobile-upload-btn')) return;
 
     var tab = btn.dataset.tab;
-    var isMainTab = ['tradingpage', 'dashboard', 'grid', 'journalpage', 'psychology', 'calendar', 'reports', 'widgets', 'goals', 'ailab', 'uploadcsv'].includes(tab);
+    var isMainTab = ['tradingpage', 'dashboard', 'grid', 'journalpage', 'psychology', 'calendar', 'accountsettings', 'widgets', 'goals', 'ailab', 'uploadcsv'].includes(tab);
     if(!isMainTab) return;
 
     event.preventDefault();
@@ -16013,11 +15986,15 @@ body:not(.firebase-auth-required) #journallApp > .sidebar{
   display:flex!important;
   flex-direction:column!important;
   position:fixed!important;
-  inset:0 auto 0 0!important;
+  top:16px!important;
+  right:auto!important;
+  bottom:16px!important;
+  left:16px!important;
   width:72px!important;
   min-width:72px!important;
   max-width:72px!important;
-  height:100vh!important;
+  height:auto!important;
+  max-height:calc(100vh - 32px)!important;
   flex:0 0 72px!important;
   padding:16px 0 12px!important;
   overflow-y:auto!important;
@@ -16025,6 +16002,7 @@ body:not(.firebase-auth-required) #journallApp > .sidebar{
   background:var(--canvas)!important;
   border-right:1px solid var(--hairline)!important;
   box-shadow:0 18px 40px rgba(0,0,0,.22)!important;
+  border-radius:32px!important;
   backdrop-filter:none!important;
   z-index:50!important;
   transition:width 180ms ease, max-width 180ms ease, min-width 180ms ease, box-shadow 180ms ease, background 180ms ease!important;
@@ -16041,6 +16019,7 @@ body:not(.firebase-auth-required) #journallApp > .sidebar:hover{
   max-width:240px!important;
   flex-basis:240px!important;
   box-shadow:0 24px 56px rgba(0,0,0,.32)!important;
+  border-radius:32px!important;
 }
 
 body:not(.firebase-auth-required) #journallApp.app{
