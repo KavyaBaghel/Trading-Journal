@@ -4035,6 +4035,11 @@ tr:hover {
           <div class="cmd-label">Status</div>
           <div class="cmd-status safe" id="cmdStatus"><span class="cmd-status-dot"></span>Safe to Trade</div>
         </div>
+        <div class="cmd-card">
+          <div class="cmd-label">Suggested Risk per Trade</div>
+          <div class="cmd-value cmd-action" id="cmdSuggestedRisk">Not enough data</div>
+          <div id="cmdSuggestedRiskSub" style="margin-top:2px;font-size:12px;line-height:1.45;color:var(--muted)">Need trade history plus an active account setup.</div>
+        </div>
         <div class="cmd-card psych-reminder-card">
           <div class="cmd-label">Tomorrow Rule</div>
           <div class="cmd-value cmd-action" id="cmdTomorrowRule">No saved rule</div>
@@ -6643,6 +6648,53 @@ function accountMetrics(data=trades){
   }
   return {config,s,todayTrades,todayPnl,accountSize,startBalance,currentBalance,profitTargetAmount,targetBalance,profitProgress,remainingToTarget,funded,maxDailyLossAmount,maxDrawdownAmount,dailyLossUsed,maxDrawdownUsed,maxDailyLossRemaining,maxDrawdownRemaining,daysRemaining};
 }
+
+function goalAnalyticsMetrics(m){
+  const s = m?.s || stats([]);
+  const totalTrades = Number(s.total) || 0;
+  const avgPnl = totalTrades ? Number(s.pnl) / totalTrades : 0;
+  const avgWin = Number(s.avgWin) || 0;
+  const avgLoss = Number(s.avgLoss) || 0;
+  const lossAbs = Math.abs(avgLoss);
+  const targetBalance = Number(m?.targetBalance) || 0;
+  const startBalance = Number(m?.startBalance) || 0;
+  const currentBalance = Number(m?.currentBalance) || 0;
+  const remainingDays = m?.daysRemaining != null ? Number(m?.daysRemaining) : null;
+  const targetRemaining = Math.max(0, Number(m?.remainingToTarget) || 0);
+  const maxDailyLossRemaining = m?.maxDailyLossRemaining != null ? Number(m?.maxDailyLossRemaining) : null;
+  const maxDrawdownRemaining = m?.maxDrawdownRemaining != null ? Number(m?.maxDrawdownRemaining) : null;
+  const dailyLossBudget = maxDailyLossRemaining != null ? maxDailyLossRemaining : (Number(m?.maxDailyLossAmount) || 0);
+  const progressSoFar = targetBalance > startBalance
+    ? clampNumber(Math.max(0, (currentBalance - startBalance) / (targetBalance - startBalance) * 100), 0, 100)
+    : null;
+  const tradesToTarget = avgPnl > 0 ? Math.ceil(targetRemaining / avgPnl) : null;
+  const safeRiskCandidates = [
+    targetRemaining > 0 && tradesToTarget ? targetRemaining / tradesToTarget : null,
+    Number.isFinite(maxDailyLossRemaining) ? maxDailyLossRemaining : null,
+    Number.isFinite(maxDrawdownRemaining) ? maxDrawdownRemaining : null,
+    remainingDays ? targetRemaining / Math.max(1, remainingDays) : null
+  ].filter(v => Number.isFinite(v) && v > 0);
+  const safeRisk = safeRiskCandidates.length ? Math.min(...safeRiskCandidates) : null;
+  return {
+    s,
+    avgPnl,
+    avgWin,
+    avgLoss,
+    lossAbs,
+    targetBalance,
+    startBalance,
+    currentBalance,
+    remainingDays,
+    targetRemaining,
+    maxDailyLossRemaining,
+    maxDrawdownRemaining,
+    dailyLossBudget,
+    progressSoFar,
+    tradesToTarget,
+    safeRisk,
+    safeRiskCandidates
+  };
+}
 function toggleFundedFields(){
   const phase = document.getElementById('accountPhaseInput')?.value || '';
   document.querySelectorAll('.funded-only').forEach(el=>{ el.hidden = !isFundedPhase(phase); });
@@ -6899,34 +6951,21 @@ async function generateAIPropGoals(force=false){
 }
 function clearAIPropGoals(){ Object.keys(localStorage).filter(k=>k.startsWith('krishna_ai_prop_goals_')).forEach(k=>localStorage.removeItem(k)); renderGoals(); generateAIPropGoals(true); }
 function buildGoalsAnalyticsMarkup(m){
-  const s = m?.s || stats([]);
-  const totalTrades = Number(s.total) || 0;
-  const avgPnl = totalTrades ? Number(s.pnl) / totalTrades : 0;
-  const avgWin = Number(s.avgWin) || 0;
-  const avgLoss = Number(s.avgLoss) || 0;
-  const lossAbs = Math.abs(avgLoss);
+  const metrics = goalAnalyticsMetrics(m);
+  const {s, avgPnl, avgWin, avgLoss, lossAbs, targetBalance, startBalance, currentBalance, remainingDays, targetRemaining, maxDailyLossRemaining, maxDrawdownRemaining, dailyLossBudget, tradesToTarget, safeRisk} = metrics;
   const today = new Date(todayDateKey() + 'T00:00:00');
   const ordered = sorted(trades || []);
   const firstTrade = ordered[0];
   const firstTradeDate = firstTrade?.date ? new Date(firstTrade.date + 'T00:00:00') : null;
+  const totalTrades = Number(s.total) || 0;
   const elapsedDays = firstTradeDate && !isNaN(firstTradeDate) ? Math.max(1, Math.ceil((today - firstTradeDate) / 86400000) + 1) : null;
   const tradesPerDay = elapsedDays ? totalTrades / elapsedDays : null;
-  const remainingDays = Number(m?.daysRemaining);
-  const targetRemaining = Math.max(0, Number(m?.remainingToTarget) || 0);
-  const maxDailyLossRemaining = Number(m?.maxDailyLossRemaining);
-  const maxDrawdownRemaining = Number(m?.maxDrawdownRemaining);
-  const targetBalance = Number(m?.targetBalance) || 0;
-  const startBalance = Number(m?.startBalance) || 0;
-  const currentBalance = Number(m?.currentBalance) || 0;
-  const dailyLossBudget = Number.isFinite(maxDailyLossRemaining) ? maxDailyLossRemaining : (Number(m?.maxDailyLossAmount) || 0);
   const windowTrades = remainingDays && tradesPerDay ? Math.max(1, Math.round(tradesPerDay * remainingDays)) : null;
   const budgetWindowTrades = (dailyLossBudget > 0 && lossAbs > 0) ? Math.max(1, Math.round(dailyLossBudget / lossAbs)) : null;
 
   const formatMoney = value => Number.isFinite(value) ? moneyPlain(value) : '—';
   const formatPct = value => Number.isFinite(value) ? `${value.toFixed(1)}%` : '—';
   const formatDate = value => Number.isFinite(value?.getTime?.()) ? value.toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' }) : '—';
-
-  const tradesToTarget = avgPnl > 0 ? Math.ceil(targetRemaining / avgPnl) : null;
 
   const requiredWinRateForWindow = (windowCount) => {
     if(!windowCount || !Number.isFinite(windowCount) || windowCount <= 0) return null;
@@ -6959,14 +6998,6 @@ function buildGoalsAnalyticsMarkup(m){
     ? new Date(today.getTime() + Math.max(0, fastestDays) * 86400000)
     : null;
 
-  const safeRiskCandidates = [
-    targetRemaining > 0 && tradesToTarget ? targetRemaining / tradesToTarget : null,
-    Number.isFinite(maxDailyLossRemaining) ? maxDailyLossRemaining : null,
-    Number.isFinite(maxDrawdownRemaining) ? maxDrawdownRemaining : null,
-    remainingDays ? targetRemaining / Math.max(1, remainingDays) : null
-  ].filter(v => Number.isFinite(v) && v > 0);
-  const safeRisk = safeRiskCandidates.length ? Math.min(...safeRiskCandidates) : null;
-
   return `
     <div class="goal-card-grid">
       <div class="goal-card">
@@ -6975,7 +7006,7 @@ function buildGoalsAnalyticsMarkup(m){
         <div class="goal-card-sub">${tradesToTarget == null ? 'Average P&L per trade is flat or negative.' : `Avg trade P&L ${formatMoney(avgPnl)}. Target remaining ${formatMoney(targetRemaining)}.`}</div>
         <div class="goal-breakdown" style="margin-top:10px">
           <div class="mini-stat"><span>Progress so far</span><strong>${targetBalance > startBalance ? formatPct(Math.max(0, (currentBalance - startBalance) / (targetBalance - startBalance) * 100)) : '—'}</strong></div>
-          <div class="mini-stat"><span>Avg win / Avg loss</span><strong>${avgWin || avgLoss ? `${formatMoney(avgWin)} / ${formatMoney(avgLoss)}` : '—'}</strong></div>
+          <div class="mini-stat"><span>Avg win / Avg loss</span><strong>${s.total ? `${formatMoney(avgWin)} / ${formatMoney(avgLoss)}` : '—'}</strong></div>
         </div>
       </div>
       <div class="goal-card">
@@ -6985,7 +7016,7 @@ function buildGoalsAnalyticsMarkup(m){
         </div>
         <div class="goal-card-sub">${remainingDays ? `Window uses ${paceWindowTrades || 0} estimated trades over ${remainingDays} day${remainingDays === 1 ? '' : 's'}.` : `Budget window uses ${budgetWindowTrades || 0} trades from remaining daily-loss-room.`}</div>
         <div class="goal-breakdown" style="margin-top:10px">
-          <div class="mini-stat"><span>Avg win / Avg loss</span><strong>${avgWin || avgLoss ? `${formatMoney(avgWin)} / ${formatMoney(avgLoss)}` : '—'}</strong></div>
+          <div class="mini-stat"><span>Avg win / Avg loss</span><strong>${s.total ? `${formatMoney(avgWin)} / ${formatMoney(avgLoss)}` : '—'}</strong></div>
           <div class="mini-stat"><span>Estimated trades left</span><strong>${paceWindowTrades != null ? `${paceWindowTrades}` : '—'}</strong></div>
         </div>
       </div>
@@ -9265,12 +9296,15 @@ function renderPsychology(){
 function renderCommandCenter(todayTrades){
   const data = Array.isArray(todayTrades) ? todayTrades : [];
   const state = todayTradingState(data);
+  const goalMetrics = goalAnalyticsMetrics(accountMetrics(trades || []));
   const pnlEl = document.getElementById('cmdTodayPnl');
   const lossEl = document.getElementById('cmdDailyLoss');
   const tradesEl = document.getElementById('cmdTrades');
   const breaksEl = document.getElementById('cmdRuleBreaks');
   const actionEl = document.getElementById('cmdNextAction');
   const statusEl = document.getElementById('cmdStatus');
+  const riskEl = document.getElementById('cmdSuggestedRisk');
+  const riskSubEl = document.getElementById('cmdSuggestedRiskSub');
   const tomorrowRuleEl = document.getElementById('cmdTomorrowRule');
 
   if(pnlEl){
@@ -9300,6 +9334,15 @@ function renderCommandCenter(todayTrades){
   if(statusEl){
     statusEl.className = 'cmd-status ' + state.statusClass;
     statusEl.innerHTML = `<span class="cmd-status-dot"></span>${state.status}`;
+  }
+  if(riskEl){
+    riskEl.textContent = goalMetrics.safeRisk == null ? 'Not enough data' : moneyPlain(goalMetrics.safeRisk);
+    riskEl.className = 'cmd-value cmd-action ' + (goalMetrics.safeRisk == null ? '' : 'green');
+  }
+  if(riskSubEl){
+    riskSubEl.textContent = goalMetrics.safeRisk == null
+      ? 'Need trade history plus an active account setup.'
+      : `Based on remaining target ${moneyPlain(goalMetrics.targetRemaining)}, daily room ${moneyPlain(goalMetrics.dailyLossBudget)}, and drawdown buffer ${goalMetrics.maxDrawdownRemaining == null ? '—' : moneyPlain(goalMetrics.maxDrawdownRemaining)}.`;
   }
   if(tomorrowRuleEl) tomorrowRuleEl.textContent = getTodayPsychologyReminder() || 'No saved rule';
 }
@@ -9528,24 +9571,19 @@ function renderTodayMetrics(data){
   const el = document.getElementById('todayMetrics');
   if(!el) return;
 
-  if(!data.length){
-    const cells = [
-      ['Today P&L','$0.00','neutral','No trades today'],
-      ['Today Trades','0','neutral','No trades today'],
-      ['Win Rate','0%','neutral','No trades today'],
-      ['Mistakes','0','neutral','No trades today']
-    ];
-    el.innerHTML = cells.map(c=>`<div class="card"><div class="label">${c[0]}</div><div class="value ${c[2]}">${c[1]}</div><div class="sub">${c[3]}</div></div>`).join('');
-    return;
-  }
-
-  const s = stats(data);
-  const mistakeCount = data.reduce((a,t)=>a+mistakes(t).length,0);
+  const goalMetrics = goalAnalyticsMetrics(accountMetrics(trades || []));
+  const moodState = getPsychologyFlowState();
+  const mood = String(moodState?.mood || moodState?.todayMood || moodState?.sessionMood || '').trim();
+  const avgWinLoss = goalMetrics.s.total ? `${moneyPlain(goalMetrics.avgWin)} / ${moneyPlain(goalMetrics.avgLoss)}` : 'Not enough data';
+  const progressText = goalMetrics.progressSoFar == null ? 'Not enough data' : `${goalMetrics.progressSoFar.toFixed(1)}%`;
+  const progressSub = goalMetrics.progressSoFar == null
+    ? 'Need account setup and target data.'
+    : `Current balance ${moneyPlain(goalMetrics.currentBalance)} of ${moneyPlain(goalMetrics.targetBalance)} target.`;
   const cells = [
-    ['Today P&L',fmt(s.pnl),pnlClass(s.pnl),'Net result'],
-    ['Today Trades',data.length,countClass(data.length,false),'Today'],
-    ['Win Rate',pct(s.wr),scoreClass(s.wr,50,40),s.wins.length+'W / '+s.losses.length+'L / '+s.breakEvens.length+'BE'],
-    ['Mistakes',mistakeCount,countClass(mistakeCount),'Today']
+    ['Avg Win / Avg Loss',avgWinLoss,'neutral',goalMetrics.safeRisk == null ? 'From all trades' : `From all trades · safe risk ${moneyPlain(goalMetrics.safeRisk)}.`],
+    ['Trades to Target %',progressText,goalMetrics.progressSoFar == null ? 'neutral' : scoreClass(goalMetrics.progressSoFar,70,45),progressSub],
+    ['Mood',mood || 'Not logged','neutral',mood ? 'From psychology log' : 'No per-day mood field exists yet.'],
+    ['Longest Streak (all-time)','Not available','neutral','No all-time streak calculator exists yet.']
   ];
   el.innerHTML = cells.map(c=>`<div class="card"><div class="label">${c[0]}</div><div class="value ${c[2]}">${c[1]}</div><div class="sub">${c[3]}</div></div>`).join('');
 }
@@ -16158,9 +16196,12 @@ body:not(.firebase-auth-required) #journallApp > .sidebar .brand{
   flex-direction:column!important;
   align-items:center!important;
   gap:8px!important;
-  padding:0 12px 14px!important;
+  padding:10px 12px 14px!important;
   margin:0 0 10px!important;
-  border-bottom:1px solid var(--hairline)!important;
+  background:linear-gradient(180deg,rgba(255,255,255,.02),rgba(255,255,255,.01))!important;
+  border:1px solid var(--hairline-strong)!important;
+  border-radius:24px!important;
+  box-shadow:0 10px 24px rgba(0,0,0,.16)!important;
   text-align:center!important;
 }
 
