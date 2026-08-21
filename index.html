@@ -64,8 +64,6 @@ function getAIStats(){
 }
 
 // --- LIVE TRADER CONTROLLER & UNJOURNALED TRADES LOGIC ---
-let qjCurrentIndex = 0;
-let qjUnjournaledList = [];
 let cooldownInterval = null;
 let cooldownRemainingSeconds = 0;
 
@@ -80,94 +78,19 @@ function getUnjournaledTrades() {
   });
 }
 
-function openQuickJournalModal() {
-  qjUnjournaledList = getUnjournaledTrades();
-  if (!qjUnjournaledList.length) {
+function openRemainingTradeJournal(){
+  const list = getUnjournaledTrades();
+  if(!list.length){
     alert('🎉 All your trades are fully journaled!');
     return;
   }
-  qjCurrentIndex = 0;
-  loadQuickJournalTrade();
-  document.getElementById('quickJournalBackdrop')?.classList.add('active');
-}
-
-function closeQuickJournalModal() {
-  document.getElementById('quickJournalBackdrop')?.classList.remove('active');
-}
-
-function loadQuickJournalTrade() {
-  if (qjCurrentIndex < 0 || qjCurrentIndex >= qjUnjournaledList.length) {
-    closeQuickJournalModal();
-    alert('✨ Great job! You have journaled all remaining trades.');
-    if (typeof renderPropChallengeDashboard === 'function') renderPropChallengeDashboard();
-    if (typeof renderAll === 'function') renderAll();
+  const trade = sorted(list)[0] || list[0];
+  const key = trade ? makeTradeKey(trade) : '';
+  if(key && typeof openTradeJournal === 'function'){
+    openTradeJournal(key);
     return;
   }
-  const t = qjUnjournaledList[qjCurrentIndex];
-  const summaryEl = document.getElementById('qjTradeSummary');
-  const titleEl = document.getElementById('qjModalTitle');
-  const progressEl = document.getElementById('qjProgressText');
-
-  if (titleEl) titleEl.textContent = `Journal Trade #${t.id || (qjCurrentIndex+1)}`;
-  if (progressEl) progressEl.textContent = `Trade ${qjCurrentIndex + 1} of ${qjUnjournaledList.length}`;
-
-  const pnlCls = (t.pnl || 0) >= 0 ? 'green' : 'red';
-  const pnlStr = (t.pnl || 0) >= 0 ? `+$${(t.pnl || 0).toFixed(2)}` : `-$${Math.abs(t.pnl || 0).toFixed(2)}`;
-
-  if (summaryEl) {
-    summaryEl.innerHTML = `
-      <div>
-        <strong style="font-size:16px; color:#fff;">${t.symbol || 'Symbol'} (${t.side || 'BUY'})</strong>
-        <div style="font-size:12px; color:#94a3b8; margin-top:2px;">${t.date || ''} ${t.time || ''} &bull; Vol: ${t.volume || 0.01} lots</div>
-      </div>
-      <div style="text-align:right;">
-        <span class="${pnlCls}" style="font-size:18px; font-weight:700;">${pnlStr}</span>
-      </div>
-    `;
-  }
-
-  const setupEl = document.getElementById('qjSetupSelect');
-  if (setupEl) setupEl.value = t.setup || '';
-  
-  const notesEl = document.getElementById('qjNotesInput');
-  if (notesEl) notesEl.value = t.notes && !t.notes.includes('Sync (#') ? t.notes : '';
-
-  const boxes = document.querySelectorAll('#qjMistakesCheckboxes input[type="checkbox"]');
-  const currentMistakes = Array.isArray(t.mistakes) ? t.mistakes : [];
-  boxes.forEach(b => {
-    b.checked = currentMistakes.includes(b.value);
-  });
-}
-
-function saveQuickJournalTrade() {
-  if (qjCurrentIndex < 0 || qjCurrentIndex >= qjUnjournaledList.length) return;
-  const t = qjUnjournaledList[qjCurrentIndex];
-
-  const setupVal = document.getElementById('qjSetupSelect')?.value || '';
-  const notesVal = document.getElementById('qjNotesInput')?.value || '';
-  
-  const boxes = document.querySelectorAll('#qjMistakesCheckboxes input[type="checkbox"]:checked');
-  const mistakeVals = Array.from(boxes).map(b => b.value);
-
-  t.setup = setupVal;
-  t.notes = notesVal;
-  t.mistakes = mistakeVals;
-  t.journaled = true;
-
-  const idx = trades.findIndex(x => x.id === t.id);
-  if (idx !== -1) {
-    trades[idx] = t;
-  }
-
-  if (typeof saveTrades === 'function') saveTrades();
-
-  qjCurrentIndex++;
-  loadQuickJournalTrade();
-}
-
-function skipQuickJournalTrade() {
-  qjCurrentIndex++;
-  loadQuickJournalTrade();
+  document.querySelector('[data-tab="journalpage"]')?.click();
 }
 
 function triggerCooldownPause() {
@@ -191,7 +114,20 @@ function updateCooldownTimerDisplay() {
   const mins = Math.floor(cooldownRemainingSeconds / 60);
   const secs = cooldownRemainingSeconds % 60;
   const circle = document.getElementById('cooldownTimerCircle');
-  if (circle) circle.textContent = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+  if (circle) {
+    const total = 15 * 60;
+    const pct = Math.max(0, Math.min(1, cooldownRemainingSeconds / total));
+    const ring = circle.querySelector('.cooldown-ring-progress');
+    if (ring) {
+      const circumference = 2 * Math.PI * 52;
+      ring.style.strokeDasharray = `${circumference}`;
+      ring.style.strokeDashoffset = `${circumference * (1 - pct)}`;
+    }
+    circle.style.setProperty('--cooldown-progress', String(pct));
+    const timeEl = circle.querySelector('.cooldown-time');
+    if (timeEl) timeEl.textContent = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+    else circle.textContent = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+  }
 }
 
 function closeCooldownModal() {
@@ -3112,67 +3048,67 @@ tr:hover {
   flex-wrap: wrap;
 }
 
-/* Quick Journal Modal Overlay */
-.quick-journal-backdrop {
-  position: fixed;
-  top: 0; left: 0; width: 100vw; height: 100vh;
-  background: rgba(0,0,0,0.8);
-  backdrop-filter: blur(8px);
-  z-index: 99999;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.25s ease;
-}
-.quick-journal-backdrop.active {
-  opacity: 1;
-  pointer-events: auto;
-}
-.quick-journal-modal {
-  background: #0f172a;
-  border: 1px solid rgba(255,255,255,0.12);
-  border-radius: 20px;
-  width: 90%;
-  max-width: 580px;
-  padding: 28px;
-  box-shadow: 0 20px 50px rgba(0,0,0,0.6);
-  transform: translateY(20px);
-  transition: transform 0.25s ease;
-}
-.quick-journal-backdrop.active .quick-journal-modal {
-  transform: translateY(0);
-}
-.qj-trade-summary {
-  background: rgba(255,255,255,0.04);
-  border-radius: 12px;
-  padding: 16px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
-}
-
 /* Breathing Cooldown Modal */
 .cooldown-circle {
   width: 120px;
   height: 120px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(99,102,241,0.4) 0%, rgba(168,85,247,0.1) 70%);
-  border: 2px solid #a855f7;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 24px;
-  font-weight: 700;
-  color: #fff;
+  position: relative;
+  display: grid;
+  place-items: center;
+  background:
+    radial-gradient(circle at 50% 35%, rgba(73,79,223,.16), rgba(73,79,223,.04) 42%, rgba(8,9,12,.96) 72%),
+    linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,.01));
+  border: 1px solid rgba(255,255,255,.08);
   margin: 20px auto;
-  animation: breathAnimation 4s ease-in-out infinite;
+  overflow: hidden;
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,.03),
+    0 0 24px rgba(73,79,223,.24),
+    0 0 44px rgba(73,79,223,.12);
 }
-@keyframes breathAnimation {
-  0%, 100% { transform: scale(1); box-shadow: 0 0 20px rgba(168,85,247,0.3); }
-  50% { transform: scale(1.15); box-shadow: 0 0 40px rgba(99,102,241,0.6); }
+.cooldown-circle::after{
+  content:'';
+  position:absolute;
+  inset:14px;
+  border-radius:50%;
+  background: radial-gradient(circle, rgba(255,255,255,.03), rgba(255,255,255,0) 70%);
+  pointer-events:none;
+}
+.cooldown-ring{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  transform:rotate(-90deg);
+  filter: drop-shadow(0 0 8px rgba(73,79,223,.28));
+}
+.cooldown-ring-track,
+.cooldown-ring-progress{
+  fill:none;
+  stroke-width:8;
+  cx:60;
+  cy:60;
+  r:52;
+}
+.cooldown-ring-track{
+  stroke:rgba(255,255,255,.10);
+}
+.cooldown-ring-progress{
+  stroke:var(--primary);
+  stroke-linecap:round;
+  stroke-dasharray:326.726;
+  stroke-dashoffset:0;
+  transition:stroke-dashoffset .8s linear, filter .2s ease;
+}
+.cooldown-time{
+  position:relative;
+  z-index:1;
+  font-size:24px;
+  font-weight:800;
+  letter-spacing:.02em;
+  color:#fff;
+  text-shadow:0 0 10px rgba(73,79,223,.28);
 }
 </style>
 <style>
@@ -3705,13 +3641,14 @@ tr:hover {
                 <button class="nav-link" data-tab="dashboard"><re-icon icon="chart-bar" weight="outline" size="20"></re-icon><span class="nav-label">Analytics</span></button>
                 <button class="nav-link" data-tab="grid"><re-icon icon="transfer-h" weight="outline" size="20"></re-icon><span class="nav-label">Trades</span></button>
                 <button class="nav-link" data-tab="journalpage"><re-icon icon="book-open" weight="outline" size="20"></re-icon><span class="nav-label">Journal</span></button>
-                <button class="nav-link" data-tab="psychology"><re-icon icon="meditation" weight="outline" size="20"></re-icon><span class="nav-label">Psychology</span></button>
                 <button class="nav-link" data-tab="calendar"><re-icon icon="calendar" weight="outline" size="20"></re-icon><span class="nav-label">Calendar</span></button>
-                <button class="nav-link" data-tab="accountsettings"><re-icon icon="settings" weight="outline" size="20"></re-icon><span class="nav-label">Account Settings</span></button>
-                <button class="nav-link" data-tab="widgets"><re-icon icon="widget" weight="outline" size="20"></re-icon><span class="nav-label">Widgets</span></button>
+                <button class="nav-link" data-tab="psychology"><re-icon icon="meditation" weight="outline" size="20"></re-icon><span class="nav-label">Psychology</span></button>
                 <button class="nav-link" data-tab="goals"><re-icon icon="target" weight="outline" size="20"></re-icon><span class="nav-label">Goals</span></button>
+                <button class="nav-link" data-tab="accountsettings"><re-icon icon="settings" weight="outline" size="20"></re-icon><span class="nav-label">Account Settings</span></button>
                 <button class="nav-link" data-tab="ailab"><re-icon icon="sparkles" weight="outline" size="20"></re-icon><span class="nav-label">AI Coach</span></button>
+                <button class="nav-link" data-tab="widgets"><re-icon icon="widget" weight="outline" size="20"></re-icon><span class="nav-label">Widgets</span></button>
                 <button class="nav-link" data-tab="userprofile"><re-icon icon="user-circle" weight="outline" size="20"></re-icon><span class="nav-label">User Profile</span></button>
+                <button class="nav-link" data-tab="uploadcsv"><re-icon icon="file-up" weight="outline" size="20"></re-icon><span class="nav-label">Upload Data <small>sync</small></span></button>
             </nav>
 
             <div class="sidebox">
@@ -4053,7 +3990,7 @@ tr:hover {
       <div class="grid two">
         <div class="card">
           <div class="panel-title"><h3>Risk/Reward</h3><span>today only</span></div>
-          <div class="sync-status streak-tracker" id="syncStatus">Not enough data</div>
+          <div class="streak-tracker" id="syncStatus">Not enough data</div>
         </div>
 
         <div class="card">
@@ -6908,7 +6845,7 @@ function renderPropChallengeDashboard(){
           <h3>${unjournaledCount} Trades Left to Journal</h3>
           <p>Complete your setup tags, rule checks, and lessons for newly synced trades to build your discipline score.</p>
         </div>
-        <button type="button" class="btn primary" onclick="openQuickJournalModal()">Journal Remaining Trades -&gt;</button>
+        <button type="button" class="btn primary" onclick="openRemainingTradeJournal()">Journal Remaining Trades -&gt;</button>
       </div>
     `;
   }
@@ -9547,23 +9484,51 @@ function clearPostSessionReview(){
   renderPostSessionReview(todayTrades);
 }
 
+function todayStreakSummary(data=[]){
+  const ordered = sorted(Array.isArray(data) ? data : []).filter(t=>t && t.date === todayISTDate());
+  if(!ordered.length){
+    return {value:'No trades yet', kind:'neutral', sub:'No trades yet today'};
+  }
+  let i = ordered.length - 1;
+  while(i >= 0 && tradeResult(ordered[i]?.pnl) === 'breakeven') i--;
+  if(i < 0){
+    return {value:'—', kind:'neutral', sub:'Today finished at breakeven.'};
+  }
+  const kind = tradeResult(ordered[i]?.pnl) === 'profit' ? 'win' : 'loss';
+  let count = 0;
+  while(i >= 0 && tradeResult(ordered[i]?.pnl) === (kind === 'win' ? 'profit' : 'loss')){
+    count++;
+    i--;
+  }
+  return {
+    value: `${count}${kind === 'win' ? 'W' : 'L'}`,
+    kind: kind === 'win' ? 'green' : 'red',
+    sub: 'Today only'
+  };
+}
+
 function renderTodayMetrics(data){
   const el = document.getElementById('todayMetrics');
   if(!el) return;
 
   const goalMetrics = goalAnalyticsMetrics(accountMetrics(trades || []));
+  const todayTrades = sorted(Array.isArray(data) ? data : []).filter(t=>t && t.date === todayISTDate());
+  const todayStats = stats(todayTrades);
   const moodState = getPsychologyFlowState();
   const mood = String(moodState?.mood || moodState?.todayMood || moodState?.sessionMood || '').trim();
-  const avgWinLoss = goalMetrics.s.total ? `${moneyPlain(goalMetrics.avgWin)} / ${moneyPlain(goalMetrics.avgLoss)}` : 'Not enough data';
+  const avgWinLoss = todayStats.wins.length && todayStats.losses.length
+    ? `${moneyPlain(todayStats.avgWin)} / ${moneyPlain(todayStats.avgLoss)}`
+    : 'Not enough data';
   const progressText = goalMetrics.progressSoFar == null ? 'Not enough data' : `${goalMetrics.progressSoFar.toFixed(1)}%`;
   const progressSub = goalMetrics.progressSoFar == null
     ? 'Need account setup and target data.'
     : `Current balance ${moneyPlain(goalMetrics.currentBalance)} of ${moneyPlain(goalMetrics.targetBalance)} target.`;
+  const winStreak = todayStreakSummary(todayTrades);
   const cells = [
-    ['Avg Win / Avg Loss',avgWinLoss,'neutral',goalMetrics.safeRisk == null ? 'From all trades' : `From all trades · safe risk ${moneyPlain(goalMetrics.safeRisk)}.`],
+    ['Avg Win / Avg Loss',avgWinLoss,'neutral',todayStats.wins.length && todayStats.losses.length ? 'Today only' : 'Not enough data yet for both wins and losses today.'],
     ['Trades to Target %',progressText,goalMetrics.progressSoFar == null ? 'neutral' : scoreClass(goalMetrics.progressSoFar,70,45),progressSub],
     ['Mood',mood || 'Not logged','neutral',mood ? 'From psychology log' : 'No per-day mood field exists yet.'],
-    ['Longest Streak (all-time)','Not available','neutral','No all-time streak calculator exists yet.']
+    ['Win Streak Today',winStreak.value,winStreak.kind,winStreak.sub]
   ];
   el.innerHTML = cells.map(c=>`<div class="card"><div class="label">${c[0]}</div><div class="value ${c[2]}">${c[1]}</div><div class="sub">${c[3]}</div></div>`).join('');
 }
@@ -10607,7 +10572,7 @@ function selectTab(tabId) {
 
   const activeBtn = document.querySelector(`.nav button[data-tab="${tabId}"]`);
   const shellHero = document.querySelector('.top > .hero');
-  if (shellHero) shellHero.classList.toggle('tab-hidden', tabId !== 'tradingpage');
+  if (shellHero) shellHero.classList.toggle('tab-hidden', tabId !== 'tradingpage' && tabId !== 'uploadcsv');
   if (activeBtn) {
     updateHeroTitle(activeBtn.textContent.trim());
     const mobSub = document.getElementById('mobileActiveTab');
@@ -10658,13 +10623,7 @@ syncMobileActiveTab();
 
 document.querySelectorAll('.nav button').forEach(btn=>{
 btn.addEventListener('click', ()=>{
-document.querySelectorAll('.nav button').forEach(b=>b.classList.remove('active'));
-btn.classList.add('active');
-
-document.querySelectorAll('.section').forEach(sec=>sec.classList.remove('active'));
-
-const target = document.getElementById(btn.dataset.tab);
-if(target) target.classList.add('active');
+if(typeof selectTab === 'function') selectTab(btn.dataset.tab);
 });
 });
 
@@ -10789,11 +10748,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
 
 document.querySelectorAll('.nav button').forEach(btn=>{
   btn.addEventListener('click', ()=>{
-    document.querySelectorAll('.nav button').forEach(b=>b.classList.remove('active'));
-    btn.classList.add('active');
-    document.querySelectorAll('.section').forEach(sec=>sec.classList.remove('active'));
-    const target = document.getElementById(btn.dataset.tab);
-    if(target) target.classList.add('active');
+    if(typeof selectTab === 'function') selectTab(btn.dataset.tab);
     if(btn.dataset.tab === 'ailab') renderAISnapshot();
   });
 });
@@ -12362,7 +12317,7 @@ body:not(.firebase-auth-required) #journallApp > .main > *{
 
 /* FIX 1 - P&L value never cut off */
 #todayMetrics .card .value,
-#commandCenter .cmd-value{
+#commandCenter .cmd-value:not(.cmd-action){
   white-space:nowrap!important;
   overflow:visible!important;
   text-overflow:unset!important;
@@ -13385,6 +13340,20 @@ p{
   color: rgba(255,255,255,0.55) !important;
 }
 
+#journallApp #goalsBox .goal-card {
+  background: linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.025)) !important;
+  background-color: rgba(8, 9, 12, 0.94) !important;
+  border: 1px solid rgba(255,255,255,0.10) !important;
+  border-radius: 18px !important;
+  padding: 20px !important;
+  box-shadow:
+    0 12px 30px rgba(0, 0, 0, 0.28),
+    0 0 0 1px rgba(255,255,255,0.02),
+    0 0 20px rgba(73,79,223,0.08) !important;
+  backdrop-filter: blur(10px) !important;
+  -webkit-backdrop-filter: blur(10px) !important;
+}
+
 #journallApp .profit-dot,
 #journallApp .dot-profit,
 #journallApp [class*="profit"] .dot,
@@ -13996,14 +13965,14 @@ main,
   justify-content: flex-end !important;
   background: transparent !important;
 }
-#journallApp #cmdNextAction {
+#journallApp #commandCenter #cmdNextAction {
   display: block !important;
   width: 100% !important;
   max-width: none !important;
   min-width: 0 !important;
   min-height: 0 !important;
   white-space: normal !important;
-  overflow-wrap: break-word !important;
+  overflow-wrap: anywhere !important;
   word-break: break-word !important;
   line-height: 1.45 !important;
   text-align: left !important;
@@ -14119,7 +14088,7 @@ main,
     if(!btn || btn.closest('.journal-result-tabs') || btn.closest('.account-onboarding-actions') || btn.classList.contains('mobile-upload-btn')) return;
 
     var tab = btn.dataset.tab;
-    var isMainTab = ['tradingpage', 'dashboard', 'grid', 'journalpage', 'psychology', 'calendar', 'accountsettings', 'widgets', 'goals', 'ailab', 'uploadcsv'].includes(tab);
+    var isMainTab = ['tradingpage', 'dashboard', 'grid', 'journalpage', 'calendar', 'psychology', 'goals', 'accountsettings', 'ailab', 'widgets', 'userprofile', 'uploadcsv'].includes(tab);
     if(!isMainTab) return;
 
     event.preventDefault();
@@ -15541,61 +15510,6 @@ input{
   flex-shrink: 0 !important;
 }
 </style>
-<!-- QUICK JOURNALING MODAL -->
-<div id="quickJournalBackdrop" class="quick-journal-backdrop">
-  <div class="quick-journal-modal">
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
-      <div>
-        <span style="font-size:11px; font-weight:700; color:#a855f7; text-transform:uppercase; letter-spacing:0.05em;">Quick Trade Journaling</span>
-        <h3 style="margin:4px 0 0 0; font-size:20px; color:#fff;" id="qjModalTitle">Trade Review</h3>
-      </div>
-      <button type="button" class="btn" onclick="closeQuickJournalModal()" style="padding:6px 12px; border-radius:9999px;">&times; Close</button>
-    </div>
-    
-    <div id="qjTradeSummary" class="qj-trade-summary"></div>
-
-    <div style="display:grid; gap:16px;">
-      <div>
-        <label style="display:block; font-size:12px; color:#94a3b8; margin-bottom:6px; font-weight:600;">SETUP / STRATEGY</label>
-        <select id="qjSetupSelect" style="width:100%; border-radius:8px; padding:10px; background:rgba(255,255,255,0.06); color:#fff;">
-          <option value="">Select strategy setup...</option>
-          <option value="Breakout">Breakout</option>
-          <option value="Retest / Pullback">Retest / Pullback</option>
-          <option value="Liquidity Sweep">Liquidity Sweep</option>
-          <option value="Order Block / FVG">Order Block / FVG</option>
-          <option value="Trend Continuation">Trend Continuation</option>
-          <option value="News Spike">News Spike</option>
-        </select>
-      </div>
-
-      <div>
-        <label style="display:block; font-size:12px; color:#94a3b8; margin-bottom:6px; font-weight:600;">MISTAKES & RULE BREAKS (IF ANY)</label>
-        <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; font-size:13px;" id="qjMistakesCheckboxes">
-          <label style="display:flex; align-items:center; gap:8px; color:#cbd5e1;"><input type="checkbox" value="Revenge Trade"> Revenge Trade</label>
-          <label style="display:flex; align-items:center; gap:8px; color:#cbd5e1;"><input type="checkbox" value="Moved Stop Loss"> Moved Stop Loss</label>
-          <label style="display:flex; align-items:center; gap:8px; color:#cbd5e1;"><input type="checkbox" value="No Confirmation Entry"> Entered Early</label>
-          <label style="display:flex; align-items:center; gap:8px; color:#cbd5e1;"><input type="checkbox" value="Overtrading"> Overtrading</label>
-          <label style="display:flex; align-items:center; gap:8px; color:#cbd5e1;"><input type="checkbox" value="Increased Lot Size"> Oversized Lot</label>
-          <label style="display:flex; align-items:center; gap:8px; color:#cbd5e1;"><input type="checkbox" value="No Patience"> FOMO Entry</label>
-        </div>
-      </div>
-
-      <div>
-        <label style="display:block; font-size:12px; color:#94a3b8; margin-bottom:6px; font-weight:600;">TRADE NOTES & LESSONS</label>
-        <textarea id="qjNotesInput" placeholder="Why did you take this trade? What did you do well or need to improve tomorrow?" style="width:100%; height:80px; border-radius:8px; padding:10px; background:rgba(255,255,255,0.06); color:#fff; resize:none;"></textarea>
-      </div>
-
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-top:8px;">
-        <span id="qjProgressText" style="font-size:12px; color:#94a3b8;">Trade 1 of 3</span>
-        <div style="display:flex; gap:10px;">
-          <button type="button" class="btn" onclick="skipQuickJournalTrade()">Skip</button>
-          <button type="button" class="btn primary" onclick="saveQuickJournalTrade()">Save & Next Trade -&gt;</button>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
 <!-- COOL-DOWN PAUSE MODAL -->
 <div id="cooldownModalBackdrop" class="quick-journal-backdrop">
   <div class="quick-journal-modal" style="text-align:center; max-width:460px;">
@@ -15603,7 +15517,13 @@ input{
     <h3 style="margin:6px 0 0 0; font-size:22px; color:#fff;">15-Minute Pause</h3>
     <p style="font-size:13px; color:#94a3b8; margin-top:6px;">Breathe in slowly. Step away from your charts to clear emotion before taking any new trades.</p>
     
-    <div id="cooldownTimerCircle" class="cooldown-circle">15:00</div>
+    <div id="cooldownTimerCircle" class="cooldown-circle" aria-label="Cooldown time remaining">
+      <svg class="cooldown-ring" viewBox="0 0 120 120" aria-hidden="true" focusable="false">
+        <circle class="cooldown-ring-track" cx="60" cy="60" r="52"></circle>
+        <circle class="cooldown-ring-progress" cx="60" cy="60" r="52"></circle>
+      </svg>
+      <span class="cooldown-time">15:00</span>
+    </div>
     <p id="cooldownInstruction" style="font-size:13px; color:#cbd5e1; font-style:italic; margin-bottom:20px;">"Deep breath in... hold... exhale slowly."</p>
 
     <button type="button" class="btn primary" onclick="closeCooldownModal()" style="width:100%;">Resume Trading Session</button>
