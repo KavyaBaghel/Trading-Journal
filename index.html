@@ -445,7 +445,9 @@ Name changes remaining this month: ${remaining} of 2.`);
   --loss:#ff5266;
   --accent:#00bcd4;
   --shadow:0 18px 48px rgba(0,0,0,.22);
-  --radius:16px;
+  --radius-card:18px;
+  --radius-md:10px;
+  --radius-pill:9999px;
   --sans:'Geist',system-ui,sans-serif;
   --mono:'Space Mono',monospace;
 }
@@ -506,7 +508,7 @@ button,input,select,textarea{font-family:inherit}
 .metrics{grid-template-columns:repeat(8,minmax(0,1fr));margin:18px 0}
 .card{
   background:linear-gradient(180deg,rgba(16,21,33,.96),rgba(11,16,25,.96));
-  border:1px solid var(--border);border-radius:var(--radius);padding:18px;box-shadow:var(--shadow);min-width:0
+  border:1px solid var(--border);border-radius:var(--radius-card);padding:18px;box-shadow:var(--shadow);min-width:0
 }
 .card.soft{box-shadow:none;background:rgba(255,255,255,.035)}
 .label{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--faint)}
@@ -11808,10 +11810,7 @@ initFirebaseAuth().catch(err=>{
 
   --rounded-xs:4px!important;
   --rounded-sm:6px!important;
-  --rounded-md:8px!important;
-  --rounded-lg:12px!important;
   --rounded-xl:16px!important;
-  --rounded-pill:9999px!important;
   --ease-out:cubic-bezier(0.0, 0, 0.2, 1)!important;
   --ease-in-out:cubic-bezier(0.4, 0, 0.2, 1)!important;
   --ease-spring:cubic-bezier(0.34, 1.56, 0.64, 1)!important;
@@ -11845,7 +11844,6 @@ initFirebaseAuth().catch(err=>{
   --accent:var(--primary)!important;
   --accent-purple:#494fdf!important;
   --shadow:none!important;
-  --radius:var(--rounded-md)!important;
   --sans:Geist,"Helvetica Neue",Arial,sans-serif!important;
   --mono:Inter,"Helvetica Neue",Arial,sans-serif!important;
 }
@@ -11855,9 +11853,9 @@ body::before,body::after,.hero::before,.hero::after,.card::before,.journal-main-
 *,*::before,*::after{box-shadow:none!important;text-shadow:none!important}
 .app,.main{background:var(--canvas)!important;color:var(--ink)!important}
 .brand{border-bottom:1px solid var(--hairline)!important}
-.logo{width:36px!important;height:36px!important;min-width:36px!important;border-radius:var(--rounded-md)!important;background:var(--surface-2)!important;background-image:none!important;border:1px solid var(--hairline-strong)!important;color:var(--ink)!important;display:grid!important;place-items:center!important;position:relative!important;overflow:hidden!important}
+.logo{width:36px!important;height:36px!important;min-width:36px!important;border-radius:var(--radius-md)!important;background:var(--surface-2)!important;background-image:none!important;border:1px solid var(--hairline-strong)!important;color:var(--ink)!important;display:grid!important;place-items:center!important;position:relative!important;overflow:hidden!important}
 .logo::before{content:"J"!important;color:var(--ink)!important;background:transparent!important;font-family:Inter,"Helvetica Neue",Arial,sans-serif!important;font-size:18px!important;font-weight:600!important;line-height:1!important}
-.logo::after{content:""!important;position:absolute!important;width:18px!important;height:2px!important;right:7px!important;bottom:8px!important;background:var(--primary)!important;border-radius:var(--rounded-pill)!important;transform:rotate(-28deg)!important}
+.logo::after{content:""!important;position:absolute!important;width:18px!important;height:2px!important;right:7px!important;bottom:8px!important;background:var(--primary)!important;border-radius:var(--radius-pill)!important;transform:rotate(-28deg)!important}
 .brand-title,.hero h1,.panel-title h3,h1,h2,h3,.calendar-hero h2,.mistake-modal-head h2{font-family:Inter,"Helvetica Neue",Arial,sans-serif!important;color:var(--ink)!important;letter-spacing:0!important;font-weight:500!important;text-transform:none!important}
 .hero h1{font-size:32px!important;line-height:1.2!important}.calendar-hero h2{font-size:32px!important;line-height:1.2!important}
 .brand-sub,.sub,.muted,.panel-title span,.label,.sidebox-title,.cmd-label,.ai-score-label,th,small{color:var(--mute)!important;letter-spacing:0!important}
@@ -11871,7 +11869,7 @@ p,span,div,td,label,em{color:inherit}.psych-check em,.psych-rule span,.journal-r
 .btn:hover,.ai-chip:hover,.journal-status-btn:hover,.pill:hover,.psych-step:hover,.nav button:hover{background:#242426!important;border-color:var(--ash)!important;color:var(--ink)!important;transform:none!important;opacity:1!important}
 .btn:active,.ai-chip:active,.journal-status-btn:active,.pill:active,.psych-step:active,.widget-icon-btn:active{transform:scale(.97)!important}
 .btn.primary,.file-picker-btn,.mobile-upload-btn,.pill.active,.psych-step.active,.journal-result-tabs .btn.active{background:var(--ink)!important;background-image:none!important;color:var(--on-primary)!important;border:1px solid var(--ink)!important}
-.nav button{min-height:40px!important;border-radius:var(--rounded-md)!important;padding:10px 16px!important;border:1px solid transparent!important;border-left:2px solid transparent!important;background:transparent!important;color:var(--ink-subtle)!important;font-size:14px!important;font-weight:400!important;letter-spacing:0!important;text-align:left!important;transition:background-color var(--dur-instant) var(--ease-out),color var(--dur-instant) var(--ease-out),border-color var(--dur-base) var(--ease-snappy),transform var(--dur-fast) var(--ease-out)!important;transform-origin:center!important}
+.nav button{min-height:40px!important;border-radius:var(--radius-md)!important;padding:10px 16px!important;border:1px solid transparent!important;border-left:2px solid transparent!important;background:transparent!important;color:var(--ink-subtle)!important;font-size:14px!important;font-weight:400!important;letter-spacing:0!important;text-align:left!important;transition:background-color var(--dur-instant) var(--ease-out),color var(--dur-instant) var(--ease-out),border-color var(--dur-base) var(--ease-snappy),transform var(--dur-fast) var(--ease-out)!important;transform-origin:center!important}
 .nav button:hover{background:var(--surface-2)!important;color:var(--ink)!important;border-color:var(--surface-2)!important;border-left-color:transparent!important}
 .nav button:active{transform:scale(0.97)!important}
 .nav button.active{background:var(--surface-2)!important;color:var(--ink)!important;border-color:var(--hairline-strong)!important;border-left-color:var(--primary)!important;font-weight:500!important}
@@ -12345,10 +12343,7 @@ html, body {
   --danger:#e23b4a;
   --warning:#ec7e00;
   --r-sm:8px;
-  --r-md:12px;
-  --r-lg:20px;
   --r-xl:28px;
-  --r-pill:9999px;
   --sp-xs:6px;
   --sp-sm:8px;
   --sp-md:14px;
@@ -12436,7 +12431,7 @@ body:not(.firebase-auth-required) #journallApp > .main > *{
 .top .hero{
   background:#16181a!important;
   border:1px solid rgba(255,255,255,.12)!important;
-  border-radius:var(--r-lg)!important;
+  border-radius:var(--radius-card)!important;
   padding:32px!important;
   margin-bottom:20px!important;
   width:100%!important;
@@ -12460,7 +12455,7 @@ body:not(.firebase-auth-required) #journallApp > .main > *{
 #commandCenter.command-center{
   background:#16181a!important;
   border:1px solid rgba(255,255,255,.12)!important;
-  border-radius:var(--r-lg)!important;
+  border-radius:var(--radius-card)!important;
   margin:0 0 20px!important;
   overflow:hidden!important;
   width:100%!important;
@@ -12531,7 +12526,7 @@ body:not(.firebase-auth-required) #journallApp > .main > *{
 #tradingpage > .grid.two > .card{
   background:#16181a!important;
   border:1px solid rgba(255,255,255,.12)!important;
-  border-radius:var(--r-lg)!important;
+  border-radius:var(--radius-card)!important;
   padding:24px!important;
   transition:transform var(--dur-base) var(--ease-out),border-color var(--dur-base) var(--ease-out)!important;
 }
@@ -12556,7 +12551,7 @@ body:not(.firebase-auth-required) #journallApp > .main > *{
 .panel-title span{
   background:rgba(255,255,255,.08)!important;
   border:0!important;
-  border-radius:var(--r-pill)!important;
+  border-radius:var(--radius-pill)!important;
   padding:4px 12px!important;
   font-size:12px!important;
   font-weight:600!important;
@@ -12570,7 +12565,7 @@ body:not(.firebase-auth-required) #journallApp > .main > *{
   background:#000000!important;
   border:1px solid rgba(255,255,255,.08)!important;
   border-left:2px solid rgba(255,255,255,.12)!important;
-  border-radius:0 var(--r-md) var(--r-md) 0!important;
+  border-radius:0 var(--radius-md) var(--radius-md) 0!important;
   padding:12px 16px!important;
   font-size:13px!important;
   color:rgba(255,255,255,.72)!important;
@@ -12599,7 +12594,7 @@ body:not(.firebase-auth-required) #journallApp > .main > *{
 .today-metrics .card{
   background:#0a0a0a!important;
   border:1px solid rgba(255,255,255,.12)!important;
-  border-radius:var(--r-lg)!important;
+  border-radius:var(--radius-card)!important;
   padding:16px!important;
   min-width:0!important;
   overflow:hidden!important;
@@ -12719,7 +12714,7 @@ button,
   font-size:16px!important;
   font-weight:600!important;
   letter-spacing:.24px!important;
-  border-radius:var(--r-pill)!important;
+  border-radius:var(--radius-pill)!important;
   cursor:pointer!important;
   border:none!important;
   padding:12px 24px!important;
@@ -12770,7 +12765,7 @@ textarea,
 select{
   background:#16181a!important;
   border:1px solid rgba(255,255,255,.12)!important;
-  border-radius:var(--r-md)!important;
+  border-radius:var(--radius-md)!important;
   padding:14px 16px!important;
   min-height:48px!important;
   color:#ffffff!important;
@@ -12824,7 +12819,7 @@ tr:hover td{
 .ai-message{
   background:#0a0a0a!important;
   border-left:2px solid #494fdf!important;
-  border-radius:0 var(--r-md) var(--r-md) 0!important;
+  border-radius:0 var(--radius-md) var(--radius-md) 0!important;
   padding:12px 16px!important;
   margin-bottom:8px!important;
   animation:msgEnter var(--dur-enter) var(--ease-out) both!important;
@@ -16240,7 +16235,7 @@ body:not(.firebase-auth-required) #journallApp > .sidebar .nav [data-tab]{
   gap:0!important;
   padding:11px 12px!important;
   margin:2px 8px!important;
-  border-radius:var(--r-pill)!important;
+  border-radius:var(--radius-pill)!important;
   font-size:14px!important;
   font-weight:600!important;
   color:rgba(255,255,255,.72)!important;
