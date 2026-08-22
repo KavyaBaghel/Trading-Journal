@@ -72,15 +72,14 @@ Work through these in order. Each ends with its own commit.
 4. **Phase D — Shared chart functions.** Write ONE function per chart type (#4, #5, #6,
    #7, #8) before styling any individual screen. Commit.
 5. **Phase E — Screen by screen**, using the shared functions/components above:
-   - Trading Dashboard (alert banner, Session Controller, stat cards)
-   - Today's Summary (stat/action/bento/chart/notes cards — mostly built, audit + patch)
+   - Trading Dashboard (command center — stat cards and action/status cards only)
+   - Today's Summary (stat/action/bento/chart/notes cards — proceed as a normal Phase E screen pass)
    - Analytics tab (heatmap, bar charts, donuts)
    - Trades tab (data table — confirm reference for #11 first)
    - Trade Journal tab (forms, filter chips #12, saved-journals list/table)
    - Trading Calendar (day-grid #8, monthly mini charts #4)
    - Psychology Command Room (checklist controls #15, rule cards #3)
-   - Account Phase / Goals tab (bento panels #9, AI insight blocks #13 — **fix the empty
-     Win Rate Gap / Suggested Risk per Trade cards and stray spinner first**)
+   - Account Phase / Goals tab (bento panels #9, AI insight blocks #13; owns alert banner + Session Controller; fix the empty Win Rate Gap / Suggested Risk per Trade cards and stray spinner before styling)
    - AI Coach tab (action-button grids #14, AI snapshot stat cards #2, insight blocks #13)
    - Profile tab (profile card, stat cards, settings form)
    - Upload Data sync tab (form fields #10, sync-status panel)

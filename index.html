@@ -9816,9 +9816,9 @@ function renderTodayChart(data){
   }));
   const labels = ['Session start', ...series.map(p => p.label)];
   const eq = [0, ...series.map(p => p.value)];
-  const primary = cssVarValue('--primary', '#494fdf');
-  const hairline = cssVarValue('--hairline', 'rgba(255,255,255,.06)');
-  const muted = cssVarValue('--muted', 'rgba(255,255,255,.45)');
+  const primary = cssVarValue('--primary') || 'currentColor';
+  const hairline = cssVarValue('--hairline') || cssVarValue('--border') || 'currentColor';
+  const muted = cssVarValue('--muted') || 'currentColor';
   destroy(id);
   charts[id] = new Chart(canvas, {
     type:'line',
@@ -9840,10 +9840,10 @@ function renderTodayChart(data){
           const chart = ctx.chart;
           const area = chart?.chartArea;
           const c = chart?.ctx;
-          if(!area || !c) return 'rgba(73,79,223,.18)';
+          if(!area || !c) return primary;
           const gradient = c.createLinearGradient(0, area.top, 0, area.bottom);
-          gradient.addColorStop(0, 'rgba(73,79,223,.28)');
-          gradient.addColorStop(1, 'rgba(73,79,223,0)');
+          gradient.addColorStop(0, primary);
+          gradient.addColorStop(1, 'transparent');
           return gradient;
         }
       }]
@@ -13657,6 +13657,161 @@ p{
   }
 }
 
+/* PHASE E SCREEN 2 - TODAY'S SUMMARY */
+#tradingpage > .grid.two:has(#syncStatus),
+#tradingpage > .grid.two:has(#todayMetrics){
+  display:grid!important;
+  grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  gap:16px!important;
+  margin:0 0 20px!important;
+}
+#tradingpage > .grid.two:has(#todayMetrics) > .card,
+#tradingpage > .grid.two:first-of-type:has(#todayMetrics) > .card:has(#todayMetrics){
+  display:block!important;
+}
+#tradingpage > .grid.two:has(#syncStatus) > .card,
+#tradingpage > .grid.two:has(#todayMetrics) > .card,
+#tradingpage > .grid.two:has(.today-equity-card) > .today-equity-card,
+#tradingpage > .grid.two:has(.today-ai-notes-card) > .today-ai-notes-card{
+  position:relative!important;
+  background:var(--surface-1)!important;
+  background-image:none!important;
+  border:1px solid var(--hairline)!important;
+  border-radius:var(--radius-card)!important;
+  box-shadow:var(--shadow)!important;
+  padding:20px!important;
+  overflow:hidden!important;
+}
+#tradingpage > .grid.two:has(#syncStatus) > .card:hover,
+#tradingpage > .grid.two:has(#todayMetrics) > .card:hover,
+#tradingpage > .grid.two:has(.today-equity-card) > .today-equity-card:hover,
+#tradingpage > .grid.two:has(.today-ai-notes-card) > .today-ai-notes-card:hover{
+  transform:translateY(-2px)!important;
+  border-color:var(--hairline-strong)!important;
+  box-shadow:var(--shadow)!important;
+}
+#tradingpage > .grid.two:has(#syncStatus) > .card > *,
+#tradingpage > .grid.two:has(#todayMetrics) > .card > *,
+#tradingpage > .grid.two:has(.today-equity-card) > .today-equity-card > *,
+#tradingpage > .grid.two:has(.today-ai-notes-card) > .today-ai-notes-card > *{
+  position:relative!important;
+  z-index:1!important;
+}
+#tradingpage #syncStatus{
+  background:transparent!important;
+  border:0!important;
+  padding:0!important;
+  color:var(--ink)!important;
+  text-align:left!important;
+}
+#tradingpage #syncStatus .rr-bento-grid,
+#tradingpage #todayMetrics.today-metrics.bento-grid{
+  display:grid!important;
+  gap:12px!important;
+  margin-top:16px!important;
+}
+#tradingpage #syncStatus .rr-bento-grid{
+  grid-template-columns:repeat(3,minmax(0,1fr))!important;
+}
+#tradingpage #todayMetrics.today-metrics.bento-grid{
+  grid-template-columns:repeat(2,minmax(0,1fr))!important;
+}
+#tradingpage #syncStatus .rr-tile,
+#tradingpage #todayMetrics .card.bento-tile{
+  position:relative!important;
+  background:var(--surface-2)!important;
+  background-image:none!important;
+  border:1px solid var(--hairline)!important;
+  border-radius:var(--radius-card)!important;
+  padding:16px!important;
+  min-width:0!important;
+  overflow:hidden!important;
+  display:flex!important;
+  flex-direction:column!important;
+  gap:8px!important;
+  box-shadow:none!important;
+  transition:transform var(--dur-base) var(--ease-out),border-color var(--dur-base) var(--ease-out),background-color var(--dur-base) var(--ease-out)!important;
+}
+#tradingpage #syncStatus .rr-tile:hover,
+#tradingpage #todayMetrics .card.bento-tile:hover,
+#tradingpage #syncStatus .rr-tile:focus-within,
+#tradingpage #todayMetrics .card.bento-tile:focus-within{
+  transform:translateY(-2px)!important;
+  border-color:var(--hairline-strong)!important;
+  background:var(--surface-1)!important;
+}
+#tradingpage .today-equity-card .today-equity-chart{
+  position:relative!important;
+  height:320px!important;
+  min-height:320px!important;
+  margin-top:16px!important;
+  background:var(--surface-2)!important;
+  border:1px solid var(--hairline)!important;
+  border-radius:var(--radius-control)!important;
+  padding:12px!important;
+  overflow:hidden!important;
+}
+#tradingpage .today-equity-card .today-equity-chart canvas{
+  width:100%!important;
+  height:100%!important;
+  display:block!important;
+}
+#tradingpage .today-equity-card .empty-chart{
+  display:grid!important;
+  place-items:center!important;
+  min-height:100%!important;
+  padding:24px!important;
+  color:var(--muted)!important;
+  text-align:center!important;
+  line-height:1.5!important;
+}
+#tradingpage .today-ai-notes-card .insights{
+  display:grid!important;
+  gap:10px!important;
+  margin-top:16px!important;
+  min-height:0!important;
+}
+#tradingpage .today-ai-notes-card .insight,
+#tradingpage .today-ai-notes-card .insight.empty{
+  position:relative!important;
+  margin:0!important;
+  padding:14px 16px!important;
+  background:var(--surface-2)!important;
+  border:1px solid var(--hairline)!important;
+  border-left:3px solid var(--hairline-strong)!important;
+  border-radius:var(--radius-control)!important;
+  color:var(--muted)!important;
+  line-height:1.5!important;
+}
+#tradingpage .today-ai-notes-card .insight.good{border-left-color:var(--success)!important;}
+#tradingpage .today-ai-notes-card .insight.warn{border-left-color:var(--warning)!important;}
+#tradingpage .today-ai-notes-card .insight.danger{border-left-color:var(--danger)!important;}
+#tradingpage .today-ai-notes-card .insight strong{
+  color:var(--ink)!important;
+  font-size:13px!important;
+  font-weight:600!important;
+}
+@media (max-width:1100px){
+  #tradingpage #syncStatus .rr-bento-grid{
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  }
+}
+@media (max-width:760px){
+  #tradingpage > .grid.two:has(#syncStatus),
+  #tradingpage > .grid.two:has(#todayMetrics){
+    grid-template-columns:1fr!important;
+  }
+  #tradingpage #syncStatus .rr-bento-grid,
+  #tradingpage #todayMetrics.today-metrics.bento-grid{
+    grid-template-columns:1fr!important;
+  }
+  #tradingpage > .grid.two:has(#syncStatus) > .card,
+  #tradingpage > .grid.two:has(#todayMetrics) > .card,
+  #tradingpage > .grid.two:has(.today-equity-card) > .today-equity-card,
+  #tradingpage > .grid.two:has(.today-ai-notes-card) > .today-ai-notes-card{
+    padding:16px!important;
+  }
+}
 
 </style>
 <style>
