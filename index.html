@@ -325,18 +325,17 @@ function renderUserProfile() {
   }
 
   // Stats
+  const statTrades = document.getElementById('profStatTrades');
+  const statBalance = document.getElementById('profStatBalance');
   const statBroker = document.getElementById('profStatBroker');
-  const balanceCard = document.getElementById('profileBalanceStatCard');
-  const tradesCard = document.getElementById('profileTradesStatCard');
-  const depositCard = document.getElementById('profileDepositStatCard');
+  const statDeposit = document.getElementById('profStatDeposit');
 
   const m = typeof accountMetrics === 'function' ? accountMetrics(trades || []) : null;
   const broker = typeof getSyncedBrokerInfo === 'function' ? getSyncedBrokerInfo() : null;
-  const profileTimeline = buildStatTimeline(trades || [], m);
 
-  if (balanceCard) balanceCard.innerHTML = buildStatCard('Current Balance', m ? `$${m.currentBalance.toFixed(2)}` : '$0.00', {label:m ? `Starting balance $${m.startBalance.toFixed(2)}` : 'Account setup required', tone:m && m.currentBalance>=m.startBalance?'positive':'neutral', valueTone:m && m.currentBalance>=m.startBalance?'positive':'neutral', sparkKey:'profile-balance'}, 'chart-bar', statSeries(profileTimeline,'currentBalance'));
-  if (tradesCard) tradesCard.innerHTML = buildStatCard('Journaled Trades', `${(trades || []).length} trades`, {label:'Total trades saved in database', tone:'neutral'}, 'book-open', []);
-  if (depositCard) depositCard.innerHTML = buildStatCard('Initial Deposit', m ? `$${m.startBalance.toFixed(2)}` : '$0.00', {label:'Configured starting balance', tone:'neutral'}, 'target', []);
+  if (statTrades) statTrades.textContent = (trades || []).length + ' trades';
+  if (statBalance) statBalance.textContent = m ? `$${m.currentBalance.toFixed(2)}` : '$0.00';
+  if (statDeposit) statDeposit.textContent = m ? `$${m.startBalance.toFixed(2)}` : '$0.00';
   if (statBroker) statBroker.textContent = broker ? `${broker.platform} (${broker.account})` : 'MetaTrader 5';
 }
 
@@ -473,7 +472,7 @@ button,input,select,textarea{font-family:inherit}
 .nav{display:flex;flex-direction:column;gap:7px}
 .nav button{
   background:transparent;border:1px solid transparent;color:var(--muted);cursor:pointer;
-  padding:12px 13px;border-radius:var(--radius-pill);display:flex;align-items:center;gap:10px;text-align:left
+  padding:12px 13px;border-radius:15px;display:flex;align-items:center;gap:10px;text-align:left
 }
 .nav button.active{background:rgba(255,255,255,.06);border-color:var(--border);color:var(--text)}
 .nav button:hover{background:rgba(255,255,255,.04)}
@@ -499,7 +498,7 @@ button,input,select,textarea{font-family:inherit}
 .hero p{color:var(--muted);line-height:1.65;max-width:860px;margin:12px 0 0}
 
 .quick-actions{display:flex;flex-direction:column;gap:10px;min-width:210px}
-.btn{border:1px solid var(--border);background:rgba(255,255,255,.055);color:var(--text);border-radius:var(--radius-md);padding:12px 14px;cursor:pointer}
+.btn{border:1px solid var(--border);background:rgba(255,255,255,.055);color:var(--text);border-radius:var(--radius-control);padding:12px 14px;cursor:pointer}
 .btn.primary{background:linear-gradient(135deg,#90efbd,#71e6aa);color:#06110c;font-weight:900;border:0}
 .btn:hover{transform:translateY(-1px)}
 
@@ -577,7 +576,7 @@ button,input,select,textarea{font-family:inherit}
   gap:6px;
   min-height:26px;
   padding:5px 8px;
-  border-radius:var(--radius-pill);
+  border-radius:999px;
   border:1px solid var(--border);
   background:rgba(255,255,255,.045);
   color:var(--muted);
@@ -621,7 +620,7 @@ button,input,select,textarea{font-family:inherit}
 .widget-icon-btn{
   width:32px;
   height:32px;
-  border-radius:var(--radius-pill);
+  border-radius:10px;
   border:1px solid var(--border);
   background:rgba(255,255,255,.045);
   color:var(--text);
@@ -641,7 +640,7 @@ button,input,select,textarea{font-family:inherit}
 .filters{display:flex;gap:9px;flex-wrap:wrap;margin-bottom:14px}
 .filters input,.filters select,.editor textarea,.editor input{
   background:rgba(255,255,255,.045);border:1px solid var(--border);color:var(--text);
-  border-radius:var(--radius-md);padding:10px 12px;outline:none
+  border-radius:14px;padding:10px 12px;outline:none
 }
 .filters input:focus,.filters select:focus,.editor textarea:focus,.editor input:focus{border-color:rgba(113,230,170,.5);box-shadow:0 0 0 4px rgba(113,230,170,.06)}
 
@@ -651,7 +650,7 @@ th,td{padding:var(--space-3) var(--space-4);border-bottom:1px solid rgba(255,255
 th{font-size:10px;color:var(--faint);font-family:var(--mono);letter-spacing:.13em;text-transform:uppercase;background:rgba(255,255,255,.025)}
 td{color:var(--muted)}
 tr:hover td{background:rgba(255,255,255,.028)}
-.badge{display:inline-flex;align-items:center;border-radius:var(--radius-pill);padding:4px 8px;font-size:11px;font-weight:800;margin:1px}
+.badge{display:inline-flex;align-items:center;border-radius:999px;padding:4px 8px;font-size:11px;font-weight:800;margin:1px}
 .buy{color:var(--blue);background:rgba(139,184,255,.14)}.sell{color:var(--amber);background:rgba(255,211,110,.14)}
 .win{color:var(--green);background:rgba(113,230,170,.12)}.loss{color:var(--red);background:rgba(255,119,136,.12)}.breakeven{color:var(--muted)!important;background:rgba(255,255,255,.045)!important}.tag{color:var(--purple);background:rgba(197,166,255,.12)}
 
@@ -725,7 +724,7 @@ tr:hover td{background:rgba(255,255,255,.028)}
   height:100%;
   min-height:180px;
   border:1px dashed var(--border2);
-  border-radius:var(--radius-card) !important;
+  border-radius:18px;
   display:flex;
   align-items:center;
   justify-content:center;
@@ -1164,7 +1163,7 @@ td{
   background:#111!important;
   color:#f5f1e8!important;
   border:1px solid rgba(212,175,55,.16)!important;
-  border-radius:var(--radius-md);
+  border-radius:14px;
   padding:11px 12px;
   outline:none;
 }
@@ -1363,7 +1362,7 @@ td{
 .calendar-kpi-card{
   background:linear-gradient(180deg,rgba(255,255,255,.04),rgba(255,255,255,.02))!important;
   border:1px solid var(--hairline)!important;
-  border-radius:var(--radius-card) !important;
+  border-radius:18px;
   padding:var(--space-4);
   box-shadow:0 18px 34px rgba(0,0,0,.18);
 }
@@ -1397,7 +1396,7 @@ td{
   display:inline-flex;
   align-items:center;
   gap:6px;
-  border-radius:var(--radius-pill);
+  border-radius:999px;
   padding:5px 10px;
   background:rgba(255,255,255,.04);
   color:var(--muted);
@@ -1419,7 +1418,7 @@ td{
   flex-direction:column;
   gap:var(--space-3);
   padding:var(--space-4);
-  border-radius:var(--radius-card);
+  border-radius:22px;
   border:1px solid var(--hairline);
   background:linear-gradient(180deg,rgba(255,255,255,.035),rgba(255,255,255,.018))!important;
   box-shadow:0 18px 38px rgba(0,0,0,.20);
@@ -1444,7 +1443,7 @@ td{
   display:inline-flex;
   align-items:center;
   gap:6px;
-  border-radius:var(--radius-pill);
+  border-radius:999px;
   padding:6px 10px;
   font-size:11px;
   color:var(--muted);
@@ -1622,7 +1621,7 @@ td{
   width:min(980px,96vw);
   max-height:88vh;
   overflow:auto;
-  border-radius:var(--radius-card);
+  border-radius:28px;
   background:linear-gradient(180deg,rgba(16,21,33,.98),rgba(9,13,20,.98));
   border:1px solid var(--border2);
   box-shadow:0 30px 90px rgba(0,0,0,.48);
@@ -1913,7 +1912,7 @@ body.modal-open .main{
   background:rgba(255,255,255,.045);
   border:1px solid var(--border);
   color:var(--text);
-  border-radius:var(--radius-md);
+  border-radius:14px;
   padding:11px 12px;
   outline:none;
 }
@@ -1928,7 +1927,7 @@ body.modal-open .main{
   background:rgba(255,255,255,.045);
   border:1px solid var(--border);
   color:var(--text);
-  border-radius:var(--radius-md);
+  border-radius:16px;
   padding:12px 13px;
   outline:none;
 }
@@ -1969,7 +1968,7 @@ body.modal-open .main{
   background:rgba(255,255,255,.045);
   border:1px solid var(--border);
   color:var(--text);
-  border-radius:var(--radius-md);
+  border-radius:14px;
   padding:11px 12px;
 }
 .journal-result-tabs{
@@ -2021,7 +2020,7 @@ body.modal-open .main{
 }
 .file-picker-btn{
   min-height:42px;
-  border-radius:var(--radius-md)!important;
+  border-radius:13px!important;
   background:linear-gradient(135deg,rgba(121,230,242,.92),rgba(113,230,170,.92))!important;
   color:#071018!important;
   border:0!important;
@@ -2095,7 +2094,7 @@ body.modal-open .main{
 .journal-category-badge{
   display:inline-flex;
   padding:4px 9px;
-  border-radius:var(--radius-pill);
+  border-radius:999px;
   background:rgba(139,184,255,.12);
   color:var(--blue);
   font-size:11px;
@@ -2163,19 +2162,19 @@ body.modal-open .main{
 /* Calendar Trade Journal Upgrade */
 .calendar-day.clickable{cursor:pointer}
 .calendar-day.clickable::after{content:"Open trades";font-family:var(--mono);font-size:9px;letter-spacing:.10em;text-transform:uppercase;color:var(--faint);opacity:.86}
-.day-trades-modal{width:min(1050px,96vw);max-height:88vh;overflow:auto;border-radius:var(--radius-card);background:linear-gradient(180deg,rgba(18,18,18,.98),rgba(8,8,8,.98));border:1px solid var(--border2);box-shadow:0 30px 90px rgba(0,0,0,.52);padding:22px}
+.day-trades-modal{width:min(1050px,96vw);max-height:88vh;overflow:auto;border-radius:28px;background:linear-gradient(180deg,rgba(18,18,18,.98),rgba(8,8,8,.98));border:1px solid var(--border2);box-shadow:0 30px 90px rgba(0,0,0,.52);padding:22px}
 .day-trade-list{display:grid;gap:12px;margin-top:16px}
-.day-trade-card{display:grid;grid-template-columns:1fr auto;gap:14px;align-items:center;padding:15px;border-radius:var(--radius-card);background:rgba(255,255,255,.035);border:1px solid var(--border);cursor:pointer}
+.day-trade-card{display:grid;grid-template-columns:1fr auto;gap:14px;align-items:center;padding:15px;border-radius:18px;background:rgba(255,255,255,.035);border:1px solid var(--border);cursor:pointer}
 .day-trade-card:hover{border-color:rgba(212,175,55,.28);background:rgba(212,175,55,.045)}
 .day-trade-title{font-weight:900;color:var(--text)}
 .day-trade-meta{margin-top:5px;color:var(--muted);font-size:12px;line-height:1.55}
-.journal-trade-box{padding:14px;border-radius:var(--radius-card);background:rgba(107,79,214,.045);border:1px solid rgba(107,79,214,.13);color:var(--muted);line-height:1.55}
+.journal-trade-box{padding:14px;border-radius:18px;background:rgba(107,79,214,.045);border:1px solid rgba(107,79,214,.13);color:var(--muted);line-height:1.55}
 .journal-trade-box strong{color:var(--text)}
 .screenshot-preview{display:none;margin-top:10px;border-radius:18px;border:1px solid var(--border);overflow:hidden;background:#0d0d0d}
 .screenshot-preview img{width:100%;display:block;max-height:280px;object-fit:contain}
 .saved-screenshot{margin-top:12px;border-radius:18px;border:1px solid var(--border);overflow:hidden;background:#0d0d0d}
 .saved-screenshot img{width:100%;display:block;max-height:360px;object-fit:contain}
-.trade-journal-tag{display:inline-flex;padding:4px 9px;border-radius:var(--radius-pill);background:rgba(107,79,214,.10);color:#d1c2ff;font-size:11px;font-weight:900;margin-left:6px}
+.trade-journal-tag{display:inline-flex;padding:4px 9px;border-radius:999px;background:rgba(107,79,214,.10);color:#d1c2ff;font-size:11px;font-weight:900;margin-left:6px}
 
 .journal-status-btn{display:inline-flex;align-items:center;gap:6px;border-radius:var(--radius-pill);padding:7px 10px;border:1px solid var(--border);font-size:12px;font-weight:900;cursor:pointer;white-space:nowrap;background:rgba(212,175,55,.055);color:var(--muted)}
 .journal-status-btn.done{background:rgba(184,216,176,.10);border-color:rgba(184,216,176,.20);color:#b8d8b0}
@@ -2293,105 +2292,6 @@ body.modal-open .main{
   margin-top:7px;
   font-size:25px;
   font-weight:900;
-}
-.stat-card{
-  background:linear-gradient(180deg,var(--surface-2),var(--surface-1));
-  border:1px solid var(--hairline);
-  border-radius:var(--radius-card);
-  box-shadow:0 16px 32px rgba(0,0,0,.22);
-  padding:16px;
-  min-width:0;
-  overflow:hidden;
-}
-.stat-card-content{
-  display:flex;
-  flex-direction:column;
-  gap:12px;
-  min-width:0;
-  height:100%;
-}
-.stat-card-header{
-  display:flex;
-  align-items:flex-start;
-  gap:10px;
-}
-.stat-card-icon-badge{
-  display:grid;
-  place-items:center;
-  flex:0 0 32px;
-  width:32px;
-  height:32px;
-  border:1px solid rgba(73,79,223,.28);
-  border-radius:var(--radius-control);
-  background:rgba(73,79,223,.12);
-  color:var(--primary);
-}
-.stat-card-heading{
-  display:flex;
-  flex-direction:column;
-  gap:3px;
-  min-width:0;
-}
-.stat-card-label{
-  color:var(--mute);
-  font-size:11px;
-  font-weight:600;
-  letter-spacing:.12em;
-  line-height:1.25;
-  text-transform:uppercase;
-}
-.stat-card-updated{
-  color:var(--faint);
-  font-size:11px;
-  line-height:1.25;
-}
-.stat-card-value{
-  color:var(--primary);
-  font-family:var(--sans);
-  font-size:clamp(26px,4vw,34px);
-  font-weight:700;
-  letter-spacing:-.03em;
-  line-height:1.05;
-  min-width:0;
-  overflow:hidden;
-  text-overflow:ellipsis;
-  white-space:nowrap;
-}
-.stat-card-value.negative{color:var(--loss);}
-.stat-card-value.positive{color:var(--success);}
-.stat-card-trend{
-  display:flex;
-  align-items:center;
-  gap:5px;
-  min-height:18px;
-  color:var(--muted);
-  font-size:12px;
-  line-height:1.35;
-}
-.stat-card-trend.positive{color:var(--success);}
-.stat-card-trend.negative{color:var(--loss);}
-.stat-card-trend.neutral{color:var(--muted);}
-.stat-card-divider{
-  width:100%;
-  height:1px;
-  background:var(--hairline);
-}
-.stat-card-content .stat-sparkline{
-  margin-top:auto;
-  min-height:52px;
-  height:52px;
-}
-.stat-card-content .stat-sparkline-svg{
-  width:100%;
-  height:52px;
-  display:block;
-  overflow:visible;
-}
-.stat-card-content .stat-sparkline-svg polyline{
-  filter:drop-shadow(0 0 5px rgba(73,79,223,.4));
-}
-.stat-card-content .stat-sparkline-svg circle{
-  filter:drop-shadow(0 0 6px rgba(73,79,223,.5));
 }
 @media(max-width:900px){
   .ai-lab-grid{grid-template-columns:1fr}
@@ -2534,7 +2434,7 @@ body, .app, .main, .section, .card, .nav button,
 input, textarea, select {
   background: #0d0e11 !important;
   border: 1px solid #23252a !important;
-  border-radius: var(--radius-md) !important;
+  border-radius: 8px !important;
   padding: 8px 12px !important;
   color: #f7f8f8 !important;
   font-size: 14px !important;
@@ -2743,7 +2643,7 @@ tr:hover {
   backdrop-filter: blur(28px) !important;
   -webkit-backdrop-filter: blur(28px) !important;
   border: 1px solid rgba(255, 255, 255, 0.12) !important;
-  border-radius: var(--radius-card);
+  border-radius: 24px !important;
   box-shadow: 0 0 100px rgba(59, 130, 246, 0.35),
               0 0 140px rgba(16, 185, 129, 0.3),
               0 30px 90px rgba(0, 0, 0, 0.95) !important;
@@ -2831,7 +2731,7 @@ tr:hover {
   backdrop-filter: blur(32px) !important;
   -webkit-backdrop-filter: blur(32px) !important;
   border: 1px solid rgba(255, 255, 255, 0.14) !important;
-  border-radius: var(--radius-card);
+  border-radius: 24px !important;
   box-shadow: 0 0 120px rgba(168, 85, 247, 0.4),
               0 0 160px rgba(16, 185, 129, 0.35),
               0 30px 90px rgba(0, 0, 0, 0.95) !important;
@@ -3074,7 +2974,7 @@ tr:hover {
   background: rgba(73, 79, 223, 0.12);
   border: 1px solid rgba(73, 79, 223, 0.24);
   padding: 4px 10px;
-  border-radius: var(--radius-pill);
+  border-radius: 9999px;
   margin-bottom: 8px;
 }
 .unjournaled-banner h3 {
@@ -3093,7 +2993,7 @@ tr:hover {
 .live-controller-card {
   background: var(--canvas);
   border: 1px solid var(--hairline);
-  border-radius: var(--radius-card);
+  border-radius: 16px;
   padding: 24px;
   margin-bottom: 24px;
   box-shadow: 0 12px 30px rgba(0,0,0,0.28);
@@ -3109,7 +3009,7 @@ tr:hover {
   align-items: center;
   gap: 8px;
   padding: 6px 14px;
-  border-radius: var(--radius-pill);
+  border-radius: 9999px;
   font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.04em;
@@ -3128,7 +3028,7 @@ tr:hover {
 .live-metric-box {
   background: rgba(255, 255, 255, 0.03);
   border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: var(--radius-card);
+  border-radius: 12px;
   padding: 14px 16px;
 }
 .live-metric-label { font-size: 11px; color: var(--muted); text-transform: uppercase; margin-bottom: 4px; }
@@ -3213,7 +3113,7 @@ tr:hover {
 .synced-broker-header-card {
   background: linear-gradient(135deg, rgba(15, 23, 42, 0.85), rgba(30, 41, 59, 0.7));
   border: 1px solid rgba(34, 197, 94, 0.3);
-  border-radius: var(--radius-card);
+  border-radius: 16px;
   padding: 18px 24px;
   margin-bottom: 24px;
   display: flex;
@@ -3249,7 +3149,7 @@ tr:hover {
 .profile-card-hero {
   background: linear-gradient(135deg, rgba(30, 41, 59, 0.8), rgba(15, 23, 42, 0.95));
   border: 1px solid rgba(168, 85, 247, 0.3);
-  border-radius: var(--radius-card);
+  border-radius: 20px;
   padding: 28px;
   box-shadow: 0 12px 35px rgba(0, 0, 0, 0.4);
 }
@@ -3351,7 +3251,7 @@ tr:hover {
     min-width: 90px !important;
     height: 42px !important;
     padding: 0 14px !important;
-    border-radius: var(--radius-pill) !important;
+    border-radius: 9999px !important;
     font-size: 13px !important;
     font-weight: 600 !important;
     display: inline-flex !important;
@@ -3409,7 +3309,7 @@ tr:hover {
     max-height: 85vh !important;
     overflow-y: auto !important;
     padding: 20px !important;
-    border-radius: var(--radius-card);
+    border-radius: 16px !important;
   }
 }
 </style>
@@ -3519,7 +3419,7 @@ tr:hover {
         .nav-list { flex: 1 !important; list-style: none !important; overflow-y: auto !important; }
         .nav-link {
             display: flex !important; align-items: center !important; justify-content: flex-start !important; gap: 12px !important;
-            padding: 0.75rem 1rem !important; border-radius: var(--radius-pill) !important;
+            padding: 0.75rem 1rem !important; border-radius: var(--radius-control) !important;
             color: var(--text-muted) !important; text-decoration: none !important;
             font-weight: 500 !important; transition: all 0.2s !important;
             background: transparent !important; border: none !important; width: 100% !important;
@@ -3792,7 +3692,7 @@ tr:hover {
           <div style="flex:1;">
             <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
               <h2 style="margin:0; font-size:26px; color:#fff;" id="userProfileName">Kavya</h2>
-              <span class="badge" style="background:rgba(34,197,94,0.15); color:#4ade80; border:1px solid rgba(34,197,94,0.3); padding:4px 12px; border-radius:var(--radius-pill); font-size:11px; font-weight:700;">✓ GOOGLE ACCOUNT AUTHORIZED</span>
+              <span class="badge" style="background:rgba(34,197,94,0.15); color:#4ade80; border:1px solid rgba(34,197,94,0.3); padding:4px 12px; border-radius:9999px; font-size:11px; font-weight:700;">✓ GOOGLE ACCOUNT AUTHORIZED</span>
             </div>
             <p style="margin:6px 0 0 0; font-size:15px; color:#94a3b8;" id="userProfileEmail">krishnacnjack@gmail.com</p>
             <div style="margin-top:10px; font-size:12px; color:#cbd5e1;" id="userProfileMeta">Active Session &bull; Verified Trader Account</div>
@@ -3801,21 +3701,33 @@ tr:hover {
       </div>
 
       <div class="goal-card-grid" style="margin-top:24px;">
-        <div class="goal-card stat-card" id="profileBalanceStatCard"></div>
+        <div class="goal-card">
+          <div class="goal-card-label">Current Balance</div>
+          <div class="goal-card-value green" id="profStatBalance">$0.00</div>
+          <div class="goal-card-sub">Real-time balance calculated from synced trades</div>
+        </div>
         <div class="goal-card">
           <div class="goal-card-label">Connected Platform</div>
           <div class="goal-card-value green" id="profStatBroker">MetaTrader 5</div>
           <div class="goal-card-sub">Active auto-sync broker source</div>
         </div>
-        <div class="goal-card stat-card" id="profileTradesStatCard"></div>
-        <div class="goal-card stat-card" id="profileDepositStatCard"></div>
+        <div class="goal-card">
+          <div class="goal-card-label">Journaled Trades</div>
+          <div class="goal-card-value neutral" id="profStatTrades">0 trades</div>
+          <div class="goal-card-sub">Total trades saved in database</div>
+        </div>
+        <div class="goal-card">
+          <div class="goal-card-label">Initial Deposit</div>
+          <div class="goal-card-value neutral" id="profStatDeposit">$0.00</div>
+          <div class="goal-card-sub">Configured starting balance</div>
+        </div>
       </div>
 
       <div class="card" style="margin-top:24px;">
         <div class="panel-title"><h3>Profile Settings</h3><span>Customize Account</span></div>
         <div style="display:grid; gap:16px; max-width:520px; margin-top:16px;">
           <label style="display:block; font-size:13px; color:#94a3b8; font-weight:600;">DISPLAY TRADER NAME
-            <input type="text" id="customUsernameInput" style="width:100%; border-radius:var(--radius-md); padding:12px; background:rgba(255,255,255,0.06); color:#fff; margin-top:6px;" placeholder="Enter custom display name..." oninput="handleLiveUsernameInput(this.value)">
+            <input type="text" id="customUsernameInput" style="width:100%; border-radius:var(--radius-control); padding:12px; background:rgba(255,255,255,0.06); color:#fff; margin-top:6px;" placeholder="Enter custom display name..." oninput="handleLiveUsernameInput(this.value)">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-top:6px; flex-wrap:wrap; gap:6px;">
               <span id="nameChangeLimitBadge" style="font-size:12px; color:#a855f7; font-weight:600;">Name changes remaining this month: 2 of 2</span>
               <span style="font-size:11px; color:#64748b;">Limit: Max 2 name changes / month</span>
@@ -3839,7 +3751,7 @@ tr:hover {
 
         <div style="margin-bottom: 16px;">
           <label style="display:block; font-size:11px; text-transform:uppercase; color:rgba(255,255,255,0.4); margin-bottom:4px;">Trading Platform / Broker</label>
-          <select id="brokerPlatformSelect" onchange="onBrokerPlatformChange()" style="width:100% !important; border-radius:var(--radius-md) !important; padding:8px 12px !important; height: 38px !important; background: rgba(255,255,255,0.06); color: #fff;">
+          <select id="brokerPlatformSelect" onchange="onBrokerPlatformChange()" style="width:100% !important; border-radius:var(--radius-control) !important; padding:8px 12px !important; height: 38px !important; background: rgba(255,255,255,0.06); color: #fff;">
             <option value="matchtrader" selected>MatchTrader (Direct Cloud Sync)</option>
             <option value="ctrader">cTrader (Direct Cloud Sync)</option>
             <option value="mt5">MetaTrader 5 (HTML Report / Desktop App)</option>
@@ -3850,12 +3762,12 @@ tr:hover {
         <div id="fieldsMt5" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 16px;">
           <div>
             <label style="display:block; font-size:11px; text-transform:uppercase; color:rgba(255,255,255,0.4); margin-bottom:4px;">MT5 Account Login (Optional)</label>
-            <input type="number" id="brokerSyncLogin" placeholder="Active account number..." style="width:100% !important; border-radius:var(--radius-md) !important; padding:8px 12px !important;">
+            <input type="number" id="brokerSyncLogin" placeholder="Active account number..." style="width:100% !important; border-radius:var(--radius-control) !important; padding:8px 12px !important;">
             <div style="font-size:10px; color:rgba(255,255,255,0.4); margin-top:3px;">Found at the top bar of MT5 or in your broker dashboard credentials email. Leave blank if MT5 is already active.</div>
           </div>
           <div>
             <label style="display:block; font-size:11px; text-transform:uppercase; color:rgba(255,255,255,0.4); margin-bottom:4px;">MT5 Server Name (Optional)</label>
-            <input type="text" id="brokerSyncServer" placeholder="e.g. FundingPips-Server..." style="width:100% !important; border-radius:var(--radius-md) !important; padding:8px 12px !important;">
+            <input type="text" id="brokerSyncServer" placeholder="e.g. FundingPips-Server..." style="width:100% !important; border-radius:var(--radius-control) !important; padding:8px 12px !important;">
           </div>
         </div>
 
@@ -3863,16 +3775,16 @@ tr:hover {
         <div id="fieldsMatchtrader" style="display: none; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 16px;">
           <div>
             <label style="display:block; font-size:11px; text-transform:uppercase; color:rgba(255,255,255,0.4); margin-bottom:4px;">MatchTrader Platform URL</label>
-            <input type="text" id="matchtraderUrl" placeholder="https://matchtrader.fundingpips.com" style="width:100% !important; border-radius:var(--radius-md) !important; padding:8px 12px !important;">
+            <input type="text" id="matchtraderUrl" placeholder="https://matchtrader.fundingpips.com" style="width:100% !important; border-radius:var(--radius-control) !important; padding:8px 12px !important;">
           </div>
           <div>
             <label style="display:block; font-size:11px; text-transform:uppercase; color:rgba(255,255,255,0.4); margin-bottom:4px;">Account Email / Username</label>
-            <input type="text" id="matchtraderEmail" placeholder="Your account email..." style="width:100% !important; border-radius:var(--radius-md) !important; padding:8px 12px !important;">
+            <input type="text" id="matchtraderEmail" placeholder="Your account email..." style="width:100% !important; border-radius:var(--radius-control) !important; padding:8px 12px !important;">
             <div style="font-size:10px; color:rgba(255,255,255,0.4); margin-top:3px;">Use the email address registered with your prop firm / MatchTrader account.</div>
           </div>
           <div>
             <label style="display:block; font-size:11px; text-transform:uppercase; color:rgba(255,255,255,0.4); margin-bottom:4px;">Password</label>
-            <input type="password" id="matchtraderPassword" placeholder="MatchTrader password..." style="width:100% !important; border-radius:var(--radius-md) !important; padding:8px 12px !important;">
+            <input type="password" id="matchtraderPassword" placeholder="MatchTrader password..." style="width:100% !important; border-radius:var(--radius-control) !important; padding:8px 12px !important;">
           </div>
         </div>
 
@@ -3880,18 +3792,18 @@ tr:hover {
         <div id="fieldsCtrader" style="display: none; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 16px;">
           <div>
             <label style="display:block; font-size:11px; text-transform:uppercase; color:rgba(255,255,255,0.4); margin-bottom:4px;">cTrader Access Token</label>
-            <input type="text" id="ctraderToken" placeholder="Spotware cTrader API Access Token..." style="width:100% !important; border-radius:var(--radius-md) !important; padding:8px 12px !important;">
+            <input type="text" id="ctraderToken" placeholder="Spotware cTrader API Access Token..." style="width:100% !important; border-radius:var(--radius-control) !important; padding:8px 12px !important;">
           </div>
           <div>
             <label style="display:block; font-size:11px; text-transform:uppercase; color:rgba(255,255,255,0.4); margin-bottom:4px;">cTrader Account ID (Optional)</label>
-            <input type="text" id="ctraderAccountId" placeholder="e.g. 1234567..." style="width:100% !important; border-radius:var(--radius-md) !important; padding:8px 12px !important;">
+            <input type="text" id="ctraderAccountId" placeholder="e.g. 1234567..." style="width:100% !important; border-radius:var(--radius-control) !important; padding:8px 12px !important;">
             <div style="font-size:10px; color:rgba(255,255,255,0.4); margin-top:3px;">Shown at top-left of cTrader app next to your account name.</div>
           </div>
         </div>
 
         <div style="margin-bottom: 16px;">
           <label style="display:block; font-size:11px; text-transform:uppercase; color:rgba(255,255,255,0.4); margin-bottom:4px;">Sync Window</label>
-          <select id="brokerSyncDays" style="width:100% !important; border-radius:var(--radius-md) !important; padding:8px 12px !important; height: 38px !important;">
+          <select id="brokerSyncDays" style="width:100% !important; border-radius:var(--radius-control) !important; padding:8px 12px !important; height: 38px !important;">
             <option value="7">Last 7 Days</option>
             <option value="30" selected>Last 30 Days</option>
             <option value="90">Last 90 Days</option>
@@ -4036,10 +3948,25 @@ tr:hover {
 
     <section id="tradingpage" class="section active">
       <div class="command-center" id="commandCenter">
-        <div class="cmd-card stat-card" id="cmdTodayPnlCard"></div>
-        <div class="cmd-card stat-card" id="cmdDailyLossCard"></div>
-        <div class="cmd-card stat-card" id="cmdTradesCard"></div>
-        <div class="cmd-card stat-card" id="cmdRuleBreaksCard"></div>
+        <div class="cmd-card stat-card">
+          <div class="cmd-label">Today P&L</div>
+          <div class="cmd-value" id="cmdTodayPnl">$0.00</div>
+          <div class="stat-sparkline" id="cmdTodayPnlSparkline"></div>
+        </div>
+        <div class="cmd-card stat-card">
+      <div class="cmd-label">Daily Loss Used</div>
+      <div class="cmd-value" id="cmdDailyLoss">$0.00 / not set</div>
+          <div class="stat-sparkline" id="cmdDailyLossSparkline"></div>
+        </div>
+        <div class="cmd-card stat-card">
+          <div class="cmd-label">Trades</div>
+          <div class="cmd-value" id="cmdTrades">0 / not set</div>
+          <div class="stat-sparkline" id="cmdTradesSparkline"></div>
+        </div>
+        <div class="cmd-card">
+          <div class="cmd-label">Rule Breaks</div>
+          <div class="cmd-value" id="cmdRuleBreaks">0</div>
+        </div>
         <div class="cmd-card">
           <div class="cmd-label">Best Next Action</div>
           <div class="cmd-value cmd-action" id="cmdNextAction">Wait for setup</div>
@@ -4979,13 +4906,7 @@ function showEmptyChart(id, message='Upload CSV to generate this chart.'){
   const wrap = canvas.parentElement;
   if(!wrap) return;
   wrap.setAttribute('data-chart-id', id);
-  wrap.innerHTML = `<div class="empty-chart" role="status">
-    <div class="empty-chart-icon" aria-hidden="true">
-      <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19V5"></path><path d="M4 19h16"></path><path d="m7 15 3-3 3 2 5-6"></path><path d="M18 8h-3V5"></path></svg>
-    </div>
-    <strong>No trade data yet</strong>
-    <span>${escapeHtml(message)}</span>
-  </div>`;
+  wrap.innerHTML = `<div class="empty-chart">${message}</div>`;
 }
 
 function ensureCanvas(id){
@@ -5327,30 +5248,37 @@ function renderAnalyticsBars(){
 }
 function renderMetrics(){
   const s=stats(filtered);
-  const cells=!filtered.length ? [
-    ['Net P&L','$0.00','neutral','Upload CSV to calculate','chart-bar'],
-    ['Win Rate','0%','neutral','No trades yet','activity'],
-    ['Profit Factor','0.00','neutral','No trades yet','target'],
-    ['Avg Win','$0.00','neutral','No trades yet','arrow-up-right'],
-    ['Avg Loss','$0.00','neutral','No trades yet','arrow-down-right'],
-    ['Max Drawdown','$0.00','neutral','No trades yet','shield'],
-    ['Mistake Count','0','neutral','No trades yet','meditation']
-  ] : [
-    ['Net P&L',fmt(s.pnl),pnlClass(s.pnl),'Total after commission/swap','chart-bar'],
-    ['Win Rate',pct(s.wr),scoreClass(s.wr,50,40),s.wins.length+'W / '+s.losses.length+'L / '+s.breakEvens.length+'BE','activity'],
-    ['Profit Factor',s.pf.toFixed(2),factorClass(s.pf),'Gross profit / gross loss','target'],
-    ['Avg Win',fmt(s.avgWin),pnlClass(s.avgWin),'Mean winning trade','arrow-up-right'],
-    ['Avg Loss',fmt(s.avgLoss),pnlClass(s.avgLoss),'Mean losing trade','arrow-down-right'],
-    ['Max Drawdown',fmt(s.maxDD),pnlClass(s.maxDD),'Worst equity dip','shield'],
-    ['Mistake Count',s.mistakeTotal,countClass(s.mistakeTotal),'Open dashboard: universal rule mistakes','meditation']
+
+  if(!filtered.length){
+    const cells=[
+      ['Net P&L','$0.00','neutral','Upload CSV to calculate'],
+      ['Win Rate','0%','neutral','No trades yet'],
+      ['Profit Factor','0.00','neutral','No trades yet'],
+      ['Avg Win','$0.00','neutral','No trades yet'],
+      ['Avg Loss','$0.00','neutral','No trades yet'],
+      ['Max Drawdown','$0.00','neutral','No trades yet'],
+      ['Mistake Count','0','neutral','No trades yet']
+    ];
+    document.getElementById('metrics').innerHTML=cells.map(c=>{
+      const isMistake = c[0] === 'Mistake Count';
+      return `<div class="card ${isMistake?'mistake-card-click':''}" ${isMistake?'onclick="openMistakeDashboard()"':''}><div class="label">${c[0]}</div><div class="value ${c[2]}">${c[1]}</div><div class="sub">${c[3]}</div></div>`;
+    }).join('');
+    return;
+  }
+
+  const cells=[
+    ['Net P&L',fmt(s.pnl),pnlClass(s.pnl),'Total after commission/swap'],
+    ['Win Rate',pct(s.wr),scoreClass(s.wr,50,40),s.wins.length+'W / '+s.losses.length+'L / '+s.breakEvens.length+'BE'],
+    ['Profit Factor',s.pf.toFixed(2),factorClass(s.pf),'Gross profit / gross loss'],
+    ['Avg Win',fmt(s.avgWin),pnlClass(s.avgWin),'Mean winning trade'],
+    ['Avg Loss',fmt(s.avgLoss),pnlClass(s.avgLoss),'Mean losing trade'],
+    ['Max Drawdown',fmt(s.maxDD),pnlClass(s.maxDD),'Worst equity dip'],
+    ['Mistake Count',s.mistakeTotal,countClass(s.mistakeTotal),'Open dashboard: universal rule mistakes']
   ];
-  const toneFor = tone => ['red','negative','loss','danger','warn'].includes(tone) ? 'negative' : (['green','positive','profit'].includes(tone) ? 'positive' : 'neutral');
-  document.getElementById('metrics').innerHTML=cells.map(c=>`<div class="stat-card analytics-stat-card">${buildStatCard(c[0],c[1],{label:c[3],tone:toneFor(c[2]),valueTone:toneFor(c[2]),action:c[0]==='Mistake Count'?'mistakes':''},c[4],[])}</div>`).join('');
-  document.querySelectorAll('#metrics [data-stat-action="mistakes"]').forEach(card=>{
-    card.tabIndex=0;
-    card.addEventListener('click',()=>openMistakeDashboard());
-    card.addEventListener('keydown',event=>{if(event.key==='Enter'||event.key===' ')openMistakeDashboard();});
-  });
+  document.getElementById('metrics').innerHTML=cells.map(c=>{
+      const isMistake = c[0] === 'Mistake Count';
+      return `<div class="card ${isMistake?'mistake-card-click':''}" ${isMistake?'onclick="openMistakeDashboard()"':''}><div class="label">${c[0]}</div><div class="value ${c[2]}">${c[1]}</div><div class="sub">${c[3]}</div></div>`;
+    }).join('');
 }
 
 function renderInsights(){
@@ -6402,34 +6330,14 @@ function buildCalendarSparkline(monthTrades, year, month){
   `;
 }
 
-function buildStatCard(label, value, trend, icon, sparklineData){
-  const info = trend && typeof trend === 'object' ? trend : {label:String(trend || 'No change data'), tone:'neutral'};
-  const tone = ['positive','negative','neutral'].includes(info.tone) ? info.tone : 'neutral';
-  const direction = info.direction === 'up' || (info.direction == null && tone === 'positive') ? 'arrow-up-right' : (info.direction === 'down' || (info.direction == null && tone === 'negative') ? 'arrow-down-right' : 'chart-bar');
-  const valueClass = ['positive','negative'].includes(info.valueTone) ? ` ${info.valueTone}` : '';
-  const actionAttr = info.action ? ` data-stat-action="${escapeHtml(info.action)}"` : '';
-  const valueAttr = info.valueId ? ` id="${escapeHtml(info.valueId)}"` : '';
-  const sparkline = Array.isArray(sparklineData) && sparklineData.length && info.sparkKey
-    ? statSparklineMarkup(sparklineData, info.sparkKey)
-    : '';
-  return `<div class="stat-card-content"${actionAttr}>
-    <div class="stat-card-header">
-      <div class="stat-card-icon-badge" aria-hidden="true"><re-icon icon="${escapeHtml(icon || 'activity')}" weight="outline" size="16"></re-icon></div>
-      <div class="stat-card-heading">
-        <div class="stat-card-label">${escapeHtml(label)}</div>
-        <div class="stat-card-updated">${escapeHtml(info.updated || 'Updated just now')}</div>
-      </div>
-    </div>
-    <div class="stat-card-value${valueClass}"${valueAttr}>${escapeHtml(String(value ?? '—'))}</div>
-    <div class="stat-card-trend ${tone}"><re-icon icon="${direction}" weight="outline" size="14"></re-icon><span>${escapeHtml(info.label || 'No change data')}</span></div>
-    <div class="stat-card-divider" aria-hidden="true"></div>
-    ${sparkline}
-  </div>`;
-}
-
 function buildCalendarMetricCard(label, value, subline, valueClass=''){
-  const tone = valueClass === 'red' ? 'negative' : (valueClass === 'green' ? 'positive' : 'neutral');
-  return `<div class="calendar-kpi-card stat-card">${buildStatCard(label, value, {label:subline, tone, valueTone:tone, sparkKey:`calendar-${String(label).toLowerCase().replace(/\s+/g,'-')}`}, label === 'Profit' ? 'chart-bar' : (label === 'Expenses' ? 'shield' : 'activity'), [])}</div>`;
+  return `
+    <div class="calendar-kpi-card">
+      <div class="calendar-kpi-label">${escapeHtml(label)}</div>
+      <div class="calendar-kpi-value ${valueClass}">${value}</div>
+      <div class="calendar-kpi-sub">${subline}</div>
+    </div>
+  `;
 }
 
 function renderCalendar(){
@@ -6778,27 +6686,20 @@ function statSeries(timeline, key, count=14){
   const series = (Array.isArray(timeline) ? timeline : [])
     .map(row => Number(row?.[key]))
     .filter(v => Number.isFinite(v));
-  return series.length ? series.slice(-count) : [];
+  return series.length ? series.slice(-count) : [0, 0];
 }
 
 function buildStatSparklineSvg(series, key){
   const pointsValues = Array.isArray(series) && series.length
     ? series.map(v => Number(v)).filter(v => Number.isFinite(v))
     : [];
+  const values = pointsValues.length ? pointsValues : [0, 0];
   const width = 240;
   const height = 52;
   const padX = 4;
   const padY = 6;
   const usableW = width - padX * 2;
   const usableH = height - padY * 2;
-  if (!pointsValues.length) {
-    return `
-      <svg class="stat-sparkline-svg stat-sparkline-empty" viewBox="0 0 ${width} ${height}" preserveAspectRatio="none" role="img" aria-label="No trade data yet">
-        <line x1="${padX}" y1="${height / 2}" x2="${width - padX}" y2="${height / 2}" stroke="var(--primary)" stroke-width="1.5" stroke-linecap="round" stroke-dasharray="4 6"></line>
-      </svg>
-    `;
-  }
-  const values = pointsValues;
   const min = Math.min(...values);
   const max = Math.max(...values);
   const range = (max - min) || 1;
@@ -7070,13 +6971,7 @@ function renderPropChallengeDashboard(){
   const liveCtrlHtml = renderLiveTraderControllerMarkup(m);
   const timeline = buildStatTimeline(trades || [], m);
   const statusClass = (m.maxDailyLossAmount && m.dailyLossUsed >= m.maxDailyLossAmount) || (m.maxDrawdownAmount && m.maxDrawdownUsed >= m.maxDrawdownAmount) ? 'red' : m.currentBalance >= m.targetBalance && m.profitTargetAmount ? 'green' : 'neutral';
-  box.innerHTML = bannerHtml + liveCtrlHtml + `<div class="goal-card-grid">
-    <div class="goal-card"><div class="goal-card-label">Account Phase</div><div class="goal-card-value ${statusClass}">${escapeHtml(m.config.phase)}</div><div class="goal-card-sub">${m.s.total} trades tracked &bull; ${m.s.wr.toFixed(0)}% win rate &bull; ${fmt(m.s.pnl)} net. <button class="btn" type="button" onclick="openAccountSetup()">Edit setup</button></div></div>
-    <div class="goal-card stat-card">${buildStatCard('Current Balance', `$${m.currentBalance.toFixed(2)}`, {label:`Today ${fmt(m.todayPnl)} • ${m.s.total} trades tracked`, tone:m.currentBalance>=m.startBalance?'positive':'negative', valueTone:m.currentBalance>=m.startBalance?'positive':'negative', sparkKey:'goal-current-balance'}, 'chart-bar', statSeries(timeline,'currentBalance'))}</div>
-    <div class="goal-card stat-card">${buildStatCard('Profit Target', `$${m.remainingToTarget.toFixed(2)} left`, {label:`${m.profitProgress.toFixed(0)}% complete • Target $${m.targetBalance.toFixed(2)}`, tone:m.profitProgress>=100?'positive':'neutral', sparkKey:'goal-profit-target'}, 'target', statSeries(timeline,'profitTargetRemaining'))}</div>
-    <div class="goal-card stat-card">${buildStatCard('Days Remaining', m.daysRemaining==null?'No deadline':`${m.daysRemaining} days`, {label:`Phase deadline ${m.config.phaseDeadline || 'not set'}`, tone:'neutral', sparkKey:'goal-days-remaining'}, 'calendar', statSeries(timeline,'daysRemaining'))}</div>
-    <div class="goal-card stat-card">${buildStatCard('Daily Loss Remaining', m.maxDailyLossRemaining==null?'Skipped':`$${m.maxDailyLossRemaining.toFixed(2)}`, {label:m.maxDailyLossAmount==null?'Daily loss limit not set':`$${m.dailyLossUsed.toFixed(2)} used of $${m.maxDailyLossAmount.toFixed(2)}`, tone:m.maxDailyLossRemaining!=null&&m.maxDailyLossRemaining<=0?'negative':'positive', valueTone:m.maxDailyLossRemaining!=null&&m.maxDailyLossRemaining<=0?'negative':'positive', sparkKey:'goal-daily-loss-remaining'}, 'shield', statSeries(timeline,'dailyLossRemaining'))}</div>
-    <div class="goal-card stat-card">${buildStatCard('Drawdown Buffer', m.maxDrawdownRemaining==null?'Skipped':`$${m.maxDrawdownRemaining.toFixed(2)}`, {label:m.maxDrawdownAmount==null?'Overall drawdown limit not set':`$${m.maxDrawdownUsed.toFixed(2)} max DD used of $${m.maxDrawdownAmount.toFixed(2)}`, tone:m.maxDrawdownRemaining!=null&&m.maxDrawdownRemaining<=0?'negative':'positive', valueTone:m.maxDrawdownRemaining!=null&&m.maxDrawdownRemaining<=0?'negative':'positive', sparkKey:'goal-drawdown-buffer'}, 'shield', statSeries(timeline,'drawdownRemaining'))}</div>${riskCalculatorMarkup(m)}</div>`;
+  box.innerHTML = bannerHtml + liveCtrlHtml + `<div class="goal-card-grid"><div class="goal-card"><div class="goal-card-label">Account Phase</div><div class="goal-card-value ${statusClass}">${escapeHtml(m.config.phase)}</div><div class="goal-card-sub">${m.s.total} trades tracked &bull; ${m.s.wr.toFixed(0)}% win rate &bull; ${fmt(m.s.pnl)} net. <button class="btn" type="button" onclick="openAccountSetup()">Edit setup</button></div></div><div class="goal-card stat-card"><div class="goal-card-label">Current Balance</div><div class="goal-card-value ${pnlClass(m.currentBalance-m.startBalance)}">$${m.currentBalance.toFixed(2)}</div><div class="goal-card-sub">Initial deposit $${m.startBalance.toFixed(2)} &bull; today ${fmt(m.todayPnl)}.</div>${statSparklineMarkup(statSeries(timeline, 'currentBalance'), 'goal-current-balance')}</div><div class="goal-card stat-card"><div class="goal-card-label">Profit Target</div><div class="goal-card-value ${m.remainingToTarget<=0&&m.profitTargetAmount?'green':'neutral'}">$${m.remainingToTarget.toFixed(2)} left</div><div class="bar" style="margin-top:12px"><div style="width:${m.profitProgress}%"></div></div><div class="goal-card-sub">Target $${m.targetBalance.toFixed(2)} &bull; ${m.profitProgress.toFixed(0)}% complete.</div>${statSparklineMarkup(statSeries(timeline, 'profitTargetRemaining'), 'goal-profit-target')}</div><div class="goal-card stat-card"><div class="goal-card-label">Days Remaining</div><div class="goal-card-value neutral">${m.daysRemaining==null?'No deadline':m.daysRemaining+' days'}</div><div class="goal-card-sub">Phase deadline ${m.config.phaseDeadline || 'not set'}.</div>${statSparklineMarkup(statSeries(timeline, 'daysRemaining'), 'goal-days-remaining')}</div><div class="goal-card stat-card"><div class="goal-card-label">Daily Loss Remaining</div><div class="goal-card-value ${m.maxDailyLossRemaining!=null&&m.maxDailyLossRemaining<=0?'red':'green'}">${m.maxDailyLossRemaining==null?'Skipped':'$'+m.maxDailyLossRemaining.toFixed(2)}</div><div class="goal-card-sub">${m.maxDailyLossAmount==null?'Daily loss limit applies only to funded account setup.':'$'+m.dailyLossUsed.toFixed(2)+' used today of $'+m.maxDailyLossAmount.toFixed(2)}.</div>${statSparklineMarkup(statSeries(timeline, 'dailyLossRemaining'), 'goal-daily-loss-remaining')}</div><div class="goal-card stat-card"><div class="goal-card-label">Drawdown Buffer</div><div class="goal-card-value ${m.maxDrawdownRemaining!=null&&m.maxDrawdownRemaining<=0?'red':'green'}">${m.maxDrawdownRemaining==null?'Skipped':'$'+m.maxDrawdownRemaining.toFixed(2)}</div><div class="goal-card-sub">${m.maxDrawdownAmount==null?'Overall drawdown applies only to funded account setup.':'$'+m.maxDrawdownUsed.toFixed(2)+' max DD used of $'+m.maxDrawdownAmount.toFixed(2)}.</div>${statSparklineMarkup(statSeries(timeline, 'drawdownRemaining'), 'goal-drawdown-buffer')}</div>${riskCalculatorMarkup(m)}</div>`;
 }
 async function generateAIPropGoals(force=false){
   if(!(trades || []).length){ const propBox=document.getElementById('propBox'); if(propBox) propBox.innerHTML='<div class="insight empty"><strong>No trades yet.</strong><br>Upload trades first.</div>'; return; }
@@ -9470,23 +9365,59 @@ function renderCommandCenter(todayTrades){
   const goalMetrics = goalAnalyticsMetrics(account);
   const timeline = buildStatTimeline(trades || [], account);
   const recentTimeline = timeline.slice(-14);
-  const cards = [
-    [document.getElementById('cmdTodayPnlCard'), buildStatCard('Today P&L', fmt(state.todayPnl), {label:state.todayPnl>=0?'Positive today':'Negative today', tone:state.todayPnl>=0?'positive':'negative', valueTone:state.todayPnl>=0?'positive':'negative', sparkKey:'cmdTodayPnl', valueId:'cmdTodayPnl'}, 'chart-bar', statSeries(recentTimeline,'dayPnl'))],
-    [document.getElementById('cmdDailyLossCard'), buildStatCard('Daily Loss Used', `$${state.lossUsed.toFixed(2)} / ${state.maxDailyLoss == null ? 'not set' : '$'+state.maxDailyLoss.toFixed(2)}`, {label:state.maxDailyLoss == null ? 'Limit not set' : `${state.lossUsed.toFixed(2)} used today`, tone:state.lossUsed>0?'negative':'positive', valueTone:state.lossUsed>0?'negative':'positive', sparkKey:'cmdDailyLoss', valueId:'cmdDailyLoss'}, 'shield', statSeries(recentTimeline,'dailyLossUsed'))],
-    [document.getElementById('cmdTradesCard'), buildStatCard('Trades', `${state.tradesCount} / ${state.maxTrades || 'not set'}`, {label:state.maxTrades ? `${state.maxTrades-state.tradesCount} remaining today` : 'Daily limit not set', tone:state.maxTrades && state.tradesCount>=state.maxTrades?'negative':'neutral', sparkKey:'cmdTrades', valueId:'cmdTrades'}, 'activity', statSeries(recentTimeline,'tradeCount'))],
-    [document.getElementById('cmdRuleBreaksCard'), buildStatCard('Rule Breaks', state.mistakesToday, {label:state.mistakesToday ? 'Review before trading' : 'No breaks today', tone:state.mistakesToday?'negative':'positive', valueTone:state.mistakesToday?'negative':'positive', valueId:'cmdRuleBreaks'},'meditation', [])]
-  ];
-  cards.forEach(([el, content])=>{if(el)el.innerHTML=content;});
+  const pnlEl = document.getElementById('cmdTodayPnl');
+  const lossEl = document.getElementById('cmdDailyLoss');
+  const tradesEl = document.getElementById('cmdTrades');
+  const pnlSparkEl = document.getElementById('cmdTodayPnlSparkline');
+  const lossSparkEl = document.getElementById('cmdDailyLossSparkline');
+  const tradesSparkEl = document.getElementById('cmdTradesSparkline');
+  const breaksEl = document.getElementById('cmdRuleBreaks');
   const actionEl = document.getElementById('cmdNextAction');
   const statusEl = document.getElementById('cmdStatus');
   const riskEl = document.getElementById('cmdSuggestedRisk');
   const riskSubEl = document.getElementById('cmdSuggestedRiskSub');
   const tomorrowRuleEl = document.getElementById('cmdTomorrowRule');
+
+  if(pnlEl){
+    const nextPnlText = fmt(state.todayPnl);
+    const pnlChanged = pnlEl.textContent !== nextPnlText;
+    pnlEl.textContent = nextPnlText;
+    pnlEl.className = 'cmd-value ' + (state.todayPnl < 0 ? 'red' : 'neutral');
+    if(pnlChanged){
+      pnlEl.classList.add('pnl-value-updating');
+      window.setTimeout(()=>pnlEl.classList.remove('pnl-value-updating'), 150);
+    }
+  }
+  if(lossEl){
+    lossEl.textContent = `$${state.lossUsed.toFixed(2)} / ${state.maxDailyLoss == null ? 'not set' : '$'+state.maxDailyLoss.toFixed(2)}`;
+    lossEl.className = 'cmd-value neutral';
+  }
+  if(tradesEl){
+    tradesEl.textContent = `${state.tradesCount} / ${state.maxTrades || 'not set'}`;
+    tradesEl.className = 'cmd-value neutral';
+  }
+  if(breaksEl){
+    breaksEl.textContent = state.mistakesToday;
+    breaksEl.className = 'cmd-value ' + (state.mistakesToday ? 'warn' : '');
+  }
   if(actionEl) actionEl.textContent = state.nextAction;
-  if(statusEl){ statusEl.className = 'cmd-status ' + state.statusClass; statusEl.innerHTML = `<span class="cmd-status-dot"></span>${state.status}`; }
-  if(riskEl){ riskEl.textContent = goalMetrics.safeRisk == null ? 'Not enough data' : moneyPlain(goalMetrics.safeRisk); }
-  if(riskSubEl){ riskSubEl.textContent = goalMetrics.safeRisk == null ? 'Need trade history plus an active account setup.' : `Based on remaining target ${moneyPlain(goalMetrics.targetRemaining)}, daily room ${moneyPlain(goalMetrics.dailyLossBudget)}, and drawdown buffer ${goalMetrics.maxDrawdownRemaining == null ? '—' : moneyPlain(goalMetrics.maxDrawdownRemaining)}.`; }
+  if(statusEl){
+    statusEl.className = 'cmd-status ' + state.statusClass;
+    statusEl.innerHTML = `<span class="cmd-status-dot"></span>${state.status}`;
+  }
+  if(riskEl){
+    riskEl.textContent = goalMetrics.safeRisk == null ? 'Not enough data' : moneyPlain(goalMetrics.safeRisk);
+    riskEl.className = 'cmd-value cmd-action ' + (goalMetrics.safeRisk == null ? '' : 'green');
+  }
+  if(riskSubEl){
+    riskSubEl.textContent = goalMetrics.safeRisk == null
+      ? 'Need trade history plus an active account setup.'
+      : `Based on remaining target ${moneyPlain(goalMetrics.targetRemaining)}, daily room ${moneyPlain(goalMetrics.dailyLossBudget)}, and drawdown buffer ${goalMetrics.maxDrawdownRemaining == null ? '—' : moneyPlain(goalMetrics.maxDrawdownRemaining)}.`;
+  }
   if(tomorrowRuleEl) tomorrowRuleEl.textContent = getTodayPsychologyReminder() || 'No saved rule';
+  if(pnlSparkEl) pnlSparkEl.innerHTML = buildStatSparklineSvg(recentTimeline.map(row => row.dayPnl), 'cmdTodayPnl');
+  if(lossSparkEl) lossSparkEl.innerHTML = buildStatSparklineSvg(recentTimeline.map(row => row.dailyLossUsed), 'cmdDailyLoss');
+  if(tradesSparkEl) tradesSparkEl.innerHTML = buildStatSparklineSvg(recentTimeline.map(row => row.tradeCount), 'cmdTrades');
 }
 
 function toggleChecklistCheck(id){
@@ -11046,14 +10977,24 @@ function renderAISnapshot(){
   const s = stats(trades);
   const leakEntries = Object.entries(s.mistakes || {}).sort((a,b)=>b[1]-a[1]);
   const mainLeak = leakEntries.length ? `${leakEntries[0][0]} (${leakEntries[0][1]})` : 'No mistake data yet';
-  const account = accountMetrics(trades || []);
-  const timeline = buildStatTimeline(trades || [], account);
-  el.innerHTML = [
-    buildStatCard('Trades Logged', s.total, {label:s.total ? 'Activity captured' : 'No trades yet', tone:'neutral', sparkKey:'ai-trades'}, 'activity', statSeries(timeline,'tradeCount')),
-    buildStatCard('Win Rate', `${Math.round(Number(s.wr) || 0)}%`, {label:`${s.wins.length} wins / ${s.losses.length} losses`, tone:s.wr>=50?'positive':'negative'}, 'target', []),
-    buildStatCard('Net P&L', signedMoney(s.pnl), {label:s.pnl>=0?'Positive net result':'Negative net result', tone:s.pnl>=0?'positive':'negative', valueTone:s.pnl>=0?'positive':'negative', sparkKey:'ai-pnl'}, 'chart-bar', statSeries(timeline,'dayPnl')),
-    buildStatCard('Main Leak', mainLeak, {label:leakEntries.length ? 'Most frequent mistake' : 'No mistake data', tone:'neutral'}, 'meditation', [])
-  ].map(content=>`<div class="ai-score-card stat-card">${content}</div>`).join('');
+  el.innerHTML = `
+    <div class="ai-score-card">
+      <div class="ai-score-label">Trades Logged</div>
+      <div class="ai-score-value neutral">${s.total}</div>
+    </div>
+    <div class="ai-score-card">
+      <div class="ai-score-label">Win Rate</div>
+      <div class="ai-score-value ${s.wr>=50?'green':'purple'}">${Math.round(Number(s.wr) || 0)}%</div>
+    </div>
+    <div class="ai-score-card">
+      <div class="ai-score-label">Net P&L</div>
+      <div class="ai-score-value ${s.pnl>=0?'green':'red'}">${signedMoney(s.pnl)}</div>
+    </div>
+    <div class="ai-score-card">
+      <div class="ai-score-label">Main Leak</div>
+      <div class="ai-score-value purple" style="font-size:18px">${mainLeak}</div>
+    </div>
+  `;
 }
 
 function aiAnswer(prompt){
@@ -12260,7 +12201,7 @@ body::before,body::after,.hero::before,.hero::after,.card::before,.journal-main-
 .value,.goal-card-value,.metric-value,.ai-score-value,.widget-value,.cmd-value,.analytics-bar-value,.calendar-summary-card .summary-value,.calendar-date,.coach-title,.coach-section-text,.mistake-box-count,.day-trade-title,.saved-journal-title,.journal-rule-title,.checklist-text,.psych-rule strong,.psych-check strong,strong{color:var(--ink)!important;font-family:var(--sans)!important;letter-spacing:0!important}
 p,span,div,td,label,em{color:inherit}.psych-check em,.psych-rule span,.journal-rule-text,.checklist-result-sub,.widget-why,.day-trade-meta,.saved-journal-meta{color:var(--mute)!important}
 .green,.profit,.pnl-positive,.win{color:var(--success)!important}.red,.loss,.pnl-negative{color:var(--sale)!important}.amber,.neutral,.zero-state,.rule-neutral{color:var(--ash)!important}.blue{color:var(--info)!important}.purple{color:var(--accent-purple-soft)!important}.cyan{color:var(--accent-teal)!important}
-.btn{min-height:44px!important;border-radius:var(--radius-md)!important;background:var(--soft-cloud)!important;background-image:none!important;border:1px solid var(--hairline)!important;color:var(--ink)!important;font-family:var(--sans)!important;font-weight:500!important;letter-spacing:0!important;transition:background-color var(--dur-instant) var(--ease-out),border-color var(--dur-instant) var(--ease-out),transform var(--dur-fast) var(--ease-snappy),opacity var(--dur-fast) var(--ease-out)!important;transform-origin:center!important}
+.btn{min-height:44px!important;border-radius:var(--radius-control)!important;background:var(--soft-cloud)!important;background-image:none!important;border:1px solid var(--hairline)!important;color:var(--ink)!important;font-family:var(--sans)!important;font-weight:500!important;letter-spacing:0!important;transition:background-color var(--dur-instant) var(--ease-out),border-color var(--dur-instant) var(--ease-out),transform var(--dur-fast) var(--ease-snappy),opacity var(--dur-fast) var(--ease-out)!important;transform-origin:center!important}
 .ai-chip,.journal-status-btn,.pill,.filter-chip,.psych-step,.widget-icon-btn{min-height:44px!important;border-radius:var(--radius-pill)!important;background:var(--soft-cloud)!important;background-image:none!important;border:1px solid var(--hairline)!important;color:var(--ink)!important;font-family:var(--sans)!important;font-weight:500!important;letter-spacing:0!important;transition:background-color var(--dur-instant) var(--ease-out),border-color var(--dur-instant) var(--ease-out),transform var(--dur-fast) var(--ease-snappy),opacity var(--dur-fast) var(--ease-out)!important;transform-origin:center!important}
 .btn:hover,.ai-chip:hover,.journal-status-btn:hover,.pill:hover,.psych-step:hover,.nav button:hover{background:#242426!important;border-color:var(--ash)!important;color:var(--ink)!important;transform:none!important;opacity:1!important}
 .btn:active,.ai-chip:active,.journal-status-btn:active,.pill:active,.psych-step:active,.widget-icon-btn:active{transform:scale(.97)!important}
@@ -12269,17 +12210,17 @@ p,span,div,td,label,em{color:inherit}.psych-check em,.psych-rule span,.journal-r
 .nav button:hover{background:var(--surface-2)!important;color:var(--ink)!important;border-color:var(--surface-2)!important;border-left-color:transparent!important}
 .nav button:active{transform:scale(0.97)!important}
 .nav button.active{background:var(--surface-2)!important;color:var(--ink)!important;border-color:var(--hairline-strong)!important;border-left-color:var(--primary)!important;font-weight:500!important}
-input,select,textarea,.search input,.filters input,.filters select,.editor textarea,.editor input,.journal-entry-form input,.journal-entry-form select,.journal-entry-form textarea,.journal-search-row input,.journal-search-row select,.journal-trade-select-row select,.real-ai-settings input,.real-ai-settings select{background:var(--soft-cloud)!important;border:1px solid var(--hairline)!important;border-radius:var(--radius-md)!important;color:var(--ink)!important;font-family:var(--sans)!important;letter-spacing:0!important}
-textarea{border-radius:var(--radius-md)!important}input::placeholder,textarea::placeholder{color:var(--stone)!important}input:focus,select:focus,textarea:focus{background:#101012!important;border-color:var(--ink)!important;outline:2px solid var(--ink)!important;outline-offset:2px!important}
+input,select,textarea,.search input,.filters input,.filters select,.editor textarea,.editor input,.journal-entry-form input,.journal-entry-form select,.journal-entry-form textarea,.journal-search-row input,.journal-search-row select,.journal-trade-select-row select,.real-ai-settings input,.real-ai-settings select{background:var(--soft-cloud)!important;border:1px solid var(--hairline)!important;border-radius:var(--radius-control)!important;color:var(--ink)!important;font-family:var(--sans)!important;letter-spacing:0!important}
+textarea{border-radius:var(--radius-control)!important}input::placeholder,textarea::placeholder{color:var(--stone)!important}input:focus,select:focus,textarea:focus{background:#101012!important;border-color:var(--ink)!important;outline:2px solid var(--ink)!important;outline-offset:2px!important}
 .btn:focus-visible,.nav button:focus-visible{outline:2px solid var(--ink)!important;outline-offset:2px!important}
 .table-wrap{border:1px solid var(--hairline)!important;border-radius:0!important;background:var(--canvas)!important}table,thead,tbody,tr,td,th{background:var(--canvas)!important}th{background:var(--soft-cloud)!important;color:var(--mute)!important;border-bottom:1px solid var(--hairline)!important;font-weight:500!important;letter-spacing:0!important;text-transform:none!important}td{color:var(--ink)!important;border-bottom:1px solid var(--hairline-soft)!important}tr:hover td{background:var(--soft-cloud)!important}
 .chart,.ai-chat-box{background:var(--soft-cloud)!important;border:1px solid var(--hairline)!important;border-radius:0!important}.bar,.drawdown-bar,.analytics-track,.balance-scale{background:#242426!important;border-radius:9999px!important}.bar div,.analytics-fill,.drawdown-bar span,.balance-marker{background:var(--ink)!important;background-image:none!important;border-radius:9999px!important}.analytics-fill.profit,.green-bg,.calendar-dot.green,.balance-fill.profit{background:var(--success)!important}.analytics-fill.loss,.analytics-fill.drawdown,.red-bg,.calendar-dot.red,.balance-fill.loss{background:var(--sale)!important}.neutral-bg,.calendar-dot.neutral{background:var(--stone)!important}
-.win{background:rgba(46,204,113,.12)!important}.loss{background:rgba(255,77,79,.12)!important}.breakeven,.buy,.sell,.tag,.badge,.journal-category-badge,.widget-chip{background:var(--soft-cloud)!important;color:var(--ink)!important;border:1px solid var(--hairline)!important;border-radius:var(--radius-pill)!important}
+.win{background:rgba(46,204,113,.12)!important}.loss{background:rgba(255,77,79,.12)!important}.breakeven,.buy,.sell,.tag,.badge,.journal-category-badge,.widget-chip{background:var(--soft-cloud)!important;color:var(--ink)!important;border:1px solid var(--hairline)!important;border-radius:9999px!important}
 .insight{border-left:4px solid var(--ash)!important}.insight.good{border-left-color:var(--success)!important}.insight.danger{border-left-color:var(--sale)!important}.insight.warn{border-left-color:var(--ash)!important}.insight strong{color:var(--ink)!important}
-.cmd-status.safe{background:var(--ink)!important;color:var(--on-primary)!important;border-radius:var(--radius-pill)!important}.cmd-status.caution{background:var(--soft-cloud)!important;color:var(--ink)!important;border:1px solid var(--hairline)!important;border-radius:var(--radius-pill)!important}.cmd-status.stop{background:transparent!important;color:var(--sale)!important;border:1px solid var(--sale)!important;border-radius:var(--radius-pill)!important}
+.cmd-status.safe{background:var(--ink)!important;color:var(--on-primary)!important;border-radius:9999px!important}.cmd-status.caution{background:var(--soft-cloud)!important;color:var(--ink)!important;border:1px solid var(--hairline)!important;border-radius:9999px!important}.cmd-status.stop{background:transparent!important;color:var(--sale)!important;border:1px solid var(--sale)!important;border-radius:9999px!important}
 .psych-check.checked{background:var(--ink)!important;color:var(--on-primary)!important;border-color:var(--ink)!important}.psych-check.checked strong,.psych-check.checked em{color:var(--on-primary)!important}.psych-check.checked>span{background:var(--on-primary)!important;border-color:var(--on-primary)!important;color:var(--ink)!important}.psych-status{background:var(--soft-cloud)!important;color:var(--ink)!important;border:1px solid var(--hairline)!important;border-radius:0!important}
 .calendar-day,.calendar-day.profit,.calendar-day.lossday,.calendar-day.flatday{background:var(--canvas)!important;border:1px solid var(--hairline)!important;border-radius:0!important}.calendar-day:hover{border-color:var(--ink)!important}.calendar-pnl{font-weight:500!important}
-.ai-msg.user{background:#1e2027!important;color:#f7f8f8!important;border-color:#2e3038!important}.ai-msg.user strong{color:#f7f8f8!important}.ai-msg.bot{background:var(--soft-cloud)!important;color:var(--ink)!important}.ai-connection-detail{display:block;margin-top:10px;color:var(--ink-subtle)!important;font-size:12px;line-height:1.45}.coach-avatar{background:var(--ink)!important;color:var(--on-primary)!important}.coach-confidence{background:var(--soft-cloud)!important;color:var(--ink)!important;border:1px solid var(--hairline)!important;border-radius:var(--radius-pill)!important}.coach-confidence.low{color:var(--sale)!important;border-color:var(--sale)!important}.coach-confidence.high{color:var(--success)!important;border-color:var(--success)!important}
+.ai-msg.user{background:#1e2027!important;color:#f7f8f8!important;border-color:#2e3038!important}.ai-msg.user strong{color:#f7f8f8!important}.ai-msg.bot{background:var(--soft-cloud)!important;color:var(--ink)!important}.ai-connection-detail{display:block;margin-top:10px;color:var(--ink-subtle)!important;font-size:12px;line-height:1.45}.coach-avatar{background:var(--ink)!important;color:var(--on-primary)!important}.coach-confidence{background:var(--soft-cloud)!important;color:var(--ink)!important;border:1px solid var(--hairline)!important;border-radius:9999px!important}.coach-confidence.low{color:var(--sale)!important;border-color:var(--sale)!important}.coach-confidence.high{color:var(--success)!important;border-color:var(--success)!important}
 .modal-backdrop{background:rgba(0,0,0,.85)!important;backdrop-filter:blur(8px)!important;-webkit-backdrop-filter:blur(8px)!important;z-index:1000!important}.mistake-modal,.day-trades-modal,.firebase-auth-gate .firebase-auth-card{background:var(--surface-2)!important;border:1px solid var(--hairline-strong)!important;border-radius:var(--rounded-xl)!important;color:var(--ink)!important}.firebase-auth-gate{display:none!important;min-height:100vh!important;place-items:center!important;background:var(--canvas)!important;padding:var(--space-xl)!important}.firebase-auth-gate.show{display:grid!important}.firebase-auth-gate[hidden],#journallApp[hidden],.mobile-appbar[hidden],.firebase-auth-bar[hidden]{display:none!important}html.firebase-auth-required body{overflow:hidden!important}html.firebase-auth-required #journallApp,html.firebase-auth-required .mobile-appbar{display:none!important}html:not(.firebase-auth-required) #firebaseAuthGate,html:not(.firebase-auth-required) #firebaseAuthBar{display:none!important}.firebase-auth-bar,.mobile-appbar{background:var(--canvas)!important;color:var(--ink)!important;border-color:var(--hairline)!important}.firebase-auth-bar .btn,.firebase-auth-bar .btn.primary{background:var(--primary)!important;color:var(--ink)!important;border-color:var(--primary)!important}
 /* Emil Kowalski motion layer: fast, subtle, purposeful. */
 .card,.hero,.sidebox,.goal-card,.widget,.saved-journal-card,.analytics-bar-card,.cmd-card,.ai-score-card,.calendar-summary-card,.journal-main-card,.coach-card,.mistake-box,.mistake-modal-section,.mistake-row,.day-trade-card{transition:transform var(--dur-base) var(--ease-out),border-color var(--dur-base) var(--ease-out),opacity var(--dur-fast) var(--ease-out)!important}
@@ -13506,7 +13447,7 @@ button,
   font-size:16px!important;
   font-weight:600!important;
   letter-spacing:.24px!important;
-  border-radius:var(--radius-md)!important;
+  border-radius:var(--radius-control)!important;
   cursor:pointer!important;
   border:none!important;
   padding:12px 24px!important;
@@ -13905,7 +13846,7 @@ p{
   background-color: #16181a !important;
   color: #ffffff !important;
   border: 1px solid rgba(255,255,255,0.12) !important;
-  border-radius: var(--radius-md) !important;
+  border-radius: 12px !important;
 }
 
 /* 9. JOURNAL PAGE LAYOUT */
@@ -14179,7 +14120,7 @@ p{
   background: transparent !important;
   color: rgba(255,255,255,0.56) !important;
   border: 0 !important;
-  border-radius: var(--radius-pill) !important;
+  border-radius: 8px !important;
   padding: 10px 16px !important;
   font-size: 14px !important;
   font-weight: 500 !important;
@@ -14324,7 +14265,7 @@ main,
   background: #494fdf !important;
   color: #ffffff !important;
   border: none !important;
-  border-radius: var(--radius-pill) !important;
+  border-radius: 9999px !important;
   padding: 10px 20px !important;
   font-size: 14px !important;
   font-weight: 600 !important;
@@ -14418,7 +14359,7 @@ main,
 #journallApp #propChallengeDashboard {
   background: #16181a !important;
   border: 1px solid rgba(255,255,255,0.08) !important;
-  border-radius: var(--radius-card);
+  border-radius: 16px !important;
   padding: 28px !important;
 }
 #journallApp #goalsBox .goal-card-grid,
@@ -14443,7 +14384,7 @@ main,
   width: 100% !important;
   background: #16181a !important;
   border: 1px solid rgba(255,255,255,0.08) !important;
-  border-radius: var(--radius-card);
+  border-radius: 16px !important;
   padding: 24px !important;
 }
 
@@ -14610,10 +14551,10 @@ main,
 #journallApp #commandCenter .cmd-status,
 #journallApp .command-center .cmd-value,
 #journallApp .command-center .cmd-status,
-#journallApp #cmdTodayPnl:not(.stat-card-value),
-#journallApp #cmdDailyLoss:not(.stat-card-value),
-#journallApp #cmdTrades:not(.stat-card-value),
-#journallApp #cmdRuleBreaks:not(.stat-card-value),
+#journallApp #cmdTodayPnl,
+#journallApp #cmdDailyLoss,
+#journallApp #cmdTrades,
+#journallApp #cmdRuleBreaks,
 #journallApp #cmdNextAction,
 #journallApp #cmdStatus,
 #journallApp #cmdTomorrowRule {
@@ -14709,10 +14650,10 @@ main,
 }
 #journallApp #commandCenter .cmd-value,
 #journallApp #commandCenter .cmd-status,
-#journallApp #cmdTodayPnl:not(.stat-card-value),
-#journallApp #cmdDailyLoss:not(.stat-card-value),
-#journallApp #cmdTrades:not(.stat-card-value),
-#journallApp #cmdRuleBreaks:not(.stat-card-value),
+#journallApp #cmdTodayPnl,
+#journallApp #cmdDailyLoss,
+#journallApp #cmdTrades,
+#journallApp #cmdRuleBreaks,
 #journallApp #cmdNextAction,
 #journallApp #cmdStatus,
 #journallApp #cmdTomorrowRule {
@@ -14751,7 +14692,7 @@ main,
   min-height: 44px !important;
   padding: 12px 18px !important;
   border: 0 !important;
-  border-radius: var(--radius-pill) !important;
+  border-radius: 9999px !important;
   background: #494fdf !important;
   color: #ffffff !important;
   font-family: Inter, system-ui, -apple-system, sans-serif !important;
@@ -14898,7 +14839,7 @@ html.firebase-auth-required body{
   overflow:hidden!important;
   background:rgba(13,14,17,.94)!important;
   border:1px solid rgba(255,255,255,.11)!important;
-  border-radius:var(--radius-card);
+  border-radius:28px!important;
   box-shadow:0 24px 80px rgba(0,0,0,.42)!important;
   color:#f7f8f8!important;
   padding:0!important;
@@ -15032,7 +14973,7 @@ html.firebase-auth-required body{
 .signin-preview-card{
   background:#010102!important;
   border:1px solid rgba(255,255,255,.10)!important;
-  border-radius:var(--radius-card);
+  border-radius:18px!important;
   overflow:hidden!important;
   margin-bottom:20px!important;
 }
@@ -15065,7 +15006,7 @@ html.firebase-auth-required body{
   background:#f7f8f8!important;
   color:#010102!important;
   border:1px solid #f7f8f8!important;
-  border-radius:var(--radius-md)!important;
+  border-radius:14px!important;
   font-size:15px!important;
   font-weight:800!important;
   letter-spacing:-.02em!important;
@@ -15104,7 +15045,7 @@ html.firebase-auth-required body{
   .journall-signin-card{
     grid-template-columns:1fr!important;
     min-height:auto!important;
-    border-radius:var(--radius-card) !important;
+    border-radius:22px!important;
   }
   .signin-copy{padding:30px!important}
   .signin-copy:before{display:none!important}
@@ -15179,7 +15120,7 @@ html.firebase-auth-required body{
 
 </style>
 <style id="journall-account-risk-theme">
-.account-onboarding-gate{position:fixed;inset:0;z-index:10000;display:none;place-items:center;background:rgba(0,0,0,.85);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);padding:24px;color:#f7f8f8}.account-onboarding-gate.show{display:grid}.account-onboarding-card{width:min(980px,96vw);max-height:92vh;overflow:auto;background:#16181d;border:1px solid #2e3038;border-radius:var(--radius-card) !important;padding:32px}.account-onboarding-head{display:flex;justify-content:space-between;gap:18px;align-items:flex-start;margin-bottom:22px}.account-kicker{display:block;color:#8a8f98;font-size:12px;letter-spacing:.4px;text-transform:uppercase;margin-bottom:8px}.account-onboarding-card h2{margin:0;color:#f7f8f8;font-size:32px;letter-spacing:-.8px}.account-onboarding-card p{color:#d0d6e0;margin:8px 0 0}.setup-section{background:#0d0e10;border:1px solid rgba(255,255,255,.06);border-radius:14px;padding:20px;margin-bottom:16px}.setup-section-label{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.4);margin-bottom:12px}.account-form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}.setup-section:first-of-type .account-form-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.account-form-grid label{display:flex;flex-direction:column;gap:8px;color:#8a8f98;font-size:12px;text-transform:uppercase;letter-spacing:.4px}.account-onboarding-card input,.account-onboarding-card select{background:#16181a!important;border:1px solid rgba(255,255,255,.08)!important;border-radius:var(--radius-md)!important;color:#fff!important;padding:12px 14px!important;font-size:15px!important;font-family:'Inter',sans-serif!important;transition:border-color .15s ease,box-shadow .15s ease}.account-onboarding-card input:focus,.account-onboarding-card select:focus{border-color:var(--primary)!important;outline:none!important;box-shadow:0 0 0 3px rgba(73,79,223,.15)!important}.account-onboarding-card input[type=number]{-moz-appearance:textfield;appearance:textfield}.account-onboarding-card input[type=number]::-webkit-outer-spin-button,.account-onboarding-card input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}.number-stepper,.stepper-group{display:flex;align-items:center;gap:6px;width:100%}.number-stepper input{min-width:48px;flex:1;color:#fff!important;-webkit-text-fill-color:#fff!important;opacity:1!important}.account-inline-field{display:flex;gap:10px;align-items:center}.account-inline-field .number-stepper{flex:1}.account-inline-field select{width:92px}.account-inline-field span{color:#d0d6e0}.stepper-btn{background:#16181a!important;border:1px solid rgba(255,255,255,.08)!important;color:rgba(255,255,255,.5)!important;flex-shrink:0!important;width:32px!important;height:32px!important;border-radius:var(--radius-control)!important;display:flex!important;align-items:center!important;justify-content:center!important;padding:0!important;font-size:16px!important;line-height:1!important;cursor:pointer!important}.stepper-btn:hover{background:#1f2124!important;color:#fff!important}.setup-preview{background:rgba(73,79,223,.08);border:1px solid rgba(73,79,223,.25);border-radius:12px;padding:16px 20px;margin-top:4px}.setup-preview-row{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.08)}.setup-preview-row:last-child{border-bottom:0}.setup-preview-row span{color:rgba(255,255,255,.58);font-size:13px}.setup-preview-row strong{color:#fff;font-size:15px;font-weight:700;text-align:right}.account-onboarding-actions{display:flex;align-items:center;gap:14px;margin-top:22px}.account-onboarding-actions p{margin:0;color:#8a8f98}.save-setup-btn{background:#494fdf!important;color:#fff!important;border:none!important;font-weight:600!important}.save-setup-btn:hover{background:#5a5ff0!important}.risk-calc-card{grid-column:span 2}.risk-calc-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:12px 0}.risk-calc-grid label{display:flex;flex-direction:column;gap:6px;color:#8a8f98;font-size:12px;text-transform:uppercase;letter-spacing:.4px}.risk-calc-grid input{background:#010102!important;border:1px solid #23252a!important;color:#f7f8f8!important;border-radius:var(--radius-md)!important;padding:9px 10px!important}@media(max-width:760px){.account-form-grid,.setup-section:first-of-type .account-form-grid,.risk-calc-grid{grid-template-columns:1fr}.risk-calc-card{grid-column:auto}.account-onboarding-head{flex-direction:column}.account-onboarding-card{padding:20px}.account-inline-field{align-items:stretch;flex-direction:column}.account-inline-field select{width:100%}.setup-preview-row{align-items:flex-start;flex-direction:column}.setup-preview-row strong{text-align:left}}
+.account-onboarding-gate{position:fixed;inset:0;z-index:10000;display:none;place-items:center;background:rgba(0,0,0,.85);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);padding:24px;color:#f7f8f8}.account-onboarding-gate.show{display:grid}.account-onboarding-card{width:min(980px,96vw);max-height:92vh;overflow:auto;background:#16181d;border:1px solid #2e3038;border-radius:18px;padding:32px}.account-onboarding-head{display:flex;justify-content:space-between;gap:18px;align-items:flex-start;margin-bottom:22px}.account-kicker{display:block;color:#8a8f98;font-size:12px;letter-spacing:.4px;text-transform:uppercase;margin-bottom:8px}.account-onboarding-card h2{margin:0;color:#f7f8f8;font-size:32px;letter-spacing:-.8px}.account-onboarding-card p{color:#d0d6e0;margin:8px 0 0}.setup-section{background:#0d0e10;border:1px solid rgba(255,255,255,.06);border-radius:14px;padding:20px;margin-bottom:16px}.setup-section-label{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.4);margin-bottom:12px}.account-form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}.setup-section:first-of-type .account-form-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.account-form-grid label{display:flex;flex-direction:column;gap:8px;color:#8a8f98;font-size:12px;text-transform:uppercase;letter-spacing:.4px}.account-onboarding-card input,.account-onboarding-card select{background:#16181a!important;border:1px solid rgba(255,255,255,.08)!important;border-radius:var(--radius-control)!important;color:#fff!important;padding:12px 14px!important;font-size:15px!important;font-family:'Inter',sans-serif!important;transition:border-color .15s ease,box-shadow .15s ease}.account-onboarding-card input:focus,.account-onboarding-card select:focus{border-color:var(--primary)!important;outline:none!important;box-shadow:0 0 0 3px rgba(73,79,223,.15)!important}.account-onboarding-card input[type=number]{-moz-appearance:textfield;appearance:textfield}.account-onboarding-card input[type=number]::-webkit-outer-spin-button,.account-onboarding-card input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}.number-stepper,.stepper-group{display:flex;align-items:center;gap:6px;width:100%}.number-stepper input{min-width:48px;flex:1;color:#fff!important;-webkit-text-fill-color:#fff!important;opacity:1!important}.account-inline-field{display:flex;gap:10px;align-items:center}.account-inline-field .number-stepper{flex:1}.account-inline-field select{width:92px}.account-inline-field span{color:#d0d6e0}.stepper-btn{background:#16181a!important;border:1px solid rgba(255,255,255,.08)!important;color:rgba(255,255,255,.5)!important;flex-shrink:0!important;width:32px!important;height:32px!important;border-radius:var(--radius-control)!important;display:flex!important;align-items:center!important;justify-content:center!important;padding:0!important;font-size:16px!important;line-height:1!important;cursor:pointer!important}.stepper-btn:hover{background:#1f2124!important;color:#fff!important}.setup-preview{background:rgba(73,79,223,.08);border:1px solid rgba(73,79,223,.25);border-radius:12px;padding:16px 20px;margin-top:4px}.setup-preview-row{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.08)}.setup-preview-row:last-child{border-bottom:0}.setup-preview-row span{color:rgba(255,255,255,.58);font-size:13px}.setup-preview-row strong{color:#fff;font-size:15px;font-weight:700;text-align:right}.account-onboarding-actions{display:flex;align-items:center;gap:14px;margin-top:22px}.account-onboarding-actions p{margin:0;color:#8a8f98}.save-setup-btn{background:#494fdf!important;color:#fff!important;border:none!important;font-weight:600!important}.save-setup-btn:hover{background:#5a5ff0!important}.risk-calc-card{grid-column:span 2}.risk-calc-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:12px 0}.risk-calc-grid label{display:flex;flex-direction:column;gap:6px;color:#8a8f98;font-size:12px;text-transform:uppercase;letter-spacing:.4px}.risk-calc-grid input{background:#010102!important;border:1px solid #23252a!important;color:#f7f8f8!important;border-radius:var(--radius-control)!important;padding:9px 10px!important}@media(max-width:760px){.account-form-grid,.setup-section:first-of-type .account-form-grid,.risk-calc-grid{grid-template-columns:1fr}.risk-calc-card{grid-column:auto}.account-onboarding-head{flex-direction:column}.account-onboarding-card{padding:20px}.account-inline-field{align-items:stretch;flex-direction:column}.account-inline-field select{width:100%}.setup-preview-row{align-items:flex-start;flex-direction:column}.setup-preview-row strong{text-align:left}}
 
 
 </style>
@@ -15617,7 +15558,7 @@ input{
   align-items: center !important;
   background: #16181d !important;
   border: 1px solid rgba(255, 255, 255, 0.08) !important;
-  border-radius: var(--radius-md) !important;
+  border-radius: 12px !important;
   overflow: hidden !important;
   transition: border-color 0.2s ease, box-shadow 0.2s ease !important;
 }
@@ -15939,7 +15880,7 @@ input{
   max-width: 400px !important;
   width: calc(100% - 32px) !important;
   padding: 52px 38px !important;
-  border-radius: var(--radius-card);
+  border-radius: 24px !important;
   background: linear-gradient(180deg, #12141a, #0e1014) !important;
   backdrop-filter: blur(16px) !important;
   border: 1px solid rgba(255, 255, 255, 0.08) !important;
@@ -16001,7 +15942,7 @@ input{
 #firebaseGateSignInBtn {
   background: #000000 !important;
   color: #ffffff !important;
-  border-radius: var(--radius-md) !important;
+  border-radius: 14px !important;
   font-weight: 600 !important;
   min-height: 52px !important;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4),
@@ -16022,7 +15963,7 @@ input{
 
 #bypassAuthBtn {
   margin-top: 14px !important;
-  border-radius: var(--radius-md) !important;
+  border-radius: 14px !important;
   min-height: 52px !important;
   background: rgba(255, 255, 255, 0.03) !important;
   border: 1px solid rgba(255, 255, 255, 0.06) !important;
@@ -16246,7 +16187,7 @@ input{
   background-color: #16181d !important;
   color: #ffffff !important;
   border: 1px solid rgba(255, 255, 255, 0.08) !important;
-  border-radius: var(--radius-md) !important;
+  border-radius: 10px !important;
   box-sizing: border-box !important;
   vertical-align: middle !important;
   cursor: pointer !important;
@@ -17287,7 +17228,7 @@ body:not(.firebase-auth-required) #journallApp > .sidebar .sidebox *{
       .save-setup-btn,
       .stepper-btn,
       .nav-link {
-        border-radius: var(--radius-md) !important;
+        border-radius: var(--radius-control) !important;
         background: var(--surface-2) !important;
         background-image: none !important;
         border: 1px solid var(--hairline) !important;
@@ -17375,7 +17316,7 @@ body:not(.firebase-auth-required) #journallApp > .sidebar .sidebox *{
 
       .nav button,
       .nav-link {
-        border-radius: var(--radius-pill) !important;
+        border-radius: var(--radius-control) !important;
         min-height: 40px !important;
         padding: 10px 16px !important;
         border: 1px solid transparent !important;
@@ -17485,192 +17426,6 @@ body:not(.firebase-auth-required) #journallApp > .sidebar .sidebox *{
         border-color: var(--primary) !important;
       }
     </style>
-    <style id="premium-card-elevation-layer">
-  :root {
-    --card-glow-border: color-mix(in srgb, var(--primary) 26%, var(--hairline));
-    --card-glow-border-hover: color-mix(in srgb, var(--primary) 42%, var(--hairline));
-    --card-glow-ambient: rgba(73,79,223,.10);
-    --card-glow-ambient-hover: rgba(73,79,223,.16);
-  }
-
-  #journallApp .card,
-  #journallApp .goal-card,
-  #journallApp .widget,
-  #journallApp .saved-journal-card,
-  #journallApp .analytics-bar-card,
-  #journallApp .cmd-card,
-  #journallApp .ai-score-card,
-  #journallApp .calendar-summary-card,
-  #journallApp .journal-main-card,
-  #journallApp .coach-card,
-  #journallApp .mistake-box,
-  #journallApp .mistake-modal-section,
-  #journallApp .mistake-row,
-  #journallApp .day-trade-card,
-  #journallApp .live-controller-card,
-  #journallApp .profile-card-hero,
-  #journallApp .synced-broker-header-card,
-  #accountOnboardingGate .account-onboarding-card {
-    border-radius: var(--radius-card) !important;
-    border-color: var(--card-glow-border) !important;
-    box-shadow: 0 0 0 1px rgba(73,79,223,.04), 0 10px 26px rgba(0,0,0,.20), 0 0 18px var(--card-glow-ambient) !important;
-    transition: transform 200ms ease, border-color 200ms ease, box-shadow 200ms ease !important;
-  }
-
-  #journallApp #tradingpage #commandCenter .cmd-card,
-  #journallApp #tradingpage .today-equity-card,
-  #journallApp #tradingpage .today-ai-notes-card {
-    border-radius: var(--radius-card) !important;
-    border-color: var(--card-glow-border) !important;
-    box-shadow: 0 0 0 1px rgba(73,79,223,.04), 0 10px 26px rgba(0,0,0,.20), 0 0 18px var(--card-glow-ambient) !important;
-    transition: transform 200ms ease, border-color 200ms ease, box-shadow 200ms ease !important;
-  }
-
-  #journallApp .card:hover,
-  #journallApp .goal-card:hover,
-  #journallApp .widget:hover,
-  #journallApp .saved-journal-card:hover,
-  #journallApp .analytics-bar-card:hover,
-  #journallApp .cmd-card:hover,
-  #journallApp .ai-score-card:hover,
-  #journallApp .calendar-summary-card:hover,
-  #journallApp .journal-main-card:hover,
-  #journallApp .coach-card:hover,
-  #journallApp .mistake-box:hover,
-  #journallApp .mistake-modal-section:hover,
-  #journallApp .mistake-row:hover,
-  #journallApp .day-trade-card:hover,
-  #journallApp .live-controller-card:hover,
-  #journallApp .profile-card-hero:hover,
-  #journallApp .synced-broker-header-card:hover,
-  #accountOnboardingGate .account-onboarding-card:hover {
-    border-color: var(--card-glow-border-hover) !important;
-    box-shadow: 0 0 0 1px rgba(73,79,223,.07), 0 12px 28px rgba(0,0,0,.22), 0 0 24px var(--card-glow-ambient-hover) !important;
-  }
-
-  #journallApp #tradingpage #commandCenter .cmd-card:hover,
-  #journallApp #tradingpage .today-equity-card:hover,
-  #journallApp #tradingpage .today-ai-notes-card:hover {
-    border-color: var(--card-glow-border-hover) !important;
-    box-shadow: 0 0 0 1px rgba(73,79,223,.07), 0 12px 28px rgba(0,0,0,.22), 0 0 24px var(--card-glow-ambient-hover) !important;
-  }
-
-  #journallApp .card.bento-tile,
-  #journallApp #syncStatus .rr-tile {
-    border-radius: var(--radius-card) !important;
-    box-shadow: 0 0 0 1px rgba(73,79,223,.025), 0 6px 16px rgba(0,0,0,.14), 0 0 12px rgba(73,79,223,.055) !important;
-  }
-
-  #journallApp .card.bento-tile:hover,
-  #journallApp #syncStatus .rr-tile:hover {
-    box-shadow: 0 0 0 1px rgba(73,79,223,.05), 0 8px 18px rgba(0,0,0,.16), 0 0 16px rgba(73,79,223,.09) !important;
-  }
-
-  #journallApp .card,
-  #journallApp .goal-card,
-  #journallApp .widget,
-  #journallApp .cmd-card,
-  #journallApp .saved-journal-card,
-  #journallApp .analytics-bar-card,
-  #journallApp .ai-score-card,
-  #journallApp .calendar-summary-card,
-  #journallApp .journal-main-card,
-  #journallApp .coach-card,
-  #journallApp .mistake-box,
-  #journallApp .mistake-modal-section,
-  #journallApp .mistake-row,
-  #journallApp .day-trade-card,
-  #journallApp .live-controller-card,
-  #journallApp .profile-card-hero,
-  #journallApp .synced-broker-header-card,
-  #accountOnboardingGate .account-onboarding-card {
-    padding: 28px !important;
-  }
-
-  #journallApp .cmd-card,
-  #journallApp .goal-card {
-    padding: 19px !important;
-  }
-
-  #journallApp .card.bento-tile,
-  #journallApp #syncStatus .rr-tile {
-    padding: 17px 18px 16px !important;
-  }
-
-  #journallApp #tradingpage #commandCenter .cmd-card {
-    padding: 19px !important;
-  }
-
-  #journallApp .stat-sparkline-empty {
-    opacity: .66 !important;
-  }
-
-  #journallApp .stat-sparkline-empty line {
-    opacity: .55 !important;
-  }
-
-  #journallApp .empty-chart {
-    min-height: 240px !important;
-    height: 100% !important;
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: center !important;
-    justify-content: center !important;
-    gap: 8px !important;
-    border: 1px dashed color-mix(in srgb, var(--primary) 34%, var(--hairline)) !important;
-    border-radius: var(--radius-card) !important;
-    background: linear-gradient(180deg, rgba(73,79,223,.07), rgba(73,79,223,.025)) !important;
-    color: var(--muted) !important;
-    padding: 24px !important;
-    text-align: center !important;
-  }
-
-  #journallApp .empty-chart-icon {
-    display: grid !important;
-    place-items: center !important;
-    width: 48px !important;
-    height: 48px !important;
-    border: 1px solid color-mix(in srgb, var(--primary) 34%, var(--hairline)) !important;
-    border-radius: var(--radius-card) !important;
-    color: var(--primary) !important;
-    background: rgba(73,79,223,.08) !important;
-  }
-
-  #journallApp .empty-chart strong {
-    color: var(--ink) !important;
-    font-family: var(--sans) !important;
-    font-size: 14px !important;
-    font-weight: 600 !important;
-  }
-
-  #journallApp .empty-chart span {
-    max-width: 360px !important;
-    color: var(--muted) !important;
-    font-family: var(--sans) !important;
-    font-size: 12px !important;
-    line-height: 1.5 !important;
-  }
-
-  @media (max-width: 820px) {
-    #journallApp .card,
-    #journallApp .profile-card-hero,
-    #journallApp .synced-broker-header-card,
-    #accountOnboardingGate .account-onboarding-card {
-      padding: 22px !important;
-    }
-
-    #journallApp .cmd-card,
-    #journallApp .goal-card,
-    #journallApp #tradingpage #commandCenter .cmd-card {
-      padding: 18px !important;
-    }
-
-    #journallApp .card.bento-tile,
-    #journallApp #syncStatus .rr-tile {
-      padding: 16px !important;
-    }
-  }
-</style>
     <style id="navigation-shell-phase-b">
       /* Phase B: one navigation language across sidebar, profile top bar, and psychology steps. */
       body:not(.firebase-auth-required) #journallApp > .sidebar {
@@ -17702,7 +17457,7 @@ body:not(.firebase-auth-required) #journallApp > .sidebar .sidebox *{
         margin: 0 4px !important;
         padding: 9px 12px !important;
         border: 1px solid transparent !important;
-        border-radius: var(--radius-pill) !important;
+        border-radius: var(--radius-control) !important;
         background: transparent !important;
         color: var(--ink-subtle) !important;
         font-family: var(--sans) !important;
@@ -18291,7 +18046,7 @@ body:not(.firebase-auth-required) #journallApp > .sidebar .sidebox *{
         }
       }
     </style>
-    <style id="chart-styles-phase-d">
+<style id="chart-styles-phase-d">
       /* Phase D: shared chart-family treatment. Existing tokens only, no new variables. */
       #journallApp .heatmap.phase-d-heatmap {
         gap: 6px !important;
@@ -18409,11 +18164,11 @@ body:not(.firebase-auth-required) #journallApp > .sidebar .sidebox *{
         }
       }
     </style>
-    <script id="chart-functions-phase-d-original-hooks">
+<script id="chart-functions-phase-d-original-hooks">
       window.__journallPhaseDOriginalRenderHeatmap = window.renderHeatmap;
       window.__journallPhaseDOriginalRenderCalendarDayGrid = window.renderCalendarDayGrid;
     </script>
-    <script id="chart-functions-phase-d">
+<script id="chart-functions-phase-d">
       /* Phase D: shared Chart.js and grid renderers. */
       function phaseDChartTheme(){
         return {
@@ -18548,7 +18303,7 @@ body:not(.firebase-auth-required) #journallApp > .sidebar .sidebox *{
         calendar.querySelectorAll('.day').forEach(cell=>cell.classList.add('phase-d-calendar-day'));
       }
     </script>
-    <style id="phase-e-trading-dashboard">
+<style id="phase-e-trading-dashboard">
       /* Phase E, screen 1: Trading Dashboard command center only. */
       #journallApp #tradingpage #commandCenter .shared-stat-card {
         min-height: 148px !important;
