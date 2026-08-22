@@ -576,7 +576,7 @@ button,input,select,textarea{font-family:inherit}
   gap:6px;
   min-height:26px;
   padding:5px 8px;
-  border-radius:999px;
+  border-radius:var(--radius-pill);
   border:1px solid var(--border);
   background:rgba(255,255,255,.045);
   color:var(--muted);
@@ -650,7 +650,7 @@ th,td{padding:var(--space-3) var(--space-4);border-bottom:1px solid rgba(255,255
 th{font-size:10px;color:var(--faint);font-family:var(--mono);letter-spacing:.13em;text-transform:uppercase;background:rgba(255,255,255,.025)}
 td{color:var(--muted)}
 tr:hover td{background:rgba(255,255,255,.028)}
-.badge{display:inline-flex;align-items:center;border-radius:999px;padding:4px 8px;font-size:11px;font-weight:800;margin:1px}
+.badge{display:inline-flex;align-items:center;border-radius:var(--radius-pill);padding:4px 8px;font-size:11px;font-weight:800;margin:1px}
 .buy{color:var(--blue);background:rgba(139,184,255,.14)}.sell{color:var(--amber);background:rgba(255,211,110,.14)}
 .win{color:var(--green);background:rgba(113,230,170,.12)}.loss{color:var(--red);background:rgba(255,119,136,.12)}.breakeven{color:var(--muted)!important;background:rgba(255,255,255,.045)!important}.tag{color:var(--purple);background:rgba(197,166,255,.12)}
 
@@ -1396,7 +1396,7 @@ td{
   display:inline-flex;
   align-items:center;
   gap:6px;
-  border-radius:999px;
+  border-radius:var(--radius-pill);
   padding:5px 10px;
   background:rgba(255,255,255,.04);
   color:var(--muted);
@@ -1443,7 +1443,7 @@ td{
   display:inline-flex;
   align-items:center;
   gap:6px;
-  border-radius:999px;
+  border-radius:var(--radius-pill);
   padding:6px 10px;
   font-size:11px;
   color:var(--muted);
@@ -2094,7 +2094,7 @@ body.modal-open .main{
 .journal-category-badge{
   display:inline-flex;
   padding:4px 9px;
-  border-radius:999px;
+  border-radius:var(--radius-pill);
   background:rgba(139,184,255,.12);
   color:var(--blue);
   font-size:11px;
@@ -2174,7 +2174,7 @@ body.modal-open .main{
 .screenshot-preview img{width:100%;display:block;max-height:280px;object-fit:contain}
 .saved-screenshot{margin-top:12px;border-radius:18px;border:1px solid var(--border);overflow:hidden;background:#0d0d0d}
 .saved-screenshot img{width:100%;display:block;max-height:360px;object-fit:contain}
-.trade-journal-tag{display:inline-flex;padding:4px 9px;border-radius:999px;background:rgba(107,79,214,.10);color:#d1c2ff;font-size:11px;font-weight:900;margin-left:6px}
+.trade-journal-tag{display:inline-flex;padding:4px 9px;border-radius:var(--radius-pill);background:rgba(107,79,214,.10);color:#d1c2ff;font-size:11px;font-weight:900;margin-left:6px}
 
 .journal-status-btn{display:inline-flex;align-items:center;gap:6px;border-radius:var(--radius-pill);padding:7px 10px;border:1px solid var(--border);font-size:12px;font-weight:900;cursor:pointer;white-space:nowrap;background:rgba(212,175,55,.055);color:var(--muted)}
 .journal-status-btn.done{background:rgba(184,216,176,.10);border-color:rgba(184,216,176,.20);color:#b8d8b0}
@@ -2974,7 +2974,7 @@ tr:hover {
   background: rgba(73, 79, 223, 0.12);
   border: 1px solid rgba(73, 79, 223, 0.24);
   padding: 4px 10px;
-  border-radius: 9999px;
+  border-radius: var(--radius-pill);
   margin-bottom: 8px;
 }
 .unjournaled-banner h3 {
@@ -3009,7 +3009,7 @@ tr:hover {
   align-items: center;
   gap: 8px;
   padding: 6px 14px;
-  border-radius: 9999px;
+  border-radius: var(--radius-pill);
   font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.04em;
@@ -3692,7 +3692,7 @@ tr:hover {
           <div style="flex:1;">
             <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
               <h2 style="margin:0; font-size:26px; color:#fff;" id="userProfileName">Kavya</h2>
-              <span class="badge" style="background:rgba(34,197,94,0.15); color:#4ade80; border:1px solid rgba(34,197,94,0.3); padding:4px 12px; border-radius:9999px; font-size:11px; font-weight:700;">✓ GOOGLE ACCOUNT AUTHORIZED</span>
+              <span class="badge" style="background:rgba(34,197,94,0.15); color:#4ade80; border:1px solid rgba(34,197,94,0.3); padding:4px 12px; border-radius:var(--radius-pill); font-size:11px; font-weight:700;">✓ GOOGLE ACCOUNT AUTHORIZED</span>
             </div>
             <p style="margin:6px 0 0 0; font-size:15px; color:#94a3b8;" id="userProfileEmail">krishnacnjack@gmail.com</p>
             <div style="margin-top:10px; font-size:12px; color:#cbd5e1;" id="userProfileMeta">Active Session &bull; Verified Trader Account</div>
@@ -12228,12 +12228,12 @@ textarea{border-radius:var(--radius-md)!important}input::placeholder,textarea::p
 .btn:focus-visible,.nav button:focus-visible{outline:2px solid var(--ink)!important;outline-offset:2px!important}
 .table-wrap{border:1px solid var(--hairline)!important;border-radius:0!important;background:var(--canvas)!important}table,thead,tbody,tr,td,th{background:var(--canvas)!important}th{background:var(--soft-cloud)!important;color:var(--mute)!important;border-bottom:1px solid var(--hairline)!important;font-weight:500!important;letter-spacing:0!important;text-transform:none!important}td{color:var(--ink)!important;border-bottom:1px solid var(--hairline-soft)!important}tr:hover td{background:var(--soft-cloud)!important}
 .chart,.ai-chat-box{background:var(--soft-cloud)!important;border:1px solid var(--hairline)!important;border-radius:0!important}.bar,.drawdown-bar,.analytics-track,.balance-scale{background:#242426!important;border-radius:9999px!important}.bar div,.analytics-fill,.drawdown-bar span,.balance-marker{background:var(--ink)!important;background-image:none!important;border-radius:9999px!important}.analytics-fill.profit,.green-bg,.calendar-dot.green,.balance-fill.profit{background:var(--success)!important}.analytics-fill.loss,.analytics-fill.drawdown,.red-bg,.calendar-dot.red,.balance-fill.loss{background:var(--sale)!important}.neutral-bg,.calendar-dot.neutral{background:var(--stone)!important}
-.win{background:rgba(46,204,113,.12)!important}.loss{background:rgba(255,77,79,.12)!important}.breakeven,.buy,.sell,.tag,.badge,.journal-category-badge,.widget-chip{background:var(--soft-cloud)!important;color:var(--ink)!important;border:1px solid var(--hairline)!important;border-radius:9999px!important}
+.win{background:rgba(46,204,113,.12)!important}.loss{background:rgba(255,77,79,.12)!important}.breakeven,.buy,.sell,.tag,.badge,.journal-category-badge,.widget-chip{background:var(--soft-cloud)!important;color:var(--ink)!important;border:1px solid var(--hairline)!important;border-radius:var(--radius-pill)!important}
 .insight{border-left:4px solid var(--ash)!important}.insight.good{border-left-color:var(--success)!important}.insight.danger{border-left-color:var(--sale)!important}.insight.warn{border-left-color:var(--ash)!important}.insight strong{color:var(--ink)!important}
-.cmd-status.safe{background:var(--ink)!important;color:var(--on-primary)!important;border-radius:9999px!important}.cmd-status.caution{background:var(--soft-cloud)!important;color:var(--ink)!important;border:1px solid var(--hairline)!important;border-radius:9999px!important}.cmd-status.stop{background:transparent!important;color:var(--sale)!important;border:1px solid var(--sale)!important;border-radius:9999px!important}
+.cmd-status.safe{background:var(--ink)!important;color:var(--on-primary)!important;border-radius:var(--radius-pill)!important}.cmd-status.caution{background:var(--soft-cloud)!important;color:var(--ink)!important;border:1px solid var(--hairline)!important;border-radius:var(--radius-pill)!important}.cmd-status.stop{background:transparent!important;color:var(--sale)!important;border:1px solid var(--sale)!important;border-radius:var(--radius-pill)!important}
 .psych-check.checked{background:var(--ink)!important;color:var(--on-primary)!important;border-color:var(--ink)!important}.psych-check.checked strong,.psych-check.checked em{color:var(--on-primary)!important}.psych-check.checked>span{background:var(--on-primary)!important;border-color:var(--on-primary)!important;color:var(--ink)!important}.psych-status{background:var(--soft-cloud)!important;color:var(--ink)!important;border:1px solid var(--hairline)!important;border-radius:0!important}
 .calendar-day,.calendar-day.profit,.calendar-day.lossday,.calendar-day.flatday{background:var(--canvas)!important;border:1px solid var(--hairline)!important;border-radius:0!important}.calendar-day:hover{border-color:var(--ink)!important}.calendar-pnl{font-weight:500!important}
-.ai-msg.user{background:#1e2027!important;color:#f7f8f8!important;border-color:#2e3038!important}.ai-msg.user strong{color:#f7f8f8!important}.ai-msg.bot{background:var(--soft-cloud)!important;color:var(--ink)!important}.ai-connection-detail{display:block;margin-top:10px;color:var(--ink-subtle)!important;font-size:12px;line-height:1.45}.coach-avatar{background:var(--ink)!important;color:var(--on-primary)!important}.coach-confidence{background:var(--soft-cloud)!important;color:var(--ink)!important;border:1px solid var(--hairline)!important;border-radius:9999px!important}.coach-confidence.low{color:var(--sale)!important;border-color:var(--sale)!important}.coach-confidence.high{color:var(--success)!important;border-color:var(--success)!important}
+.ai-msg.user{background:#1e2027!important;color:#f7f8f8!important;border-color:#2e3038!important}.ai-msg.user strong{color:#f7f8f8!important}.ai-msg.bot{background:var(--soft-cloud)!important;color:var(--ink)!important}.ai-connection-detail{display:block;margin-top:10px;color:var(--ink-subtle)!important;font-size:12px;line-height:1.45}.coach-avatar{background:var(--ink)!important;color:var(--on-primary)!important}.coach-confidence{background:var(--soft-cloud)!important;color:var(--ink)!important;border:1px solid var(--hairline)!important;border-radius:var(--radius-pill)!important}.coach-confidence.low{color:var(--sale)!important;border-color:var(--sale)!important}.coach-confidence.high{color:var(--success)!important;border-color:var(--success)!important}
 .modal-backdrop{background:rgba(0,0,0,.85)!important;backdrop-filter:blur(8px)!important;-webkit-backdrop-filter:blur(8px)!important;z-index:1000!important}.mistake-modal,.day-trades-modal,.firebase-auth-gate .firebase-auth-card{background:var(--surface-2)!important;border:1px solid var(--hairline-strong)!important;border-radius:var(--rounded-xl)!important;color:var(--ink)!important}.firebase-auth-gate{display:none!important;min-height:100vh!important;place-items:center!important;background:var(--canvas)!important;padding:var(--space-xl)!important}.firebase-auth-gate.show{display:grid!important}.firebase-auth-gate[hidden],#journallApp[hidden],.mobile-appbar[hidden],.firebase-auth-bar[hidden]{display:none!important}html.firebase-auth-required body{overflow:hidden!important}html.firebase-auth-required #journallApp,html.firebase-auth-required .mobile-appbar{display:none!important}html:not(.firebase-auth-required) #firebaseAuthGate,html:not(.firebase-auth-required) #firebaseAuthBar{display:none!important}.firebase-auth-bar,.mobile-appbar{background:var(--canvas)!important;color:var(--ink)!important;border-color:var(--hairline)!important}.firebase-auth-bar .btn,.firebase-auth-bar .btn.primary{background:var(--primary)!important;color:var(--ink)!important;border-color:var(--primary)!important}
 /* Emil Kowalski motion layer: fast, subtle, purposeful. */
 .card,.hero,.sidebox,.goal-card,.widget,.saved-journal-card,.analytics-bar-card,.cmd-card,.ai-score-card,.calendar-summary-card,.journal-main-card,.coach-card,.mistake-box,.mistake-modal-section,.mistake-row,.day-trade-card{transition:transform var(--dur-base) var(--ease-out),border-color var(--dur-base) var(--ease-out),opacity var(--dur-fast) var(--ease-out)!important}
