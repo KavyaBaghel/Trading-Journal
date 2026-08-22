@@ -17611,5 +17611,440 @@ body:not(.firebase-auth-required) #journallApp > .sidebar .sidebox *{
         }
       }
     </style>
+    <style id="form-controls-phase-c">
+      /* Phase C: shared shadcn-style field shells and Uiverse-inspired control states. */
+      #journallApp input:not([type="hidden"]):not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]),
+      #journallApp select,
+      #journallApp textarea,
+      #accountOnboardingGate .account-onboarding-card input:not([type="hidden"]):not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]),
+      #accountOnboardingGate .account-onboarding-card select {
+        width: 100%;
+        min-height: 44px;
+        padding: 10px 12px !important;
+        border: 1px solid var(--hairline) !important;
+        border-radius: var(--radius-control) !important;
+        background: var(--surface-2) !important;
+        color: var(--ink) !important;
+        font-family: var(--sans) !important;
+        letter-spacing: 0 !important;
+        line-height: 1.35;
+        color-scheme: dark;
+        transition: background-color 160ms var(--ease-out), border-color 160ms var(--ease-out), box-shadow 160ms var(--ease-out), transform 160ms var(--ease-snappy) !important;
+      }
+
+      #journallApp textarea,
+      #accountOnboardingGate .account-onboarding-card textarea {
+        min-height: 104px;
+        resize: vertical;
+      }
+
+      #journallApp input::placeholder,
+      #journallApp textarea::placeholder,
+      #accountOnboardingGate .account-onboarding-card input::placeholder,
+      #accountOnboardingGate .account-onboarding-card textarea::placeholder {
+        color: var(--muted) !important;
+        opacity: 1;
+      }
+
+      #journallApp input:not([type="hidden"]):not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]):hover,
+      #journallApp select:hover,
+      #journallApp textarea:hover,
+      #accountOnboardingGate .account-onboarding-card input:not([type="hidden"]):not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]):hover,
+      #accountOnboardingGate .account-onboarding-card select:hover {
+        border-color: color-mix(in srgb, var(--primary) 28%, var(--hairline));
+        background: color-mix(in srgb, var(--primary) 5%, var(--surface-2));
+      }
+
+      #journallApp input:not([type="hidden"]):not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]):focus-visible,
+      #journallApp select:focus-visible,
+      #journallApp textarea:focus-visible,
+      #accountOnboardingGate .account-onboarding-card input:not([type="hidden"]):not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]):focus-visible,
+      #accountOnboardingGate .account-onboarding-card select:focus-visible {
+        outline: 2px solid color-mix(in srgb, var(--primary) 72%, transparent) !important;
+        outline-offset: 2px !important;
+        border-color: var(--primary) !important;
+        box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 16%, transparent) !important;
+        transform: translateY(-1px) !important;
+      }
+
+      #journallApp input:disabled,
+      #journallApp select:disabled,
+      #journallApp textarea:disabled,
+      #accountOnboardingGate .account-onboarding-card input:disabled,
+      #accountOnboardingGate .account-onboarding-card select:disabled {
+        cursor: not-allowed;
+        opacity: .55;
+        background: var(--surface-1);
+      }
+
+      /* Native checkboxes retain !important because pre-existing Psychology checkbox rules do. */
+      #journallApp input[type="checkbox"],
+      #accountOnboardingGate .account-onboarding-card input[type="checkbox"] {
+        appearance: none !important;
+        -webkit-appearance: none !important;
+        width: 20px !important;
+        height: 20px !important;
+        min-width: 20px !important;
+        min-height: 20px !important;
+        margin: 0;
+        padding: 0;
+        border: 1px solid var(--hairline-strong) !important;
+        border-radius: var(--radius-control) !important;
+        background: var(--surface-2) !important;
+        cursor: pointer;
+        flex: 0 0 20px;
+        position: relative;
+        transition: background-color 160ms var(--ease-out), border-color 160ms var(--ease-out), box-shadow 160ms var(--ease-out), transform 160ms var(--ease-snappy) !important;
+      }
+
+      /* No pre-Phase-C radio rules exist, so this group uses normal cascade priority. */
+      #journallApp input[type="radio"],
+      #accountOnboardingGate .account-onboarding-card input[type="radio"] {
+        appearance: none;
+        -webkit-appearance: none;
+        width: 20px;
+        height: 20px;
+        min-width: 20px;
+        min-height: 20px;
+        margin: 0;
+        padding: 0;
+        border: 1px solid var(--hairline-strong);
+        border-radius: var(--radius-control);
+        background: var(--surface-2);
+        cursor: pointer;
+        flex: 0 0 20px;
+        position: relative;
+        transition: background-color 160ms var(--ease-out), border-color 160ms var(--ease-out), box-shadow 160ms var(--ease-out), transform 160ms var(--ease-snappy);
+      }
+
+      #journallApp input[type="checkbox"]:hover,
+      #journallApp input[type="radio"]:hover,
+      #accountOnboardingGate .account-onboarding-card input[type="checkbox"]:hover,
+      #accountOnboardingGate .account-onboarding-card input[type="radio"]:hover {
+        border-color: color-mix(in srgb, var(--primary) 42%, var(--hairline-strong));
+        box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 8%, transparent);
+      }
+
+      #journallApp input[type="checkbox"]:checked,
+      #accountOnboardingGate .account-onboarding-card input[type="checkbox"]:checked {
+        background: var(--primary) !important;
+        border-color: var(--primary) !important;
+        box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 10%, transparent);
+      }
+
+      #journallApp input[type="radio"]:checked,
+      #accountOnboardingGate .account-onboarding-card input[type="radio"]:checked {
+        background: var(--primary);
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 10%, transparent);
+      }
+
+      #journallApp input[type="checkbox"]:checked::after,
+      #accountOnboardingGate .account-onboarding-card input[type="checkbox"]:checked::after {
+        content: "" !important;
+        position: absolute;
+        left: 6px;
+        top: 2px;
+        width: 5px;
+        height: 10px;
+        border: 2px solid var(--on-primary) !important;
+        border-top: 0 !important;
+        border-left: 0 !important;
+        transform: rotate(45deg);
+      }
+
+      #journallApp input[type="radio"]:checked::after,
+      #accountOnboardingGate .account-onboarding-card input[type="radio"]:checked::after {
+        content: "";
+        position: absolute;
+        inset: 5px;
+        border-radius: var(--radius-control);
+        background: var(--on-primary);
+      }
+
+      #journallApp input[type="checkbox"]:focus-visible,
+      #journallApp input[type="radio"]:focus-visible,
+      #accountOnboardingGate .account-onboarding-card input[type="checkbox"]:focus-visible,
+      #accountOnboardingGate .account-onboarding-card input[type="radio"]:focus-visible {
+        outline: 2px solid color-mix(in srgb, var(--primary) 72%, transparent);
+        outline-offset: 2px;
+      }
+
+      /* Psychology buttons are the app's custom checkbox controls. */
+      #journallApp .psych-check {
+        display: grid;
+        align-items: center;
+        gap: 12px !important;
+        width: 100%;
+        min-height: 56px !important;
+        margin: 0;
+        padding: 14px 16px !important;
+        border: 1px solid var(--hairline) !important;
+        border-radius: var(--radius-control) !important;
+        background: var(--surface-1) !important;
+        color: var(--ink) !important;
+        font-family: var(--sans);
+        font-size: 14px;
+        font-weight: 500;
+        line-height: 1.35;
+        text-align: left;
+        cursor: pointer;
+        transition: background-color 160ms var(--ease-out), border-color 160ms var(--ease-out), box-shadow 160ms var(--ease-out), transform 160ms var(--ease-snappy) !important;
+      }
+
+      #journallApp #preTradeChecklist .checklist-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        width: 100%;
+        min-height: 56px;
+        margin: 0;
+        padding: 14px 16px !important;
+        border: 1px solid var(--hairline) !important;
+        border-radius: var(--radius-control) !important;
+        background: var(--surface-1) !important;
+        color: var(--ink);
+        font-family: var(--sans);
+        font-size: 14px;
+        font-weight: 500;
+        line-height: 1.35;
+        text-align: left;
+        cursor: pointer;
+        transition: background-color 160ms var(--ease-out), border-color 160ms var(--ease-out), box-shadow 160ms var(--ease-out), transform 160ms var(--ease-snappy) !important;
+      }
+
+      #journallApp .setup-criterion-check {
+        width: 100%;
+      }
+
+      #journallApp .psych-check:hover {
+        background: color-mix(in srgb, var(--primary) 7%, var(--surface-2)) !important;
+        border-color: color-mix(in srgb, var(--primary) 28%, var(--hairline)) !important;
+        box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 7%, transparent);
+        transform: translateY(-1px) !important;
+      }
+
+      #journallApp #preTradeChecklist .checklist-item:hover {
+        background: color-mix(in srgb, var(--primary) 7%, var(--surface-2)) !important;
+        border-color: color-mix(in srgb, var(--primary) 28%, var(--hairline)) !important;
+        box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 7%, transparent);
+        transform: translateY(-1px);
+      }
+
+      #journallApp .psych-check:focus-visible,
+      #journallApp #preTradeChecklist .checklist-item:focus-visible,
+      #journallApp .setup-criterion-check:focus-visible {
+        outline: 2px solid color-mix(in srgb, var(--primary) 72%, transparent);
+        outline-offset: 2px;
+      }
+
+      #journallApp .psych-check.checked {
+        background: color-mix(in srgb, var(--primary) 12%, var(--surface-2)) !important;
+        border-color: color-mix(in srgb, var(--primary) 36%, var(--hairline)) !important;
+        box-shadow: 0 0 0 1px color-mix(in srgb, var(--primary) 10%, transparent);
+      }
+
+      #journallApp #preTradeChecklist .checklist-item.checked {
+        background: color-mix(in srgb, var(--primary) 12%, var(--surface-2)) !important;
+        border-color: color-mix(in srgb, var(--primary) 36%, var(--hairline)) !important;
+        box-shadow: 0 0 0 1px color-mix(in srgb, var(--primary) 10%, transparent);
+      }
+
+      #journallApp .psych-check > span,
+      #journallApp .check-icon,
+      #journallApp .checklist-result-icon {
+        display: grid !important;
+        place-items: center;
+        width: 20px !important;
+        height: 20px !important;
+        min-width: 20px !important;
+        min-height: 20px !important;
+        margin: 0;
+        border: 1px solid var(--hairline-strong) !important;
+        border-radius: var(--radius-control) !important;
+        background: var(--surface-2) !important;
+        color: transparent !important;
+        position: relative !important;
+        transition: background-color 160ms var(--ease-out), border-color 160ms var(--ease-out), box-shadow 160ms var(--ease-out), transform 160ms var(--ease-snappy) !important;
+      }
+
+      #journallApp .psych-check.checked > span,
+      #journallApp #preTradeChecklist .check-icon.done,
+      #journallApp .checklist-result-icon.pass {
+        background: var(--primary) !important;
+        border-color: var(--primary) !important;
+        box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 10%, transparent);
+      }
+
+      #journallApp .psych-check.checked > span::after,
+      #journallApp #preTradeChecklist .check-icon.done::after,
+      #journallApp .checklist-result-icon.pass::after {
+        content: "" !important;
+        position: absolute;
+        left: 6px;
+        top: 2px;
+        width: 5px;
+        height: 10px;
+        border: 2px solid var(--on-primary) !important;
+        border-top: 0 !important;
+        border-left: 0 !important;
+        transform: rotate(45deg);
+      }
+
+      #journallApp .psych-check strong,
+      #journallApp .checklist-text,
+      #journallApp .setup-criterion-check strong {
+        color: var(--ink);
+        font-family: var(--sans);
+        font-weight: 600;
+      }
+
+      #journallApp .psych-check em,
+      #journallApp .checklist-text small,
+      #journallApp .setup-section-help,
+      #journallApp .psych-debrief-form label {
+        color: var(--muted);
+        font-family: var(--sans);
+      }
+
+      #journallApp .psych-debrief-form,
+      #journallApp .account-form-grid,
+      #journallApp .journal-field-grid,
+      #journallApp .setup-criteria-rows {
+        gap: 12px;
+      }
+
+      #journallApp .psych-debrief-form label,
+      #journallApp .account-form-grid label,
+      #journallApp .setup-criteria-row label,
+      #journallApp .journal-field-label {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        font-size: 12px;
+        font-weight: 600;
+        letter-spacing: .02em;
+        line-height: 1.35;
+      }
+
+      #journallApp .file-picker-name,
+      #journallApp .file-picker-input + label + .file-picker-name {
+        color: var(--muted);
+        font-family: var(--sans);
+        font-size: 12px;
+      }
+
+      /* Toggle/switch shell plus explicit on-state track and thumb. No pre-Phase-C switch markup exists. */
+      #journallApp [role="switch"],
+      #journallApp .toggle,
+      #journallApp .switch {
+        position: relative;
+        display: inline-flex;
+        align-items: center;
+        min-width: 72px;
+        min-height: 40px !important;
+        padding: 8px 12px 8px 34px;
+        border: 1px solid var(--hairline) !important;
+        border-radius: var(--radius-control) !important;
+        background: var(--surface-1) !important;
+        color: var(--ink) !important;
+        font-family: var(--sans) !important;
+        cursor: pointer;
+        transition: background-color 160ms var(--ease-out), border-color 160ms var(--ease-out), box-shadow 160ms var(--ease-out), transform 160ms var(--ease-snappy) !important;
+      }
+
+      #journallApp [role="switch"]::after,
+      #journallApp .toggle::after,
+      #journallApp .switch::after {
+        content: "";
+        position: absolute;
+        left: 4px;
+        top: 50%;
+        width: 20px;
+        height: 20px;
+        border-radius: var(--radius-pill);
+        background: var(--muted);
+        box-shadow: 0 1px 3px rgba(0,0,0,.28);
+        transform: translateY(-50%);
+        transition: background-color 160ms var(--ease-out), transform 160ms var(--ease-snappy), box-shadow 160ms var(--ease-out);
+      }
+
+      #journallApp [role="switch"]:hover,
+      #journallApp .toggle:hover,
+      #journallApp .switch:hover {
+        border-color: color-mix(in srgb, var(--primary) 28%, var(--hairline));
+        box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 7%, transparent);
+      }
+
+      #journallApp [role="switch"]:focus-visible,
+      #journallApp .toggle:focus-visible,
+      #journallApp .switch:focus-visible {
+        outline: 2px solid color-mix(in srgb, var(--primary) 72%, transparent);
+        outline-offset: 2px;
+      }
+
+      #journallApp [role="switch"][aria-checked="true"],
+      #journallApp [role="switch"].active {
+        background: color-mix(in srgb, var(--primary) 18%, var(--surface-1)) !important;
+        border: 1px solid var(--primary) !important;
+        color: var(--on-primary) !important;
+      }
+
+      #journallApp .toggle.active,
+      #journallApp .toggle.checked,
+      #journallApp .switch.active,
+      #journallApp .switch.checked,
+      #journallApp [data-state="on"].toggle,
+      #journallApp [data-state="on"].switch {
+        background: color-mix(in srgb, var(--primary) 18%, var(--surface-1));
+        border-color: var(--primary);
+        color: var(--on-primary);
+      }
+
+      #journallApp [role="switch"][aria-checked="true"]::after,
+      #journallApp [role="switch"].active::after {
+        background: var(--on-primary) !important;
+        box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 18%, transparent) !important;
+        transform: translate(40px, -50%) !important;
+      }
+
+      #journallApp .toggle.active::after,
+      #journallApp .toggle.checked::after,
+      #journallApp .switch.active::after,
+      #journallApp .switch.checked::after,
+      #journallApp [data-state="on"].toggle::after,
+      #journallApp [data-state="on"].switch::after {
+        background: var(--on-primary) !important;
+        box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 18%, transparent) !important;
+        transform: translate(40px, -50%) !important;
+      }
+
+      #journallApp input.toggle[type="checkbox"]:checked,
+      #journallApp input.switch[type="checkbox"]:checked {
+        background: color-mix(in srgb, var(--primary) 18%, var(--surface-1));
+        border-color: var(--primary);
+      }
+
+      #journallApp option {
+        background: var(--surface-2);
+        color: var(--ink);
+        font-family: var(--sans);
+      }
+
+      @media (max-width: 820px) {
+        #journallApp .psych-check,
+        #journallApp #preTradeChecklist .checklist-item,
+        #journallApp .setup-criterion-check {
+          min-height: 52px !important;
+          padding: 12px 14px !important;
+        }
+
+        #journallApp .psych-debrief-form,
+        #journallApp .account-form-grid,
+        #journallApp .journal-field-grid {
+          gap: 10px;
+        }
+      }
+    </style>
 </body>
 </html>
