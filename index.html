@@ -5524,13 +5524,13 @@ function renderCharts(){
   const wins = filtered.filter(t=>tradeResult(t.pnl)==='profit');
   const losses = filtered.filter(t=>tradeResult(t.pnl)==='loss');
   const flats = filtered.filter(t=>tradeResult(t.pnl)==='breakeven');
-  chartDoughnut('outcomePieChart',['Wins','Losses','Break-even'],[wins.length,losses.length,flats.length],['#007d48','#d30005','#707072'],'count');
+  chartDoughnut('outcomePieChart',['Wins','Losses','Break-even'],[wins.length,losses.length,flats.length],'count');
   const outcomeHelper = document.getElementById('outcomePieHelper');
   if(outcomeHelper) outcomeHelper.innerHTML = `<strong>Read this:</strong> ${wins.length} wins, ${losses.length} losses, ${flats.length} flat trades. Win rate ${filtered.length ? ((wins.length/filtered.length)*100).toFixed(1) : '0.0'}%.`;
 
   const grossProfit = wins.reduce((a,t)=>a+Number(t.pnl || 0),0);
   const grossLoss = Math.abs(losses.reduce((a,t)=>a+Number(t.pnl || 0),0));
-  chartDoughnut('pnlPieChart',['Gross Profit','Gross Loss'],[+grossProfit.toFixed(2),+grossLoss.toFixed(2)],['#007d48','#d30005']);
+  chartDoughnut('pnlPieChart',['Gross Profit','Gross Loss'],[+grossProfit.toFixed(2),+grossLoss.toFixed(2)]);
   const pnlHelper = document.getElementById('pnlPieHelper');
   if(pnlHelper){
     const pf = grossLoss ? grossProfit / grossLoss : (grossProfit ? Infinity : 0);
@@ -5539,7 +5539,7 @@ function renderCharts(){
 
   const sessions=['Asia','London','New York'], sm=by(t=>t.session,sessions);
   const sessionCounts = sessions.map(name=>filtered.filter(t=>t.session===name).length);
-  chartDoughnut('sessionPieChart',sessions,sessionCounts,['#111111','#707072','#cacacb'],'count');
+  chartDoughnut('sessionPieChart',sessions,sessionCounts,'count');
   const sessionPieHelper = document.getElementById('sessionPieHelper');
   if(sessionPieHelper){
     const busiest = sessions[sessionCounts.indexOf(Math.max(...sessionCounts))] || 'No session';
@@ -5565,7 +5565,7 @@ function renderCharts(){
   chartBar('lotChart',lots,lots.map(x=>lm[x]));
 
   const reasons=[...new Set(filtered.map(t=>t.reason||'Unknown'))], rm=by(t=>t.reason||'Unknown',reasons);
-  chartDoughnut('reasonChart',reasons,reasons.map(x=>Math.abs(rm[x])),['#111111','#d30005','#007d48','#707072','#cacacb']);
+  chartDoughnut('reasonChart',reasons,reasons.map(x=>Math.abs(rm[x])));
 
   const weekly={};
   sorted(filtered).forEach(t=>{const d=new Date(t.date); const week='W'+Math.ceil(d.getDate()/7); if(!weekly[week]) weekly[week]={pnl:0,count:0,vol:0}; weekly[week].pnl+=t.pnl; weekly[week].count++; weekly[week].vol+=t.volume;});
@@ -18240,7 +18240,7 @@ body:not(.firebase-auth-required) #journallApp > .sidebar .sidebox *{
         });
       }
 
-      function chartDoughnut(id, labels, data, colors, formatter='money'){
+      function chartDoughnut(id, labels, data, formatter='money'){
         const canvas = ensureCanvas(id);
         if(!canvas) return;
         destroy(id);
