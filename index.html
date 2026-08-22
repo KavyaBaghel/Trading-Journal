@@ -447,6 +447,7 @@ Name changes remaining this month: ${remaining} of 2.`);
   --shadow:0 18px 48px rgba(0,0,0,.22);
   --radius-card:18px;
   --radius-md:10px;
+  --radius-control:10px;
   --radius-pill:9999px;
   --sans:'Geist',system-ui,sans-serif;
   --mono:'Space Mono',monospace;
@@ -497,7 +498,7 @@ button,input,select,textarea{font-family:inherit}
 .hero p{color:var(--muted);line-height:1.65;max-width:860px;margin:12px 0 0}
 
 .quick-actions{display:flex;flex-direction:column;gap:10px;min-width:210px}
-.btn{border:1px solid var(--border);background:rgba(255,255,255,.055);color:var(--text);border-radius:16px;padding:12px 14px;cursor:pointer}
+.btn{border:1px solid var(--border);background:rgba(255,255,255,.055);color:var(--text);border-radius:var(--radius-control);padding:12px 14px;cursor:pointer}
 .btn.primary{background:linear-gradient(135deg,#90efbd,#71e6aa);color:#06110c;font-weight:900;border:0}
 .btn:hover{transform:translateY(-1px)}
 
@@ -628,7 +629,7 @@ button,input,select,textarea{font-family:inherit}
 }
 
 .tabs-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
-.pill{padding:8px 12px;border-radius:999px;background:rgba(255,255,255,.045);border:1px solid var(--border);color:var(--muted);font-size:12px;cursor:pointer}
+.pill{padding:8px 12px;border-radius:var(--radius-pill);background:rgba(255,255,255,.045);border:1px solid var(--border);color:var(--muted);font-size:12px;cursor:pointer}
 .pill.active{background:rgba(113,230,170,.12);border-color:rgba(113,230,170,.25);color:var(--green)}
 
 .insights{display:flex;flex-direction:column;gap:10px}
@@ -2175,7 +2176,7 @@ body.modal-open .main{
 .saved-screenshot img{width:100%;display:block;max-height:360px;object-fit:contain}
 .trade-journal-tag{display:inline-flex;padding:4px 9px;border-radius:999px;background:rgba(107,79,214,.10);color:#d1c2ff;font-size:11px;font-weight:900;margin-left:6px}
 
-.journal-status-btn{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:7px 10px;border:1px solid var(--border);font-size:12px;font-weight:900;cursor:pointer;white-space:nowrap;background:rgba(212,175,55,.055);color:var(--muted)}
+.journal-status-btn{display:inline-flex;align-items:center;gap:6px;border-radius:var(--radius-pill);padding:7px 10px;border:1px solid var(--border);font-size:12px;font-weight:900;cursor:pointer;white-space:nowrap;background:rgba(212,175,55,.055);color:var(--muted)}
 .journal-status-btn.done{background:rgba(184,216,176,.10);border-color:rgba(184,216,176,.20);color:#b8d8b0}
 .journal-status-btn.todo{background:rgba(107,79,214,.08);border-color:rgba(107,79,214,.20);color:#d1c2ff}
 .journal-status-btn:hover{filter:brightness(1.08)}
@@ -2535,7 +2536,7 @@ tr:hover {
   background:#16181a !important;
   border:1px solid rgba(255,255,255,.08) !important;
   color:#fff !important;
-  border-radius:10px !important;
+  border-radius:var(--radius-control) !important;
   padding:12px 14px !important;
 }
 #journallApp .bar {
@@ -3418,7 +3419,7 @@ tr:hover {
         .nav-list { flex: 1 !important; list-style: none !important; overflow-y: auto !important; }
         .nav-link {
             display: flex !important; align-items: center !important; justify-content: flex-start !important; gap: 12px !important;
-            padding: 0.75rem 1rem !important; border-radius: 12px !important;
+            padding: 0.75rem 1rem !important; border-radius: var(--radius-control) !important;
             color: var(--text-muted) !important; text-decoration: none !important;
             font-weight: 500 !important; transition: all 0.2s !important;
             background: transparent !important; border: none !important; width: 100% !important;
@@ -3548,7 +3549,7 @@ tr:hover {
         <div class="signin-preview-row"><span>Review mode</span><strong>Rules + AI</strong></div>
       </div>
       <button id="firebaseGateSignInBtn" class="btn primary signin-google-btn" type="button" style="display:flex; align-items:center; justify-content:center; gap:10px; width:100%;"><span id="googleBtnContent" style="display:inline-flex; align-items:center; justify-content:center; gap:10px;"><svg class="google-logo-svg" viewBox="0 0 24 24" width="18" height="18" style="display:inline-block; vertical-align:middle;"><path fill="#EA4335" d="M12 5.04c1.7 0 3.2.6 4.4 1.8l3.3-3.3C17.7 1.6 15 1 12 1 7.3 1 3.4 3.7 1.5 7.7l3.9 3C6.3 7.7 8.9 5.04 12 5.04z"/><path fill="#4285F4" d="M23.5 12.3c0-.8-.1-1.7-.2-2.5H12v4.8h6.5c-.3 1.5-1.1 2.8-2.4 3.7l3.7 2.9c2.2-2 3.7-5 3.7-8.9z"/><path fill="#FBBC05" d="M5.4 14.7c-.3-.8-.4-1.7-.4-2.7s.1-1.9.4-2.7L1.5 6.3C.5 8.2 0 10.3 0 12.5s.5 4.3 1.5 6.2l3.9-3z"/><path fill="#34A853" d="M12 23c3.2 0 6-1.1 7.9-2.9l-3.7-2.9c-1.1.7-2.5 1.2-4.2 1.2-3.1 0-5.7-2.7-6.6-5.7L1.5 15.7C3.4 19.7 7.3 23 12 23z"/></svg><span>Sign in with Google</span></span></button>
-      <button id="bypassAuthBtn" class="btn" type="button" onclick="bypassAuthAndOpenLocal()" style="margin-top:10px; width:100%; border:1px solid rgba(255,255,255,0.08); background:rgba(255,255,255,0.02); color:#8a8f98; border-radius:9999px; min-height:44px; font-weight:600; cursor:pointer;">Use Offline</button>
+      <button id="bypassAuthBtn" class="btn" type="button" onclick="bypassAuthAndOpenLocal()" style="margin-top:10px; width:100%; border:1px solid rgba(255,255,255,0.08); background:rgba(255,255,255,0.02); color:#8a8f98; border-radius:var(--radius-control); min-height:44px; font-weight:600; cursor:pointer;">Use Offline</button>
       <div id="firebaseGateMessage" class="firebase-auth-message">Checking website sign-in...</div>
       <p class="signin-footnote">Use Journall privately with your own Google account. Your journal data stays tied to your sign-in.</p>
     </aside>
@@ -3726,7 +3727,7 @@ tr:hover {
         <div class="panel-title"><h3>Profile Settings</h3><span>Customize Account</span></div>
         <div style="display:grid; gap:16px; max-width:520px; margin-top:16px;">
           <label style="display:block; font-size:13px; color:#94a3b8; font-weight:600;">DISPLAY TRADER NAME
-            <input type="text" id="customUsernameInput" style="width:100%; border-radius:8px; padding:12px; background:rgba(255,255,255,0.06); color:#fff; margin-top:6px;" placeholder="Enter custom display name..." oninput="handleLiveUsernameInput(this.value)">
+            <input type="text" id="customUsernameInput" style="width:100%; border-radius:var(--radius-control); padding:12px; background:rgba(255,255,255,0.06); color:#fff; margin-top:6px;" placeholder="Enter custom display name..." oninput="handleLiveUsernameInput(this.value)">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-top:6px; flex-wrap:wrap; gap:6px;">
               <span id="nameChangeLimitBadge" style="font-size:12px; color:#a855f7; font-weight:600;">Name changes remaining this month: 2 of 2</span>
               <span style="font-size:11px; color:#64748b;">Limit: Max 2 name changes / month</span>
@@ -3750,7 +3751,7 @@ tr:hover {
 
         <div style="margin-bottom: 16px;">
           <label style="display:block; font-size:11px; text-transform:uppercase; color:rgba(255,255,255,0.4); margin-bottom:4px;">Trading Platform / Broker</label>
-          <select id="brokerPlatformSelect" onchange="onBrokerPlatformChange()" style="width:100% !important; border-radius:8px !important; padding:8px 12px !important; height: 38px !important; background: rgba(255,255,255,0.06); color: #fff;">
+          <select id="brokerPlatformSelect" onchange="onBrokerPlatformChange()" style="width:100% !important; border-radius:var(--radius-control) !important; padding:8px 12px !important; height: 38px !important; background: rgba(255,255,255,0.06); color: #fff;">
             <option value="matchtrader" selected>MatchTrader (Direct Cloud Sync)</option>
             <option value="ctrader">cTrader (Direct Cloud Sync)</option>
             <option value="mt5">MetaTrader 5 (HTML Report / Desktop App)</option>
@@ -3761,12 +3762,12 @@ tr:hover {
         <div id="fieldsMt5" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 16px;">
           <div>
             <label style="display:block; font-size:11px; text-transform:uppercase; color:rgba(255,255,255,0.4); margin-bottom:4px;">MT5 Account Login (Optional)</label>
-            <input type="number" id="brokerSyncLogin" placeholder="Active account number..." style="width:100% !important; border-radius:8px !important; padding:8px 12px !important;">
+            <input type="number" id="brokerSyncLogin" placeholder="Active account number..." style="width:100% !important; border-radius:var(--radius-control) !important; padding:8px 12px !important;">
             <div style="font-size:10px; color:rgba(255,255,255,0.4); margin-top:3px;">Found at the top bar of MT5 or in your broker dashboard credentials email. Leave blank if MT5 is already active.</div>
           </div>
           <div>
             <label style="display:block; font-size:11px; text-transform:uppercase; color:rgba(255,255,255,0.4); margin-bottom:4px;">MT5 Server Name (Optional)</label>
-            <input type="text" id="brokerSyncServer" placeholder="e.g. FundingPips-Server..." style="width:100% !important; border-radius:8px !important; padding:8px 12px !important;">
+            <input type="text" id="brokerSyncServer" placeholder="e.g. FundingPips-Server..." style="width:100% !important; border-radius:var(--radius-control) !important; padding:8px 12px !important;">
           </div>
         </div>
 
@@ -3774,16 +3775,16 @@ tr:hover {
         <div id="fieldsMatchtrader" style="display: none; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 16px;">
           <div>
             <label style="display:block; font-size:11px; text-transform:uppercase; color:rgba(255,255,255,0.4); margin-bottom:4px;">MatchTrader Platform URL</label>
-            <input type="text" id="matchtraderUrl" placeholder="https://matchtrader.fundingpips.com" style="width:100% !important; border-radius:8px !important; padding:8px 12px !important;">
+            <input type="text" id="matchtraderUrl" placeholder="https://matchtrader.fundingpips.com" style="width:100% !important; border-radius:var(--radius-control) !important; padding:8px 12px !important;">
           </div>
           <div>
             <label style="display:block; font-size:11px; text-transform:uppercase; color:rgba(255,255,255,0.4); margin-bottom:4px;">Account Email / Username</label>
-            <input type="text" id="matchtraderEmail" placeholder="Your account email..." style="width:100% !important; border-radius:8px !important; padding:8px 12px !important;">
+            <input type="text" id="matchtraderEmail" placeholder="Your account email..." style="width:100% !important; border-radius:var(--radius-control) !important; padding:8px 12px !important;">
             <div style="font-size:10px; color:rgba(255,255,255,0.4); margin-top:3px;">Use the email address registered with your prop firm / MatchTrader account.</div>
           </div>
           <div>
             <label style="display:block; font-size:11px; text-transform:uppercase; color:rgba(255,255,255,0.4); margin-bottom:4px;">Password</label>
-            <input type="password" id="matchtraderPassword" placeholder="MatchTrader password..." style="width:100% !important; border-radius:8px !important; padding:8px 12px !important;">
+            <input type="password" id="matchtraderPassword" placeholder="MatchTrader password..." style="width:100% !important; border-radius:var(--radius-control) !important; padding:8px 12px !important;">
           </div>
         </div>
 
@@ -3791,18 +3792,18 @@ tr:hover {
         <div id="fieldsCtrader" style="display: none; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 16px;">
           <div>
             <label style="display:block; font-size:11px; text-transform:uppercase; color:rgba(255,255,255,0.4); margin-bottom:4px;">cTrader Access Token</label>
-            <input type="text" id="ctraderToken" placeholder="Spotware cTrader API Access Token..." style="width:100% !important; border-radius:8px !important; padding:8px 12px !important;">
+            <input type="text" id="ctraderToken" placeholder="Spotware cTrader API Access Token..." style="width:100% !important; border-radius:var(--radius-control) !important; padding:8px 12px !important;">
           </div>
           <div>
             <label style="display:block; font-size:11px; text-transform:uppercase; color:rgba(255,255,255,0.4); margin-bottom:4px;">cTrader Account ID (Optional)</label>
-            <input type="text" id="ctraderAccountId" placeholder="e.g. 1234567..." style="width:100% !important; border-radius:8px !important; padding:8px 12px !important;">
+            <input type="text" id="ctraderAccountId" placeholder="e.g. 1234567..." style="width:100% !important; border-radius:var(--radius-control) !important; padding:8px 12px !important;">
             <div style="font-size:10px; color:rgba(255,255,255,0.4); margin-top:3px;">Shown at top-left of cTrader app next to your account name.</div>
           </div>
         </div>
 
         <div style="margin-bottom: 16px;">
           <label style="display:block; font-size:11px; text-transform:uppercase; color:rgba(255,255,255,0.4); margin-bottom:4px;">Sync Window</label>
-          <select id="brokerSyncDays" style="width:100% !important; border-radius:8px !important; padding:8px 12px !important; height: 38px !important;">
+          <select id="brokerSyncDays" style="width:100% !important; border-radius:var(--radius-control) !important; padding:8px 12px !important; height: 38px !important;">
             <option value="7">Last 7 Days</option>
             <option value="30" selected>Last 30 Days</option>
             <option value="90">Last 90 Days</option>
@@ -3947,17 +3948,20 @@ tr:hover {
 
     <section id="tradingpage" class="section active">
       <div class="command-center" id="commandCenter">
-        <div class="cmd-card">
+        <div class="cmd-card stat-card">
           <div class="cmd-label">Today P&L</div>
           <div class="cmd-value" id="cmdTodayPnl">$0.00</div>
+          <div class="stat-sparkline" id="cmdTodayPnlSparkline"></div>
         </div>
-        <div class="cmd-card">
+        <div class="cmd-card stat-card">
       <div class="cmd-label">Daily Loss Used</div>
       <div class="cmd-value" id="cmdDailyLoss">$0.00 / not set</div>
+          <div class="stat-sparkline" id="cmdDailyLossSparkline"></div>
         </div>
-        <div class="cmd-card">
+        <div class="cmd-card stat-card">
           <div class="cmd-label">Trades</div>
           <div class="cmd-value" id="cmdTrades">0 / not set</div>
+          <div class="stat-sparkline" id="cmdTradesSparkline"></div>
         </div>
         <div class="cmd-card">
           <div class="cmd-label">Rule Breaks</div>
@@ -3985,22 +3989,25 @@ tr:hover {
       <div class="grid two">
         <div class="card">
           <div class="panel-title"><h3>Risk/Reward</h3><span>today only</span></div>
-          <div class="streak-tracker" id="syncStatus">Not enough data</div>
+          <div class="streak-tracker bento-grid" id="syncStatus">Not enough data</div>
         </div>
 
         <div class="card">
           <div class="panel-title"><h3>Today Summary</h3><span id="todayDateLabel">IST</span></div>
-          <div class="grid metrics today-metrics" id="todayMetrics"></div>
+          <div class="grid metrics today-metrics bento-grid" id="todayMetrics"></div>
         </div>
       </div>
 
       <div class="grid two" style="margin-top:16px">
-        <div class="card">
+        <div class="card today-equity-card">
           <div class="panel-title"><h3>Today Equity Curve</h3><span>intraday</span></div>
-          <div class="chart tall"><canvas id="todayEquityChart"></canvas></div>
+          <div class="chart tall today-equity-chart" data-chart-id="todayEquityChart">
+            <canvas id="todayEquityChart"></canvas>
+            <div id="todayEquityTooltip" class="today-equity-tooltip" hidden></div>
+          </div>
         </div>
 
-        <div class="card">
+        <div class="card today-ai-notes-card">
           <div class="panel-title"><h3>Today AI Notes</h3><span>live review</span></div>
           <div id="todayInsights" class="insights"></div>
         </div>
@@ -4761,7 +4768,19 @@ function renderStreakTracker(todayTrades){
     .filter(t => t && t.date === todayISTDate());
 
   if(!ordered.length){
-    status.innerHTML = `<div style="padding:2px 0;color:var(--muted);text-align:center">Not enough data</div>`;
+    status.innerHTML = `
+      <div class="rr-bento-grid">
+        ${bentoTileMarkup({
+          icon:'activity',
+          label:'Average R:R',
+          kicker:'today only',
+          value:'Not enough data',
+          tone:'neutral',
+          sub:'No trades yet today.',
+          className:'rr-tile'
+        })}
+      </div>
+    `;
     return;
   }
 
@@ -4773,7 +4792,19 @@ function renderStreakTracker(todayTrades){
     .filter(Boolean);
 
   if(!rrRows.length){
-    status.innerHTML = `<div style="padding:2px 0;color:var(--muted);text-align:center">R:R not tracked</div>`;
+    status.innerHTML = `
+      <div class="rr-bento-grid">
+        ${bentoTileMarkup({
+          icon:'activity',
+          label:'Average R:R',
+          kicker:'today only',
+          value:'R:R not tracked',
+          tone:'neutral',
+          sub:'Planned risk and reward values are not available for today’s trades.',
+          className:'rr-tile'
+        })}
+      </div>
+    `;
     return;
   }
 
@@ -4786,21 +4817,34 @@ function renderStreakTracker(todayTrades){
   const worstClass = worstTrade && worstTrade.rr >= 1 ? 'neutral' : 'red';
 
   status.innerHTML = `
-    <div class="streak-tracker-wrap">
-      <div class="streak-grid">
-        <div class="streak-stat">
-          <div class="streak-label">Average R:R</div>
-          <div class="streak-value ${avgClass}">${rrText(avgRr)}</div>
-        </div>
-        <div class="streak-stat">
-          <div class="streak-label">Best / Worst Today</div>
-          <div class="streak-substats">
-            <div><span class="streak-sub-label">Best:</span> <strong class="${bestClass}">${rrText(bestTrade?.rr)}</strong></div>
-            <div><span class="streak-sub-label">Worst:</span> <strong class="${worstClass}">${rrText(worstTrade?.rr)}</strong></div>
-          </div>
-        </div>
-      </div>
-      <div class="streak-note">Derived from today's trades where planned risk and reward values are available.</div>
+    <div class="rr-bento-grid">
+      ${bentoTileMarkup({
+        icon:'activity',
+        label:'Average R:R',
+        kicker:'today only',
+        value:rrText(avgRr),
+        tone:avgClass,
+        sub:'Derived from today’s trades where planned risk and reward values are available.',
+        className:'rr-tile'
+      })}
+      ${bentoTileMarkup({
+        icon:'arrow-up-right',
+        label:'Best Today',
+        kicker:'highest R:R',
+        value:rrText(bestTrade?.rr),
+        tone:bestClass,
+        sub:bestTrade ? `${escapeHtml(bestTrade.trade?.symbol || 'Trade')} · ${escapeHtml(bestTrade.trade?.time || 'Today')}` : 'No qualified trades yet.',
+        className:'rr-tile'
+      })}
+      ${bentoTileMarkup({
+        icon:'arrow-down-right',
+        label:'Worst Today',
+        kicker:'lowest R:R',
+        value:rrText(worstTrade?.rr),
+        tone:worstClass,
+        sub:worstTrade ? `${escapeHtml(worstTrade.trade?.symbol || 'Trade')} · ${escapeHtml(worstTrade.trade?.time || 'Today')}` : 'No qualified trades yet.',
+        className:'rr-tile'
+      })}
     </div>
   `;
 }
@@ -5263,6 +5307,11 @@ function formatChartMoney(value){
   if(value > 0) return '+$' + Math.abs(value).toFixed(2);
   if(value < 0) return '-$' + Math.abs(value).toFixed(2);
   return '$0.00';
+}
+
+function cssVarValue(name, fallback=''){
+  const v = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+  return v || fallback;
 }
 
 function chartLine(id, labels, data, color){
@@ -6587,6 +6636,103 @@ function goalAnalyticsMetrics(m){
     safeRiskCandidates
   };
 }
+
+function buildStatTimeline(data=trades, m=accountMetrics(data)){
+  const allTrades = Array.isArray(data) ? data : [];
+  const grouped = new Map();
+  allTrades.forEach(t=>{
+    if(!t || !t.date) return;
+    const key = String(t.date);
+    if(!grouped.has(key)) grouped.set(key, []);
+    grouped.get(key).push(t);
+  });
+  const dates = [...grouped.keys()].sort((a,b)=>new Date(a + 'T00:00:00') - new Date(b + 'T00:00:00'));
+  const startBalance = Number(m?.startBalance) || 0;
+  const targetBalance = Number(m?.targetBalance) || 0;
+  const dailyLossLimit = Number.isFinite(m?.maxDailyLossAmount) ? Number(m.maxDailyLossAmount) : null;
+  const drawdownLimit = Number.isFinite(m?.maxDrawdownAmount) ? Number(m.maxDrawdownAmount) : null;
+  const deadlineRaw = m?.config?.phaseDeadline ? new Date(m.config.phaseDeadline + 'T23:59:59') : null;
+  const deadline = deadlineRaw && !Number.isNaN(deadlineRaw.getTime()) ? deadlineRaw : null;
+  let runningPnl = 0;
+
+  return dates.map(dateKey => {
+    const dayTrades = grouped.get(dateKey) || [];
+    const dayPnl = dayTrades.reduce((sum, t) => sum + (Number(t.pnl) || 0), 0);
+    let dayLow = 0;
+    let dayCum = 0;
+    dayTrades.forEach(t => {
+      dayCum += Number(t.pnl) || 0;
+      dayLow = Math.min(dayLow, dayCum);
+    });
+    runningPnl += dayPnl;
+    const currentBalance = startBalance + runningPnl;
+    const dailyLossUsed = Math.abs(Math.min(0, dayLow));
+    const maxDrawdownUsed = Math.max(0, startBalance - currentBalance);
+    return {
+      dateKey,
+      dayPnl,
+      tradeCount: dayTrades.length,
+      currentBalance,
+      profitTargetRemaining: Math.max(0, targetBalance - currentBalance),
+      dailyLossUsed,
+      dailyLossRemaining: dailyLossLimit == null ? null : Math.max(0, dailyLossLimit - dailyLossUsed),
+      drawdownRemaining: drawdownLimit == null ? null : Math.max(0, drawdownLimit - maxDrawdownUsed),
+      daysRemaining: deadline ? Math.max(0, Math.ceil((deadline - new Date(dateKey + 'T23:59:59')) / 86400000)) : null
+    };
+  });
+}
+
+function statSeries(timeline, key, count=14){
+  const series = (Array.isArray(timeline) ? timeline : [])
+    .map(row => Number(row?.[key]))
+    .filter(v => Number.isFinite(v));
+  return series.length ? series.slice(-count) : [0, 0];
+}
+
+function buildStatSparklineSvg(series, key){
+  const pointsValues = Array.isArray(series) && series.length
+    ? series.map(v => Number(v)).filter(v => Number.isFinite(v))
+    : [];
+  const values = pointsValues.length ? pointsValues : [0, 0];
+  const width = 240;
+  const height = 52;
+  const padX = 4;
+  const padY = 6;
+  const usableW = width - padX * 2;
+  const usableH = height - padY * 2;
+  const min = Math.min(...values);
+  const max = Math.max(...values);
+  const range = (max - min) || 1;
+  const step = values.length > 1 ? usableW / (values.length - 1) : 0;
+  const points = values.map((value, idx) => {
+    const x = padX + idx * step;
+    const y = padY + usableH - (((value - min) / range) * usableH);
+    return {x, y};
+  });
+  const linePoints = points.map(p => `${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(' ');
+  const baselineY = height - 6;
+  const areaPoints = `${padX},${baselineY} ${linePoints} ${width - padX},${baselineY}`;
+  const last = points[points.length - 1] || {x:width - padX, y:baselineY};
+  const gradientId = `sparkline-${key}`;
+  return `
+    <svg class="stat-sparkline-svg" viewBox="0 0 ${width} ${height}" preserveAspectRatio="none" aria-hidden="true">
+      <defs>
+        <linearGradient id="${gradientId}" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" style="stop-color:var(--primary);stop-opacity:.26"></stop>
+          <stop offset="100%" style="stop-color:var(--primary);stop-opacity:0"></stop>
+        </linearGradient>
+      </defs>
+      <polygon points="${areaPoints}" fill="url(#${gradientId})"></polygon>
+      <polyline points="${linePoints}" fill="none" stroke="var(--primary)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"></polyline>
+      <circle cx="${last.x.toFixed(1)}" cy="${last.y.toFixed(1)}" r="3.4" fill="var(--primary)" style="filter:drop-shadow(0 0 5px rgba(73,79,223,.52))"></circle>
+    </svg>
+  `;
+}
+
+function statSparklineMarkup(series, key){
+  return `<div class="stat-sparkline">${buildStatSparklineSvg(series, key)}</div>`;
+}
+
 function toggleFundedFields(){
   const phase = document.getElementById('accountPhaseInput')?.value || '';
   document.querySelectorAll('.funded-only').forEach(el=>{ el.hidden = !isFundedPhase(phase); });
@@ -6823,8 +6969,9 @@ function renderPropChallengeDashboard(){
     `;
   }
   const liveCtrlHtml = renderLiveTraderControllerMarkup(m);
+  const timeline = buildStatTimeline(trades || [], m);
   const statusClass = (m.maxDailyLossAmount && m.dailyLossUsed >= m.maxDailyLossAmount) || (m.maxDrawdownAmount && m.maxDrawdownUsed >= m.maxDrawdownAmount) ? 'red' : m.currentBalance >= m.targetBalance && m.profitTargetAmount ? 'green' : 'neutral';
-  box.innerHTML = bannerHtml + liveCtrlHtml + `<div class="goal-card-grid"><div class="goal-card"><div class="goal-card-label">Account Phase</div><div class="goal-card-value ${statusClass}">${escapeHtml(m.config.phase)}</div><div class="goal-card-sub">${m.s.total} trades tracked &bull; ${m.s.wr.toFixed(0)}% win rate &bull; ${fmt(m.s.pnl)} net. <button class="btn" type="button" onclick="openAccountSetup()">Edit setup</button></div></div><div class="goal-card"><div class="goal-card-label">Current Balance</div><div class="goal-card-value ${pnlClass(m.currentBalance-m.startBalance)}">$${m.currentBalance.toFixed(2)}</div><div class="goal-card-sub">Initial deposit $${m.startBalance.toFixed(2)} &bull; today ${fmt(m.todayPnl)}.</div></div><div class="goal-card"><div class="goal-card-label">Profit Target</div><div class="goal-card-value ${m.remainingToTarget<=0&&m.profitTargetAmount?'green':'neutral'}">$${m.remainingToTarget.toFixed(2)} left</div><div class="bar" style="margin-top:12px"><div style="width:${m.profitProgress}%"></div></div><div class="goal-card-sub">Target $${m.targetBalance.toFixed(2)} &bull; ${m.profitProgress.toFixed(0)}% complete.</div></div><div class="goal-card"><div class="goal-card-label">Days Remaining</div><div class="goal-card-value neutral">${m.daysRemaining==null?'No deadline':m.daysRemaining+' days'}</div><div class="goal-card-sub">Phase deadline ${m.config.phaseDeadline || 'not set'}.</div></div><div class="goal-card"><div class="goal-card-label">Daily Loss Remaining</div><div class="goal-card-value ${m.maxDailyLossRemaining!=null&&m.maxDailyLossRemaining<=0?'red':'green'}">${m.maxDailyLossRemaining==null?'Skipped':'$'+m.maxDailyLossRemaining.toFixed(2)}</div><div class="goal-card-sub">${m.maxDailyLossAmount==null?'Daily loss limit applies only to funded account setup.':'$'+m.dailyLossUsed.toFixed(2)+' used today of $'+m.maxDailyLossAmount.toFixed(2)}.</div></div><div class="goal-card"><div class="goal-card-label">Drawdown Buffer</div><div class="goal-card-value ${m.maxDrawdownRemaining!=null&&m.maxDrawdownRemaining<=0?'red':'green'}">${m.maxDrawdownRemaining==null?'Skipped':'$'+m.maxDrawdownRemaining.toFixed(2)}</div><div class="goal-card-sub">${m.maxDrawdownAmount==null?'Overall drawdown applies only to funded account setup.':'$'+m.maxDrawdownUsed.toFixed(2)+' max DD used of $'+m.maxDrawdownAmount.toFixed(2)}.</div></div>${riskCalculatorMarkup(m)}</div>`;
+  box.innerHTML = bannerHtml + liveCtrlHtml + `<div class="goal-card-grid"><div class="goal-card"><div class="goal-card-label">Account Phase</div><div class="goal-card-value ${statusClass}">${escapeHtml(m.config.phase)}</div><div class="goal-card-sub">${m.s.total} trades tracked &bull; ${m.s.wr.toFixed(0)}% win rate &bull; ${fmt(m.s.pnl)} net. <button class="btn" type="button" onclick="openAccountSetup()">Edit setup</button></div></div><div class="goal-card stat-card"><div class="goal-card-label">Current Balance</div><div class="goal-card-value ${pnlClass(m.currentBalance-m.startBalance)}">$${m.currentBalance.toFixed(2)}</div><div class="goal-card-sub">Initial deposit $${m.startBalance.toFixed(2)} &bull; today ${fmt(m.todayPnl)}.</div>${statSparklineMarkup(statSeries(timeline, 'currentBalance'), 'goal-current-balance')}</div><div class="goal-card stat-card"><div class="goal-card-label">Profit Target</div><div class="goal-card-value ${m.remainingToTarget<=0&&m.profitTargetAmount?'green':'neutral'}">$${m.remainingToTarget.toFixed(2)} left</div><div class="bar" style="margin-top:12px"><div style="width:${m.profitProgress}%"></div></div><div class="goal-card-sub">Target $${m.targetBalance.toFixed(2)} &bull; ${m.profitProgress.toFixed(0)}% complete.</div>${statSparklineMarkup(statSeries(timeline, 'profitTargetRemaining'), 'goal-profit-target')}</div><div class="goal-card stat-card"><div class="goal-card-label">Days Remaining</div><div class="goal-card-value neutral">${m.daysRemaining==null?'No deadline':m.daysRemaining+' days'}</div><div class="goal-card-sub">Phase deadline ${m.config.phaseDeadline || 'not set'}.</div>${statSparklineMarkup(statSeries(timeline, 'daysRemaining'), 'goal-days-remaining')}</div><div class="goal-card stat-card"><div class="goal-card-label">Daily Loss Remaining</div><div class="goal-card-value ${m.maxDailyLossRemaining!=null&&m.maxDailyLossRemaining<=0?'red':'green'}">${m.maxDailyLossRemaining==null?'Skipped':'$'+m.maxDailyLossRemaining.toFixed(2)}</div><div class="goal-card-sub">${m.maxDailyLossAmount==null?'Daily loss limit applies only to funded account setup.':'$'+m.dailyLossUsed.toFixed(2)+' used today of $'+m.maxDailyLossAmount.toFixed(2)}.</div>${statSparklineMarkup(statSeries(timeline, 'dailyLossRemaining'), 'goal-daily-loss-remaining')}</div><div class="goal-card stat-card"><div class="goal-card-label">Drawdown Buffer</div><div class="goal-card-value ${m.maxDrawdownRemaining!=null&&m.maxDrawdownRemaining<=0?'red':'green'}">${m.maxDrawdownRemaining==null?'Skipped':'$'+m.maxDrawdownRemaining.toFixed(2)}</div><div class="goal-card-sub">${m.maxDrawdownAmount==null?'Overall drawdown applies only to funded account setup.':'$'+m.maxDrawdownUsed.toFixed(2)+' max DD used of $'+m.maxDrawdownAmount.toFixed(2)}.</div>${statSparklineMarkup(statSeries(timeline, 'drawdownRemaining'), 'goal-drawdown-buffer')}</div>${riskCalculatorMarkup(m)}</div>`;
 }
 async function generateAIPropGoals(force=false){
   if(!(trades || []).length){ const propBox=document.getElementById('propBox'); if(propBox) propBox.innerHTML='<div class="insight empty"><strong>No trades yet.</strong><br>Upload trades first.</div>'; return; }
@@ -6889,55 +7036,83 @@ function buildGoalsAnalyticsMarkup(m){
     : null;
 
   return `
-    <div class="goal-card-grid">
-      <div class="goal-card">
-        <div class="goal-card-label">Trades to Target</div>
-        <div class="goal-card-value ${tradesToTarget == null ? 'neutral' : 'green'}">${tradesToTarget == null ? 'Not on pace' : `${tradesToTarget} trades`}</div>
-        <div class="goal-card-sub">${tradesToTarget == null ? 'Average P&L per trade is flat or negative.' : `Avg trade P&L ${formatMoney(avgPnl)}. Target remaining ${formatMoney(targetRemaining)}.`}</div>
-        <div class="goal-breakdown" style="margin-top:10px">
-          <div class="mini-stat"><span>Progress so far</span><strong>${targetBalance > startBalance ? formatPct(Math.max(0, (currentBalance - startBalance) / (targetBalance - startBalance) * 100)) : '—'}</strong></div>
-          <div class="mini-stat"><span>Avg win / Avg loss</span><strong>${s.total ? `${formatMoney(avgWin)} / ${formatMoney(avgLoss)}` : '—'}</strong></div>
-        </div>
-      </div>
-      <div class="goal-card">
-        <div class="goal-card-label">Win Rate Gap</div>
-        <div class="goal-card-value ${requiredWinRate == null ? 'neutral' : (requiredWinRate <= currentWinRate ? 'green' : 'amber')}">
-          ${requiredWinRate == null ? 'Need more data' : `Current: ${Math.round(currentWinRate)}% · Needed: ${Math.round(requiredWinRate)}%`}
-        </div>
-        <div class="goal-card-sub">${remainingDays ? `Window uses ${paceWindowTrades || 0} estimated trades over ${remainingDays} day${remainingDays === 1 ? '' : 's'}.` : `Budget window uses ${budgetWindowTrades || 0} trades from remaining daily-loss-room.`}</div>
-        <div class="goal-breakdown" style="margin-top:10px">
-          <div class="mini-stat"><span>Avg win / Avg loss</span><strong>${s.total ? `${formatMoney(avgWin)} / ${formatMoney(avgLoss)}` : '—'}</strong></div>
-          <div class="mini-stat"><span>Estimated trades left</span><strong>${paceWindowTrades != null ? `${paceWindowTrades}` : '—'}</strong></div>
-        </div>
-      </div>
-      <div class="goal-card">
-        <div class="goal-card-label">Suggested Risk per Trade</div>
-        <div class="goal-card-value ${safeRisk == null ? 'neutral' : 'green'}">${safeRisk == null ? 'Not enough data' : formatMoney(safeRisk)}</div>
-        <div class="goal-card-sub">${safeRisk == null ? 'Need trade history plus an active account setup.' : `Based on remaining target ${formatMoney(targetRemaining)}, daily room ${formatMoney(dailyLossBudget)}, and drawdown buffer ${formatMoney(Number.isFinite(maxDrawdownRemaining) ? maxDrawdownRemaining : Number(m?.maxDrawdownAmount) || 0)}.`}</div>
-        <div class="goal-breakdown" style="margin-top:10px">
-          <div class="mini-stat"><span>Target-pace</span><strong>${formatMoney(targetRemaining > 0 && tradesToTarget ? targetRemaining / tradesToTarget : null)}</strong></div>
-          <div class="mini-stat"><span>Daily-loss-room</span><strong>${formatMoney(Number.isFinite(maxDailyLossRemaining) ? maxDailyLossRemaining : null)}</strong></div>
-          <div class="mini-stat"><span>Drawdown buffer</span><strong>${formatMoney(Number.isFinite(maxDrawdownRemaining) ? maxDrawdownRemaining : null)}</strong></div>
-        </div>
-      </div>
-      <div class="goal-card">
-        <div class="goal-card-label">Pace Tracker</div>
-        <div class="goal-card-value ${paceAhead == null ? 'neutral' : (paceAhead ? 'green' : 'red')}">${paceAhead == null ? 'No deadline' : paceAhead ? 'Ahead' : 'Behind'}</div>
-        <div class="goal-card-sub">${paceText}</div>
-        <div class="goal-breakdown" style="margin-top:10px">
-          <div class="mini-stat"><span>Actual trades so far</span><strong>${totalTrades || '—'}</strong></div>
-          <div class="mini-stat"><span>Required total trades</span><strong>${tradesToTarget != null ? tradesToTarget : '—'}</strong></div>
-          <div class="mini-stat"><span>Days remaining</span><strong>${remainingDays != null && Number.isFinite(remainingDays) ? remainingDays : '—'}</strong></div>
-        </div>
-      </div>
-      <div class="goal-card">
-        <div class="goal-card-label">Fastest Path Estimate</div>
-        <div class="goal-card-value ${fastestTrades == null ? 'neutral' : 'green'}">${fastestTrades == null ? 'Not enough data' : `${fastestTrades} trades`}</div>
-        <div class="goal-card-sub">${fastestTrades == null ? 'Need positive average trade P&L to project completion.' : `${fastestDays != null ? `${fastestDays.toFixed(1)} days · ` : ''}Assumes current win rate ${Math.round(currentWinRate)}% and average trade size hold steady.`}</div>
-        <div class="goal-breakdown" style="margin-top:10px">
-          <div class="mini-stat"><span>Projected completion</span><strong>${formatDate(projectedCompletionDate)}</strong></div>
-        </div>
-      </div>
+    <div class="goal-card-grid bento-grid goal-account-phase-grid">
+      ${bentoTileMarkup({
+        icon:'target',
+        label:'Trades to Target',
+        kicker:'pace to goal',
+        value:tradesToTarget == null ? 'Not on pace' : `${tradesToTarget} trades`,
+        tone:tradesToTarget == null ? 'neutral' : 'green',
+        sub:tradesToTarget == null ? 'Average P&L per trade is flat or negative.' : `Avg trade P&L ${formatMoney(avgPnl)}. Target remaining ${formatMoney(targetRemaining)}. <button class="btn" type="button" onclick="openAccountSetup()">Edit setup</button>`,
+        details:`
+          <div class="goal-breakdown">
+            <div class="mini-stat"><span>Progress so far</span><strong>${targetBalance > startBalance ? formatPct(Math.max(0, (currentBalance - startBalance) / (targetBalance - startBalance) * 100)) : '—'}</strong></div>
+            <div class="mini-stat"><span>Avg win / Avg loss</span><strong>${s.total ? `${formatMoney(avgWin)} / ${formatMoney(avgLoss)}` : '—'}</strong></div>
+          </div>
+        `,
+        className:'goal-card goal-tile'
+      })}
+      ${bentoTileMarkup({
+        icon:'chart-bar',
+        label:'Win Rate Gap',
+        kicker:'account pace',
+        value:requiredWinRate == null ? 'Need more data' : `Current: ${Math.round(currentWinRate)}% · Needed: ${Math.round(requiredWinRate)}%`,
+        tone:requiredWinRate == null ? 'neutral' : (requiredWinRate <= currentWinRate ? 'green' : 'amber'),
+        sub:remainingDays ? `Window uses ${paceWindowTrades || 0} estimated trades over ${remainingDays} day${remainingDays === 1 ? '' : 's'}.` : `Budget window uses ${budgetWindowTrades || 0} trades from remaining daily-loss-room.`,
+        details:`
+          <div class="goal-breakdown">
+            <div class="mini-stat"><span>Avg win / Avg loss</span><strong>${s.total ? `${formatMoney(avgWin)} / ${formatMoney(avgLoss)}` : '—'}</strong></div>
+            <div class="mini-stat"><span>Estimated trades left</span><strong>${paceWindowTrades != null ? `${paceWindowTrades}` : '—'}</strong></div>
+          </div>
+        `,
+        className:'goal-card goal-tile'
+      })}
+      ${bentoTileMarkup({
+        icon:'shield',
+        label:'Suggested Risk per Trade',
+        kicker:'safety bound',
+        value:safeRisk == null ? 'Not enough data' : formatMoney(safeRisk),
+        tone:safeRisk == null ? 'neutral' : 'green',
+        sub:safeRisk == null ? 'Need trade history plus an active account setup.' : `Based on remaining target ${formatMoney(targetRemaining)}, daily room ${formatMoney(dailyLossBudget)}, and drawdown buffer ${formatMoney(Number.isFinite(maxDrawdownRemaining) ? maxDrawdownRemaining : Number(m?.maxDrawdownAmount) || 0)}.`,
+        details:`
+          <div class="goal-breakdown">
+            <div class="mini-stat"><span>Target-pace</span><strong>${formatMoney(targetRemaining > 0 && tradesToTarget ? targetRemaining / tradesToTarget : null)}</strong></div>
+            <div class="mini-stat"><span>Daily-loss-room</span><strong>${formatMoney(Number.isFinite(maxDailyLossRemaining) ? maxDailyLossRemaining : null)}</strong></div>
+            <div class="mini-stat"><span>Drawdown buffer</span><strong>${formatMoney(Number.isFinite(maxDrawdownRemaining) ? maxDrawdownRemaining : null)}</strong></div>
+          </div>
+        `,
+        className:'goal-card goal-tile'
+      })}
+      ${bentoTileMarkup({
+        icon:'calendar',
+        label:'Pace Tracker',
+        kicker:'timeline',
+        value:paceAhead == null ? 'No deadline' : paceAhead ? 'Ahead' : 'Behind',
+        tone:paceAhead == null ? 'neutral' : (paceAhead ? 'green' : 'red'),
+        sub:paceText,
+        details:`
+          <div class="goal-breakdown">
+            <div class="mini-stat"><span>Actual trades so far</span><strong>${totalTrades || '—'}</strong></div>
+            <div class="mini-stat"><span>Required total trades</span><strong>${tradesToTarget != null ? tradesToTarget : '—'}</strong></div>
+            <div class="mini-stat"><span>Days remaining</span><strong>${remainingDays != null && Number.isFinite(remainingDays) ? remainingDays : '—'}</strong></div>
+          </div>
+        `,
+        className:'goal-card goal-tile'
+      })}
+      ${bentoTileMarkup({
+        icon:'sparkles',
+        label:'Fastest Path Estimate',
+        kicker:'projection',
+        value:fastestTrades == null ? 'Not enough data' : `${fastestTrades} trades`,
+        tone:fastestTrades == null ? 'neutral' : 'green',
+        sub:fastestTrades == null ? 'Need positive average trade P&L to project completion.' : `${fastestDays != null ? `${fastestDays.toFixed(1)} days · ` : ''}Assumes current win rate ${Math.round(currentWinRate)}% and average trade size hold steady.`,
+        details:`
+          <div class="goal-breakdown">
+            <div class="mini-stat"><span>Projected completion</span><strong>${formatDate(projectedCompletionDate)}</strong></div>
+          </div>
+        `,
+        className:'goal-card goal-tile'
+      })}
     </div>
   `;
 }
@@ -9186,10 +9361,16 @@ function renderPsychology(){
 function renderCommandCenter(todayTrades){
   const data = Array.isArray(todayTrades) ? todayTrades : [];
   const state = todayTradingState(data);
-  const goalMetrics = goalAnalyticsMetrics(accountMetrics(trades || []));
+  const account = accountMetrics(trades || []);
+  const goalMetrics = goalAnalyticsMetrics(account);
+  const timeline = buildStatTimeline(trades || [], account);
+  const recentTimeline = timeline.slice(-14);
   const pnlEl = document.getElementById('cmdTodayPnl');
   const lossEl = document.getElementById('cmdDailyLoss');
   const tradesEl = document.getElementById('cmdTrades');
+  const pnlSparkEl = document.getElementById('cmdTodayPnlSparkline');
+  const lossSparkEl = document.getElementById('cmdDailyLossSparkline');
+  const tradesSparkEl = document.getElementById('cmdTradesSparkline');
   const breaksEl = document.getElementById('cmdRuleBreaks');
   const actionEl = document.getElementById('cmdNextAction');
   const statusEl = document.getElementById('cmdStatus');
@@ -9201,20 +9382,19 @@ function renderCommandCenter(todayTrades){
     const nextPnlText = fmt(state.todayPnl);
     const pnlChanged = pnlEl.textContent !== nextPnlText;
     pnlEl.textContent = nextPnlText;
-    pnlEl.className = 'cmd-value ' + pnlClass(state.todayPnl);
+    pnlEl.className = 'cmd-value ' + (state.todayPnl < 0 ? 'red' : 'neutral');
     if(pnlChanged){
       pnlEl.classList.add('pnl-value-updating');
-      if(state.todayPnl > 0) pnlEl.classList.add('pnl-flash-success');
-      window.setTimeout(()=>pnlEl.classList.remove('pnl-value-updating','pnl-flash-success'), 150);
+      window.setTimeout(()=>pnlEl.classList.remove('pnl-value-updating'), 150);
     }
   }
   if(lossEl){
     lossEl.textContent = `$${state.lossUsed.toFixed(2)} / ${state.maxDailyLoss == null ? 'not set' : '$'+state.maxDailyLoss.toFixed(2)}`;
-    lossEl.className = 'cmd-value ' + (state.dailyLossHit ? 'danger' : '');
+    lossEl.className = 'cmd-value neutral';
   }
   if(tradesEl){
     tradesEl.textContent = `${state.tradesCount} / ${state.maxTrades || 'not set'}`;
-    tradesEl.className = 'cmd-value ' + (state.tradeLimitHit ? 'warn' : '');
+    tradesEl.className = 'cmd-value neutral';
   }
   if(breaksEl){
     breaksEl.textContent = state.mistakesToday;
@@ -9235,6 +9415,9 @@ function renderCommandCenter(todayTrades){
       : `Based on remaining target ${moneyPlain(goalMetrics.targetRemaining)}, daily room ${moneyPlain(goalMetrics.dailyLossBudget)}, and drawdown buffer ${goalMetrics.maxDrawdownRemaining == null ? '—' : moneyPlain(goalMetrics.maxDrawdownRemaining)}.`;
   }
   if(tomorrowRuleEl) tomorrowRuleEl.textContent = getTodayPsychologyReminder() || 'No saved rule';
+  if(pnlSparkEl) pnlSparkEl.innerHTML = buildStatSparklineSvg(recentTimeline.map(row => row.dayPnl), 'cmdTodayPnl');
+  if(lossSparkEl) lossSparkEl.innerHTML = buildStatSparklineSvg(recentTimeline.map(row => row.dailyLossUsed), 'cmdDailyLoss');
+  if(tradesSparkEl) tradesSparkEl.innerHTML = buildStatSparklineSvg(recentTimeline.map(row => row.tradeCount), 'cmdTrades');
 }
 
 function toggleChecklistCheck(id){
@@ -9480,6 +9663,24 @@ function todayStreakSummary(data=[]){
   };
 }
 
+function bentoTileMarkup({icon, label, kicker='', value='', tone='neutral', sub='', details='', className=''}) {
+  return `
+    <div class="${['card','bento-tile',className].filter(Boolean).join(' ')}">
+      <div class="metric-bento-head">
+        <span class="metric-bento-icon"><re-icon icon="${icon}" weight="outline" size="16"></re-icon></span>
+        <div class="metric-bento-copy">
+          <div class="metric-bento-label">${escapeHtml(label)}</div>
+          ${kicker ? `<div class="metric-bento-kicker">${escapeHtml(kicker)}</div>` : ''}
+        </div>
+      </div>
+      <div class="metric-bento-body">
+        <div class="metric-bento-value ${tone}">${value}</div>
+        ${sub ? `<div class="metric-bento-sub">${sub}</div>` : ''}
+        ${details ? `<div class="metric-bento-detail">${details}</div>` : ''}
+      </div>
+    </div>`;
+}
+
 function renderTodayMetrics(data){
   const el = document.getElementById('todayMetrics');
   if(!el) return;
@@ -9498,12 +9699,40 @@ function renderTodayMetrics(data){
     : `Current balance ${moneyPlain(goalMetrics.currentBalance)} of ${moneyPlain(goalMetrics.targetBalance)} target.`;
   const winStreak = todayStreakSummary(todayTrades);
   const cells = [
-    ['Avg Win / Avg Loss',avgWinLoss,'neutral',todayStats.wins.length && todayStats.losses.length ? 'Today only' : 'Not enough data yet for both wins and losses today.'],
-    ['Trades to Target %',progressText,goalMetrics.progressSoFar == null ? 'neutral' : scoreClass(goalMetrics.progressSoFar,70,45),progressSub],
-    ['Mood',mood || 'Not logged','neutral',mood ? 'From psychology log' : 'No per-day mood field exists yet.'],
-    ['Win Streak Today',winStreak.value,winStreak.kind,winStreak.sub]
+    {
+      icon:'chart-bar',
+      label:'Avg Win / Avg Loss',
+      kicker:'today only',
+      value:avgWinLoss,
+      tone:'neutral',
+      sub:todayStats.wins.length && todayStats.losses.length ? 'Average of today’s winning and losing trades.' : 'Not enough data yet for both wins and losses today.'
+    },
+    {
+      icon:'target',
+      label:'Trades to Target %',
+      kicker:'pace to goal',
+      value:progressText,
+      tone:goalMetrics.progressSoFar == null ? 'neutral' : scoreClass(goalMetrics.progressSoFar,70,45),
+      sub:progressSub
+    },
+    {
+      icon:'meditation',
+      label:'Mood',
+      kicker:'psychology log',
+      value:mood || 'Not logged',
+      tone:'neutral',
+      sub:mood ? 'From psychology log.' : 'No per-day mood field exists yet.'
+    },
+    {
+      icon:'sparkles',
+      label:'Win Streak Today',
+      kicker:'today only',
+      value:winStreak.value,
+      tone:winStreak.kind,
+      sub:winStreak.sub
+    }
   ];
-  el.innerHTML = cells.map(c=>`<div class="card"><div class="label">${c[0]}</div><div class="value ${c[2]}">${c[1]}</div><div class="sub">${c[3]}</div></div>`).join('');
+  el.innerHTML = cells.map(c=>bentoTileMarkup({...c, className:'today-summary-tile'})).join('');
 }
 
 function renderTodayRows(data){
@@ -9561,20 +9790,127 @@ function renderTodayInsights(data){
 
 function renderTodayChart(data){
   const id = 'todayEquityChart';
+  const tooltip = document.getElementById('todayEquityTooltip');
   if(!data.length){
     destroy(id);
+    if(tooltip) tooltip.hidden = true;
     showEmptyChart(id, 'Upload today\'s trading page export to generate intraday equity curve.');
     return;
+  }
+
+  const shell = document.querySelector('#tradingpage .today-equity-chart');
+  if(shell && (!shell.querySelector(`#${id}`) || !shell.querySelector('#todayEquityTooltip'))){
+    shell.setAttribute('data-chart-id', id);
+    shell.innerHTML = `<canvas id="${id}"></canvas><div id="todayEquityTooltip" class="today-equity-tooltip" hidden></div>`;
   }
 
   const canvas = ensureCanvas(id);
   if(!canvas) return;
 
+  const equityTooltip = document.getElementById('todayEquityTooltip');
   let cum = 0;
   const srt = sorted(data);
-  const eq = [0, ...srt.map(t => +(cum += t.pnl).toFixed(2))];
-  const labels = ['Start', ...srt.map(t=>t.time || '')];
-  chartLine(id, labels, eq, cum>0?'#007d48':cum<0?'#d30005':'#111111');
+  const series = srt.map(t => ({
+    label: `${t.date || ''} ${t.time || ''}`.trim() || 'Unknown',
+    value: +(cum += Number(t.pnl) || 0).toFixed(2)
+  }));
+  const labels = ['Session start', ...series.map(p => p.label)];
+  const eq = [0, ...series.map(p => p.value)];
+  const primary = cssVarValue('--primary', '#494fdf');
+  const hairline = cssVarValue('--hairline', 'rgba(255,255,255,.06)');
+  const muted = cssVarValue('--muted', 'rgba(255,255,255,.45)');
+  destroy(id);
+  charts[id] = new Chart(canvas, {
+    type:'line',
+    data:{
+      labels,
+      datasets:[{
+        label:'Equity',
+        data:eq,
+        tension:0.42,
+        cubicInterpolationMode:'monotone',
+        pointRadius:2.5,
+        pointHoverRadius:6,
+        pointBackgroundColor:primary,
+        pointBorderWidth:0,
+        borderWidth:2.5,
+        borderColor:primary,
+        fill:true,
+        backgroundColor:(ctx)=>{
+          const chart = ctx.chart;
+          const area = chart?.chartArea;
+          const c = chart?.ctx;
+          if(!area || !c) return 'rgba(73,79,223,.18)';
+          const gradient = c.createLinearGradient(0, area.top, 0, area.bottom);
+          gradient.addColorStop(0, 'rgba(73,79,223,.28)');
+          gradient.addColorStop(1, 'rgba(73,79,223,0)');
+          return gradient;
+        }
+      }]
+    },
+    options:{
+      responsive:true,
+      maintainAspectRatio:false,
+      animation:{duration:900,easing:'easeOutQuart'},
+      interaction:{mode:'nearest',intersect:false},
+      layout:{padding:{top:8,right:6,bottom:4,left:6}},
+      plugins:{
+        legend:{display:false},
+        tooltip:{
+          enabled:false,
+          external:(context)=>{
+            const tooltipModel = context.tooltip;
+            const chart = context.chart;
+            if(!equityTooltip) return;
+            if(!tooltipModel || tooltipModel.opacity === 0 || !tooltipModel.dataPoints?.length){
+              equityTooltip.hidden = true;
+              return;
+            }
+            const point = tooltipModel.dataPoints[0];
+            const title = String(point.label || tooltipModel.title?.[0] || 'Session start');
+            const value = formatChartMoney(point.parsed.y);
+            equityTooltip.innerHTML = `
+              <span class="today-equity-tooltip-label">${escapeHtml(title)}</span>
+              <span class="today-equity-tooltip-value">${escapeHtml(value)}</span>
+            `;
+            equityTooltip.hidden = false;
+            const wrap = chart.canvas.parentElement;
+            if(!wrap) return;
+            const left = Math.min(Math.max((tooltipModel.caretX || 0) + 12, 12), Math.max(12, wrap.clientWidth - 180));
+            const top = Math.min(Math.max((tooltipModel.caretY || 0) - 44, 12), Math.max(12, wrap.clientHeight - 72));
+            equityTooltip.style.left = `${left}px`;
+            equityTooltip.style.top = `${top}px`;
+          }
+        }
+      },
+      scales:{
+        x:{
+          grid:{display:false},
+          border:{color:hairline},
+          ticks:{
+            color:muted,
+            font:{size:11},
+            maxRotation:0,
+            autoSkip:true,
+            maxTicksLimit:7,
+            callback:(value, index, ticks)=> {
+              const label = labels[index] || '';
+              return label === 'Session start' ? 'Start' : label.split(' ').slice(-1)[0];
+            }
+          }
+        },
+        y:{
+          grid:{color:hairline},
+          border:{color:hairline},
+          ticks:{
+            color:muted,
+            font:{size:11},
+            callback:(v)=>formatChartMoney(v)
+          }
+        }
+      }
+    }
+  });
 }
 
 
@@ -11865,7 +12201,8 @@ body::before,body::after,.hero::before,.hero::after,.card::before,.journal-main-
 .value,.goal-card-value,.metric-value,.ai-score-value,.widget-value,.cmd-value,.analytics-bar-value,.calendar-summary-card .summary-value,.calendar-date,.coach-title,.coach-section-text,.mistake-box-count,.day-trade-title,.saved-journal-title,.journal-rule-title,.checklist-text,.psych-rule strong,.psych-check strong,strong{color:var(--ink)!important;font-family:var(--sans)!important;letter-spacing:0!important}
 p,span,div,td,label,em{color:inherit}.psych-check em,.psych-rule span,.journal-rule-text,.checklist-result-sub,.widget-why,.day-trade-meta,.saved-journal-meta{color:var(--mute)!important}
 .green,.profit,.pnl-positive,.win{color:var(--success)!important}.red,.loss,.pnl-negative{color:var(--sale)!important}.amber,.neutral,.zero-state,.rule-neutral{color:var(--ash)!important}.blue{color:var(--info)!important}.purple{color:var(--accent-purple-soft)!important}.cyan{color:var(--accent-teal)!important}
-.btn,.ai-chip,.journal-status-btn,.pill,.filter-chip,.psych-step,.widget-icon-btn{min-height:44px!important;border-radius:9999px!important;background:var(--soft-cloud)!important;background-image:none!important;border:1px solid var(--hairline)!important;color:var(--ink)!important;font-family:var(--sans)!important;font-weight:500!important;letter-spacing:0!important;transition:background-color var(--dur-instant) var(--ease-out),border-color var(--dur-instant) var(--ease-out),transform var(--dur-fast) var(--ease-snappy),opacity var(--dur-fast) var(--ease-out)!important;transform-origin:center!important}
+.btn{min-height:44px!important;border-radius:var(--radius-control)!important;background:var(--soft-cloud)!important;background-image:none!important;border:1px solid var(--hairline)!important;color:var(--ink)!important;font-family:var(--sans)!important;font-weight:500!important;letter-spacing:0!important;transition:background-color var(--dur-instant) var(--ease-out),border-color var(--dur-instant) var(--ease-out),transform var(--dur-fast) var(--ease-snappy),opacity var(--dur-fast) var(--ease-out)!important;transform-origin:center!important}
+.ai-chip,.journal-status-btn,.pill,.filter-chip,.psych-step,.widget-icon-btn{min-height:44px!important;border-radius:var(--radius-pill)!important;background:var(--soft-cloud)!important;background-image:none!important;border:1px solid var(--hairline)!important;color:var(--ink)!important;font-family:var(--sans)!important;font-weight:500!important;letter-spacing:0!important;transition:background-color var(--dur-instant) var(--ease-out),border-color var(--dur-instant) var(--ease-out),transform var(--dur-fast) var(--ease-snappy),opacity var(--dur-fast) var(--ease-out)!important;transform-origin:center!important}
 .btn:hover,.ai-chip:hover,.journal-status-btn:hover,.pill:hover,.psych-step:hover,.nav button:hover{background:#242426!important;border-color:var(--ash)!important;color:var(--ink)!important;transform:none!important;opacity:1!important}
 .btn:active,.ai-chip:active,.journal-status-btn:active,.pill:active,.psych-step:active,.widget-icon-btn:active{transform:scale(.97)!important}
 .btn.primary,.file-picker-btn,.mobile-upload-btn,.pill.active,.psych-step.active,.journal-result-tabs .btn.active{background:var(--ink)!important;background-image:none!important;color:var(--on-primary)!important;border:1px solid var(--ink)!important}
@@ -11873,8 +12210,8 @@ p,span,div,td,label,em{color:inherit}.psych-check em,.psych-rule span,.journal-r
 .nav button:hover{background:var(--surface-2)!important;color:var(--ink)!important;border-color:var(--surface-2)!important;border-left-color:transparent!important}
 .nav button:active{transform:scale(0.97)!important}
 .nav button.active{background:var(--surface-2)!important;color:var(--ink)!important;border-color:var(--hairline-strong)!important;border-left-color:var(--primary)!important;font-weight:500!important}
-input,select,textarea,.search input,.filters input,.filters select,.editor textarea,.editor input,.journal-entry-form input,.journal-entry-form select,.journal-entry-form textarea,.journal-search-row input,.journal-search-row select,.journal-trade-select-row select,.real-ai-settings input,.real-ai-settings select{background:var(--soft-cloud)!important;border:1px solid var(--hairline)!important;border-radius:24px!important;color:var(--ink)!important;font-family:var(--sans)!important;letter-spacing:0!important}
-textarea{border-radius:24px!important}input::placeholder,textarea::placeholder{color:var(--stone)!important}input:focus,select:focus,textarea:focus{background:#101012!important;border-color:var(--ink)!important;outline:2px solid var(--ink)!important;outline-offset:2px!important}
+input,select,textarea,.search input,.filters input,.filters select,.editor textarea,.editor input,.journal-entry-form input,.journal-entry-form select,.journal-entry-form textarea,.journal-search-row input,.journal-search-row select,.journal-trade-select-row select,.real-ai-settings input,.real-ai-settings select{background:var(--soft-cloud)!important;border:1px solid var(--hairline)!important;border-radius:var(--radius-control)!important;color:var(--ink)!important;font-family:var(--sans)!important;letter-spacing:0!important}
+textarea{border-radius:var(--radius-control)!important}input::placeholder,textarea::placeholder{color:var(--stone)!important}input:focus,select:focus,textarea:focus{background:#101012!important;border-color:var(--ink)!important;outline:2px solid var(--ink)!important;outline-offset:2px!important}
 .btn:focus-visible,.nav button:focus-visible{outline:2px solid var(--ink)!important;outline-offset:2px!important}
 .table-wrap{border:1px solid var(--hairline)!important;border-radius:0!important;background:var(--canvas)!important}table,thead,tbody,tr,td,th{background:var(--canvas)!important}th{background:var(--soft-cloud)!important;color:var(--mute)!important;border-bottom:1px solid var(--hairline)!important;font-weight:500!important;letter-spacing:0!important;text-transform:none!important}td{color:var(--ink)!important;border-bottom:1px solid var(--hairline-soft)!important}tr:hover td{background:var(--soft-cloud)!important}
 .chart,.ai-chat-box{background:var(--soft-cloud)!important;border:1px solid var(--hairline)!important;border-radius:0!important}.bar,.drawdown-bar,.analytics-track,.balance-scale{background:#242426!important;border-radius:9999px!important}.bar div,.analytics-fill,.drawdown-bar span,.balance-marker{background:var(--ink)!important;background-image:none!important;border-radius:9999px!important}.analytics-fill.profit,.green-bg,.calendar-dot.green,.balance-fill.profit{background:var(--success)!important}.analytics-fill.loss,.analytics-fill.drawdown,.red-bg,.calendar-dot.red,.balance-fill.loss{background:var(--sale)!important}.neutral-bg,.calendar-dot.neutral{background:var(--stone)!important}
@@ -11896,6 +12233,83 @@ textarea{border-radius:24px!important}input::placeholder,textarea::placeholder{c
 .ai-chat-box .ai-msg:nth-last-child(3){transition-delay:80ms!important}
 .cmd-value,.value,.goal-card-value,.metric-value,.ai-score-value,.widget-value{transition:opacity var(--dur-fast) var(--ease-out),color var(--dur-fast) var(--ease-out)!important}
 .value,.goal-card-value,.metric-value,.ai-score-value,.widget-value,.cmd-value,.analytics-bar-value,.calendar-summary-card .summary-value,.calendar-date,.graph-kpi-value,.account-balance-value,.live-metric-val,.day-num,.day-pnl,.calendar-pnl,.saved-journal-meta{font-family:var(--font-mono);font-variant-numeric:tabular-nums}
+.cmd-card.stat-card,
+.goal-card.stat-card{
+  background:linear-gradient(180deg,var(--surface-2),var(--surface-1))!important;
+  border:1px solid var(--hairline)!important;
+  border-radius:var(--radius-card)!important;
+  box-shadow:0 16px 32px rgba(0,0,0,.22)!important;
+  padding:16px 16px 12px!important;
+  min-width:0!important;
+  overflow:hidden!important;
+  display:flex!important;
+  flex-direction:column!important;
+  gap:10px!important;
+}
+.cmd-card.stat-card .cmd-label,
+.goal-card.stat-card .goal-card-label{
+  display:flex!important;
+  align-items:center!important;
+  justify-content:space-between!important;
+  gap:8px!important;
+  color:var(--mute)!important;
+  text-transform:uppercase!important;
+  font-size:11px!important;
+  letter-spacing:.14em!important;
+  font-weight:500!important;
+}
+.cmd-card.stat-card .cmd-value,
+.goal-card.stat-card .goal-card-value{
+  color:var(--primary)!important;
+  font-family:var(--sans)!important;
+  font-size:clamp(26px,4vw,34px)!important;
+  font-weight:700!important;
+  letter-spacing:-.03em!important;
+  line-height:1.05!important;
+  white-space:nowrap!important;
+  overflow:hidden!important;
+  text-overflow:ellipsis!important;
+}
+.cmd-card.stat-card .cmd-value.red,
+.cmd-card.stat-card .cmd-value.loss,
+.cmd-card.stat-card .cmd-value.pnl-negative,
+.goal-card.stat-card .goal-card-value.red,
+.goal-card.stat-card .goal-card-value.loss,
+.goal-card.stat-card .goal-card-value.pnl-negative{
+  color:var(--loss)!important;
+}
+.cmd-card.stat-card .cmd-value.green,
+.cmd-card.stat-card .cmd-value.neutral,
+.cmd-card.stat-card .cmd-value.amber,
+.goal-card.stat-card .goal-card-value.green,
+.goal-card.stat-card .goal-card-value.neutral,
+.goal-card.stat-card .goal-card-value.amber{
+  color:var(--primary)!important;
+}
+.cmd-card.stat-card .stat-sparkline,
+.goal-card.stat-card .stat-sparkline{
+  margin-top:auto!important;
+  height:52px!important;
+}
+.cmd-card.stat-card .stat-sparkline-svg,
+.goal-card.stat-card .stat-sparkline-svg{
+  width:100%!important;
+  height:52px!important;
+  display:block!important;
+  overflow:visible!important;
+}
+.cmd-card.stat-card .stat-sparkline-svg polygon,
+.goal-card.stat-card .stat-sparkline-svg polygon{
+  opacity:.8!important;
+}
+.cmd-card.stat-card .stat-sparkline-svg polyline,
+.goal-card.stat-card .stat-sparkline-svg polyline{
+  filter:drop-shadow(0 0 5px rgba(73,79,223,.4))!important;
+}
+.cmd-card.stat-card .stat-sparkline-svg circle,
+.goal-card.stat-card .stat-sparkline-svg circle{
+  filter:drop-shadow(0 0 6px rgba(73,79,223,.5))!important;
+}
 .pnl-value-updating{opacity:.6!important}
 .pnl-flash-success{color:var(--success)!important}
 .firebase-auth-card{opacity:1!important;transform:scale(1)!important;transform-origin:center!important;transition:opacity var(--dur-modal) var(--ease-spring),transform var(--dur-modal) var(--ease-spring)!important}
@@ -12080,6 +12494,169 @@ body:not(.firebase-auth-required) #journallApp > .main > *{
   font-size:13px!important;
   line-height:1.45!important;
 }
+#todayMetrics.today-metrics.bento-grid,
+#goalsBox .goal-card-grid.goal-account-phase-grid.bento-grid,
+#syncStatus .rr-bento-grid{
+  display:grid!important;
+  gap:12px!important;
+}
+#todayMetrics.today-metrics.bento-grid{
+  grid-template-columns:repeat(4,minmax(0,1fr))!important;
+  margin-top:16px!important;
+}
+#goalsBox .goal-card-grid.goal-account-phase-grid.bento-grid{
+  grid-template-columns:repeat(3,minmax(0,1fr))!important;
+  margin-bottom:16px!important;
+}
+#syncStatus .rr-bento-grid{
+  grid-template-columns:repeat(3,minmax(0,1fr))!important;
+  margin-top:14px!important;
+}
+#todayMetrics .card.bento-tile,
+#goalsBox .goal-card.bento-tile,
+#syncStatus .rr-tile{
+  position:relative!important;
+  background:var(--card)!important;
+  background-image:none!important;
+  border:1px solid var(--hairline)!important;
+  border-radius:var(--radius-md)!important;
+  padding:14px 14px 12px!important;
+  min-width:0!important;
+  overflow:hidden!important;
+  display:flex!important;
+  flex-direction:column!important;
+  gap:8px!important;
+  transition:transform var(--dur-base) var(--ease-out),border-color var(--dur-base) var(--ease-out),background-color var(--dur-base) var(--ease-out)!important;
+}
+#todayMetrics .card.bento-tile:hover,
+#goalsBox .goal-card.bento-tile:hover,
+#syncStatus .rr-tile:hover{
+  transform:translateY(-1px)!important;
+  border-color:var(--hairline-strong)!important;
+  background:color-mix(in srgb, var(--card) 90%, var(--primary) 10%)!important;
+}
+.metric-bento-head{
+  display:flex!important;
+  align-items:center!important;
+  gap:10px!important;
+  min-height:28px!important;
+}
+.metric-bento-icon{
+  width:28px!important;
+  height:28px!important;
+  border-radius:var(--radius-pill)!important;
+  display:grid!important;
+  place-items:center!important;
+  background:var(--surface-2)!important;
+  border:1px solid var(--hairline)!important;
+  color:var(--primary)!important;
+  flex:0 0 auto!important;
+}
+.metric-bento-icon re-icon{
+  width:16px!important;
+  height:16px!important;
+}
+.metric-bento-copy{min-width:0!important;}
+.metric-bento-label{
+  color:var(--ink)!important;
+  font-family:var(--sans)!important;
+  font-size:12px!important;
+  font-weight:600!important;
+  line-height:1.25!important;
+  letter-spacing:-.01em!important;
+}
+.metric-bento-kicker{
+  margin-top:2px!important;
+  color:var(--muted)!important;
+  font-size:10px!important;
+  font-weight:600!important;
+  letter-spacing:.12em!important;
+  text-transform:uppercase!important;
+}
+.metric-bento-body{
+  margin-top:auto!important;
+  max-height:0!important;
+  opacity:0!important;
+  transform:translateY(6px)!important;
+  overflow:hidden!important;
+  transition:opacity var(--dur-base) var(--ease-out),transform var(--dur-base) var(--ease-out),max-height var(--dur-base) var(--ease-out)!important;
+}
+#todayMetrics .card.bento-tile:hover .metric-bento-body,
+#todayMetrics .card.bento-tile:focus-within .metric-bento-body,
+#goalsBox .goal-card.bento-tile:hover .metric-bento-body,
+#goalsBox .goal-card.bento-tile:focus-within .metric-bento-body,
+#syncStatus .rr-tile:hover .metric-bento-body,
+#syncStatus .rr-tile:focus-within .metric-bento-body{
+  max-height:360px!important;
+  opacity:1!important;
+  transform:none!important;
+}
+.metric-bento-value{
+  font-family:var(--sans)!important;
+  color:var(--ink)!important;
+  font-size:clamp(24px,3.5vw,34px)!important;
+  font-weight:700!important;
+  letter-spacing:-.03em!important;
+  line-height:1.05!important;
+}
+.metric-bento-value.green{color:var(--success)!important;}
+.metric-bento-value.red{color:var(--danger)!important;}
+.metric-bento-value.amber{color:var(--warning)!important;}
+.metric-bento-value.neutral{color:var(--ink)!important;}
+.metric-bento-sub{
+  margin-top:6px!important;
+  color:var(--muted)!important;
+  font-size:12px!important;
+  line-height:1.45!important;
+}
+.metric-bento-detail{
+  margin-top:10px!important;
+  display:grid!important;
+  gap:8px!important;
+}
+.metric-bento-detail .goal-breakdown{
+  margin:0!important;
+  display:grid!important;
+  gap:8px!important;
+}
+.metric-bento-detail .mini-stat{
+  padding:8px 10px!important;
+  border:1px solid var(--hairline)!important;
+  border-radius:var(--radius-md)!important;
+  background:var(--surface-1)!important;
+}
+.metric-bento-detail .mini-stat span{
+  color:var(--muted)!important;
+  font-size:11px!important;
+}
+.metric-bento-detail .mini-stat strong{
+  color:var(--ink)!important;
+  font-size:13px!important;
+}
+@media (max-width:1100px){
+  #todayMetrics.today-metrics.bento-grid{
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  }
+  #goalsBox .goal-card-grid.goal-account-phase-grid.bento-grid,
+  #syncStatus .rr-bento-grid{
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  }
+}
+@media (max-width:760px), (hover:none){
+  #todayMetrics.today-metrics.bento-grid,
+  #goalsBox .goal-card-grid.goal-account-phase-grid.bento-grid,
+  #syncStatus .rr-bento-grid{
+    grid-template-columns:1fr!important;
+  }
+  #todayMetrics .card.bento-tile .metric-bento-body,
+  #goalsBox .goal-card.bento-tile .metric-bento-body,
+  #syncStatus .rr-tile .metric-bento-body{
+    max-height:none!important;
+    opacity:1!important;
+    transform:none!important;
+    overflow:visible!important;
+  }
+}
 #commandCenter.command-center{
   display:block!important;
   background:#0d0e11!important;
@@ -12240,6 +12817,162 @@ body:not(.firebase-auth-required) #journallApp > .main > *{
   line-height:1.45!important;
   text-align:left!important;
 }
+#tradingpage #commandCenter .cmd-card:has(#cmdNextAction),
+#tradingpage #commandCenter .cmd-card:has(#cmdStatus),
+#tradingpage #commandCenter .cmd-card:has(#cmdTomorrowRule){
+  background:var(--card)!important;
+  background-image:none!important;
+  border:1px solid var(--hairline)!important;
+  border-radius:var(--radius-card)!important;
+  box-shadow:none!important;
+  padding:var(--space-4)!important;
+  gap:var(--space-2)!important;
+  min-height:112px!important;
+}
+#tradingpage #commandCenter .cmd-card:has(#cmdNextAction),
+#tradingpage #commandCenter .cmd-card:has(#cmdTomorrowRule){
+  align-items:flex-start!important;
+}
+#tradingpage #commandCenter .cmd-card:has(#cmdNextAction) .cmd-label,
+#tradingpage #commandCenter .cmd-card:has(#cmdStatus) .cmd-label,
+#tradingpage #commandCenter .cmd-card:has(#cmdTomorrowRule) .cmd-label{
+  color:var(--muted)!important;
+  font-size:11px!important;
+  font-weight:600!important;
+  letter-spacing:.08em!important;
+  text-transform:uppercase!important;
+  margin:0!important;
+}
+#tradingpage #commandCenter .cmd-card:has(#cmdNextAction) .cmd-value.cmd-action,
+#tradingpage #commandCenter .cmd-card:has(#cmdTomorrowRule) .cmd-value.cmd-action{
+  position:relative!important;
+  z-index:1!important;
+  display:block!important;
+  width:100%!important;
+  max-width:none!important;
+  min-width:0!important;
+  min-height:0!important;
+  margin:0!important;
+  padding:0!important;
+  color:var(--muted)!important;
+  font-family:var(--sans)!important;
+  font-size:var(--body-size)!important;
+  font-weight:400!important;
+  line-height:1.55!important;
+  white-space:normal!important;
+  overflow-wrap:anywhere!important;
+  word-break:break-word!important;
+  text-align:left!important;
+}
+#tradingpage #commandCenter .cmd-card:has(#cmdStatus) .cmd-status{
+  position:relative!important;
+  z-index:1!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:flex-start!important;
+  gap:8px!important;
+  width:100%!important;
+  max-width:none!important;
+  min-width:0!important;
+  min-height:0!important;
+  margin:0!important;
+  padding:0!important;
+  color:var(--ink)!important;
+  font-family:var(--sans)!important;
+  font-size:var(--body-size)!important;
+  font-weight:500!important;
+  line-height:1.45!important;
+  text-align:left!important;
+  background:transparent!important;
+  border:0!important;
+}
+#tradingpage #commandCenter .cmd-card:has(#cmdStatus) .cmd-status-dot{
+  flex:0 0 auto!important;
+}
+.today-ai-notes-card{
+  background:var(--card)!important;
+  background-image:none!important;
+  border:1px solid var(--hairline)!important;
+  border-radius:var(--radius-card)!important;
+  box-shadow:none!important;
+  padding:var(--space-4)!important;
+  display:flex!important;
+  flex-direction:column!important;
+  gap:var(--space-3)!important;
+}
+.today-ai-notes-card .panel-title{
+  margin:0!important;
+}
+.today-ai-notes-card .insights{
+  margin:0!important;
+  background:transparent!important;
+  border:0!important;
+  padding:0!important;
+}
+#tradingpage .today-equity-card{
+  background:var(--card)!important;
+  background-image:none!important;
+  border:1px solid var(--hairline)!important;
+  border-radius:var(--radius-card)!important;
+  box-shadow:none!important;
+  padding:var(--space-4)!important;
+  display:flex!important;
+  flex-direction:column!important;
+  gap:var(--space-3)!important;
+  overflow:hidden!important;
+}
+#tradingpage .today-equity-card:hover{
+  transform:none!important;
+}
+#tradingpage .today-equity-card .panel-title{
+  margin:0!important;
+}
+#tradingpage .today-equity-card .today-equity-chart{
+  position:relative!important;
+  height:320px!important;
+  min-height:320px!important;
+  background:transparent!important;
+  border:0!important;
+  border-radius:0!important;
+  padding:0!important;
+  overflow:hidden!important;
+}
+#tradingpage .today-equity-card .today-equity-chart canvas{
+  width:100%!important;
+  height:100%!important;
+  display:block!important;
+}
+#tradingpage .today-equity-tooltip{
+  position:absolute!important;
+  z-index:3!important;
+  min-width:168px!important;
+  max-width:240px!important;
+  padding:10px 12px!important;
+  background:var(--surface-2)!important;
+  border:1px solid var(--hairline)!important;
+  border-radius:var(--radius-md)!important;
+  color:var(--ink)!important;
+  box-shadow:none!important;
+  backdrop-filter:none!important;
+  -webkit-backdrop-filter:none!important;
+  pointer-events:none!important;
+  font-family:var(--sans)!important;
+  line-height:1.35!important;
+}
+#tradingpage .today-equity-tooltip .today-equity-tooltip-label{
+  display:block!important;
+  color:var(--muted)!important;
+  font-size:11px!important;
+  text-transform:uppercase!important;
+  letter-spacing:.08em!important;
+  margin-bottom:4px!important;
+}
+#tradingpage .today-equity-tooltip .today-equity-tooltip-value{
+  display:block!important;
+  color:var(--ink)!important;
+  font-size:16px!important;
+  font-weight:700!important;
+}
 
 @media (max-width: 1180px){
   #tradingpage #commandCenter{
@@ -12370,7 +13103,7 @@ body{
   padding:0!important;
   overflow:hidden!important;
   background:#000000!important;
-  font-family:'Inter',-apple-system,system-ui,sans-serif!important;
+  font-family:var(--sans)!important;
   color:#ffffff!important;
   -webkit-font-smoothing:antialiased!important;
 }
@@ -12714,7 +13447,7 @@ button,
   font-size:16px!important;
   font-weight:600!important;
   letter-spacing:.24px!important;
-  border-radius:var(--radius-pill)!important;
+  border-radius:var(--radius-control)!important;
   cursor:pointer!important;
   border:none!important;
   padding:12px 24px!important;
@@ -12749,6 +13482,7 @@ button.btn:not(.primary):hover{
 #psychNextSetupBtn,
 button[onclick*="AI"],
 button[onclick*="generate"]{
+  border-radius:var(--radius-pill)!important;
   background:#494fdf!important;
   color:#ffffff!important;
 }
@@ -12956,15 +13690,15 @@ p{
   height: 18px !important;
   min-width: 18px !important;
   border: 1.5px solid rgba(255,255,255,0.3) !important;
-  border-radius: 4px !important;
+  border-radius: var(--radius-control) !important;
   background: transparent !important;
   cursor: pointer !important;
 }
 
 #journallApp .psych-check input[type="checkbox"]:checked,
 #journallApp [data-psych-check] input[type="checkbox"]:checked {
-  background: #494fdf !important;
-  border-color: #494fdf !important;
+  background: var(--primary) !important;
+  border-color: var(--primary) !important;
 }
 
 #journallApp .psych-check strong,
@@ -13578,15 +14312,15 @@ main,
   height: 20px !important;
   min-width: 20px !important;
   border: 2px solid rgba(255,255,255,0.25) !important;
-  border-radius: 6px !important;
+  border-radius: var(--radius-control) !important;
   background: transparent !important;
   cursor: pointer !important;
   transition: all 150ms !important;
   position: relative !important;
 }
 #journallApp .psych-check input[type="checkbox"]:checked {
-  background: #494fdf !important;
-  border-color: #494fdf !important;
+  background: var(--primary) !important;
+  border-color: var(--primary) !important;
 }
 #journallApp .psych-check input[type="checkbox"]:checked::after {
   content: '' !important;
@@ -13710,7 +14444,7 @@ main,
   min-width: 22px !important;
   min-height: 22px !important;
   border: 2px solid rgba(255,255,255,0.4) !important;
-  border-radius: 6px !important;
+  border-radius: var(--radius-control) !important;
   background: rgba(255,255,255,0.05) !important;
   cursor: pointer !important;
   display: inline-block !important;
@@ -13720,8 +14454,8 @@ main,
 }
 #journallApp .psych-check input[type="checkbox"]:checked,
 #journallApp [data-psych-check] input[type="checkbox"]:checked {
-  background: #494fdf !important;
-  border-color: #494fdf !important;
+  background: var(--primary) !important;
+  border-color: var(--primary) !important;
 }
 #journallApp .psych-check input[type="checkbox"]:checked::after,
 #journallApp [data-psych-check] input[type="checkbox"]:checked::after {
@@ -14386,7 +15120,7 @@ html.firebase-auth-required body{
 
 </style>
 <style id="journall-account-risk-theme">
-.account-onboarding-gate{position:fixed;inset:0;z-index:10000;display:none;place-items:center;background:rgba(0,0,0,.85);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);padding:24px;color:#f7f8f8}.account-onboarding-gate.show{display:grid}.account-onboarding-card{width:min(980px,96vw);max-height:92vh;overflow:auto;background:#16181d;border:1px solid #2e3038;border-radius:18px;padding:32px}.account-onboarding-head{display:flex;justify-content:space-between;gap:18px;align-items:flex-start;margin-bottom:22px}.account-kicker{display:block;color:#8a8f98;font-size:12px;letter-spacing:.4px;text-transform:uppercase;margin-bottom:8px}.account-onboarding-card h2{margin:0;color:#f7f8f8;font-size:32px;letter-spacing:-.8px}.account-onboarding-card p{color:#d0d6e0;margin:8px 0 0}.setup-section{background:#0d0e10;border:1px solid rgba(255,255,255,.06);border-radius:14px;padding:20px;margin-bottom:16px}.setup-section-label{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.4);margin-bottom:12px}.account-form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}.setup-section:first-of-type .account-form-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.account-form-grid label{display:flex;flex-direction:column;gap:8px;color:#8a8f98;font-size:12px;text-transform:uppercase;letter-spacing:.4px}.account-onboarding-card input,.account-onboarding-card select{background:#16181a!important;border:1px solid rgba(255,255,255,.08)!important;border-radius:10px!important;color:#fff!important;padding:12px 14px!important;font-size:15px!important;font-family:'Inter',sans-serif!important;transition:border-color .15s ease,box-shadow .15s ease}.account-onboarding-card input:focus,.account-onboarding-card select:focus{border-color:#494fdf!important;outline:none!important;box-shadow:0 0 0 3px rgba(73,79,223,.15)!important}.account-onboarding-card input[type=number]{-moz-appearance:textfield;appearance:textfield}.account-onboarding-card input[type=number]::-webkit-outer-spin-button,.account-onboarding-card input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}.number-stepper,.stepper-group{display:flex;align-items:center;gap:6px;width:100%}.number-stepper input{min-width:48px;flex:1;color:#fff!important;-webkit-text-fill-color:#fff!important;opacity:1!important}.account-inline-field{display:flex;gap:10px;align-items:center}.account-inline-field .number-stepper{flex:1}.account-inline-field select{width:92px}.account-inline-field span{color:#d0d6e0}.stepper-btn{background:#16181a!important;border:1px solid rgba(255,255,255,.08)!important;color:rgba(255,255,255,.5)!important;flex-shrink:0!important;width:32px!important;height:32px!important;border-radius:6px!important;display:flex!important;align-items:center!important;justify-content:center!important;padding:0!important;font-size:16px!important;line-height:1!important;cursor:pointer!important}.stepper-btn:hover{background:#1f2124!important;color:#fff!important}.setup-preview{background:rgba(73,79,223,.08);border:1px solid rgba(73,79,223,.25);border-radius:12px;padding:16px 20px;margin-top:4px}.setup-preview-row{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.08)}.setup-preview-row:last-child{border-bottom:0}.setup-preview-row span{color:rgba(255,255,255,.58);font-size:13px}.setup-preview-row strong{color:#fff;font-size:15px;font-weight:700;text-align:right}.account-onboarding-actions{display:flex;align-items:center;gap:14px;margin-top:22px}.account-onboarding-actions p{margin:0;color:#8a8f98}.save-setup-btn{background:#494fdf!important;color:#fff!important;border:none!important;font-weight:600!important}.save-setup-btn:hover{background:#5a5ff0!important}.risk-calc-card{grid-column:span 2}.risk-calc-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:12px 0}.risk-calc-grid label{display:flex;flex-direction:column;gap:6px;color:#8a8f98;font-size:12px;text-transform:uppercase;letter-spacing:.4px}.risk-calc-grid input{background:#010102!important;border:1px solid #23252a!important;color:#f7f8f8!important;border-radius:8px!important;padding:9px 10px!important}@media(max-width:760px){.account-form-grid,.setup-section:first-of-type .account-form-grid,.risk-calc-grid{grid-template-columns:1fr}.risk-calc-card{grid-column:auto}.account-onboarding-head{flex-direction:column}.account-onboarding-card{padding:20px}.account-inline-field{align-items:stretch;flex-direction:column}.account-inline-field select{width:100%}.setup-preview-row{align-items:flex-start;flex-direction:column}.setup-preview-row strong{text-align:left}}
+.account-onboarding-gate{position:fixed;inset:0;z-index:10000;display:none;place-items:center;background:rgba(0,0,0,.85);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);padding:24px;color:#f7f8f8}.account-onboarding-gate.show{display:grid}.account-onboarding-card{width:min(980px,96vw);max-height:92vh;overflow:auto;background:#16181d;border:1px solid #2e3038;border-radius:18px;padding:32px}.account-onboarding-head{display:flex;justify-content:space-between;gap:18px;align-items:flex-start;margin-bottom:22px}.account-kicker{display:block;color:#8a8f98;font-size:12px;letter-spacing:.4px;text-transform:uppercase;margin-bottom:8px}.account-onboarding-card h2{margin:0;color:#f7f8f8;font-size:32px;letter-spacing:-.8px}.account-onboarding-card p{color:#d0d6e0;margin:8px 0 0}.setup-section{background:#0d0e10;border:1px solid rgba(255,255,255,.06);border-radius:14px;padding:20px;margin-bottom:16px}.setup-section-label{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.4);margin-bottom:12px}.account-form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}.setup-section:first-of-type .account-form-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.account-form-grid label{display:flex;flex-direction:column;gap:8px;color:#8a8f98;font-size:12px;text-transform:uppercase;letter-spacing:.4px}.account-onboarding-card input,.account-onboarding-card select{background:#16181a!important;border:1px solid rgba(255,255,255,.08)!important;border-radius:var(--radius-control)!important;color:#fff!important;padding:12px 14px!important;font-size:15px!important;font-family:'Inter',sans-serif!important;transition:border-color .15s ease,box-shadow .15s ease}.account-onboarding-card input:focus,.account-onboarding-card select:focus{border-color:var(--primary)!important;outline:none!important;box-shadow:0 0 0 3px rgba(73,79,223,.15)!important}.account-onboarding-card input[type=number]{-moz-appearance:textfield;appearance:textfield}.account-onboarding-card input[type=number]::-webkit-outer-spin-button,.account-onboarding-card input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}.number-stepper,.stepper-group{display:flex;align-items:center;gap:6px;width:100%}.number-stepper input{min-width:48px;flex:1;color:#fff!important;-webkit-text-fill-color:#fff!important;opacity:1!important}.account-inline-field{display:flex;gap:10px;align-items:center}.account-inline-field .number-stepper{flex:1}.account-inline-field select{width:92px}.account-inline-field span{color:#d0d6e0}.stepper-btn{background:#16181a!important;border:1px solid rgba(255,255,255,.08)!important;color:rgba(255,255,255,.5)!important;flex-shrink:0!important;width:32px!important;height:32px!important;border-radius:var(--radius-control)!important;display:flex!important;align-items:center!important;justify-content:center!important;padding:0!important;font-size:16px!important;line-height:1!important;cursor:pointer!important}.stepper-btn:hover{background:#1f2124!important;color:#fff!important}.setup-preview{background:rgba(73,79,223,.08);border:1px solid rgba(73,79,223,.25);border-radius:12px;padding:16px 20px;margin-top:4px}.setup-preview-row{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.08)}.setup-preview-row:last-child{border-bottom:0}.setup-preview-row span{color:rgba(255,255,255,.58);font-size:13px}.setup-preview-row strong{color:#fff;font-size:15px;font-weight:700;text-align:right}.account-onboarding-actions{display:flex;align-items:center;gap:14px;margin-top:22px}.account-onboarding-actions p{margin:0;color:#8a8f98}.save-setup-btn{background:#494fdf!important;color:#fff!important;border:none!important;font-weight:600!important}.save-setup-btn:hover{background:#5a5ff0!important}.risk-calc-card{grid-column:span 2}.risk-calc-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:12px 0}.risk-calc-grid label{display:flex;flex-direction:column;gap:6px;color:#8a8f98;font-size:12px;text-transform:uppercase;letter-spacing:.4px}.risk-calc-grid input{background:#010102!important;border:1px solid #23252a!important;color:#f7f8f8!important;border-radius:var(--radius-control)!important;padding:9px 10px!important}@media(max-width:760px){.account-form-grid,.setup-section:first-of-type .account-form-grid,.risk-calc-grid{grid-template-columns:1fr}.risk-calc-card{grid-column:auto}.account-onboarding-head{flex-direction:column}.account-onboarding-card{padding:20px}.account-inline-field{align-items:stretch;flex-direction:column}.account-inline-field select{width:100%}.setup-preview-row{align-items:flex-start;flex-direction:column}.setup-preview-row strong{text-align:left}}
 
 
 </style>
@@ -16485,6 +17219,212 @@ body:not(.firebase-auth-required) #journallApp > .sidebar .sidebox *{
     background:rgba(248, 113, 113, 0.04)!important;
   }
 }
+    </style>
+    <style id="control-surface-pass">
+      button:not(.pill):not(.ai-chip):not(.journal-status-btn):not(.filter-chip):not(.psych-step):not(.widget-icon-btn):not(.android-install-btn),
+      .btn:not(.pill):not(.ai-chip):not(.journal-status-btn):not(.filter-chip):not(.psych-step):not(.widget-icon-btn):not(.android-install-btn),
+      .file-picker-btn,
+      .mobile-upload-btn,
+      .save-setup-btn,
+      .stepper-btn,
+      .nav-link {
+        border-radius: var(--radius-control) !important;
+        background: var(--surface-2) !important;
+        background-image: none !important;
+        border: 1px solid var(--hairline) !important;
+        color: var(--ink) !important;
+        font-family: var(--sans) !important;
+        font-weight: 500 !important;
+        letter-spacing: 0 !important;
+        min-height: 44px !important;
+        transition:
+          background-color 160ms var(--ease-out),
+          border-color 160ms var(--ease-out),
+          transform 160ms var(--ease-snappy),
+          opacity 160ms var(--ease-out),
+          box-shadow 160ms var(--ease-out) !important;
+      }
+
+      button:not(.pill):not(.ai-chip):not(.journal-status-btn):not(.filter-chip):not(.psych-step):not(.widget-icon-btn):not(.android-install-btn):hover,
+      .btn:not(.pill):not(.ai-chip):not(.journal-status-btn):not(.filter-chip):not(.psych-step):not(.widget-icon-btn):not(.android-install-btn):hover,
+      .file-picker-btn:hover,
+      .mobile-upload-btn:hover,
+      .save-setup-btn:hover,
+      .stepper-btn:hover,
+      .nav-link:hover {
+        background: color-mix(in srgb, var(--primary) 9%, var(--surface-2)) !important;
+        border-color: color-mix(in srgb, var(--primary) 24%, var(--hairline)) !important;
+        color: var(--ink) !important;
+        opacity: 1 !important;
+        transform: translateY(-1px) !important;
+      }
+
+      button:not(.pill):not(.ai-chip):not(.journal-status-btn):not(.filter-chip):not(.psych-step):not(.widget-icon-btn):not(.android-install-btn):active,
+      .btn:not(.pill):not(.ai-chip):not(.journal-status-btn):not(.filter-chip):not(.psych-step):not(.widget-icon-btn):not(.android-install-btn):active,
+      .file-picker-btn:active,
+      .mobile-upload-btn:active,
+      .save-setup-btn:active,
+      .stepper-btn:active,
+      .nav-link:active {
+        transform: translateY(0) scale(.98) !important;
+      }
+
+      button:not(.pill):not(.ai-chip):not(.journal-status-btn):not(.filter-chip):not(.psych-step):not(.widget-icon-btn):not(.android-install-btn):disabled,
+      .btn:not(.pill):not(.ai-chip):not(.journal-status-btn):not(.filter-chip):not(.psych-step):not(.widget-icon-btn):not(.android-install-btn):disabled,
+      .file-picker-btn:disabled,
+      .mobile-upload-btn:disabled,
+      .save-setup-btn:disabled,
+      .stepper-btn:disabled,
+      .nav-link[aria-disabled="true"] {
+        opacity: .55 !important;
+        pointer-events: none !important;
+        transform: none !important;
+      }
+
+      .btn.primary,
+      .mobile-upload-btn,
+      .save-setup-btn {
+        background: var(--primary) !important;
+        border-color: var(--primary) !important;
+        color: var(--on-primary) !important;
+      }
+
+      .btn.primary:hover,
+      .mobile-upload-btn:hover,
+      .save-setup-btn:hover {
+        background: color-mix(in srgb, var(--primary) 88%, #ffffff 12%) !important;
+        border-color: color-mix(in srgb, var(--primary) 88%, #ffffff 12%) !important;
+        color: var(--on-primary) !important;
+        box-shadow: 0 6px 18px rgba(73,79,223,.14) !important;
+      }
+
+      .btn:not(.primary),
+      .file-picker-btn,
+      .stepper-btn {
+        background: transparent !important;
+        color: var(--primary) !important;
+        border-color: var(--primary) !important;
+      }
+
+      .btn:not(.primary):hover,
+      .file-picker-btn:hover,
+      .stepper-btn:hover {
+        background: rgba(73,79,223,.08) !important;
+        border-color: rgba(73,79,223,.28) !important;
+        color: var(--primary) !important;
+      }
+
+      .nav button,
+      .nav-link {
+        border-radius: var(--radius-control) !important;
+        min-height: 40px !important;
+        padding: 10px 16px !important;
+        border: 1px solid transparent !important;
+        border-left: 2px solid transparent !important;
+        background: transparent !important;
+        color: var(--ink-subtle) !important;
+        text-align: left !important;
+        justify-content: flex-start !important;
+      }
+
+      .nav button:hover,
+      .nav-link:hover {
+        background: var(--surface-2) !important;
+        color: var(--ink) !important;
+        border-color: var(--surface-2) !important;
+        border-left-color: transparent !important;
+        transform: none !important;
+      }
+
+      .nav button.active,
+      .nav-link.active {
+        background: var(--surface-2) !important;
+        color: var(--ink) !important;
+        border-color: var(--hairline-strong) !important;
+        border-left-color: var(--primary) !important;
+        font-weight: 500 !important;
+      }
+
+      .nav button:focus-visible,
+      .nav-link:focus-visible {
+        outline: 2px solid rgba(73,79,223,.72) !important;
+        outline-offset: 2px !important;
+      }
+
+      input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
+      select,
+      textarea,
+      .search input,
+      .filters input,
+      .filters select,
+      .editor textarea,
+      .editor input,
+      .journal-entry-form input,
+      .journal-entry-form select,
+      .journal-entry-form textarea,
+      .journal-search-row input,
+      .journal-search-row select,
+      .journal-trade-select-row select,
+      .real-ai-settings input,
+      .real-ai-settings select,
+      .account-onboarding-card input,
+      .account-onboarding-card select,
+      .risk-calc-grid input {
+        border-radius: var(--radius-control) !important;
+        background: var(--surface-2) !important;
+        background-image: none !important;
+        border: 1px solid var(--hairline) !important;
+        color: var(--ink) !important;
+        font-family: var(--sans) !important;
+        letter-spacing: 0 !important;
+        transition:
+          background-color 160ms var(--ease-out),
+          border-color 160ms var(--ease-out),
+          box-shadow 160ms var(--ease-out),
+          transform 160ms var(--ease-snappy) !important;
+      }
+
+      textarea {
+        border-radius: var(--radius-control) !important;
+      }
+
+      input::placeholder,
+      textarea::placeholder {
+        color: var(--muted) !important;
+      }
+
+      input:focus-visible,
+      select:focus-visible,
+      textarea:focus-visible {
+        outline: 2px solid rgba(73,79,223,.72) !important;
+        outline-offset: 2px !important;
+        border-color: var(--primary) !important;
+        box-shadow: 0 0 0 3px rgba(73,79,223,.16) !important;
+      }
+
+      .pill,
+      .ai-chip,
+      .journal-status-btn,
+      .filter-chip,
+      .psych-step,
+      .widget-icon-btn,
+      .android-install-btn {
+        border-radius: var(--radius-pill) !important;
+      }
+
+      #journallApp .psych-check input[type="checkbox"],
+      #journallApp [class*="checklist-item"] input[type="checkbox"],
+      #journallApp [data-psych-check] input[type="checkbox"] {
+        border-radius: var(--radius-control) !important;
+        accent-color: var(--primary) !important;
+      }
+
+      #journallApp .psych-check input[type="checkbox"]:checked,
+      #journallApp [class*="checklist-item"] input[type="checkbox"]:checked,
+      #journallApp [data-psych-check] input[type="checkbox"]:checked {
+        background: var(--primary) !important;
+        border-color: var(--primary) !important;
+      }
     </style>
     </body>
 </html>
