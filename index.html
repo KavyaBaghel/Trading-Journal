@@ -17426,5 +17426,190 @@ body:not(.firebase-auth-required) #journallApp > .sidebar .sidebox *{
         border-color: var(--primary) !important;
       }
     </style>
-    </body>
+    <style id="navigation-shell-phase-b">
+      /* Phase B: one navigation language across sidebar, profile top bar, and psychology steps. */
+      body:not(.firebase-auth-required) #journallApp > .sidebar {
+        background: var(--surface-1) !important;
+        border-right: 1px solid var(--hairline) !important;
+        color: var(--ink) !important;
+      }
+
+      body:not(.firebase-auth-required) #journallApp > .sidebar .brand {
+        border-bottom: 1px solid var(--hairline) !important;
+        background: var(--surface-1) !important;
+      }
+
+      body:not(.firebase-auth-required) #journallApp > .sidebar .brand-name,
+      body:not(.firebase-auth-required) #journallApp > .sidebar .brand-text {
+        color: var(--ink) !important;
+        font-family: var(--sans) !important;
+        letter-spacing: .08em !important;
+      }
+
+      body:not(.firebase-auth-required) #journallApp > .sidebar .nav {
+        gap: 6px !important;
+        padding: 12px 0 !important;
+      }
+
+      body:not(.firebase-auth-required) #journallApp > .sidebar .nav button,
+      body:not(.firebase-auth-required) #journallApp > .sidebar .nav [data-tab] {
+        min-height: 40px !important;
+        margin: 0 4px !important;
+        padding: 9px 12px !important;
+        border: 1px solid transparent !important;
+        border-radius: var(--radius-control) !important;
+        background: transparent !important;
+        color: var(--ink-subtle) !important;
+        font-family: var(--sans) !important;
+        font-size: 13px !important;
+        font-weight: 500 !important;
+        letter-spacing: 0 !important;
+        transition: background-color 200ms ease, border-color 200ms ease, color 200ms ease, transform 200ms ease, box-shadow 200ms ease !important;
+      }
+
+      body:not(.firebase-auth-required) #journallApp > .sidebar .nav button > re-icon,
+      body:not(.firebase-auth-required) #journallApp > .sidebar .nav [data-tab] > re-icon {
+        color: var(--ink-subtle) !important;
+        transition: color 200ms ease, transform 200ms ease !important;
+      }
+
+      body:not(.firebase-auth-required) #journallApp > .sidebar .nav button:hover,
+      body:not(.firebase-auth-required) #journallApp > .sidebar .nav [data-tab]:hover {
+        background: color-mix(in srgb, var(--primary) 8%, var(--surface-2)) !important;
+        border-color: color-mix(in srgb, var(--primary) 20%, var(--hairline)) !important;
+        color: var(--ink) !important;
+        transform: translateX(2px) !important;
+        box-shadow: 0 0 0 1px color-mix(in srgb, var(--primary) 6%, transparent) !important;
+      }
+
+      body:not(.firebase-auth-required) #journallApp > .sidebar .nav button:hover > re-icon,
+      body:not(.firebase-auth-required) #journallApp > .sidebar .nav [data-tab]:hover > re-icon {
+        color: var(--primary) !important;
+        transform: translateX(1px) !important;
+      }
+
+      body:not(.firebase-auth-required) #journallApp > .sidebar .nav button.active,
+      body:not(.firebase-auth-required) #journallApp > .sidebar .nav [data-tab].active {
+        background: color-mix(in srgb, var(--primary) 14%, var(--surface-2)) !important;
+        border-color: color-mix(in srgb, var(--primary) 30%, var(--hairline)) !important;
+        border-left: 2px solid var(--primary) !important;
+        color: var(--ink) !important;
+        font-weight: 600 !important;
+        box-shadow: 0 0 0 1px color-mix(in srgb, var(--primary) 8%, transparent), 0 0 14px color-mix(in srgb, var(--primary) 10%, transparent) !important;
+      }
+
+      body:not(.firebase-auth-required) #journallApp > .sidebar .nav button.active > re-icon,
+      body:not(.firebase-auth-required) #journallApp > .sidebar .nav [data-tab].active > re-icon {
+        color: var(--primary) !important;
+      }
+
+      body:not(.firebase-auth-required) #journallApp > .sidebar .nav button:focus-visible,
+      body:not(.firebase-auth-required) #journallApp > .sidebar .nav [data-tab]:focus-visible,
+      .psych-step:focus-visible {
+        outline: 2px solid color-mix(in srgb, var(--primary) 72%, transparent) !important;
+        outline-offset: 2px !important;
+      }
+
+      body:not(.firebase-auth-required) #journallApp > .sidebar .nav small {
+        color: var(--muted) !important;
+        font-family: var(--sans) !important;
+        letter-spacing: 0 !important;
+      }
+
+      .fixed-top-right-profile {
+        background: var(--surface-1) !important;
+        border: 1px solid var(--hairline) !important;
+        border-radius: var(--radius-control) !important;
+        box-shadow: 0 0 0 1px color-mix(in srgb, var(--primary) 5%, transparent), 0 10px 24px color-mix(in srgb, var(--canvas) 80%, transparent) !important;
+        font-family: var(--sans) !important;
+        transition: background-color 200ms ease, border-color 200ms ease, box-shadow 200ms ease, transform 200ms ease !important;
+      }
+
+      .fixed-top-right-profile:hover {
+        background: color-mix(in srgb, var(--primary) 8%, var(--surface-1)) !important;
+        border-color: color-mix(in srgb, var(--primary) 28%, var(--hairline)) !important;
+        box-shadow: 0 0 0 1px color-mix(in srgb, var(--primary) 10%, transparent), 0 12px 26px color-mix(in srgb, var(--canvas) 76%, transparent) !important;
+      }
+
+      .top-profile-name,
+      .top-profile-email {
+        font-family: var(--sans) !important;
+      }
+
+      .psych-progress .psych-step {
+        min-height: 44px !important;
+        border: 1px solid var(--hairline) !important;
+        border-radius: var(--radius-pill) !important;
+        background: var(--surface-1) !important;
+        color: var(--ink-subtle) !important;
+        font-family: var(--sans) !important;
+        font-size: 13px !important;
+        font-weight: 500 !important;
+        transition: background-color 200ms ease, border-color 200ms ease, color 200ms ease, transform 200ms ease, box-shadow 200ms ease !important;
+      }
+
+      .psych-progress .psych-step:hover,
+      .psych-progress .psych-step.active:hover {
+        background: color-mix(in srgb, var(--primary) 8%, var(--surface-2)) !important;
+        border-color: color-mix(in srgb, var(--primary) 24%, var(--hairline)) !important;
+        color: var(--ink) !important;
+        transform: translateY(-1px) !important;
+      }
+
+      .psych-progress .psych-step.active,
+      .psych-progress .psych-step.completed {
+        background: color-mix(in srgb, var(--primary) 14%, var(--surface-2)) !important;
+        border-color: color-mix(in srgb, var(--primary) 34%, var(--hairline)) !important;
+        color: var(--ink) !important;
+        box-shadow: 0 0 0 1px color-mix(in srgb, var(--primary) 8%, transparent), 0 0 14px color-mix(in srgb, var(--primary) 10%, transparent) !important;
+      }
+
+      .psych-progress .psych-step.locked {
+        background: var(--surface-1) !important;
+        border-color: var(--hairline) !important;
+        color: var(--muted) !important;
+        box-shadow: none !important;
+      }
+
+      @media (max-width: 820px) {
+        body:not(.firebase-auth-required) #journallApp > .sidebar {
+          border-right: 0 !important;
+          border-bottom: 1px solid var(--hairline) !important;
+          background: var(--surface-1) !important;
+        }
+
+        body:not(.firebase-auth-required) #journallApp > .sidebar .brand {
+          border-bottom: 1px solid var(--hairline) !important;
+        }
+
+        body:not(.firebase-auth-required) #journallApp > .sidebar .nav {
+          gap: 8px !important;
+          padding: 10px 4px !important;
+        }
+
+        body:not(.firebase-auth-required) #journallApp > .sidebar .nav button,
+        body:not(.firebase-auth-required) #journallApp > .sidebar .nav [data-tab] {
+          min-width: 92px !important;
+          margin: 0 !important;
+          padding: 9px 14px !important;
+          justify-content: center !important;
+          border-radius: var(--radius-pill) !important;
+        }
+
+        body:not(.firebase-auth-required) #journallApp > .sidebar .nav button:hover,
+        body:not(.firebase-auth-required) #journallApp > .sidebar .nav [data-tab]:hover {
+          transform: translateY(-1px) !important;
+        }
+
+        body:not(.firebase-auth-required) #journallApp > .sidebar .nav button.active,
+        body:not(.firebase-auth-required) #journallApp > .sidebar .nav [data-tab].active {
+          border-left: 1px solid color-mix(in srgb, var(--primary) 30%, var(--hairline)) !important;
+        }
+
+        .psych-progress {
+          gap: 8px !important;
+        }
+      }
+    </style>
+</body>
 </html>
