@@ -325,17 +325,18 @@ function renderUserProfile() {
   }
 
   // Stats
-  const statTrades = document.getElementById('profStatTrades');
-  const statBalance = document.getElementById('profStatBalance');
   const statBroker = document.getElementById('profStatBroker');
-  const statDeposit = document.getElementById('profStatDeposit');
+  const balanceCard = document.getElementById('profileBalanceStatCard');
+  const tradesCard = document.getElementById('profileTradesStatCard');
+  const depositCard = document.getElementById('profileDepositStatCard');
 
   const m = typeof accountMetrics === 'function' ? accountMetrics(trades || []) : null;
   const broker = typeof getSyncedBrokerInfo === 'function' ? getSyncedBrokerInfo() : null;
+  const profileTimeline = buildStatTimeline(trades || [], m);
 
-  if (statTrades) statTrades.textContent = (trades || []).length + ' trades';
-  if (statBalance) statBalance.textContent = m ? `$${m.currentBalance.toFixed(2)}` : '$0.00';
-  if (statDeposit) statDeposit.textContent = m ? `$${m.startBalance.toFixed(2)}` : '$0.00';
+  if (balanceCard) balanceCard.innerHTML = buildStatCard('Current Balance', m ? `$${m.currentBalance.toFixed(2)}` : '$0.00', {label:m ? `Starting balance $${m.startBalance.toFixed(2)}` : 'Account setup required', tone:m && m.currentBalance>=m.startBalance?'positive':'neutral', valueTone:m && m.currentBalance>=m.startBalance?'positive':'neutral', sparkKey:'profile-balance'}, 'chart-bar', statSeries(profileTimeline,'currentBalance'));
+  if (tradesCard) tradesCard.innerHTML = buildStatCard('Journaled Trades', `${(trades || []).length} trades`, {label:'Total trades saved in database', tone:'neutral'}, 'book-open', []);
+  if (depositCard) depositCard.innerHTML = buildStatCard('Initial Deposit', m ? `$${m.startBalance.toFixed(2)}` : '$0.00', {label:'Configured starting balance', tone:'neutral'}, 'target', []);
   if (statBroker) statBroker.textContent = broker ? `${broker.platform} (${broker.account})` : 'MetaTrader 5';
 }
 
@@ -2293,6 +2294,105 @@ body.modal-open .main{
   font-size:25px;
   font-weight:900;
 }
+.stat-card{
+  background:linear-gradient(180deg,var(--surface-2),var(--surface-1));
+  border:1px solid var(--hairline);
+  border-radius:var(--radius-card);
+  box-shadow:0 16px 32px rgba(0,0,0,.22);
+  padding:16px;
+  min-width:0;
+  overflow:hidden;
+}
+.stat-card-content{
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+  min-width:0;
+  height:100%;
+}
+.stat-card-header{
+  display:flex;
+  align-items:flex-start;
+  gap:10px;
+}
+.stat-card-icon-badge{
+  display:grid;
+  place-items:center;
+  flex:0 0 32px;
+  width:32px;
+  height:32px;
+  border:1px solid rgba(73,79,223,.28);
+  border-radius:var(--radius-control);
+  background:rgba(73,79,223,.12);
+  color:var(--primary);
+}
+.stat-card-heading{
+  display:flex;
+  flex-direction:column;
+  gap:3px;
+  min-width:0;
+}
+.stat-card-label{
+  color:var(--mute);
+  font-size:11px;
+  font-weight:600;
+  letter-spacing:.12em;
+  line-height:1.25;
+  text-transform:uppercase;
+}
+.stat-card-updated{
+  color:var(--faint);
+  font-size:11px;
+  line-height:1.25;
+}
+.stat-card-value{
+  color:var(--primary);
+  font-family:var(--sans);
+  font-size:clamp(26px,4vw,34px);
+  font-weight:700;
+  letter-spacing:-.03em;
+  line-height:1.05;
+  min-width:0;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+.stat-card-value.negative{color:var(--loss);}
+.stat-card-value.positive{color:var(--success);}
+.stat-card-trend{
+  display:flex;
+  align-items:center;
+  gap:5px;
+  min-height:18px;
+  color:var(--muted);
+  font-size:12px;
+  line-height:1.35;
+}
+.stat-card-trend.positive{color:var(--success);}
+.stat-card-trend.negative{color:var(--loss);}
+.stat-card-trend.neutral{color:var(--muted);}
+.stat-card-divider{
+  width:100%;
+  height:1px;
+  background:var(--hairline);
+}
+.stat-card-content .stat-sparkline{
+  margin-top:auto;
+  min-height:52px;
+  height:52px;
+}
+.stat-card-content .stat-sparkline-svg{
+  width:100%;
+  height:52px;
+  display:block;
+  overflow:visible;
+}
+.stat-card-content .stat-sparkline-svg polyline{
+  filter:drop-shadow(0 0 5px rgba(73,79,223,.4));
+}
+.stat-card-content .stat-sparkline-svg circle{
+  filter:drop-shadow(0 0 6px rgba(73,79,223,.5));
+}
 @media(max-width:900px){
   .ai-lab-grid{grid-template-columns:1fr}
   .ai-msg.user,.ai-msg.bot{margin-left:0;margin-right:0}
@@ -3701,26 +3801,14 @@ tr:hover {
       </div>
 
       <div class="goal-card-grid" style="margin-top:24px;">
-        <div class="goal-card">
-          <div class="goal-card-label">Current Balance</div>
-          <div class="goal-card-value green" id="profStatBalance">$0.00</div>
-          <div class="goal-card-sub">Real-time balance calculated from synced trades</div>
-        </div>
+        <div class="goal-card stat-card" id="profileBalanceStatCard"></div>
         <div class="goal-card">
           <div class="goal-card-label">Connected Platform</div>
           <div class="goal-card-value green" id="profStatBroker">MetaTrader 5</div>
           <div class="goal-card-sub">Active auto-sync broker source</div>
         </div>
-        <div class="goal-card">
-          <div class="goal-card-label">Journaled Trades</div>
-          <div class="goal-card-value neutral" id="profStatTrades">0 trades</div>
-          <div class="goal-card-sub">Total trades saved in database</div>
-        </div>
-        <div class="goal-card">
-          <div class="goal-card-label">Initial Deposit</div>
-          <div class="goal-card-value neutral" id="profStatDeposit">$0.00</div>
-          <div class="goal-card-sub">Configured starting balance</div>
-        </div>
+        <div class="goal-card stat-card" id="profileTradesStatCard"></div>
+        <div class="goal-card stat-card" id="profileDepositStatCard"></div>
       </div>
 
       <div class="card" style="margin-top:24px;">
@@ -3948,25 +4036,10 @@ tr:hover {
 
     <section id="tradingpage" class="section active">
       <div class="command-center" id="commandCenter">
-        <div class="cmd-card stat-card">
-          <div class="cmd-label">Today P&L</div>
-          <div class="cmd-value" id="cmdTodayPnl">$0.00</div>
-          <div class="stat-sparkline" id="cmdTodayPnlSparkline"></div>
-        </div>
-        <div class="cmd-card stat-card">
-      <div class="cmd-label">Daily Loss Used</div>
-      <div class="cmd-value" id="cmdDailyLoss">$0.00 / not set</div>
-          <div class="stat-sparkline" id="cmdDailyLossSparkline"></div>
-        </div>
-        <div class="cmd-card stat-card">
-          <div class="cmd-label">Trades</div>
-          <div class="cmd-value" id="cmdTrades">0 / not set</div>
-          <div class="stat-sparkline" id="cmdTradesSparkline"></div>
-        </div>
-        <div class="cmd-card">
-          <div class="cmd-label">Rule Breaks</div>
-          <div class="cmd-value" id="cmdRuleBreaks">0</div>
-        </div>
+        <div class="cmd-card stat-card" id="cmdTodayPnlCard"></div>
+        <div class="cmd-card stat-card" id="cmdDailyLossCard"></div>
+        <div class="cmd-card stat-card" id="cmdTradesCard"></div>
+        <div class="cmd-card stat-card" id="cmdRuleBreaksCard"></div>
         <div class="cmd-card">
           <div class="cmd-label">Best Next Action</div>
           <div class="cmd-value cmd-action" id="cmdNextAction">Wait for setup</div>
@@ -5254,37 +5327,30 @@ function renderAnalyticsBars(){
 }
 function renderMetrics(){
   const s=stats(filtered);
-
-  if(!filtered.length){
-    const cells=[
-      ['Net P&L','$0.00','neutral','Upload CSV to calculate'],
-      ['Win Rate','0%','neutral','No trades yet'],
-      ['Profit Factor','0.00','neutral','No trades yet'],
-      ['Avg Win','$0.00','neutral','No trades yet'],
-      ['Avg Loss','$0.00','neutral','No trades yet'],
-      ['Max Drawdown','$0.00','neutral','No trades yet'],
-      ['Mistake Count','0','neutral','No trades yet']
-    ];
-    document.getElementById('metrics').innerHTML=cells.map(c=>{
-      const isMistake = c[0] === 'Mistake Count';
-      return `<div class="card ${isMistake?'mistake-card-click':''}" ${isMistake?'onclick="openMistakeDashboard()"':''}><div class="label">${c[0]}</div><div class="value ${c[2]}">${c[1]}</div><div class="sub">${c[3]}</div></div>`;
-    }).join('');
-    return;
-  }
-
-  const cells=[
-    ['Net P&L',fmt(s.pnl),pnlClass(s.pnl),'Total after commission/swap'],
-    ['Win Rate',pct(s.wr),scoreClass(s.wr,50,40),s.wins.length+'W / '+s.losses.length+'L / '+s.breakEvens.length+'BE'],
-    ['Profit Factor',s.pf.toFixed(2),factorClass(s.pf),'Gross profit / gross loss'],
-    ['Avg Win',fmt(s.avgWin),pnlClass(s.avgWin),'Mean winning trade'],
-    ['Avg Loss',fmt(s.avgLoss),pnlClass(s.avgLoss),'Mean losing trade'],
-    ['Max Drawdown',fmt(s.maxDD),pnlClass(s.maxDD),'Worst equity dip'],
-    ['Mistake Count',s.mistakeTotal,countClass(s.mistakeTotal),'Open dashboard: universal rule mistakes']
+  const cells=!filtered.length ? [
+    ['Net P&L','$0.00','neutral','Upload CSV to calculate','chart-bar'],
+    ['Win Rate','0%','neutral','No trades yet','activity'],
+    ['Profit Factor','0.00','neutral','No trades yet','target'],
+    ['Avg Win','$0.00','neutral','No trades yet','arrow-up-right'],
+    ['Avg Loss','$0.00','neutral','No trades yet','arrow-down-right'],
+    ['Max Drawdown','$0.00','neutral','No trades yet','shield'],
+    ['Mistake Count','0','neutral','No trades yet','meditation']
+  ] : [
+    ['Net P&L',fmt(s.pnl),pnlClass(s.pnl),'Total after commission/swap','chart-bar'],
+    ['Win Rate',pct(s.wr),scoreClass(s.wr,50,40),s.wins.length+'W / '+s.losses.length+'L / '+s.breakEvens.length+'BE','activity'],
+    ['Profit Factor',s.pf.toFixed(2),factorClass(s.pf),'Gross profit / gross loss','target'],
+    ['Avg Win',fmt(s.avgWin),pnlClass(s.avgWin),'Mean winning trade','arrow-up-right'],
+    ['Avg Loss',fmt(s.avgLoss),pnlClass(s.avgLoss),'Mean losing trade','arrow-down-right'],
+    ['Max Drawdown',fmt(s.maxDD),pnlClass(s.maxDD),'Worst equity dip','shield'],
+    ['Mistake Count',s.mistakeTotal,countClass(s.mistakeTotal),'Open dashboard: universal rule mistakes','meditation']
   ];
-  document.getElementById('metrics').innerHTML=cells.map(c=>{
-      const isMistake = c[0] === 'Mistake Count';
-      return `<div class="card ${isMistake?'mistake-card-click':''}" ${isMistake?'onclick="openMistakeDashboard()"':''}><div class="label">${c[0]}</div><div class="value ${c[2]}">${c[1]}</div><div class="sub">${c[3]}</div></div>`;
-    }).join('');
+  const toneFor = tone => ['red','negative','loss','danger','warn'].includes(tone) ? 'negative' : (['green','positive','profit'].includes(tone) ? 'positive' : 'neutral');
+  document.getElementById('metrics').innerHTML=cells.map(c=>`<div class="stat-card analytics-stat-card">${buildStatCard(c[0],c[1],{label:c[3],tone:toneFor(c[2]),valueTone:toneFor(c[2]),action:c[0]==='Mistake Count'?'mistakes':''},c[4],[])}</div>`).join('');
+  document.querySelectorAll('#metrics [data-stat-action="mistakes"]').forEach(card=>{
+    card.tabIndex=0;
+    card.addEventListener('click',()=>openMistakeDashboard());
+    card.addEventListener('keydown',event=>{if(event.key==='Enter'||event.key===' ')openMistakeDashboard();});
+  });
 }
 
 function renderInsights(){
@@ -6336,14 +6402,34 @@ function buildCalendarSparkline(monthTrades, year, month){
   `;
 }
 
-function buildCalendarMetricCard(label, value, subline, valueClass=''){
-  return `
-    <div class="calendar-kpi-card">
-      <div class="calendar-kpi-label">${escapeHtml(label)}</div>
-      <div class="calendar-kpi-value ${valueClass}">${value}</div>
-      <div class="calendar-kpi-sub">${subline}</div>
+function buildStatCard(label, value, trend, icon, sparklineData){
+  const info = trend && typeof trend === 'object' ? trend : {label:String(trend || 'No change data'), tone:'neutral'};
+  const tone = ['positive','negative','neutral'].includes(info.tone) ? info.tone : 'neutral';
+  const direction = info.direction === 'up' || (info.direction == null && tone === 'positive') ? 'arrow-up-right' : (info.direction === 'down' || (info.direction == null && tone === 'negative') ? 'arrow-down-right' : 'chart-bar');
+  const valueClass = ['positive','negative'].includes(info.valueTone) ? ` ${info.valueTone}` : '';
+  const actionAttr = info.action ? ` data-stat-action="${escapeHtml(info.action)}"` : '';
+  const valueAttr = info.valueId ? ` id="${escapeHtml(info.valueId)}"` : '';
+  const sparkline = Array.isArray(sparklineData) && sparklineData.length && info.sparkKey
+    ? statSparklineMarkup(sparklineData, info.sparkKey)
+    : '';
+  return `<div class="stat-card-content"${actionAttr}>
+    <div class="stat-card-header">
+      <div class="stat-card-icon-badge" aria-hidden="true"><re-icon icon="${escapeHtml(icon || 'activity')}" weight="outline" size="16"></re-icon></div>
+      <div class="stat-card-heading">
+        <div class="stat-card-label">${escapeHtml(label)}</div>
+        <div class="stat-card-updated">${escapeHtml(info.updated || 'Updated just now')}</div>
+      </div>
     </div>
-  `;
+    <div class="stat-card-value${valueClass}"${valueAttr}>${escapeHtml(String(value ?? '—'))}</div>
+    <div class="stat-card-trend ${tone}"><re-icon icon="${direction}" weight="outline" size="14"></re-icon><span>${escapeHtml(info.label || 'No change data')}</span></div>
+    <div class="stat-card-divider" aria-hidden="true"></div>
+    ${sparkline}
+  </div>`;
+}
+
+function buildCalendarMetricCard(label, value, subline, valueClass=''){
+  const tone = valueClass === 'red' ? 'negative' : (valueClass === 'green' ? 'positive' : 'neutral');
+  return `<div class="calendar-kpi-card stat-card">${buildStatCard(label, value, {label:subline, tone, valueTone:tone, sparkKey:`calendar-${String(label).toLowerCase().replace(/\s+/g,'-')}`}, label === 'Profit' ? 'chart-bar' : (label === 'Expenses' ? 'shield' : 'activity'), [])}</div>`;
 }
 
 function renderCalendar(){
@@ -6984,7 +7070,13 @@ function renderPropChallengeDashboard(){
   const liveCtrlHtml = renderLiveTraderControllerMarkup(m);
   const timeline = buildStatTimeline(trades || [], m);
   const statusClass = (m.maxDailyLossAmount && m.dailyLossUsed >= m.maxDailyLossAmount) || (m.maxDrawdownAmount && m.maxDrawdownUsed >= m.maxDrawdownAmount) ? 'red' : m.currentBalance >= m.targetBalance && m.profitTargetAmount ? 'green' : 'neutral';
-  box.innerHTML = bannerHtml + liveCtrlHtml + `<div class="goal-card-grid"><div class="goal-card"><div class="goal-card-label">Account Phase</div><div class="goal-card-value ${statusClass}">${escapeHtml(m.config.phase)}</div><div class="goal-card-sub">${m.s.total} trades tracked &bull; ${m.s.wr.toFixed(0)}% win rate &bull; ${fmt(m.s.pnl)} net. <button class="btn" type="button" onclick="openAccountSetup()">Edit setup</button></div></div><div class="goal-card stat-card"><div class="goal-card-label">Current Balance</div><div class="goal-card-value ${pnlClass(m.currentBalance-m.startBalance)}">$${m.currentBalance.toFixed(2)}</div><div class="goal-card-sub">Initial deposit $${m.startBalance.toFixed(2)} &bull; today ${fmt(m.todayPnl)}.</div>${statSparklineMarkup(statSeries(timeline, 'currentBalance'), 'goal-current-balance')}</div><div class="goal-card stat-card"><div class="goal-card-label">Profit Target</div><div class="goal-card-value ${m.remainingToTarget<=0&&m.profitTargetAmount?'green':'neutral'}">$${m.remainingToTarget.toFixed(2)} left</div><div class="bar" style="margin-top:12px"><div style="width:${m.profitProgress}%"></div></div><div class="goal-card-sub">Target $${m.targetBalance.toFixed(2)} &bull; ${m.profitProgress.toFixed(0)}% complete.</div>${statSparklineMarkup(statSeries(timeline, 'profitTargetRemaining'), 'goal-profit-target')}</div><div class="goal-card stat-card"><div class="goal-card-label">Days Remaining</div><div class="goal-card-value neutral">${m.daysRemaining==null?'No deadline':m.daysRemaining+' days'}</div><div class="goal-card-sub">Phase deadline ${m.config.phaseDeadline || 'not set'}.</div>${statSparklineMarkup(statSeries(timeline, 'daysRemaining'), 'goal-days-remaining')}</div><div class="goal-card stat-card"><div class="goal-card-label">Daily Loss Remaining</div><div class="goal-card-value ${m.maxDailyLossRemaining!=null&&m.maxDailyLossRemaining<=0?'red':'green'}">${m.maxDailyLossRemaining==null?'Skipped':'$'+m.maxDailyLossRemaining.toFixed(2)}</div><div class="goal-card-sub">${m.maxDailyLossAmount==null?'Daily loss limit applies only to funded account setup.':'$'+m.dailyLossUsed.toFixed(2)+' used today of $'+m.maxDailyLossAmount.toFixed(2)}.</div>${statSparklineMarkup(statSeries(timeline, 'dailyLossRemaining'), 'goal-daily-loss-remaining')}</div><div class="goal-card stat-card"><div class="goal-card-label">Drawdown Buffer</div><div class="goal-card-value ${m.maxDrawdownRemaining!=null&&m.maxDrawdownRemaining<=0?'red':'green'}">${m.maxDrawdownRemaining==null?'Skipped':'$'+m.maxDrawdownRemaining.toFixed(2)}</div><div class="goal-card-sub">${m.maxDrawdownAmount==null?'Overall drawdown applies only to funded account setup.':'$'+m.maxDrawdownUsed.toFixed(2)+' max DD used of $'+m.maxDrawdownAmount.toFixed(2)}.</div>${statSparklineMarkup(statSeries(timeline, 'drawdownRemaining'), 'goal-drawdown-buffer')}</div>${riskCalculatorMarkup(m)}</div>`;
+  box.innerHTML = bannerHtml + liveCtrlHtml + `<div class="goal-card-grid">
+    <div class="goal-card"><div class="goal-card-label">Account Phase</div><div class="goal-card-value ${statusClass}">${escapeHtml(m.config.phase)}</div><div class="goal-card-sub">${m.s.total} trades tracked &bull; ${m.s.wr.toFixed(0)}% win rate &bull; ${fmt(m.s.pnl)} net. <button class="btn" type="button" onclick="openAccountSetup()">Edit setup</button></div></div>
+    <div class="goal-card stat-card">${buildStatCard('Current Balance', `$${m.currentBalance.toFixed(2)}`, {label:`Today ${fmt(m.todayPnl)} • ${m.s.total} trades tracked`, tone:m.currentBalance>=m.startBalance?'positive':'negative', valueTone:m.currentBalance>=m.startBalance?'positive':'negative', sparkKey:'goal-current-balance'}, 'chart-bar', statSeries(timeline,'currentBalance'))}</div>
+    <div class="goal-card stat-card">${buildStatCard('Profit Target', `$${m.remainingToTarget.toFixed(2)} left`, {label:`${m.profitProgress.toFixed(0)}% complete • Target $${m.targetBalance.toFixed(2)}`, tone:m.profitProgress>=100?'positive':'neutral', sparkKey:'goal-profit-target'}, 'target', statSeries(timeline,'profitTargetRemaining'))}</div>
+    <div class="goal-card stat-card">${buildStatCard('Days Remaining', m.daysRemaining==null?'No deadline':`${m.daysRemaining} days`, {label:`Phase deadline ${m.config.phaseDeadline || 'not set'}`, tone:'neutral', sparkKey:'goal-days-remaining'}, 'calendar', statSeries(timeline,'daysRemaining'))}</div>
+    <div class="goal-card stat-card">${buildStatCard('Daily Loss Remaining', m.maxDailyLossRemaining==null?'Skipped':`$${m.maxDailyLossRemaining.toFixed(2)}`, {label:m.maxDailyLossAmount==null?'Daily loss limit not set':`$${m.dailyLossUsed.toFixed(2)} used of $${m.maxDailyLossAmount.toFixed(2)}`, tone:m.maxDailyLossRemaining!=null&&m.maxDailyLossRemaining<=0?'negative':'positive', valueTone:m.maxDailyLossRemaining!=null&&m.maxDailyLossRemaining<=0?'negative':'positive', sparkKey:'goal-daily-loss-remaining'}, 'shield', statSeries(timeline,'dailyLossRemaining'))}</div>
+    <div class="goal-card stat-card">${buildStatCard('Drawdown Buffer', m.maxDrawdownRemaining==null?'Skipped':`$${m.maxDrawdownRemaining.toFixed(2)}`, {label:m.maxDrawdownAmount==null?'Overall drawdown limit not set':`$${m.maxDrawdownUsed.toFixed(2)} max DD used of $${m.maxDrawdownAmount.toFixed(2)}`, tone:m.maxDrawdownRemaining!=null&&m.maxDrawdownRemaining<=0?'negative':'positive', valueTone:m.maxDrawdownRemaining!=null&&m.maxDrawdownRemaining<=0?'negative':'positive', sparkKey:'goal-drawdown-buffer'}, 'shield', statSeries(timeline,'drawdownRemaining'))}</div>${riskCalculatorMarkup(m)}</div>`;
 }
 async function generateAIPropGoals(force=false){
   if(!(trades || []).length){ const propBox=document.getElementById('propBox'); if(propBox) propBox.innerHTML='<div class="insight empty"><strong>No trades yet.</strong><br>Upload trades first.</div>'; return; }
@@ -9378,59 +9470,23 @@ function renderCommandCenter(todayTrades){
   const goalMetrics = goalAnalyticsMetrics(account);
   const timeline = buildStatTimeline(trades || [], account);
   const recentTimeline = timeline.slice(-14);
-  const pnlEl = document.getElementById('cmdTodayPnl');
-  const lossEl = document.getElementById('cmdDailyLoss');
-  const tradesEl = document.getElementById('cmdTrades');
-  const pnlSparkEl = document.getElementById('cmdTodayPnlSparkline');
-  const lossSparkEl = document.getElementById('cmdDailyLossSparkline');
-  const tradesSparkEl = document.getElementById('cmdTradesSparkline');
-  const breaksEl = document.getElementById('cmdRuleBreaks');
+  const cards = [
+    [document.getElementById('cmdTodayPnlCard'), buildStatCard('Today P&L', fmt(state.todayPnl), {label:state.todayPnl>=0?'Positive today':'Negative today', tone:state.todayPnl>=0?'positive':'negative', valueTone:state.todayPnl>=0?'positive':'negative', sparkKey:'cmdTodayPnl', valueId:'cmdTodayPnl'}, 'chart-bar', statSeries(recentTimeline,'dayPnl'))],
+    [document.getElementById('cmdDailyLossCard'), buildStatCard('Daily Loss Used', `$${state.lossUsed.toFixed(2)} / ${state.maxDailyLoss == null ? 'not set' : '$'+state.maxDailyLoss.toFixed(2)}`, {label:state.maxDailyLoss == null ? 'Limit not set' : `${state.lossUsed.toFixed(2)} used today`, tone:state.lossUsed>0?'negative':'positive', valueTone:state.lossUsed>0?'negative':'positive', sparkKey:'cmdDailyLoss', valueId:'cmdDailyLoss'}, 'shield', statSeries(recentTimeline,'dailyLossUsed'))],
+    [document.getElementById('cmdTradesCard'), buildStatCard('Trades', `${state.tradesCount} / ${state.maxTrades || 'not set'}`, {label:state.maxTrades ? `${state.maxTrades-state.tradesCount} remaining today` : 'Daily limit not set', tone:state.maxTrades && state.tradesCount>=state.maxTrades?'negative':'neutral', sparkKey:'cmdTrades', valueId:'cmdTrades'}, 'activity', statSeries(recentTimeline,'tradeCount'))],
+    [document.getElementById('cmdRuleBreaksCard'), buildStatCard('Rule Breaks', state.mistakesToday, {label:state.mistakesToday ? 'Review before trading' : 'No breaks today', tone:state.mistakesToday?'negative':'positive', valueTone:state.mistakesToday?'negative':'positive', valueId:'cmdRuleBreaks'},'meditation', [])]
+  ];
+  cards.forEach(([el, content])=>{if(el)el.innerHTML=content;});
   const actionEl = document.getElementById('cmdNextAction');
   const statusEl = document.getElementById('cmdStatus');
   const riskEl = document.getElementById('cmdSuggestedRisk');
   const riskSubEl = document.getElementById('cmdSuggestedRiskSub');
   const tomorrowRuleEl = document.getElementById('cmdTomorrowRule');
-
-  if(pnlEl){
-    const nextPnlText = fmt(state.todayPnl);
-    const pnlChanged = pnlEl.textContent !== nextPnlText;
-    pnlEl.textContent = nextPnlText;
-    pnlEl.className = 'cmd-value ' + (state.todayPnl < 0 ? 'red' : 'neutral');
-    if(pnlChanged){
-      pnlEl.classList.add('pnl-value-updating');
-      window.setTimeout(()=>pnlEl.classList.remove('pnl-value-updating'), 150);
-    }
-  }
-  if(lossEl){
-    lossEl.textContent = `$${state.lossUsed.toFixed(2)} / ${state.maxDailyLoss == null ? 'not set' : '$'+state.maxDailyLoss.toFixed(2)}`;
-    lossEl.className = 'cmd-value neutral';
-  }
-  if(tradesEl){
-    tradesEl.textContent = `${state.tradesCount} / ${state.maxTrades || 'not set'}`;
-    tradesEl.className = 'cmd-value neutral';
-  }
-  if(breaksEl){
-    breaksEl.textContent = state.mistakesToday;
-    breaksEl.className = 'cmd-value ' + (state.mistakesToday ? 'warn' : '');
-  }
   if(actionEl) actionEl.textContent = state.nextAction;
-  if(statusEl){
-    statusEl.className = 'cmd-status ' + state.statusClass;
-    statusEl.innerHTML = `<span class="cmd-status-dot"></span>${state.status}`;
-  }
-  if(riskEl){
-    riskEl.textContent = goalMetrics.safeRisk == null ? 'Not enough data' : moneyPlain(goalMetrics.safeRisk);
-    riskEl.className = 'cmd-value cmd-action ' + (goalMetrics.safeRisk == null ? '' : 'green');
-  }
-  if(riskSubEl){
-    riskSubEl.textContent = goalMetrics.safeRisk == null
-      ? 'Need trade history plus an active account setup.'
-      : `Based on remaining target ${moneyPlain(goalMetrics.targetRemaining)}, daily room ${moneyPlain(goalMetrics.dailyLossBudget)}, and drawdown buffer ${goalMetrics.maxDrawdownRemaining == null ? '—' : moneyPlain(goalMetrics.maxDrawdownRemaining)}.`;
-  }
+  if(statusEl){ statusEl.className = 'cmd-status ' + state.statusClass; statusEl.innerHTML = `<span class="cmd-status-dot"></span>${state.status}`; }
+  if(riskEl){ riskEl.textContent = goalMetrics.safeRisk == null ? 'Not enough data' : moneyPlain(goalMetrics.safeRisk); }
+  if(riskSubEl){ riskSubEl.textContent = goalMetrics.safeRisk == null ? 'Need trade history plus an active account setup.' : `Based on remaining target ${moneyPlain(goalMetrics.targetRemaining)}, daily room ${moneyPlain(goalMetrics.dailyLossBudget)}, and drawdown buffer ${goalMetrics.maxDrawdownRemaining == null ? '—' : moneyPlain(goalMetrics.maxDrawdownRemaining)}.`; }
   if(tomorrowRuleEl) tomorrowRuleEl.textContent = getTodayPsychologyReminder() || 'No saved rule';
-  if(pnlSparkEl) pnlSparkEl.innerHTML = buildStatSparklineSvg(recentTimeline.map(row => row.dayPnl), 'cmdTodayPnl');
-  if(lossSparkEl) lossSparkEl.innerHTML = buildStatSparklineSvg(recentTimeline.map(row => row.dailyLossUsed), 'cmdDailyLoss');
-  if(tradesSparkEl) tradesSparkEl.innerHTML = buildStatSparklineSvg(recentTimeline.map(row => row.tradeCount), 'cmdTrades');
 }
 
 function toggleChecklistCheck(id){
@@ -10990,24 +11046,14 @@ function renderAISnapshot(){
   const s = stats(trades);
   const leakEntries = Object.entries(s.mistakes || {}).sort((a,b)=>b[1]-a[1]);
   const mainLeak = leakEntries.length ? `${leakEntries[0][0]} (${leakEntries[0][1]})` : 'No mistake data yet';
-  el.innerHTML = `
-    <div class="ai-score-card">
-      <div class="ai-score-label">Trades Logged</div>
-      <div class="ai-score-value neutral">${s.total}</div>
-    </div>
-    <div class="ai-score-card">
-      <div class="ai-score-label">Win Rate</div>
-      <div class="ai-score-value ${s.wr>=50?'green':'purple'}">${Math.round(Number(s.wr) || 0)}%</div>
-    </div>
-    <div class="ai-score-card">
-      <div class="ai-score-label">Net P&L</div>
-      <div class="ai-score-value ${s.pnl>=0?'green':'red'}">${signedMoney(s.pnl)}</div>
-    </div>
-    <div class="ai-score-card">
-      <div class="ai-score-label">Main Leak</div>
-      <div class="ai-score-value purple" style="font-size:18px">${mainLeak}</div>
-    </div>
-  `;
+  const account = accountMetrics(trades || []);
+  const timeline = buildStatTimeline(trades || [], account);
+  el.innerHTML = [
+    buildStatCard('Trades Logged', s.total, {label:s.total ? 'Activity captured' : 'No trades yet', tone:'neutral', sparkKey:'ai-trades'}, 'activity', statSeries(timeline,'tradeCount')),
+    buildStatCard('Win Rate', `${Math.round(Number(s.wr) || 0)}%`, {label:`${s.wins.length} wins / ${s.losses.length} losses`, tone:s.wr>=50?'positive':'negative'}, 'target', []),
+    buildStatCard('Net P&L', signedMoney(s.pnl), {label:s.pnl>=0?'Positive net result':'Negative net result', tone:s.pnl>=0?'positive':'negative', valueTone:s.pnl>=0?'positive':'negative', sparkKey:'ai-pnl'}, 'chart-bar', statSeries(timeline,'dayPnl')),
+    buildStatCard('Main Leak', mainLeak, {label:leakEntries.length ? 'Most frequent mistake' : 'No mistake data', tone:'neutral'}, 'meditation', [])
+  ].map(content=>`<div class="ai-score-card stat-card">${content}</div>`).join('');
 }
 
 function aiAnswer(prompt){
@@ -14564,10 +14610,10 @@ main,
 #journallApp #commandCenter .cmd-status,
 #journallApp .command-center .cmd-value,
 #journallApp .command-center .cmd-status,
-#journallApp #cmdTodayPnl,
-#journallApp #cmdDailyLoss,
-#journallApp #cmdTrades,
-#journallApp #cmdRuleBreaks,
+#journallApp #cmdTodayPnl:not(.stat-card-value),
+#journallApp #cmdDailyLoss:not(.stat-card-value),
+#journallApp #cmdTrades:not(.stat-card-value),
+#journallApp #cmdRuleBreaks:not(.stat-card-value),
 #journallApp #cmdNextAction,
 #journallApp #cmdStatus,
 #journallApp #cmdTomorrowRule {
@@ -14663,10 +14709,10 @@ main,
 }
 #journallApp #commandCenter .cmd-value,
 #journallApp #commandCenter .cmd-status,
-#journallApp #cmdTodayPnl,
-#journallApp #cmdDailyLoss,
-#journallApp #cmdTrades,
-#journallApp #cmdRuleBreaks,
+#journallApp #cmdTodayPnl:not(.stat-card-value),
+#journallApp #cmdDailyLoss:not(.stat-card-value),
+#journallApp #cmdTrades:not(.stat-card-value),
+#journallApp #cmdRuleBreaks:not(.stat-card-value),
 #journallApp #cmdNextAction,
 #journallApp #cmdStatus,
 #journallApp #cmdTomorrowRule {
