@@ -15526,6 +15526,24 @@ input{
               box-shadow 0.25s ease !important;
 }
 
+/* Trades outer shell: standard card treatment; direct child keeps table-wrap scope separate. */
+#journallApp #grid > .card{
+  position:relative!important;
+  background:var(--surface-1)!important;
+  background-image:none!important;
+  border:1px solid var(--hairline)!important;
+  border-radius:var(--radius-card)!important;
+  box-shadow:var(--shadow)!important;
+  overflow:hidden!important;
+  transition:transform var(--dur-base) var(--ease-out),border-color var(--dur-base) var(--ease-out),background-color var(--dur-base) var(--ease-out)!important;
+}
+#journallApp #grid > .card:hover{
+  transform:translateY(-2px)!important;
+  border-color:var(--hairline-strong)!important;
+  background:var(--surface-2)!important;
+  box-shadow:var(--shadow)!important;
+}
+
 #journallApp .card:hover {
   border-color: rgba(94, 106, 210, 0.25) !important;
   transform: translateY(-2px) !important;
