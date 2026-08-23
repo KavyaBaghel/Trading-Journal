@@ -6034,7 +6034,7 @@ function renderAIReportText(text, context='default'){
     const tones = ['verdict', 'mistake', 'decision', 'strength', 'reminder', 'setup'];
     const tone = tones[i % tones.length];
 
-    if(context === 'dashboard'){
+    if(context === 'dashboard' || context === 'ailab'){
       return `
         <div class="insight ai-report-insight ${tone}">
           <div class="ai-report-insight-head">
@@ -6055,6 +6055,15 @@ function renderAIReportText(text, context='default'){
       </div>
     `;
   }).join('');
+}
+
+function renderReports(){
+  const box = document.getElementById('reportCards');
+  if(!box) return;
+  const cached = localStorage.getItem(aiReportStorageKey('main'));
+  box.innerHTML = cached
+    ? renderAIReportText(cached, 'ailab')
+    : '<div class="insight empty"><strong>No AI report yet.</strong><br>Generate a report after loading trade data.</div>';
 }
 
 function setupPerformanceRows(){
@@ -11003,23 +11012,24 @@ function renderAISnapshot(){
   const leakEntries = Object.entries(s.mistakes || {}).sort((a,b)=>b[1]-a[1]);
   const mainLeak = leakEntries.length ? `${leakEntries[0][0]} (${leakEntries[0][1]})` : 'No mistake data yet';
   el.innerHTML = `
-    <div class="ai-score-card">
+    <div class="ai-score-card stat-card" data-shared-stat-card="true">
       <div class="ai-score-label">Trades Logged</div>
       <div class="ai-score-value neutral">${s.total}</div>
     </div>
-    <div class="ai-score-card">
+    <div class="ai-score-card stat-card" data-shared-stat-card="true">
       <div class="ai-score-label">Win Rate</div>
       <div class="ai-score-value ${s.wr>=50?'green':'purple'}">${Math.round(Number(s.wr) || 0)}%</div>
     </div>
-    <div class="ai-score-card">
+    <div class="ai-score-card stat-card" data-shared-stat-card="true">
       <div class="ai-score-label">Net P&L</div>
       <div class="ai-score-value ${s.pnl>=0?'green':'red'}">${signedMoney(s.pnl)}</div>
     </div>
-    <div class="ai-score-card">
+    <div class="ai-score-card stat-card" data-shared-stat-card="true">
       <div class="ai-score-label">Main Leak</div>
       <div class="ai-score-value purple" style="font-size:18px">${mainLeak}</div>
     </div>
   `;
+  if(typeof applySharedStatCardTreatment === 'function') applySharedStatCardTreatment(el);
 }
 
 function aiAnswer(prompt){
@@ -19201,6 +19211,200 @@ body:not(.firebase-auth-required) #journallApp > .sidebar .sidebox *{
 
       #journallApp #psychology .checklist-result-sub {
         color: var(--muted) !important;
+      }
+    </style>
+    <style id="phase-e-ai-coach-screen">
+      /* Phase E, screen 9: AI Coach only. */
+      #journallApp #ailab .ai-lab-grid > .card,
+      #journallApp #ailab > .card {
+        background: var(--surface-1) !important;
+        border: 1px solid var(--hairline) !important;
+        border-radius: var(--radius-card) !important;
+        box-shadow: var(--shadow) !important;
+      }
+
+      #journallApp #ailab .ai-chip-row {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 10px;
+      }
+
+      /* The earlier global AI-chip rule uses important hardcoded surface/color values,
+         so these scoped action-grid declarations intentionally override that conflict. */
+      #journallApp #ailab .ai-chip {
+        min-height: 42px !important;
+        padding: 10px 12px !important;
+        border: 1px solid var(--hairline) !important;
+        border-radius: var(--radius-pill) !important;
+        background: var(--surface-2) !important;
+        color: var(--ink-subtle) !important;
+        font-family: var(--sans) !important;
+        font-size: 12px !important;
+        font-weight: 600 !important;
+        line-height: 1.25 !important;
+        text-align: center !important;
+        transition: background-color 160ms var(--ease-out), border-color 160ms var(--ease-out), box-shadow 160ms var(--ease-out), color 160ms var(--ease-out), transform 160ms var(--ease-snappy) !important;
+      }
+
+      #journallApp #ailab .ai-chip:hover {
+        background: color-mix(in srgb, var(--primary) 12%, var(--surface-2)) !important;
+        border-color: color-mix(in srgb, var(--primary) 34%, var(--hairline)) !important;
+        box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 8%, transparent) !important;
+        color: var(--ink) !important;
+        transform: translateY(-1px) !important;
+      }
+
+      #journallApp #ailab .ai-chip:focus-visible {
+        outline: 2px solid color-mix(in srgb, var(--primary) 72%, transparent) !important;
+        outline-offset: 2px !important;
+      }
+
+      #journallApp #ailab .ai-score {
+        gap: 12px;
+      }
+
+      #journallApp #ailab .ai-score-card {
+        min-height: 116px;
+        padding: 16px;
+        border: 1px solid var(--hairline) !important;
+        border-radius: var(--radius-card) !important;
+        background: var(--surface-2) !important;
+        box-shadow: 0 0 0 1px color-mix(in srgb, var(--primary) 4%, transparent);
+        transition: background-color 160ms var(--ease-out), border-color 160ms var(--ease-out), box-shadow 160ms var(--ease-out), transform 160ms var(--ease-snappy);
+      }
+
+      #journallApp #ailab .ai-score-card:hover {
+        background: color-mix(in srgb, var(--primary) 6%, var(--surface-2));
+        border-color: color-mix(in srgb, var(--primary) 28%, var(--hairline));
+        box-shadow: 0 10px 22px color-mix(in srgb, var(--primary) 10%, transparent);
+        transform: translateY(-2px);
+      }
+
+      #journallApp #ailab .ai-score-label {
+        color: var(--muted);
+        font-family: var(--sans);
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: .08em;
+      }
+
+      #journallApp #ailab .ai-score-value {
+        margin-top: 12px;
+        color: var(--ink);
+        font-family: var(--sans);
+        font-size: 26px;
+        font-weight: 650;
+        letter-spacing: -.02em;
+        line-height: 1.05;
+      }
+
+      #journallApp #ailab .ai-score-value.green {
+        color: var(--success) !important;
+      }
+
+      #journallApp #ailab .ai-score-value.red {
+        color: var(--danger) !important;
+      }
+
+      #journallApp #ailab .ai-score-value.purple {
+        color: var(--primary) !important;
+      }
+
+      #journallApp #ailab .ai-chat-box {
+        min-height: 220px;
+        padding: 14px;
+        border: 1px solid var(--hairline) !important;
+        border-radius: var(--radius-card) !important;
+        background: var(--surface-2) !important;
+        color: var(--ink) !important;
+      }
+
+      #journallApp #ailab .ai-msg {
+        background: var(--surface-1) !important;
+        border-left: 2px solid var(--primary) !important;
+        border-radius: 0 var(--radius-control) var(--radius-control) 0 !important;
+        color: var(--ink-subtle) !important;
+      }
+
+      #journallApp #ailab .ai-msg.user {
+        border-left-color: var(--hairline-strong) !important;
+        color: var(--ink) !important;
+      }
+
+      #journallApp #ailab .ai-msg.loading {
+        border-left-color: var(--warning) !important;
+      }
+
+      /* #13 Alert-style callouts: token surface plus semantic left accent. */
+      #journallApp #ailab .insight {
+        margin: 0;
+        padding: 14px 16px;
+        border: 1px solid var(--hairline) !important;
+        border-left: 3px solid var(--hairline-strong) !important;
+        border-radius: var(--radius-control) !important;
+        background: var(--surface-2) !important;
+        color: var(--ink-subtle) !important;
+        line-height: 1.55;
+      }
+
+      #journallApp #ailab .insight.good {
+        border-left-color: var(--success) !important;
+      }
+
+      #journallApp #ailab .insight.warn {
+        border-left-color: var(--warning) !important;
+      }
+
+      #journallApp #ailab .insight.danger {
+        border-left-color: var(--danger) !important;
+      }
+
+      #journallApp #ailab .ai-report-insight {
+        min-height: 132px;
+        transition: background-color 160ms var(--ease-out), border-color 160ms var(--ease-out), box-shadow 160ms var(--ease-out), transform 160ms var(--ease-snappy) !important;
+      }
+
+      #journallApp #ailab .ai-report-insight:hover {
+        background: color-mix(in srgb, var(--primary) 6%, var(--surface-2)) !important;
+        border-color: color-mix(in srgb, var(--primary) 26%, var(--hairline)) !important;
+        box-shadow: 0 8px 18px color-mix(in srgb, var(--primary) 8%, transparent) !important;
+        transform: translateY(-1px) !important;
+      }
+
+      #journallApp #ailab .ai-report-insight-head {
+        margin-bottom: 10px;
+      }
+
+      #journallApp #ailab .ai-report-insight-title {
+        color: var(--ink);
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: .08em;
+        text-transform: uppercase;
+      }
+
+      #journallApp #ailab .ai-report-insight-diagnosis {
+        color: var(--ink-subtle);
+        font-size: 14px;
+        line-height: 1.5;
+      }
+
+      #journallApp #ailab .ai-report-insight-action {
+        margin-top: 10px;
+        color: var(--muted);
+        font-size: 13px;
+        line-height: 1.5;
+      }
+
+      #journallApp #ailab .insights {
+        display: grid;
+        gap: 10px;
+      }
+
+      @media (max-width: 680px) {
+        #journallApp #ailab .ai-score-card {
+          min-height: 104px;
+        }
       }
     </style>
 </body>
