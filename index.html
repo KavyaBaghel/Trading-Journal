@@ -337,6 +337,7 @@ function renderUserProfile() {
   if (statBalance) statBalance.textContent = m ? `$${m.currentBalance.toFixed(2)}` : '$0.00';
   if (statDeposit) statDeposit.textContent = m ? `$${m.startBalance.toFixed(2)}` : '$0.00';
   if (statBroker) statBroker.textContent = broker ? `${broker.platform} (${broker.account})` : 'MetaTrader 5';
+  if (typeof applySharedStatCardTreatment === 'function') applySharedStatCardTreatment(document.getElementById('userprofile'));
 }
 
 function handleCustomAvatarUpload(event) {
@@ -3701,22 +3702,22 @@ tr:hover {
       </div>
 
       <div class="goal-card-grid" style="margin-top:24px;">
-        <div class="goal-card">
+<div class="goal-card stat-card profile-stat-card" data-shared-stat-card="true">
           <div class="goal-card-label">Current Balance</div>
           <div class="goal-card-value green" id="profStatBalance">$0.00</div>
           <div class="goal-card-sub">Real-time balance calculated from synced trades</div>
         </div>
-        <div class="goal-card">
+<div class="goal-card stat-card profile-stat-card" data-shared-stat-card="true">
           <div class="goal-card-label">Connected Platform</div>
           <div class="goal-card-value green" id="profStatBroker">MetaTrader 5</div>
           <div class="goal-card-sub">Active auto-sync broker source</div>
         </div>
-        <div class="goal-card">
+<div class="goal-card stat-card profile-stat-card" data-shared-stat-card="true">
           <div class="goal-card-label">Journaled Trades</div>
           <div class="goal-card-value neutral" id="profStatTrades">0 trades</div>
           <div class="goal-card-sub">Total trades saved in database</div>
         </div>
-        <div class="goal-card">
+<div class="goal-card stat-card profile-stat-card" data-shared-stat-card="true">
           <div class="goal-card-label">Initial Deposit</div>
           <div class="goal-card-value neutral" id="profStatDeposit">$0.00</div>
           <div class="goal-card-sub">Configured starting balance</div>
@@ -19405,6 +19406,106 @@ body:not(.firebase-auth-required) #journallApp > .sidebar .sidebox *{
         #journallApp #ailab .ai-score-card {
           min-height: 104px;
         }
+      }
+    </style>
+    <style id="phase-e-profile-screen">
+      /* Phase E, screen 10: Profile only. */
+      /* The generic card/goal-card layers use important hardcoded glass surfaces,
+         so these scoped declarations intentionally override those cited conflicts. */
+      #journallApp #userprofile .profile-card-hero,
+      #journallApp #userprofile > .card:not(.profile-card-hero) {
+        background: var(--surface-1) !important;
+        border: 1px solid var(--hairline) !important;
+        border-radius: var(--radius-card) !important;
+        box-shadow: var(--shadow) !important;
+      }
+
+      #journallApp #userprofile .profile-card-hero {
+        padding: 24px;
+      }
+
+      #journallApp #userprofile .goal-card-grid {
+        gap: 16px !important;
+      }
+
+      #journallApp #userprofile .profile-stat-card {
+        min-height: 132px !important;
+        padding: 18px !important;
+        border: 1px solid var(--hairline) !important;
+        border-radius: var(--radius-card) !important;
+        background: var(--surface-2) !important;
+        box-shadow: 0 0 0 1px color-mix(in srgb, var(--primary) 4%, transparent) !important;
+        transition: background-color 160ms var(--ease-out), border-color 160ms var(--ease-out), box-shadow 160ms var(--ease-out), transform 160ms var(--ease-snappy) !important;
+      }
+
+      #journallApp #userprofile .profile-stat-card:hover {
+        background: color-mix(in srgb, var(--primary) 6%, var(--surface-2)) !important;
+        border-color: color-mix(in srgb, var(--primary) 28%, var(--hairline)) !important;
+        box-shadow: 0 10px 22px color-mix(in srgb, var(--primary) 10%, transparent) !important;
+        transform: translateY(-2px) !important;
+      }
+
+      #journallApp #userprofile .profile-stat-card .goal-card-label {
+        color: var(--muted) !important;
+        font-family: var(--sans) !important;
+        font-size: 11px !important;
+        font-weight: 600 !important;
+        letter-spacing: .08em !important;
+        line-height: 1.3 !important;
+        text-transform: uppercase;
+      }
+
+      #journallApp #userprofile .profile-stat-card .goal-card-value {
+        margin-top: 12px !important;
+        color: var(--ink) !important;
+        font-family: var(--sans) !important;
+        font-size: 26px !important;
+        font-weight: 650 !important;
+        letter-spacing: -.02em !important;
+        line-height: 1.05 !important;
+      }
+
+      #journallApp #userprofile .profile-stat-card .goal-card-value.green {
+        color: var(--success) !important;
+      }
+
+      #journallApp #userprofile .profile-stat-card .goal-card-value.neutral {
+        color: var(--ink) !important;
+      }
+
+      #journallApp #userprofile .profile-stat-card .goal-card-sub {
+        margin-top: auto !important;
+        color: var(--muted) !important;
+        font-family: var(--sans) !important;
+        font-size: 12px !important;
+        line-height: 1.45 !important;
+      }
+
+      #journallApp #userprofile .panel-title span {
+        color: var(--muted) !important;
+      }
+
+      #journallApp #userprofile .avatar-upload-container {
+        border-radius: var(--radius-card);
+      }
+
+      #journallApp #userprofile .profile-card-hero h2 {
+        color: var(--ink) !important;
+        font-family: var(--sans) !important;
+      }
+
+      #journallApp #userprofile #userProfileEmail,
+      #journallApp #userprofile #userProfileMeta {
+        color: var(--ink-subtle) !important;
+        font-family: var(--sans) !important;
+      }
+
+      #journallApp #userprofile #nameChangeLimitBadge {
+        color: var(--primary) !important;
+      }
+
+      #journallApp #userprofile .profile-card-hero + .goal-card-grid + .card {
+        padding: 20px !important;
       }
     </style>
 </body>
