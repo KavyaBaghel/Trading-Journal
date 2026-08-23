@@ -96,3 +96,35 @@ Work through these in order. Each ends with its own commit.
   stop and ask.
 - Don't restyle the Account Phase tab's empty cards without first checking why they're
   empty (see rule 7 above).
+
+
+---
+
+## 5. Final status - redesign v2 complete
+
+The Journall redesign v2 workflow is complete. **Phase E**, covering all 11 screens in the prescribed execution order, and **Phase F**, covering final verification and targeted remediation, are complete. The redesign v2 effort is considered done as of commit `8cd914e`.
+
+### Phase F fixes completed
+
+| Fix | Commit(s) | Result |
+|---|---|---|
+| Button specificity cascade | `28ab79c` | Restored the canonical `.btn` treatment where a legacy ID-scoped rule was silently winning by specificity. |
+| Save Setup button rendering and gate cascade | `52fc6cf` | Fixed the `:not()`-chain specificity issue that rendered the Save Setup button dark instead of purple, and removed the stale duplicate `--primary: #8b5cf6` token definition. |
+| Dead or shadowed duplicate CSS | `5b06095`, `8ab20e6`, `b533150` | Removed dead or unreachable duplicate rules affecting checklist items, `cmdTodayPnl`, the Today Metrics grid, and the `psych-check` base styling. |
+| Radius token consolidation | `1f790ed` | Removed `--radius-md` and consolidated its usages onto the locked `--radius-control` token. |
+| Trades outer card shell | `7bdf8f7` | Standardized the Trades tab outer card shell to match the card-shell treatment used by the other 10 screens. |
+| AI Coach and Profile stat cards | `6b943be` | Aligned AI Coach and Profile stat cards with Trading Dashboard's shared surface and primary-tinted shadow treatment. |
+| Google sign-in branding | `8cd914e` | Removed the unnecessary `.primary` class from the Google sign-in button so it no longer renders with the app's purple primary color and retains its intended dark Google-branded treatment. |
+
+### Accepted and known variance
+
+The following items were deliberately left unchanged and are recorded as accepted variance rather than open redesign defects:
+
+| Variance | Scope and rationale |
+|---|---|
+| Card-shell shadow and background differences | Some screens retain low-impact card-shell shadow or background differences outside the specifically aligned Dashboard and Trades treatments. |
+| Transition-timing spread | Different screens still use established transition durations of 160ms, 180ms, 200ms, and 250ms where those timings were not part of the approved remediation scope. |
+| Dashboard stat-card versus action-card elevation | The Dashboard retains its internal elevation difference between shared stat cards and action/status cards because that distinction was explicitly deferred. |
+| Remaining low-impact dead CSS | A few redundant, low-impact rules identified during the Fix 2 audits remain outside scope, including redundant `#journallApp .psych-check` blocks beyond the base styling addressed by Fix 2. |
+
+With these fixes and accepted variances recorded, **Phase E and Phase F are complete, and the Journall redesign v2 effort is complete as of `8cd914e`.**
