@@ -19599,5 +19599,216 @@ body:not(.firebase-auth-required) #journallApp > .sidebar .sidebox *{
         border-top-color: var(--on-primary) !important;
       }
     </style>
+    <style id="phase-e-account-goals-screen">
+      /* Phase E, screen 8: Account Phase / Goals and its owned controller banner. */
+      /* Existing generic goal/card layers at the cited late cascade use important
+         surface, border, radius, and layout values; these scoped overrides win only
+         for the Account Phase and Goals surfaces. */
+      #journallApp #goals > .grid.two > .card,
+      #journallApp #accountsettings > .card {
+        background: var(--surface-1) !important;
+        border: 1px solid var(--hairline) !important;
+        border-radius: var(--radius-card) !important;
+        box-shadow: var(--shadow) !important;
+      }
+
+      #journallApp #goals > .grid.two,
+      #journallApp #accountsettings > .card {
+        gap: 16px !important;
+      }
+
+      #journallApp #goals .goal-account-phase-grid {
+        gap: 12px !important;
+      }
+
+      #journallApp #goals .goal-account-phase-grid .goal-tile,
+      #journallApp #goals .goal-account-phase-grid .risk-calc-card {
+        min-height: 190px !important;
+        padding: 18px !important;
+        border: 1px solid var(--hairline) !important;
+        border-radius: var(--radius-card) !important;
+        background: var(--surface-2) !important;
+        box-shadow: 0 0 0 1px color-mix(in srgb, var(--primary) 4%, transparent) !important;
+        transition: background-color 160ms var(--ease-out), border-color 160ms var(--ease-out), box-shadow 160ms var(--ease-out), transform 160ms var(--ease-snappy) !important;
+      }
+
+      #journallApp #goals .goal-account-phase-grid .goal-tile:hover,
+      #journallApp #goals .goal-account-phase-grid .risk-calc-card:hover {
+        background: color-mix(in srgb, var(--primary) 6%, var(--surface-2)) !important;
+        border-color: color-mix(in srgb, var(--primary) 28%, var(--hairline)) !important;
+        box-shadow: 0 10px 22px color-mix(in srgb, var(--primary) 10%, transparent) !important;
+        transform: translateY(-2px) !important;
+      }
+
+      #journallApp #goals .goal-account-phase-grid .metric-bento-icon {
+        border-color: color-mix(in srgb, var(--primary) 30%, var(--hairline)) !important;
+        background: color-mix(in srgb, var(--primary) 12%, var(--surface-1)) !important;
+        color: var(--primary) !important;
+      }
+
+      #journallApp #goals .goal-account-phase-grid .metric-bento-label,
+      #journallApp #goals .goal-account-phase-grid .goal-card-label {
+        color: var(--muted) !important;
+        font-family: var(--sans) !important;
+        font-size: 11px !important;
+        font-weight: 600 !important;
+        letter-spacing: .08em !important;
+        text-transform: uppercase;
+      }
+
+      #journallApp #goals .goal-account-phase-grid .metric-bento-value,
+      #journallApp #goals .goal-account-phase-grid .goal-card-value {
+        color: var(--ink) !important;
+        font-family: var(--sans) !important;
+        font-weight: 650 !important;
+      }
+
+      #journallApp #goals .goal-account-phase-grid .metric-bento-sub,
+      #journallApp #goals .goal-account-phase-grid .goal-card-sub {
+        color: var(--muted) !important;
+      }
+
+      #journallApp #goals .goal-account-phase-grid .bar {
+        background: var(--hairline) !important;
+      }
+
+      #journallApp #goals .goal-account-phase-grid .bar > div {
+        background: var(--primary) !important;
+      }
+
+      #journallApp #goals #propBox {
+        display: grid;
+        gap: 10px;
+      }
+
+      #journallApp #goals #propGoalStatus {
+        color: var(--muted) !important;
+      }
+
+      /* #13 Alert-style AI goal callouts. */
+      #journallApp #goals #propBox .insight {
+        margin: 0;
+        padding: 14px 16px;
+        border: 1px solid var(--hairline) !important;
+        border-left: 3px solid var(--hairline-strong) !important;
+        border-radius: var(--radius-control) !important;
+        background: var(--surface-2) !important;
+        color: var(--ink-subtle) !important;
+        line-height: 1.55;
+      }
+
+      #journallApp #goals #propBox .insight.good {
+        border-left-color: var(--success) !important;
+      }
+
+      #journallApp #goals #propBox .insight.warn {
+        border-left-color: var(--warning) !important;
+      }
+
+      #journallApp #goals #propBox .insight.danger {
+        border-left-color: var(--danger) !important;
+      }
+
+      #journallApp #goals #propBox .insight strong {
+        color: var(--ink) !important;
+      }
+
+      #journallApp #accountsettings .unjournaled-banner,
+      #journallApp #accountsettings .live-controller-card {
+        border: 1px solid var(--hairline) !important;
+        border-radius: var(--radius-card) !important;
+        background: var(--surface-2) !important;
+        box-shadow: 0 0 0 1px color-mix(in srgb, var(--primary) 4%, transparent) !important;
+      }
+
+      #journallApp #accountsettings .unjournaled-banner {
+        display: flex;
+        align-items: center;
+        gap: 18px;
+        padding: 18px !important;
+      }
+
+      #journallApp #accountsettings .unjournaled-banner-left {
+        flex: 1;
+        min-width: 0;
+      }
+
+      #journallApp #accountsettings .unjournaled-badge {
+        border-radius: var(--radius-pill) !important;
+        background: color-mix(in srgb, var(--warning) 14%, var(--surface-1)) !important;
+        color: var(--warning) !important;
+      }
+
+      #journallApp #accountsettings .unjournaled-banner h3 {
+        color: var(--ink) !important;
+      }
+
+      #journallApp #accountsettings .unjournaled-banner p,
+      #journallApp #accountsettings .live-metric-label {
+        color: var(--muted) !important;
+      }
+
+      #journallApp #accountsettings .live-controller-card {
+        margin: 0 0 16px !important;
+        padding: 18px !important;
+      }
+
+      #journallApp #accountsettings .live-controller-header {
+        align-items: flex-start;
+        gap: 12px;
+      }
+
+      #journallApp #accountsettings .live-controller-header h3 {
+        color: var(--ink) !important;
+        font-family: var(--sans) !important;
+      }
+
+      #journallApp #accountsettings .live-status-pill {
+        border: 1px solid var(--hairline) !important;
+        border-radius: var(--radius-pill) !important;
+        background: var(--surface-1) !important;
+        color: var(--ink-subtle) !important;
+      }
+
+      #journallApp #accountsettings .live-status-pill.ready {
+        border-color: color-mix(in srgb, var(--success) 32%, var(--hairline)) !important;
+        background: color-mix(in srgb, var(--success) 10%, var(--surface-1)) !important;
+        color: var(--success) !important;
+      }
+
+      #journallApp #accountsettings .live-status-pill.warning {
+        border-color: color-mix(in srgb, var(--warning) 32%, var(--hairline)) !important;
+        background: color-mix(in srgb, var(--warning) 10%, var(--surface-1)) !important;
+        color: var(--warning) !important;
+      }
+
+      #journallApp #accountsettings .live-status-pill.lockout {
+        border-color: color-mix(in srgb, var(--danger) 32%, var(--hairline)) !important;
+        background: color-mix(in srgb, var(--danger) 10%, var(--surface-1)) !important;
+        color: var(--danger) !important;
+      }
+
+      #journallApp #accountsettings .live-metric-box {
+        border: 1px solid var(--hairline) !important;
+        border-radius: var(--radius-control) !important;
+        background: var(--surface-1) !important;
+      }
+
+      #journallApp #accountsettings .live-metric-val {
+        color: var(--ink) !important;
+        font-family: var(--sans) !important;
+      }
+
+      #journallApp #accountsettings .live-action-bar {
+        gap: 10px;
+      }
+
+      @media (max-width: 760px) {
+        #journallApp #accountsettings .unjournaled-banner {
+          align-items: stretch;
+          flex-direction: column;
+        }
+      }
+    </style>
 </body>
 </html>

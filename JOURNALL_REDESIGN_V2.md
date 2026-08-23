@@ -79,7 +79,7 @@ Work through these in order. Each ends with its own commit.
    - Trade Journal tab (forms, filter chips #12, saved-journals list/table)
    - Trading Calendar (day-grid #8, monthly mini charts #4)
    - Psychology Command Room (checklist controls #15, rule cards #3)
-   - Account Phase / Goals tab (bento panels #9, AI insight blocks #13; owns alert banner + Session Controller; fix the empty Win Rate Gap / Suggested Risk per Trade cards and stray spinner before styling)
+   - Account Phase / Goals tab (bento panels #9, AI insight blocks #13; owns alert banner + Session Controller; verified zero-config and zero-trade metric fallbacks are graceful, and AI goals expose pending/error states rather than a stray spinner)
    - AI Coach tab (action-button grids #14, AI snapshot stat cards #2, insight blocks #13)
    - Profile tab (profile card, stat cards, settings form)
    - Upload Data sync tab (form fields #10, sync-status panel)
