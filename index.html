@@ -881,11 +881,7 @@ canvas{display:block;width:100%!important;height:100%!important}
 }
 .psych-check{
   min-height:116px;
-  border:1px solid var(--border);
-  border-radius:16px;
-  padding:14px;
   text-align:left;
-  background:rgba(255,255,255,.028);
   color:var(--text);
   cursor:pointer;
   transition:border-color .15s ease,background .15s ease,transform .15s ease;
@@ -13339,14 +13335,6 @@ body:not(.firebase-auth-required) #journallApp > .main > *{
   font-size:14px!important;
   font-weight:600!important;
 }
-#todayMetrics.today-metrics,
-.grid.metrics.today-metrics,
-.today-metrics{
-  display:grid!important;
-  grid-template-columns:repeat(4,minmax(0,1fr))!important;
-  gap:10px!important;
-  margin-top:16px!important;
-}
 #todayMetrics .card,
 .today-metrics .card{
   background:#0a0a0a!important;
@@ -13840,7 +13828,6 @@ p{
 #journallApp > .main .quick-actions { display: none !important; }
 
 /* 2. PSYCHOLOGY CARDS - KILL WHITE */
-#journallApp .psych-check,
 #journallApp [data-psych-check] {
   background: #0a0a0a !important;
   border: 1px solid rgba(255,255,255,0.08) !important;
