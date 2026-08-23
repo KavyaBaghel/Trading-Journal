@@ -18958,5 +18958,156 @@ body:not(.firebase-auth-required) #journallApp > .sidebar .sidebox *{
   color:var(--ink)!important;
 }
 </style>
+<style id="phase-e-calendar-screen">
+/* Phase E, screen 6: Trading Calendar only. */
+#journallApp #calendar > .calendar-premium-card,
+#journallApp #calendar > .calendar-shell{
+  background:var(--surface-1)!important;
+  background-image:none!important;
+  border:1px solid var(--hairline)!important;
+  border-radius:var(--radius-card)!important;
+  box-shadow:var(--shadow)!important;
+  color:var(--ink)!important;
+}
+#journallApp #calendar .calendar-summary-card,
+#journallApp #calendar .calendar-kpi-card,
+#journallApp #calendar .calendar-month-card{
+  background:var(--surface-2)!important;
+  background-image:none!important;
+  border:1px solid var(--hairline)!important;
+  border-radius:var(--radius-card)!important;
+  box-shadow:var(--shadow)!important;
+  color:var(--ink)!important;
+  transition:transform var(--dur-base) var(--ease-snappy),border-color var(--dur-base) var(--ease-out),box-shadow var(--dur-base) var(--ease-out)!important;
+}
+#journallApp #calendar .calendar-summary-card:hover,
+#journallApp #calendar .calendar-kpi-card:hover,
+#journallApp #calendar .calendar-month-card:hover{
+  transform:translateY(-2px)!important;
+  border-color:color-mix(in srgb,var(--primary) 34%,var(--hairline))!important;
+  box-shadow:0 12px 28px color-mix(in srgb,var(--primary) 12%,transparent)!important;
+}
+#journallApp #calendar .calendar-summary-card .summary-label,
+#journallApp #calendar .calendar-kpi-label,
+#journallApp #calendar .calendar-month-profit-label{
+  color:var(--muted)!important;
+  font-family:var(--sans)!important;
+  letter-spacing:.08em;
+}
+#journallApp #calendar .calendar-summary-card .summary-value,
+#journallApp #calendar .calendar-kpi-value,
+#journallApp #calendar .calendar-month-profit,
+#journallApp #calendar .calendar-month-name{
+  color:var(--ink)!important;
+  font-family:var(--sans)!important;
+}
+#journallApp #calendar .calendar-kpi-sub,
+#journallApp #calendar .calendar-month-profit-label,
+#journallApp #calendar .calendar-month-list-item,
+#journallApp #calendar .calendar-month-list-item small,
+#journallApp #calendar .calendar-stat .left,
+#journallApp #calendar .calendar-month-badge{
+  color:var(--muted)!important;
+}
+#journallApp #calendar .calendar-month-badge,
+#journallApp #calendar .calendar-stat,
+#journallApp #calendar .calendar-pill{
+  background:color-mix(in srgb,var(--surface-2) 78%,var(--primary) 22%)!important;
+  border:1px solid var(--hairline)!important;
+  border-radius:var(--radius-pill)!important;
+}
+#journallApp #calendarGrid .phase-d-calendar-day{
+  background:var(--surface-2)!important;
+  border:1px solid var(--hairline)!important;
+  border-radius:var(--radius-card)!important;
+  color:var(--ink)!important;
+}
+#journallApp #calendarGrid .phase-d-calendar-day.profit{
+  background:color-mix(in srgb,var(--success) 10%,var(--surface-2))!important;
+  border-color:color-mix(in srgb,var(--success) 30%,var(--hairline))!important;
+}
+#journallApp #calendarGrid .phase-d-calendar-day.lossday{
+  background:color-mix(in srgb,var(--danger) 10%,var(--surface-2))!important;
+  border-color:color-mix(in srgb,var(--danger) 30%,var(--hairline))!important;
+}
+#journallApp #calendarGrid .phase-d-calendar-day.flatday{
+  background:color-mix(in srgb,var(--warning) 8%,var(--surface-2))!important;
+  border-color:color-mix(in srgb,var(--warning) 24%,var(--hairline))!important;
+}
+#journallApp #calendarGrid .phase-d-calendar-day.empty{
+  background:var(--surface-1)!important;
+  border-color:var(--hairline)!important;
+  opacity:.58;
+}
+#journallApp #calendarGrid .phase-d-calendar-day.today{
+  box-shadow:inset 0 0 0 1px var(--primary)!important;
+}
+#journallApp #calendarGrid .phase-d-calendar-day:hover{
+  transform:translateY(-2px)!important;
+  border-color:color-mix(in srgb,var(--primary) 38%,var(--hairline))!important;
+}
+#journallApp #calendarGrid .calendar-date{
+  color:var(--ink)!important;
+}
+#journallApp #calendarGrid .calendar-weekday-small,
+#journallApp #calendarGrid .calendar-count{
+  color:var(--muted)!important;
+}
+#journallApp #calendarGrid .calendar-mini-bar{
+  background:var(--surface-1)!important;
+  border-radius:var(--radius-pill)!important;
+}
+#journallApp #calendarGrid .calendar-mini-bar span{
+  border-radius:var(--radius-pill)!important;
+}
+#journallApp #calendarGrid .calendar-mini-bar .positive{
+  background:var(--success)!important;
+}
+#journallApp #calendarGrid .calendar-mini-bar .negative{
+  background:var(--danger)!important;
+}
+#journallApp #calendarGrid .calendar-dot.green{
+  background:var(--success)!important;
+}
+#journallApp #calendarGrid .calendar-dot.red{
+  background:var(--danger)!important;
+}
+#journallApp #calendarGrid .calendar-dot.neutral{
+  background:var(--muted)!important;
+}
+#journallApp #calendar .calendar-sparkline .baseline{
+  stroke:var(--hairline)!important;
+}
+#journallApp #calendar .calendar-sparkline .revenue-line{
+  stroke:var(--success)!important;
+}
+#journallApp #calendar .calendar-sparkline .expense-line{
+  stroke:var(--danger)!important;
+}
+#journallApp #calendar .calendar-summary-card .green,
+#journallApp #calendar .calendar-kpi-value.green,
+#journallApp #calendar .calendar-month-profit.green{
+  color:var(--success)!important;
+}
+#journallApp #calendar .calendar-summary-card .red,
+#journallApp #calendar .calendar-kpi-value.red,
+#journallApp #calendar .calendar-month-profit.red{
+  color:var(--danger)!important;
+}
+#journallApp #calendar .calendar-summary-card .amber,
+#journallApp #calendar .calendar-kpi-value.amber,
+#journallApp #calendar .calendar-month-profit.amber{
+  color:var(--warning)!important;
+}
+#journallApp #calendar .calendar-summary-card .blue,
+#journallApp #calendar .calendar-kpi-value.blue,
+#journallApp #calendar .calendar-month-profit.blue{
+  color:var(--primary)!important;
+}
+#journallApp #calendar .calendar-kpi-grid,
+#journallApp #calendar .calendar-month-grid{
+  gap:var(--space-3);
+}
+</style>
 </body>
 </html>
