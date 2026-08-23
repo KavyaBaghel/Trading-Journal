@@ -447,7 +447,6 @@ Name changes remaining this month: ${remaining} of 2.`);
   --accent:#00bcd4;
   --shadow:0 18px 48px rgba(0,0,0,.22);
   --radius-card:18px;
-  --radius-md:10px;
   --radius-control:10px;
   --radius-pill:9999px;
   --sans:'Geist',system-ui,sans-serif;
@@ -12224,7 +12223,7 @@ body::before,body::after,.hero::before,.hero::after,.card::before,.journal-main-
 *,*::before,*::after{box-shadow:none!important;text-shadow:none!important}
 .app,.main{background:var(--canvas)!important;color:var(--ink)!important}
 .brand{border-bottom:1px solid var(--hairline)!important}
-.logo{width:36px!important;height:36px!important;min-width:36px!important;border-radius:var(--radius-md)!important;background:var(--surface-2)!important;background-image:none!important;border:1px solid var(--hairline-strong)!important;color:var(--ink)!important;display:grid!important;place-items:center!important;position:relative!important;overflow:hidden!important}
+.logo{width:36px!important;height:36px!important;min-width:36px!important;border-radius:var(--radius-control)!important;background:var(--surface-2)!important;background-image:none!important;border:1px solid var(--hairline-strong)!important;color:var(--ink)!important;display:grid!important;place-items:center!important;position:relative!important;overflow:hidden!important}
 .logo::before{content:"J"!important;color:var(--ink)!important;background:transparent!important;font-family:Inter,"Helvetica Neue",Arial,sans-serif!important;font-size:18px!important;font-weight:600!important;line-height:1!important}
 .logo::after{content:""!important;position:absolute!important;width:18px!important;height:2px!important;right:7px!important;bottom:8px!important;background:var(--primary)!important;border-radius:var(--radius-pill)!important;transform:rotate(-28deg)!important}
 .brand-title,.hero h1,.panel-title h3,h1,h2,h3,.calendar-hero h2,.mistake-modal-head h2{font-family:Inter,"Helvetica Neue",Arial,sans-serif!important;color:var(--ink)!important;letter-spacing:0!important;font-weight:500!important;text-transform:none!important}
@@ -12241,7 +12240,7 @@ p,span,div,td,label,em{color:inherit}.psych-check em,.psych-rule span,.journal-r
 .btn:hover,.ai-chip:hover,.journal-status-btn:hover,.pill:hover,.psych-step:hover,.nav button:hover{background:#242426!important;border-color:var(--ash)!important;color:var(--ink)!important;transform:none!important;opacity:1!important}
 .btn:active,.ai-chip:active,.journal-status-btn:active,.pill:active,.psych-step:active,.widget-icon-btn:active{transform:scale(.97)!important}
 .btn.primary,.file-picker-btn,.mobile-upload-btn,.pill.active,.psych-step.active,.journal-result-tabs .btn.active{background:var(--ink)!important;background-image:none!important;color:var(--on-primary)!important;border:1px solid var(--ink)!important}
-.nav button{min-height:40px!important;border-radius:var(--radius-md)!important;padding:10px 16px!important;border:1px solid transparent!important;border-left:2px solid transparent!important;background:transparent!important;color:var(--ink-subtle)!important;font-size:14px!important;font-weight:400!important;letter-spacing:0!important;text-align:left!important;transition:background-color var(--dur-instant) var(--ease-out),color var(--dur-instant) var(--ease-out),border-color var(--dur-base) var(--ease-snappy),transform var(--dur-fast) var(--ease-out)!important;transform-origin:center!important}
+.nav button{min-height:40px!important;border-radius:var(--radius-control)!important;padding:10px 16px!important;border:1px solid transparent!important;border-left:2px solid transparent!important;background:transparent!important;color:var(--ink-subtle)!important;font-size:14px!important;font-weight:400!important;letter-spacing:0!important;text-align:left!important;transition:background-color var(--dur-instant) var(--ease-out),color var(--dur-instant) var(--ease-out),border-color var(--dur-base) var(--ease-snappy),transform var(--dur-fast) var(--ease-out)!important;transform-origin:center!important}
 .nav button:hover{background:var(--surface-2)!important;color:var(--ink)!important;border-color:var(--surface-2)!important;border-left-color:transparent!important}
 .nav button:active{transform:scale(0.97)!important}
 .nav button.active{background:var(--surface-2)!important;color:var(--ink)!important;border-color:var(--hairline-strong)!important;border-left-color:var(--primary)!important;font-weight:500!important}
@@ -12554,7 +12553,7 @@ body:not(.firebase-auth-required) #journallApp > .main > *{
   background:var(--card)!important;
   background-image:none!important;
   border:1px solid var(--hairline)!important;
-  border-radius:var(--radius-md)!important;
+  border-radius:var(--radius-control)!important;
   padding:14px 14px 12px!important;
   min-width:0!important;
   overflow:hidden!important;
@@ -12657,7 +12656,7 @@ body:not(.firebase-auth-required) #journallApp > .main > *{
 .metric-bento-detail .mini-stat{
   padding:8px 10px!important;
   border:1px solid var(--hairline)!important;
-  border-radius:var(--radius-md)!important;
+  border-radius:var(--radius-control)!important;
   background:var(--surface-1)!important;
 }
 .metric-bento-detail .mini-stat span{
@@ -12985,7 +12984,7 @@ body:not(.firebase-auth-required) #journallApp > .main > *{
   padding:10px 12px!important;
   background:var(--surface-2)!important;
   border:1px solid var(--hairline)!important;
-  border-radius:var(--radius-md)!important;
+  border-radius:var(--radius-control)!important;
   color:var(--ink)!important;
   box-shadow:none!important;
   backdrop-filter:none!important;
@@ -13323,7 +13322,7 @@ body:not(.firebase-auth-required) #journallApp > .main > *{
   background:#000000!important;
   border:1px solid rgba(255,255,255,.08)!important;
   border-left:2px solid rgba(255,255,255,.12)!important;
-  border-radius:0 var(--radius-md) var(--radius-md) 0!important;
+  border-radius:0 var(--radius-control) var(--radius-control) 0!important;
   padding:12px 16px!important;
   font-size:13px!important;
   color:rgba(255,255,255,.72)!important;
@@ -13524,7 +13523,7 @@ textarea,
 select{
   background:#16181a!important;
   border:1px solid rgba(255,255,255,.12)!important;
-  border-radius:var(--radius-md)!important;
+  border-radius:var(--radius-control)!important;
   padding:14px 16px!important;
   min-height:48px!important;
   color:#ffffff!important;
@@ -13578,7 +13577,7 @@ tr:hover td{
 .ai-message{
   background:#0a0a0a!important;
   border-left:2px solid #494fdf!important;
-  border-radius:0 var(--radius-md) var(--radius-md) 0!important;
+  border-radius:0 var(--radius-control) var(--radius-control) 0!important;
   padding:12px 16px!important;
   margin-bottom:8px!important;
   animation:msgEnter var(--dur-enter) var(--ease-out) both!important;
