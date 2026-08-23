@@ -3383,7 +3383,6 @@ tr:hover {
             --bg: #09090b;
             --card: #18181b;
             --card-hover: #202023;
-            --primary: #8b5cf6;
             --primary-glow: rgba(139, 92, 246, 0.1);
             --border: rgba(255, 255, 255, 0.08);
             --text-main: #e4e4e7;
@@ -17412,13 +17411,17 @@ body:not(.firebase-auth-required) #journallApp > .sidebar .sidebox *{
 }
     </style>
     <style id="control-surface-pass">
-      button:not(.pill):not(.ai-chip):not(.journal-status-btn):not(.filter-chip):not(.psych-step):not(.widget-icon-btn):not(.android-install-btn),
-      #journallApp .btn:not(.pill):not(.ai-chip):not(.journal-status-btn):not(.filter-chip):not(.psych-step):not(.widget-icon-btn):not(.android-install-btn),
-      .file-picker-btn,
-      .mobile-upload-btn,
-      .save-setup-btn,
-      .stepper-btn,
-      .nav-link {
+      button:not(.pill):not(.ai-chip):not(.journal-status-btn):not(.filter-chip):not(.psych-step):not(.widget-icon-btn):not(.android-install-btn):not(.primary),
+      #journallApp .btn:not(.pill):not(.ai-chip):not(.journal-status-btn):not(.filter-chip):not(.psych-step):not(.widget-icon-btn):not(.android-install-btn):not(.primary),
+      #accountOnboardingGate .account-onboarding-card .btn:not(.pill):not(.ai-chip):not(.journal-status-btn):not(.filter-chip):not(.psych-step):not(.widget-icon-btn):not(.android-install-btn):not(.primary),
+      #firebaseAuthGate .btn:not(.pill):not(.ai-chip):not(.journal-status-btn):not(.filter-chip):not(.psych-step):not(.widget-icon-btn):not(.android-install-btn):not(.primary),
+      #journallApp .file-picker-btn:not(.primary),
+      #journallApp .mobile-upload-btn:not(.primary),
+      #accountOnboardingGate .account-onboarding-card .save-setup-btn:not(.primary),
+      #journallApp .save-setup-btn:not(.primary),
+      #accountOnboardingGate .account-onboarding-card .stepper-btn:not(.primary),
+      #journallApp .stepper-btn:not(.primary),
+      #journallApp .nav-link {
         border-radius: var(--radius-control) !important;
         background: var(--surface-2) !important;
         background-image: none !important;
@@ -17436,13 +17439,17 @@ body:not(.firebase-auth-required) #journallApp > .sidebar .sidebox *{
           box-shadow 160ms var(--ease-out) !important;
       }
 
-      button:not(.pill):not(.ai-chip):not(.journal-status-btn):not(.filter-chip):not(.psych-step):not(.widget-icon-btn):not(.android-install-btn):hover,
-      #journallApp .btn:not(.pill):not(.ai-chip):not(.journal-status-btn):not(.filter-chip):not(.psych-step):not(.widget-icon-btn):not(.android-install-btn):hover,
-      .file-picker-btn:hover,
-      .mobile-upload-btn:hover,
-      .save-setup-btn:hover,
-      .stepper-btn:hover,
-      .nav-link:hover {
+      button:not(.pill):not(.ai-chip):not(.journal-status-btn):not(.filter-chip):not(.psych-step):not(.widget-icon-btn):not(.android-install-btn):not(.primary):hover,
+      #journallApp .btn:not(.pill):not(.ai-chip):not(.journal-status-btn):not(.filter-chip):not(.psych-step):not(.widget-icon-btn):not(.android-install-btn):not(.primary):hover,
+      #accountOnboardingGate .account-onboarding-card .btn:not(.pill):not(.ai-chip):not(.journal-status-btn):not(.filter-chip):not(.psych-step):not(.widget-icon-btn):not(.android-install-btn):not(.primary):hover,
+      #firebaseAuthGate .btn:not(.pill):not(.ai-chip):not(.journal-status-btn):not(.filter-chip):not(.psych-step):not(.widget-icon-btn):not(.android-install-btn):not(.primary):hover,
+      #journallApp .file-picker-btn:not(.primary):hover,
+      #journallApp .mobile-upload-btn:not(.primary):hover,
+      #accountOnboardingGate .account-onboarding-card .save-setup-btn:not(.primary):hover,
+      #journallApp .save-setup-btn:not(.primary):hover,
+      #accountOnboardingGate .account-onboarding-card .stepper-btn:not(.primary):hover,
+      #journallApp .stepper-btn:not(.primary):hover,
+      #journallApp .nav-link:hover {
         background: color-mix(in srgb, var(--primary) 9%, var(--surface-2)) !important;
         border-color: color-mix(in srgb, var(--primary) 24%, var(--hairline)) !important;
         color: var(--ink) !important;
@@ -17451,62 +17458,82 @@ body:not(.firebase-auth-required) #journallApp > .sidebar .sidebox *{
       }
 
       button:not(.pill):not(.ai-chip):not(.journal-status-btn):not(.filter-chip):not(.psych-step):not(.widget-icon-btn):not(.android-install-btn):active,
-      .btn:not(.pill):not(.ai-chip):not(.journal-status-btn):not(.filter-chip):not(.psych-step):not(.widget-icon-btn):not(.android-install-btn):active,
-      .file-picker-btn:active,
-      .mobile-upload-btn:active,
-      .save-setup-btn:active,
-      .stepper-btn:active,
-      .nav-link:active {
+      #journallApp .btn:not(.pill):not(.ai-chip):not(.journal-status-btn):not(.filter-chip):not(.psych-step):not(.widget-icon-btn):not(.android-install-btn):active,
+      #accountOnboardingGate .account-onboarding-card .btn:not(.pill):not(.ai-chip):not(.journal-status-btn):not(.filter-chip):not(.psych-step):not(.widget-icon-btn):not(.android-install-btn):active,
+      #firebaseAuthGate .btn:not(.pill):not(.ai-chip):not(.journal-status-btn):not(.filter-chip):not(.psych-step):not(.widget-icon-btn):not(.android-install-btn):active,
+      #journallApp .file-picker-btn:active,
+      #journallApp .mobile-upload-btn:active,
+      #accountOnboardingGate .account-onboarding-card .save-setup-btn:active,
+      #journallApp .save-setup-btn:active,
+      #accountOnboardingGate .account-onboarding-card .stepper-btn:active,
+      #journallApp .stepper-btn:active,
+      #journallApp .nav-link:active {
         transform: translateY(0) scale(.98) !important;
       }
 
       button:not(.pill):not(.ai-chip):not(.journal-status-btn):not(.filter-chip):not(.psych-step):not(.widget-icon-btn):not(.android-install-btn):disabled,
-      .btn:not(.pill):not(.ai-chip):not(.journal-status-btn):not(.filter-chip):not(.psych-step):not(.widget-icon-btn):not(.android-install-btn):disabled,
-      .file-picker-btn:disabled,
-      .mobile-upload-btn:disabled,
-      .save-setup-btn:disabled,
-      .stepper-btn:disabled,
-      .nav-link[aria-disabled="true"] {
+      #journallApp .btn:not(.pill):not(.ai-chip):not(.journal-status-btn):not(.filter-chip):not(.psych-step):not(.widget-icon-btn):not(.android-install-btn):disabled,
+      #accountOnboardingGate .account-onboarding-card .btn:not(.pill):not(.ai-chip):not(.journal-status-btn):not(.filter-chip):not(.psych-step):not(.widget-icon-btn):not(.android-install-btn):disabled,
+      #firebaseAuthGate .btn:not(.pill):not(.ai-chip):not(.journal-status-btn):not(.filter-chip):not(.psych-step):not(.widget-icon-btn):not(.android-install-btn):disabled,
+      #journallApp .file-picker-btn:disabled,
+      #journallApp .mobile-upload-btn:disabled,
+      #accountOnboardingGate .account-onboarding-card .save-setup-btn:disabled,
+      #journallApp .save-setup-btn:disabled,
+      #accountOnboardingGate .account-onboarding-card .stepper-btn:disabled,
+      #journallApp .stepper-btn:disabled,
+      #journallApp .nav-link[aria-disabled="true"] {
         opacity: .55 !important;
         pointer-events: none !important;
         transform: none !important;
       }
 
-      .btn.primary,
-      .mobile-upload-btn,
-      .save-setup-btn {
+      #journallApp .btn.primary,
+      #accountOnboardingGate .account-onboarding-card .btn.primary,
+      #firebaseAuthGate .btn.primary,
+      #journallApp .mobile-upload-btn,
+      #accountOnboardingGate .account-onboarding-card .save-setup-btn,
+      #journallApp .save-setup-btn {
         background: var(--primary) !important;
         border-color: var(--primary) !important;
         color: var(--on-primary) !important;
       }
 
-      .btn.primary:hover,
-      .mobile-upload-btn:hover,
-      .save-setup-btn:hover {
+      #journallApp .btn.primary:hover,
+      #accountOnboardingGate .account-onboarding-card .btn.primary:hover,
+      #firebaseAuthGate .btn.primary:hover,
+      #journallApp .mobile-upload-btn:hover,
+      #accountOnboardingGate .account-onboarding-card .save-setup-btn:hover,
+      #journallApp .save-setup-btn:hover {
         background: color-mix(in srgb, var(--primary) 88%, #ffffff 12%) !important;
         border-color: color-mix(in srgb, var(--primary) 88%, #ffffff 12%) !important;
         color: var(--on-primary) !important;
         box-shadow: 0 6px 18px rgba(73,79,223,.14) !important;
       }
 
-      .btn:not(.primary),
-      .file-picker-btn,
-      .stepper-btn {
+      #journallApp .btn:not(.primary),
+      #accountOnboardingGate .account-onboarding-card .btn:not(.primary),
+      #firebaseAuthGate .btn:not(.primary),
+      #journallApp .file-picker-btn,
+      #accountOnboardingGate .account-onboarding-card .stepper-btn,
+      #journallApp .stepper-btn {
         background: transparent !important;
         color: var(--primary) !important;
         border-color: var(--primary) !important;
       }
 
-      .btn:not(.primary):hover,
-      .file-picker-btn:hover,
-      .stepper-btn:hover {
+      #journallApp .btn:not(.primary):hover,
+      #accountOnboardingGate .account-onboarding-card .btn:not(.primary):hover,
+      #firebaseAuthGate .btn:not(.primary):hover,
+      #journallApp .file-picker-btn:hover,
+      #accountOnboardingGate .account-onboarding-card .stepper-btn:hover,
+      #journallApp .stepper-btn:hover {
         background: rgba(73,79,223,.08) !important;
         border-color: rgba(73,79,223,.28) !important;
         color: var(--primary) !important;
       }
 
-      .nav button,
-      .nav-link {
+      #journallApp .nav button,
+      #journallApp .nav-link {
         border-radius: var(--radius-control) !important;
         min-height: 40px !important;
         padding: 10px 16px !important;
@@ -17518,8 +17545,8 @@ body:not(.firebase-auth-required) #journallApp > .sidebar .sidebox *{
         justify-content: flex-start !important;
       }
 
-      .nav button:hover,
-      .nav-link:hover {
+      #journallApp .nav button:hover,
+      #journallApp .nav-link:hover {
         background: var(--surface-2) !important;
         color: var(--ink) !important;
         border-color: var(--surface-2) !important;
@@ -17527,8 +17554,8 @@ body:not(.firebase-auth-required) #journallApp > .sidebar .sidebox *{
         transform: none !important;
       }
 
-      .nav button.active,
-      .nav-link.active {
+      #journallApp .nav button.active,
+      #journallApp .nav-link.active {
         background: var(--surface-2) !important;
         color: var(--ink) !important;
         border-color: var(--hairline-strong) !important;
@@ -17536,31 +17563,31 @@ body:not(.firebase-auth-required) #journallApp > .sidebar .sidebox *{
         font-weight: 500 !important;
       }
 
-      .nav button:focus-visible,
-      .nav-link:focus-visible {
+      #journallApp .nav button:focus-visible,
+      #journallApp .nav-link:focus-visible {
         outline: 2px solid rgba(73,79,223,.72) !important;
         outline-offset: 2px !important;
       }
 
-      input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
-      select,
-      textarea,
-      .search input,
-      .filters input,
-      .filters select,
-      .editor textarea,
-      .editor input,
-      .journal-entry-form input,
-      .journal-entry-form select,
-      .journal-entry-form textarea,
-      .journal-search-row input,
-      .journal-search-row select,
-      .journal-trade-select-row select,
-      .real-ai-settings input,
-      .real-ai-settings select,
-      .account-onboarding-card input,
-      .account-onboarding-card select,
-      .risk-calc-grid input {
+      #journallApp input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
+      #journallApp select,
+      #journallApp textarea,
+      #journallApp .search input,
+      #journallApp .filters input,
+      #journallApp .filters select,
+      #journallApp .editor textarea,
+      #journallApp .editor input,
+      #journallApp .journal-entry-form input,
+      #journallApp .journal-entry-form select,
+      #journallApp .journal-entry-form textarea,
+      #journallApp .journal-search-row input,
+      #journallApp .journal-search-row select,
+      #journallApp .journal-trade-select-row select,
+      #journallApp .real-ai-settings input,
+      #journallApp .real-ai-settings select,
+      #journallApp .account-onboarding-card input,
+      #journallApp .account-onboarding-card select,
+      #journallApp .risk-calc-grid input {
         border-radius: var(--radius-control) !important;
         background: var(--surface-2) !important;
         background-image: none !important;
@@ -17575,18 +17602,18 @@ body:not(.firebase-auth-required) #journallApp > .sidebar .sidebox *{
           transform 160ms var(--ease-snappy) !important;
       }
 
-      textarea {
+      #journallApp textarea {
         border-radius: var(--radius-control) !important;
       }
 
-      input::placeholder,
-      textarea::placeholder {
+      #journallApp input::placeholder,
+      #journallApp textarea::placeholder {
         color: var(--muted) !important;
       }
 
-      input:focus-visible,
-      select:focus-visible,
-      textarea:focus-visible {
+      #journallApp input:focus-visible,
+      #journallApp select:focus-visible,
+      #journallApp textarea:focus-visible {
         outline: 2px solid rgba(73,79,223,.72) !important;
         outline-offset: 2px !important;
         border-color: var(--primary) !important;
