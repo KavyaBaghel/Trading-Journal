@@ -18891,5 +18891,72 @@ body:not(.firebase-auth-required) #journallApp > .sidebar .sidebox *{
   }
 }
 </style>
+<style id="phase-e-journal-screen">
+/* Phase E, screen 5: Trade Journal only. */
+#journallApp #journalpage > .journal-page-layout > .card{
+  background:var(--surface-1)!important;
+  background-image:none!important;
+  border:1px solid var(--hairline)!important;
+  border-radius:var(--radius-card)!important;
+  box-shadow:var(--shadow);
+  color:var(--ink)!important;
+}
+#journallApp #journalpage .saved-journal-card{
+  background:var(--surface-2)!important;
+  background-image:none!important;
+  border:1px solid var(--hairline)!important;
+  border-radius:var(--radius-card)!important;
+  box-shadow:var(--shadow);
+  color:var(--ink)!important;
+}
+#journallApp #journalpage .saved-journal-card *{
+  background-color:transparent!important;
+}
+#journallApp #journalpage .journal-result-tabs [data-journal-result-tab]{
+  background:var(--surface-2)!important;
+  color:var(--ink-subtle)!important;
+  border:1px solid var(--hairline)!important;
+  border-radius:var(--radius-pill)!important;
+  font-family:var(--sans)!important;
+  font-size:12px!important;
+  font-weight:600!important;
+  letter-spacing:0!important;
+}
+#journallApp #journalpage .journal-result-tabs [data-journal-result-tab]:hover{
+  background:color-mix(in srgb,var(--primary) 10%,var(--surface-2))!important;
+  border-color:color-mix(in srgb,var(--primary) 28%,var(--hairline))!important;
+  color:var(--ink)!important;
+}
+#journallApp #journalpage .journal-result-tabs [data-journal-result-tab].active{
+  background:var(--primary)!important;
+  border-color:var(--primary)!important;
+  color:var(--on-primary)!important;
+}
+#journallApp #journalpage .journal-category-badge{
+  background:color-mix(in srgb,var(--primary) 14%,var(--surface-2))!important;
+  border:1px solid color-mix(in srgb,var(--primary) 28%,var(--hairline))!important;
+  border-radius:var(--radius-pill)!important;
+  color:var(--primary)!important;
+  font-family:var(--sans)!important;
+}
+#journallApp #journalpage .trade-journal-tag{
+  background:color-mix(in srgb,var(--primary) 14%,var(--surface-2))!important;
+  border:1px solid color-mix(in srgb,var(--primary) 28%,var(--hairline))!important;
+  border-radius:var(--radius-pill)!important;
+  color:var(--primary)!important;
+  font-family:var(--sans)!important;
+}
+#journallApp #journalpage #savedJournalList .insight.empty{
+  background:var(--surface-2)!important;
+  border:1px solid var(--hairline)!important;
+  border-radius:var(--radius-card)!important;
+  color:var(--muted)!important;
+  line-height:1.5;
+  padding:16px!important;
+}
+#journallApp #journalpage #savedJournalList .insight.empty strong{
+  color:var(--ink)!important;
+}
+</style>
 </body>
 </html>
