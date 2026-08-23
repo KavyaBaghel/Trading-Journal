@@ -8566,10 +8566,10 @@ function showMt5TerminalInstallMessage(status, rawMessage=''){
     '"': '&quot;'
   })[ch]);
   const messageHtml = safeMessage.replace(/\r?\n/g, '<br>');
-  status.innerHTML = `
-    <div style="background:#050505;border:1px solid rgba(255,255,255,.12);border-left:3px solid #ef4444;border-radius:12px;padding:16px 18px;line-height:1.55;">
-      <div style="color:rgba(255,255,255,.82);font-size:13px;font-family:monospace;white-space:pre-wrap;word-break:break-word;background:rgba(255,255,255,.04);border-radius:8px;padding:10px 12px;">${messageHtml}</div>
-    </div>`;
+    status.innerHTML = `
+      <div class="sync-status-detail sync-status-error">
+        <div class="sync-status-error-copy">${messageHtml}</div>
+      </div>`;
 }
 async function triggerBrokerSync(options = {}) {
   console.log('SYNC START');
@@ -8784,7 +8784,7 @@ async function triggerBrokerSync(options = {}) {
     persistTradeStores(tradingPageTrades);
 
     if (status) {
-      status.innerHTML = `<strong style="color:#4ade80;">✓ Sync successful!</strong><br>Imported: ${parsed.length} trades from ${pName}.<br>Total journal trades: ${trades.length}.`;
+      status.innerHTML = `<strong style="color:var(--success);">Sync successful.</strong><br>Imported: ${parsed.length} trades from ${pName}.<br>Total journal trades: ${trades.length}.`;
     }
 
     ['q','session','side','mistake','result'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
@@ -8802,16 +8802,16 @@ async function triggerBrokerSync(options = {}) {
     if (platform === 'mt5') {
       showMt5TerminalInstallMessage(status, err.message || err);
     } else {
-      if (status) status.innerHTML = `<strong style="color:var(--red);">Sync failed:</strong> ${err.message || err}`;
+      if (status) status.innerHTML = `<strong style="color:var(--danger);">Sync failed:</strong> ${err.message || err}`;
       alert(`Sync failed: ${err.message || err}`);
     }
   } finally {
     if (btn) {
       btn.disabled = false;
       if (parsed && parsed.length > 0) {
-        btn.innerHTML = `<span style="display:inline-flex; align-items:center; gap:6px; color:#4ade80;">✓ Synced (${pName})</span>`;
+        btn.innerHTML = `<span style="display:inline-flex; align-items:center; gap:6px; color:var(--success);">Synced (${pName})</span>`;
       } else if (status && status.innerHTML.includes('failed')) {
-        btn.innerHTML = `<span style="display:inline-flex; align-items:center; gap:6px; color:#f87171;">↻ Retry Sync (${pName})</span>`;
+        btn.innerHTML = `<span style="display:inline-flex; align-items:center; gap:6px; color:var(--danger);">Retry Sync (${pName})</span>`;
       } else {
         btn.innerHTML = `<span>Sync from ${pName}</span>`;
       }
@@ -19506,6 +19506,97 @@ body:not(.firebase-auth-required) #journallApp > .sidebar .sidebox *{
 
       #journallApp #userprofile .profile-card-hero + .goal-card-grid + .card {
         padding: 20px !important;
+      }
+    </style>
+    <style id="phase-e-upload-sync-screen">
+      /* Phase E, screen 11: Upload Data sync only. */
+      /* The existing global dark and form-control layers use important values for
+         upload surfaces, so only the shell/status declarations that need to win
+         those conflicts use !important here. */
+      #journallApp #uploadcsv > .card {
+        background: var(--surface-1) !important;
+        border: 1px solid var(--hairline) !important;
+        border-radius: var(--radius-card) !important;
+        box-shadow: var(--shadow) !important;
+      }
+
+      #journallApp #uploadcsv .panel-title span,
+      #journallApp #uploadcsv .sub,
+      #journallApp #uploadcsv label,
+      #journallApp #uploadcsv [id^="fields"] > div > div {
+        color: var(--muted) !important;
+        font-family: var(--sans) !important;
+      }
+
+      #journallApp #uploadcsv .csv-only-box {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 10px;
+        padding: 14px;
+        border: 1px solid var(--hairline) !important;
+        border-radius: var(--radius-control) !important;
+        background: var(--surface-2) !important;
+      }
+
+      #journallApp #uploadcsv .csv-only-box .btn {
+        margin: 0 !important;
+      }
+
+      #journallApp #uploadcsv .sync-status {
+        min-height: 52px;
+        margin-top: 14px !important;
+        padding: 14px 16px !important;
+        border: 1px solid var(--hairline) !important;
+        border-radius: var(--radius-control) !important;
+        background: var(--surface-2) !important;
+        color: var(--ink-subtle) !important;
+        font-family: var(--sans) !important;
+        line-height: 1.5;
+      }
+
+      #journallApp #uploadcsv .sync-status strong {
+        color: var(--ink) !important;
+      }
+
+      #journallApp #uploadcsv .sync-status-detail {
+        padding: 0;
+        border: 0;
+        background: transparent;
+        color: var(--ink-subtle);
+        line-height: 1.55;
+      }
+
+      #journallApp #uploadcsv .sync-status-error {
+        border-left: 3px solid var(--danger);
+        padding-left: 12px;
+      }
+
+      #journallApp #uploadcsv .sync-status-error-copy {
+        padding: 10px 12px;
+        border: 1px solid color-mix(in srgb, var(--danger) 24%, var(--hairline));
+        border-radius: var(--radius-control);
+        background: color-mix(in srgb, var(--danger) 7%, var(--surface-1));
+        color: var(--ink-subtle);
+        font-family: var(--sans);
+        font-size: 13px;
+        white-space: pre-wrap;
+        overflow-wrap: anywhere;
+      }
+
+      #journallApp #uploadcsv #fieldsMt5,
+      #journallApp #uploadcsv #fieldsMatchtrader,
+      #journallApp #uploadcsv #fieldsCtrader {
+        gap: 12px;
+      }
+
+      #journallApp #uploadcsv input:focus-visible,
+      #journallApp #uploadcsv select:focus-visible {
+        transform: translateY(-1px) !important;
+      }
+
+      #journallApp #uploadcsv .spinner-mini {
+        border-top-color: var(--on-primary) !important;
       }
     </style>
 </body>
