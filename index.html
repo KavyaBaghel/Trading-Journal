@@ -13026,16 +13026,6 @@ body:not(.firebase-auth-required) #journallApp > .main > *{
 
 /* ===== MINI STAT CARD FIXES (TODAY P&L / TRADES / WIN RATE / MISTAKES) ===== */
 
-/* FIX 3 - grid: 4 equal columns, tighter gap */
-#todayMetrics.today-metrics,
-.grid.metrics.today-metrics,
-.today-metrics{
-  display:grid!important;
-  grid-template-columns:repeat(4, minmax(0, 1fr))!important;
-  gap:8px!important;
-  margin:0!important;
-}
-
 /* FIX 3 - each card */
 #todayMetrics .card{
   min-width:0!important;
@@ -13679,11 +13669,6 @@ p{
   #tradingpage > .grid.two,
   .grid.two{
     grid-template-columns:1fr!important;
-  }
-  #todayMetrics.today-metrics,
-  .grid.metrics.today-metrics,
-  .today-metrics{
-    grid-template-columns:repeat(2,1fr)!important;
   }
 }
 @media (min-width:1600px){
@@ -14465,7 +14450,6 @@ main,
   margin: 0 !important;
 }
 
-#journallApp .psych-check,
 #journallApp .checklist-item,
 #journallApp [class*="checklist-item"],
 #journallApp [class*="pretrade-item"] {
@@ -15288,13 +15272,6 @@ html.firebase-auth-required body{
   background-color: rgba(73, 79, 223, 0.15) !important;
   border-color: rgba(73, 79, 223, 0.3) !important;
   color: #a3aeff !important;
-}
-.psych-check {
-  background: #0a0a0a !important;
-  background-color: #0a0a0a !important;
-  border: 1px solid rgba(255,255,255,0.08) !important;
-  border-radius: 12px !important;
-  padding: 16px !important;
 }
 .psych-check * {
   background: transparent !important;
