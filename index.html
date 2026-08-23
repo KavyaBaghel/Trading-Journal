@@ -5295,7 +5295,7 @@ function renderInsights(){
       box.innerHTML = renderRuleBasedDashboardInsights();
       return;
     }
-    box.innerHTML = renderAIReportText(cached);
+    box.innerHTML = renderAIReportText(cached, 'dashboard');
     return;
   }
   box.innerHTML = renderRuleBasedDashboardInsights();
@@ -5314,11 +5314,16 @@ function cssVarValue(name, fallback=''){
   return v || fallback;
 }
 
-function chartLine(id, labels, data, color){
+function chartLine(id, labels, data){
   const canvas = ensureCanvas(id);
   if(!canvas) return;
   destroy(id);
   const numeric = data.map(v=>Number(v || 0));
+  const primary = cssVarValue('--primary') || 'currentColor';
+  const danger = cssVarValue('--danger') || primary;
+  const muted = cssVarValue('--muted') || 'currentColor';
+  const hairline = cssVarValue('--hairline') || cssVarValue('--border') || 'currentColor';
+  const lineColor = numeric[numeric.length - 1] > 0 ? primary : numeric[numeric.length - 1] < 0 ? danger : muted;
   const min = Math.min(...numeric,0);
   const max = Math.max(...numeric,0);
   const spread = Math.max(1, Math.abs(max - min));
@@ -5334,11 +5339,20 @@ function chartLine(id, labels, data, color){
         pointHoverRadius:5,
         borderWidth:2,
         fill:true,
-        backgroundColor:'rgba(39,166,68,0.08)',
-        borderColor:'#27a644',
-        pointBackgroundColor:'#27a644',
+        backgroundColor:(ctx)=>{
+          const chart = ctx.chart;
+          const area = chart?.chartArea;
+          const c = chart?.ctx;
+          if(!area || !c) return lineColor;
+          const gradient = c.createLinearGradient(0, area.top, 0, area.bottom);
+          gradient.addColorStop(0, lineColor);
+          gradient.addColorStop(1, 'transparent');
+          return gradient;
+        },
+        borderColor:lineColor,
+        pointBackgroundColor:lineColor,
         pointBorderWidth:0,
-        pointBorderColor:'#27a644'
+        pointBorderColor:lineColor
       }]
     },
     options:{
@@ -5357,14 +5371,14 @@ function chartLine(id, labels, data, color){
       scales:{
         x:{
           offset:true,
-          grid:{color:'rgba(255,255,255,0.04)'},
-          ticks:{color:'rgba(255,255,255,0.4)',font:{size:11},maxRotation:0,autoSkip:true,maxTicksLimit:8}
+          grid:{color:hairline},
+          ticks:{color:muted,font:{size:11},maxRotation:0,autoSkip:true,maxTicksLimit:8}
         },
         y:{
           suggestedMin:min - spread * .12,
           suggestedMax:max + spread * .12,
-          grid:{color:'rgba(255,255,255,0.04)'},
-          ticks:{color:'rgba(255,255,255,0.4)',font:{size:11},callback:(v)=>formatChartMoney(v)}
+          grid:{color:hairline},
+          ticks:{color:muted,font:{size:11},callback:(v)=>formatChartMoney(v)}
         }
       }
     }
@@ -5519,7 +5533,7 @@ function renderCharts(){
   }
   updateGraphHelpers();
   const srt=sorted(filtered); let cum=0; const eq=[0,...srt.map(t=>+(cum+=t.pnl).toFixed(2))];
-  chartLine('equityChart',['Start',...srt.map((_,i)=>i+1)],eq,cum>0?'#007d48':cum<0?'#d30005':'#111111');
+  chartLine('equityChart',['Start',...srt.map((_,i)=>i+1)],eq);
 
   const wins = filtered.filter(t=>tradeResult(t.pnl)==='profit');
   const losses = filtered.filter(t=>tradeResult(t.pnl)==='loss');
@@ -5972,7 +5986,7 @@ function renderRuleBasedDashboardInsights(){
   return cards.map((part,i)=>`<div class="insight ${i===0?'good':i===1?'warn':''}">${part}</div>`).join('');
 }
 
-function renderAIReportText(text){
+function renderAIReportText(text, context='default'){
   const cleaned = cleanAIReportText(text);
   if(!cleaned) return renderRuleBasedDashboardInsights();
 
@@ -6020,6 +6034,17 @@ function renderAIReportText(text){
     const tones = ['verdict', 'mistake', 'decision', 'strength', 'reminder', 'setup'];
     const tone = tones[i % tones.length];
 
+    if(context === 'dashboard'){
+      return `
+        <div class="insight ai-report-insight ${tone}">
+          <div class="ai-report-insight-head">
+            <span class="ai-report-insight-title">${escapeHtml(title)}</span>
+          </div>
+          ${diagnosis ? `<div class="ai-report-insight-diagnosis"><strong>Diagnosis:</strong> ${escapeHtml(diagnosis)}</div>` : ''}
+          ${action ? `<div class="ai-report-insight-action"><strong>Action:</strong> ${escapeHtml(action)}</div>` : ''}
+        </div>
+      `;
+    }
     return `
       <div class="insight" style="border-left: 4px solid var(--accent-${tone}, #494fdf) !important; margin-bottom: 14px !important; padding: 16px 20px !important; border-radius: 12px !important; background: rgba(255,255,255,0.02) !important; border-top: 1px solid rgba(255,255,255,0.03) !important; border-right: 1px solid rgba(255,255,255,0.03) !important; border-bottom: 1px solid rgba(255,255,255,0.03) !important;">
         <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
@@ -18611,5 +18636,164 @@ body:not(.firebase-auth-required) #journallApp > .sidebar .sidebox *{
       }
       applySharedStatCardTreatment(document.getElementById('commandCenter'));
     </script>
+<style id="phase-e-analytics-screen">
+/* Phase E, screen 3: Analytics only. */
+#journallApp #dashboard > .grid.performance-pies,
+#journallApp #dashboard > .grid.two:has(#equityKpis),
+#journallApp #dashboard > .grid.three:has(#sessionHelper),
+#journallApp #dashboard > .grid.two:has(#heatmap),
+#journallApp #dashboard > .grid.four{
+  display:grid!important;
+  gap:16px!important;
+  width:100%!important;
+}
+#journallApp #dashboard > .grid.performance-pies{
+  grid-template-columns:repeat(3,minmax(0,1fr))!important;
+}
+#journallApp #dashboard > .grid.two:has(#equityKpis),
+#journallApp #dashboard > .grid.two:has(#heatmap){
+  grid-template-columns:repeat(2,minmax(0,1fr))!important;
+}
+#journallApp #dashboard > .grid.three:has(#sessionHelper){
+  grid-template-columns:repeat(3,minmax(0,1fr))!important;
+}
+#journallApp #dashboard > .grid.four{
+  grid-template-columns:repeat(4,minmax(0,1fr))!important;
+}
+#journallApp #dashboard > .grid.performance-pies > .card,
+#journallApp #dashboard > .grid.two:has(#equityKpis) > .card,
+#journallApp #dashboard > .grid.three:has(#sessionHelper) > .card,
+#journallApp #dashboard > .grid.two:has(#heatmap) > .card,
+#journallApp #dashboard > .grid.four > .card{
+  position:relative!important;
+  background:var(--surface-1)!important;
+  background-image:none!important;
+  border:1px solid var(--hairline)!important;
+  border-radius:var(--radius-card)!important;
+  box-shadow:var(--shadow)!important;
+  padding:20px!important;
+  overflow:hidden!important;
+  transition:transform var(--dur-base) var(--ease-out),border-color var(--dur-base) var(--ease-out),background-color var(--dur-base) var(--ease-out)!important;
+}
+#journallApp #dashboard > .grid.performance-pies > .card:hover,
+#journallApp #dashboard > .grid.two:has(#equityKpis) > .card:hover,
+#journallApp #dashboard > .grid.three:has(#sessionHelper) > .card:hover,
+#journallApp #dashboard > .grid.two:has(#heatmap) > .card:hover,
+#journallApp #dashboard > .grid.four > .card:hover{
+  transform:translateY(-2px)!important;
+  border-color:var(--hairline-strong)!important;
+  background:var(--surface-2)!important;
+  box-shadow:var(--shadow)!important;
+}
+#journallApp #dashboard > .grid.performance-pies > .card > *,
+#journallApp #dashboard > .grid.two:has(#equityKpis) > .card > *,
+#journallApp #dashboard > .grid.three:has(#sessionHelper) > .card > *,
+#journallApp #dashboard > .grid.two:has(#heatmap) > .card > *,
+#journallApp #dashboard > .grid.four > .card > *{
+  position:relative!important;
+  z-index:1!important;
+}
+#journallApp #dashboard .chart,
+#journallApp #dashboard .chart.tall{
+  background:var(--surface-2)!important;
+  border:1px solid var(--hairline)!important;
+  border-radius:var(--radius-control)!important;
+  padding:12px!important;
+  overflow:hidden!important;
+}
+#journallApp #dashboard .chart canvas{
+  width:100%!important;
+  height:100%!important;
+  display:block!important;
+}
+#journallApp #dashboard .chart .empty-chart{
+  display:grid!important;
+  place-items:center!important;
+  min-height:180px!important;
+  padding:24px!important;
+  color:var(--muted)!important;
+  text-align:center!important;
+  line-height:1.5!important;
+}
+#journallApp #dashboard .heatmap-scroll{
+  background:var(--surface-2)!important;
+  border:1px solid var(--hairline)!important;
+  border-radius:var(--radius-control)!important;
+  padding:12px!important;
+}
+#journallApp #dashboard .heatmap{
+  min-width:720px!important;
+}
+#journallApp #dashboard .insights{
+  display:grid!important;
+  gap:10px!important;
+  margin-top:16px!important;
+}
+#journallApp #dashboard #aiInsights .insight,
+#journallApp #dashboard #aiInsights .ai-report-insight{
+  margin:0!important;
+  padding:14px 16px!important;
+  background:var(--surface-2)!important;
+  border:1px solid var(--hairline)!important;
+  border-left:3px solid var(--primary)!important;
+  border-radius:var(--radius-control)!important;
+  color:var(--muted)!important;
+  line-height:1.5!important;
+}
+#journallApp #dashboard #aiInsights .insight.good{border-left-color:var(--success)!important;}
+#journallApp #dashboard #aiInsights .insight.warn{border-left-color:var(--warning)!important;}
+#journallApp #dashboard #aiInsights .insight.danger{border-left-color:var(--danger)!important;}
+#journallApp #dashboard #aiInsights .ai-report-insight-head{
+  display:flex!important;
+  align-items:center!important;
+  justify-content:space-between!important;
+  margin-bottom:8px!important;
+}
+#journallApp #dashboard #aiInsights .ai-report-insight-title{
+  color:var(--primary)!important;
+  font-size:11px!important;
+  font-weight:700!important;
+  letter-spacing:.08em!important;
+  text-transform:uppercase!important;
+}
+#journallApp #dashboard #aiInsights .ai-report-insight-diagnosis{
+  color:var(--ink)!important;
+  font-size:14px!important;
+  line-height:1.5!important;
+  margin-bottom:8px!important;
+}
+#journallApp #dashboard #aiInsights .ai-report-insight-action{
+  color:var(--muted)!important;
+  font-size:13px!important;
+  line-height:1.5!important;
+}
+#journallApp #dashboard #aiInsights .insight strong{
+  color:var(--ink)!important;
+  font-weight:600!important;
+}
+@media (max-width:1200px){
+  #journallApp #dashboard > .grid.performance-pies,
+  #journallApp #dashboard > .grid.three:has(#sessionHelper),
+  #journallApp #dashboard > .grid.four{
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  }
+}
+@media (max-width:820px){
+  #journallApp #dashboard > .grid.performance-pies,
+  #journallApp #dashboard > .grid.two:has(#equityKpis),
+  #journallApp #dashboard > .grid.three:has(#sessionHelper),
+  #journallApp #dashboard > .grid.two:has(#heatmap),
+  #journallApp #dashboard > .grid.four{
+    grid-template-columns:1fr!important;
+  }
+  #journallApp #dashboard > .grid.performance-pies > .card,
+  #journallApp #dashboard > .grid.two:has(#equityKpis) > .card,
+  #journallApp #dashboard > .grid.three:has(#sessionHelper) > .card,
+  #journallApp #dashboard > .grid.two:has(#heatmap) > .card,
+  #journallApp #dashboard > .grid.four > .card{
+    padding:16px!important;
+  }
+}
+</style>
 </body>
 </html>
