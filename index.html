@@ -18795,5 +18795,101 @@ body:not(.firebase-auth-required) #journallApp > .sidebar .sidebox *{
   }
 }
 </style>
+<style id="phase-e-trades-screen">
+/* Phase E, screen 4: Trades table only. */
+#journallApp #grid > .card > .table-wrap{
+  background:var(--surface-1)!important;
+  border:1px solid var(--hairline)!important;
+  box-shadow:var(--shadow);
+}
+#journallApp #grid > .card > .table-wrap > table{
+  width:100%!important;
+  border-collapse:separate!important;
+  border-spacing:0!important;
+  color:var(--ink)!important;
+  font-family:var(--sans)!important;
+}
+#journallApp #grid > .card > .table-wrap > table th{
+  padding:var(--space-3) var(--space-4)!important;
+  background:var(--surface-2)!important;
+  border-bottom:1px solid var(--hairline-strong)!important;
+  color:var(--ink-subtle)!important;
+  font-family:var(--sans)!important;
+  font-size:11px!important;
+  font-weight:600!important;
+  letter-spacing:.08em!important;
+  text-transform:uppercase!important;
+  text-align:left!important;
+  white-space:nowrap;
+}
+#journallApp #grid > .card > .table-wrap > table td{
+  padding:var(--space-3) var(--space-4)!important;
+  background:transparent!important;
+  border-bottom:1px solid var(--hairline)!important;
+  color:var(--muted)!important;
+  font-size:13px!important;
+  line-height:1.45!important;
+  vertical-align:middle!important;
+}
+#journallApp #grid > .card > .table-wrap > table tbody tr:last-child td{
+  border-bottom:0!important;
+}
+#journallApp #grid > .card > .table-wrap > table tbody tr{
+  transition:background-color var(--dur-base) var(--ease-out),transform var(--dur-base) var(--ease-out);
+}
+#journallApp #grid > .card > .table-wrap > table tbody tr:hover td{
+  background:color-mix(in srgb,var(--primary) 8%,var(--surface-2))!important;
+  color:var(--ink)!important;
+}
+#journallApp #grid > .card > .table-wrap > table tbody tr:focus-within td{
+  background:color-mix(in srgb,var(--primary) 6%,var(--surface-2))!important;
+}
+#journallApp #grid .journal-table-status{
+  display:inline-flex;
+  align-items:center;
+  gap:7px;
+  color:var(--ink-subtle);
+  font-size:11px;
+  font-weight:600;
+  line-height:1.2;
+  white-space:nowrap;
+}
+#journallApp #grid .journal-dot-status{
+  display:inline-block;
+  width:7px;
+  height:7px;
+  flex:0 0 7px;
+  border-radius:var(--radius-pill);
+  background:var(--muted);
+  box-shadow:0 0 0 3px color-mix(in srgb,var(--muted) 12%,transparent);
+}
+#journallApp #grid .journal-dot-status.done{
+  background:var(--success);
+  box-shadow:0 0 0 3px color-mix(in srgb,var(--success) 14%,transparent);
+}
+#journallApp #grid .journal-dot-status.todo{
+  background:var(--warning);
+  box-shadow:0 0 0 3px color-mix(in srgb,var(--warning) 14%,transparent);
+}
+#journallApp #grid #rows tr:only-child td[colspan="14"]{
+  min-height:120px;
+  padding:32px var(--space-4)!important;
+  background:var(--surface-2)!important;
+  border-bottom:0!important;
+  color:var(--muted)!important;
+  font-size:13px;
+  text-align:center;
+  vertical-align:middle;
+}
+@media (min-width:901px){
+  #journallApp #grid > .card > .table-wrap{
+    overflow:auto;
+    border-radius:var(--radius-card)!important;
+  }
+  #journallApp #grid > .card > .table-wrap > table{
+    min-width:1250px!important;
+  }
+}
+</style>
 </body>
 </html>
