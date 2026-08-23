@@ -19109,5 +19109,99 @@ body:not(.firebase-auth-required) #journallApp > .sidebar .sidebox *{
   gap:var(--space-3);
 }
 </style>
+    <style id="phase-e-psychology-screen">
+      /* Phase E, screen 7: Psychology Command Room only. */
+      /* The late global card and psychology layers use !important backgrounds and borders,
+         so these screen-scoped shell declarations intentionally override those conflicts. */
+      #journallApp #psychology > .psychology-hero,
+      #journallApp #psychology .psych-page .card {
+        background: var(--surface-1) !important;
+        border: 1px solid var(--hairline) !important;
+        border-radius: var(--radius-card) !important;
+        box-shadow: var(--shadow) !important;
+      }
+
+      #journallApp #psychology .psych-page {
+        background: transparent !important;
+      }
+
+      #journallApp #psychology .psych-status {
+        background: color-mix(in srgb, var(--primary) 8%, var(--surface-2)) !important;
+        border: 1px solid color-mix(in srgb, var(--primary) 24%, var(--hairline)) !important;
+        border-radius: var(--radius-control) !important;
+        color: var(--ink-subtle) !important;
+      }
+
+      #journallApp #psychology .psych-rule {
+        background: var(--surface-2) !important;
+        border: 1px solid var(--hairline) !important;
+        border-radius: var(--radius-card) !important;
+        color: var(--ink) !important;
+        box-shadow: 0 0 0 1px color-mix(in srgb, var(--primary) 4%, transparent) !important;
+        transition: background-color 160ms var(--ease-out), border-color 160ms var(--ease-out), box-shadow 160ms var(--ease-out), transform 160ms var(--ease-snappy) !important;
+      }
+
+      #journallApp #psychology .psych-rule:hover {
+        background: color-mix(in srgb, var(--primary) 6%, var(--surface-2)) !important;
+        border-color: color-mix(in srgb, var(--primary) 24%, var(--hairline)) !important;
+        box-shadow: 0 0 0 1px color-mix(in srgb, var(--primary) 8%, transparent) !important;
+        transform: translateY(-1px) !important;
+      }
+
+      #journallApp #psychology .psych-rule strong {
+        color: var(--ink) !important;
+      }
+
+      #journallApp #psychology .psych-rule span {
+        color: var(--muted) !important;
+      }
+
+      /* Phase C owns the control geometry and checked states; these declarations only
+         replace the older hardcoded checklist surface rules inside this screen. */
+      #journallApp #psychology #preTradeChecklist .checklist-item,
+      #journallApp #psychology .setup-criterion-check {
+        background: var(--surface-1) !important;
+        border: 1px solid var(--hairline) !important;
+        border-radius: var(--radius-control) !important;
+        color: var(--ink) !important;
+      }
+
+      #journallApp #psychology #preTradeChecklist .checklist-item:hover,
+      #journallApp #psychology .setup-criterion-check:hover {
+        background: color-mix(in srgb, var(--primary) 7%, var(--surface-2)) !important;
+        border-color: color-mix(in srgb, var(--primary) 28%, var(--hairline)) !important;
+        box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 7%, transparent) !important;
+        transform: translateY(-1px) !important;
+      }
+
+      #journallApp #psychology #preTradeChecklist .checklist-item.checked,
+      #journallApp #psychology .setup-criterion-check.checked {
+        background: color-mix(in srgb, var(--primary) 12%, var(--surface-2)) !important;
+        border-color: color-mix(in srgb, var(--primary) 36%, var(--hairline)) !important;
+        box-shadow: 0 0 0 1px color-mix(in srgb, var(--primary) 10%, transparent) !important;
+      }
+
+      #journallApp #psychology .checklist-result {
+        border-radius: var(--radius-card) !important;
+      }
+
+      #journallApp #psychology .checklist-result.pending {
+        background: var(--surface-2) !important;
+        border-color: var(--hairline) !important;
+      }
+
+      #journallApp #psychology .checklist-result.cleared {
+        background: color-mix(in srgb, var(--success) 10%, var(--surface-2)) !important;
+        border-color: color-mix(in srgb, var(--success) 30%, var(--hairline)) !important;
+      }
+
+      #journallApp #psychology .checklist-result-title {
+        color: var(--ink) !important;
+      }
+
+      #journallApp #psychology .checklist-result-sub {
+        color: var(--muted) !important;
+      }
+    </style>
 </body>
 </html>
