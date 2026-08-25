@@ -2624,7 +2624,6 @@ tr:hover {
 
 /* JOURNALL_SUN_RAYS_BLUE_GREEN_LOGIN_AURA */
 .firebase-auth-gate {
-  background: #020305 !important;
   display: grid !important;
   place-items: center !important;
   min-height: 100vh !important;
@@ -2712,7 +2711,6 @@ tr:hover {
 
 /* JOURNALL_BLOOMING_PURPLE_GREEN_LOGIN_AURA */
 .firebase-auth-gate {
-  background: #020305 !important;
   display: grid !important;
   place-items: center !important;
   min-height: 100vh !important;
@@ -3499,6 +3497,26 @@ tr:hover {
     </style>
     
 
+<style id="login-antigravity-styles">
+/* Login-only Antigravity background: the canvas is the page layer, never the sign-in card. */
+#firebaseAuthGate {
+  background: #010102 !important;
+}
+#firebaseAuthGate .antigravity-login-bg {
+  position: fixed;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+  opacity: .78;
+  mix-blend-mode: screen;
+}
+@media (prefers-reduced-motion: reduce) {
+  #firebaseAuthGate .antigravity-login-bg { display: none; }
+}
+</style>
 </head>
 <body>
 <button id="androidInstallBtn" class="android-install-btn" type="button" hidden>Install Journall</button>
@@ -3513,6 +3531,7 @@ tr:hover {
   </div>
 </div>
 <div id="firebaseAuthGate" class="firebase-auth-gate show">
+  <canvas class="antigravity-login-bg" aria-hidden="true"></canvas>
 
     <div id="firebaseAuthLoading" class="login-loading"><div class="spinner" aria-hidden="true"></div><p id="firebaseAuthLoadingText">Loading Journall...</p><button id="firebaseAuthRetryBtn" class="btn primary" type="button" hidden>Retry</button></div>
 <div class="firebase-auth-card journall-signin-card" hidden>
@@ -12251,7 +12270,7 @@ textarea{border-radius:var(--radius-control)!important}input::placeholder,textar
 .psych-check.checked{background:var(--ink)!important;color:var(--on-primary)!important;border-color:var(--ink)!important}.psych-check.checked strong,.psych-check.checked em{color:var(--on-primary)!important}.psych-check.checked>span{background:var(--on-primary)!important;border-color:var(--on-primary)!important;color:var(--ink)!important}.psych-status{background:var(--soft-cloud)!important;color:var(--ink)!important;border:1px solid var(--hairline)!important;border-radius:0!important}
 .calendar-day,.calendar-day.profit,.calendar-day.lossday,.calendar-day.flatday{background:var(--canvas)!important;border:1px solid var(--hairline)!important;border-radius:0!important}.calendar-day:hover{border-color:var(--ink)!important}.calendar-pnl{font-weight:500!important}
 .ai-msg.user{background:#1e2027!important;color:#f7f8f8!important;border-color:#2e3038!important}.ai-msg.user strong{color:#f7f8f8!important}.ai-msg.bot{background:var(--soft-cloud)!important;color:var(--ink)!important}.ai-connection-detail{display:block;margin-top:10px;color:var(--ink-subtle)!important;font-size:12px;line-height:1.45}.coach-avatar{background:var(--ink)!important;color:var(--on-primary)!important}.coach-confidence{background:var(--soft-cloud)!important;color:var(--ink)!important;border:1px solid var(--hairline)!important;border-radius:9999px!important}.coach-confidence.low{color:var(--sale)!important;border-color:var(--sale)!important}.coach-confidence.high{color:var(--success)!important;border-color:var(--success)!important}
-.modal-backdrop{background:rgba(0,0,0,.85)!important;backdrop-filter:blur(8px)!important;-webkit-backdrop-filter:blur(8px)!important;z-index:1000!important}.mistake-modal,.day-trades-modal,.firebase-auth-gate .firebase-auth-card{background:var(--surface-2)!important;border:1px solid var(--hairline-strong)!important;border-radius:var(--rounded-xl)!important;color:var(--ink)!important}.firebase-auth-gate{display:none!important;min-height:100vh!important;place-items:center!important;background:var(--canvas)!important;padding:var(--space-xl)!important}.firebase-auth-gate.show{display:grid!important}.firebase-auth-gate[hidden],#journallApp[hidden],.mobile-appbar[hidden],.firebase-auth-bar[hidden]{display:none!important}html.firebase-auth-required body{overflow:hidden!important}html.firebase-auth-required #journallApp,html.firebase-auth-required .mobile-appbar{display:none!important}html:not(.firebase-auth-required) #firebaseAuthGate,html:not(.firebase-auth-required) #firebaseAuthBar{display:none!important}.firebase-auth-bar,.mobile-appbar{background:var(--canvas)!important;color:var(--ink)!important;border-color:var(--hairline)!important}.firebase-auth-bar .btn,.firebase-auth-bar .btn.primary{background:var(--primary)!important;color:var(--ink)!important;border-color:var(--primary)!important}
+.modal-backdrop{background:rgba(0,0,0,.85)!important;backdrop-filter:blur(8px)!important;-webkit-backdrop-filter:blur(8px)!important;z-index:1000!important}.mistake-modal,.day-trades-modal,.firebase-auth-gate .firebase-auth-card{background:var(--surface-2)!important;border:1px solid var(--hairline-strong)!important;border-radius:var(--rounded-xl)!important;color:var(--ink)!important}.firebase-auth-gate{display:none!important;min-height:100vh!important;place-items:center!important;padding:var(--space-xl)!important}.firebase-auth-gate.show{display:grid!important}body:has(#firebaseAuthGate.show){background:#010102!important}.firebase-auth-gate[hidden],#journallApp[hidden],.mobile-appbar[hidden],.firebase-auth-bar[hidden]{display:none!important}html.firebase-auth-required body{overflow:hidden!important}html.firebase-auth-required #journallApp,html.firebase-auth-required .mobile-appbar{display:none!important}html:not(.firebase-auth-required) #firebaseAuthGate,html:not(.firebase-auth-required) #firebaseAuthBar{display:none!important}.firebase-auth-bar,.mobile-appbar{background:var(--canvas)!important;color:var(--ink)!important;border-color:var(--hairline)!important}.firebase-auth-bar .btn,.firebase-auth-bar .btn.primary{background:var(--primary)!important;color:var(--ink)!important;border-color:var(--primary)!important}
 /* Emil Kowalski motion layer: fast, subtle, purposeful. */
 .card,.hero,.sidebox,.goal-card,.widget,.saved-journal-card,.analytics-bar-card,.cmd-card,.ai-score-card,.calendar-summary-card,.journal-main-card,.coach-card,.mistake-box,.mistake-modal-section,.mistake-row,.day-trade-card{transition:transform var(--dur-base) var(--ease-out),border-color var(--dur-base) var(--ease-out),opacity var(--dur-fast) var(--ease-out)!important}
 .card:hover,.goal-card:hover,.widget:hover,.saved-journal-card:hover,.cmd-card:hover,.analytics-bar-card:hover,.calendar-summary-card:hover,.day-trade-card:hover{transform:translateY(-2px)!important;border-color:var(--hairline-strong)!important}
@@ -12353,6 +12372,7 @@ body{
   margin:0!important;
   min-height:100%!important;
   background:#010102!important;
+
   overflow:hidden!important;
 }
 body{
@@ -12368,6 +12388,7 @@ body:not(.firebase-auth-required) > .mobile-appbar{
   min-height:100vh!important;
   width:100%!important;
   background:#010102!important;
+
   color:var(--ink)!important;
   overflow:hidden!important;
 }
@@ -12379,8 +12400,9 @@ body:not(.firebase-auth-required) > .mobile-appbar{
   width:calc(100% - 220px)!important;
   min-height:100vh!important;
   margin-left:220px!important;
-  overflow-y:auto!important;
   background:#010102!important;
+  overflow-y:auto!important;
+
 }
 html.firebase-auth-required,
 html.firebase-auth-required body{
@@ -12402,6 +12424,7 @@ body:not(.firebase-auth-required) #journallApp.app{
   min-height:100vh!important;
   overflow:hidden!important;
   background:#010102!important;
+
 }
 body:not(.firebase-auth-required) #journallApp > .main{
   flex:1 1 auto!important;
@@ -12415,6 +12438,7 @@ body:not(.firebase-auth-required) #journallApp > .main{
   overflow-y:auto!important;
   overflow-x:hidden!important;
   background:#010102!important;
+
 }
 body:not(.firebase-auth-required) #journallApp > .main > *{
   max-width:900px!important;
@@ -15602,7 +15626,6 @@ input{
 
 /* 4. Auth Gate & Sign-in UI Polish */
 .firebase-auth-gate {
-  background: radial-gradient(circle at 50% 50%, #0d0f14, #010102 90%) !important;
 }
 
 .journall-signin-card {
@@ -16033,7 +16056,6 @@ input{
 
 /* 16. Minimalist, Clean & Calm Sign-In overlay */
 .firebase-auth-gate {
-  background: radial-gradient(circle at 50% 50%, rgba(99, 102, 241, 0.14), transparent 60%), #07080a !important;
   display: grid !important;
   place-items: center !important;
   min-height: 100vh !important;
@@ -19815,5 +19837,418 @@ body:not(.firebase-auth-required) #journallApp > .sidebar .sidebox *{
         }
       }
     </style>
+<script>
+(function(){
+  function startLoginAntigravity(){
+    const gate = document.getElementById('firebaseAuthGate');
+    const canvas = gate && gate.querySelector('.antigravity-login-bg');
+    const motionApi = window.Motion;
+    if(!gate || !canvas || !motionApi || typeof motionApi.animate !== 'function' || typeof motionApi.motionValue !== 'function') return null;
+    if(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return null;
+
+    const ctx = canvas.getContext('2d');
+    if(!ctx) return null;
+
+    const cursorX = motionApi.motionValue(window.innerWidth / 2);
+    const cursorY = motionApi.motionValue(window.innerHeight / 2);
+    const particles = [];
+    const particleColor = '#f5b84a';
+    const isMobileDevice = (navigator.userAgentData && navigator.userAgentData.mobile === true) || /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent || '');
+    const isLowCoreDevice = Number.isFinite(navigator.hardwareConcurrency) && navigator.hardwareConcurrency <= 4;
+    const particleCount = isMobileDevice || isLowCoreDevice ? 90 : 180;
+    const magnetRadiusFactor = .16;
+    const ringRadiusFactor = .08;
+    let width = 0;
+    let height = 0;
+    let frameId = 0;
+    let lastPointerAt = performance.now();
+    let lastWidth = 0;
+    let lastHeight = 0;
+    let autoPhase = 0;
+    let autoControls = null;
+    let cursorAnimationX = null;
+    let cursorAnimationY = null;
+
+    function resize(){
+      const rect = gate.getBoundingClientRect();
+      width = Math.max(1, rect.width || window.innerWidth);
+      height = Math.max(1, rect.height || window.innerHeight);
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      canvas.width = Math.round(width * dpr);
+      canvas.height = Math.round(height * dpr);
+      canvas.style.width = width + 'px';
+      canvas.style.height = height + 'px';
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      if(lastWidth && lastHeight){
+        const sx = width / lastWidth;
+        const sy = height / lastHeight;
+        particles.forEach(p => {
+          p.cx *= sx; p.cy *= sy; p.mx *= sx; p.my *= sy;
+        });
+        cursorX.set(cursorX.get() * sx);
+        cursorY.set(cursorY.get() * sy);
+      } else {
+        cursorX.set(width / 2);
+        cursorY.set(height / 2);
+      }
+      lastWidth = width;
+      lastHeight = height;
+    }
+
+    function seedParticles(){
+      particles.length = 0;
+      for(let i = 0; i < particleCount; i++){
+        const x = Math.random() * width;
+        const y = Math.random() * height;
+        const z = -10 + Math.random() * 20;
+        particles.push({
+          t: Math.random() * 100,
+          speed: .012 + Math.random() * .026,
+          mx: x,
+          my: y,
+          mz: z,
+          cx: x,
+          cy: y,
+          cz: z,
+          randomRadiusOffset: Math.random() - .5,
+          drift: Math.random() * Math.PI * 2
+        });
+      }
+    }
+
+    function moveCursor(x, y){
+      lastPointerAt = performance.now();
+      if(cursorAnimationX) cursorAnimationX.stop();
+      if(cursorAnimationY) cursorAnimationY.stop();
+      cursorAnimationX = motionApi.animate(cursorX, x, { type:'spring', stiffness:180, damping:28, mass:.7 });
+      cursorAnimationY = motionApi.animate(cursorY, y, { type:'spring', stiffness:180, damping:28, mass:.7 });
+    }
+
+    function onPointerMove(event){ moveCursor(event.clientX, event.clientY); }
+
+    function draw(){
+      const idle = performance.now() - lastPointerAt > 1800;
+      const targetX = idle ? width / 2 + Math.sin(autoPhase * Math.PI * 2) * width * .18 : cursorX.get();
+      const targetY = idle ? height / 2 + Math.cos(autoPhase * Math.PI * 4) * height * .16 : cursorY.get();
+      const magnetRadius = Math.max(70, Math.min(width, height) * magnetRadiusFactor);
+      const ringRadius = Math.max(34, Math.min(width, height) * ringRadiusFactor);
+      const waveAmplitude = Math.max(5, Math.min(width, height) * .012);
+
+      ctx.clearRect(0, 0, width, height);
+      particles.forEach(p => {
+        p.t += p.speed;
+        const projection = 1 - p.cz / 50;
+        const projectedX = targetX * projection;
+        const projectedY = targetY * projection;
+        const dx = p.mx - projectedX;
+        const dy = p.my - projectedY;
+        const distance = Math.hypot(dx, dy);
+        let targetParticleX = p.mx;
+        let targetParticleY = p.my;
+        let targetParticleZ = p.mz;
+
+        if(distance < magnetRadius){
+          const angle = Math.atan2(dy, dx) + autoPhase * .35;
+          const wave = Math.sin(p.t * .4 + angle) * (waveAmplitude * .5);
+          const deviation = p.randomRadiusOffset * (waveAmplitude * .42);
+          const currentRingRadius = ringRadius + wave + deviation;
+          targetParticleX = projectedX + currentRingRadius * Math.cos(angle);
+          targetParticleY = projectedY + currentRingRadius * Math.sin(angle);
+          targetParticleZ = p.mz + Math.sin(p.t) * waveAmplitude * .25;
+        } else {
+          targetParticleX += Math.sin(p.t * .35 + p.drift) * .12;
+          targetParticleY += Math.cos(p.t * .28 + p.drift) * .12;
+        }
+
+        p.cx += (targetParticleX - p.cx) * .075;
+        p.cy += (targetParticleY - p.cy) * .075;
+        p.cz += (targetParticleZ - p.cz) * .075;
+
+        const currentDistance = Math.hypot(p.cx - projectedX, p.cy - projectedY);
+        const ringDistance = Math.abs(currentDistance - ringRadius);
+        const ringFactor = Math.max(0, Math.min(1, 1 - ringDistance / Math.max(18, ringRadius * .7)));
+        const depth = .72 + Math.max(0, Math.min(1, (p.cz + 10) / 20)) * .5;
+        const length = (5 + ringFactor * 4) * depth;
+        const thickness = Math.max(.8, 1.1 * depth);
+        const opacity = Math.min(.78, (.12 + ringFactor * .72) * depth);
+        const particleAngle = Math.atan2(p.cy - projectedY, p.cx - projectedX) + Math.PI / 2;
+
+        if(opacity < .03) return;
+        ctx.save();
+        ctx.translate(p.cx, p.cy);
+        ctx.rotate(particleAngle);
+        ctx.globalAlpha = opacity;
+        ctx.fillStyle = particleColor;
+        ctx.shadowColor = particleColor;
+        ctx.shadowBlur = ringFactor > .25 ? 8 * depth : 3 * depth;
+        ctx.beginPath();
+        if(typeof ctx.roundRect === 'function') ctx.roundRect(-thickness / 2, -length / 2, thickness, length, thickness / 2);
+        else ctx.rect(-thickness / 2, -length / 2, thickness, length);
+        ctx.fill();
+        ctx.restore();
+      });
+      frameId = requestAnimationFrame(draw);
+    }
+
+    resize();
+    seedParticles();
+    const onResize = () => { resize(); if(!particles.length) seedParticles(); };
+    window.addEventListener('resize', onResize, { passive:true });
+    window.addEventListener('pointermove', onPointerMove, { passive:true });
+    autoControls = motionApi.animate(0, 1, { duration:12, repeat:Infinity, ease:'linear', onUpdate: latest => { autoPhase = latest; } });
+    frameId = requestAnimationFrame(draw);
+
+    return function stop(){
+      cancelAnimationFrame(frameId);
+      window.removeEventListener('resize', onResize);
+      window.removeEventListener('pointermove', onPointerMove);
+      if(autoControls) autoControls.stop();
+      if(cursorAnimationX) cursorAnimationX.stop();
+      if(cursorAnimationY) cursorAnimationY.stop();
+      ctx.clearRect(0, 0, width, height);
+    };
+  }
+
+  function initLoginAntigravity(){
+    const gate = document.getElementById('firebaseAuthGate');
+    if(!gate) return;
+    let stop = null;
+    let motionLoading = false;
+
+    function isVisible(){
+      return gate.classList.contains('show') && !gate.hidden && getComputedStyle(gate).display !== 'none';
+    }
+
+    function loadMotion(onReady){
+      if(window.Motion && typeof window.Motion.animate === 'function' && typeof window.Motion.motionValue === 'function'){
+        onReady();
+        return;
+      }
+      const existingScript = document.querySelector('script[src="https://cdn.jsdelivr.net/npm/motion@latest/dist/motion.js"]');
+      if(existingScript){
+        existingScript.addEventListener('load', onReady, { once:true });
+        return;
+      }
+      motionLoading = true;
+      const script = document.createElement('script');
+      script.src = 'https://cdn.jsdelivr.net/npm/motion@latest/dist/motion.js';
+      script.async = true;
+      script.onload = () => { motionLoading = false; onReady(); };
+      script.onerror = () => { motionLoading = false; };
+      document.head.appendChild(script);
+    }
+
+    function sync(){
+      if(isVisible() && !stop && !motionLoading){
+        loadMotion(() => {
+          if(isVisible() && !stop) stop = startLoginAntigravity();
+        });
+      }
+      if(!isVisible() && stop){
+        stop();
+        stop = null;
+      }
+    }
+
+    sync();
+    const observer = new MutationObserver(sync);
+    observer.observe(gate, { attributes:true, attributeFilter:['class','hidden','style'] });
+    window.addEventListener('beforeunload', () => { observer.disconnect(); if(stop) stop(); }, { once:true });
+  }
+
+  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initLoginAntigravity, { once:true });
+  else initLoginAntigravity();
+})();
+</script>
+<script>
+(function(){
+  const DEFAULT_GRADUAL_BLUR_OPTIONS = {
+    position: 'bottom',
+    height: '6rem',
+    strength: 2,
+    divCount: 5,
+    curve: 'bezier',
+    exponential: true,
+    opacity: 1
+  };
+
+  function ensureGradualBlurStyles(){
+    if(document.getElementById('gradual-blur-base-styles')) return;
+    const style = document.createElement('style');
+    style.id = 'gradual-blur-base-styles';
+    style.textContent = `
+      .gradual-blur-container { position: relative; }
+      .gradual-blur-layer {
+        position: absolute;
+        pointer-events: none;
+        z-index: 3;
+        display: block;
+        max-width: none;
+        max-height: none;
+        background: transparent;
+        background-image: none;
+        border: 0;
+        transform: translateZ(0);
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .gradual-blur-layer { transition: none !important; animation: none !important; }
+      }
+    `;
+    document.head.appendChild(style);
+  }
+
+  function resolveGradualBlurCurve(value, curve){
+    const t = Math.max(0, Math.min(1, value));
+    switch(curve){
+      case 'linear': return t;
+      case 'ease-in': return t * t;
+      case 'ease-out': return 1 - Math.pow(1 - t, 2);
+      case 'bezier': return t * t * (3 - 2 * t);
+      default: return t;
+    }
+  }
+
+  function createGradualBlur(targetEl, options){
+    if(!(targetEl instanceof HTMLElement)) return null;
+    ensureGradualBlurStyles();
+
+    const config = Object.assign({}, DEFAULT_GRADUAL_BLUR_OPTIONS, options || {});
+    const position = ['top','bottom','left','right'].includes(config.position) ? config.position : 'bottom';
+    const divCount = Math.max(1, Math.round(Number(config.divCount) || DEFAULT_GRADUAL_BLUR_OPTIONS.divCount));
+    const strength = Math.max(0, Number(config.strength) || 0);
+    const opacity = Math.max(0, Math.min(1, Number(config.opacity) || 0));
+    const height = String(config.height || DEFAULT_GRADUAL_BLUR_OPTIONS.height);
+    const existing = targetEl.querySelector(':scope > .gradual-blur-layer-group');
+    if(existing){
+      if(typeof existing.__gradualBlurCleanup === 'function') existing.__gradualBlurCleanup();
+      existing.remove();
+    }
+
+    targetEl.classList.add('gradual-blur-container');
+    const group = document.createElement('div');
+    group.className = 'gradual-blur-layer-group';
+    group.setAttribute('aria-hidden', 'true');
+    group.style.position = 'fixed';
+    group.style.inset = 'auto';
+    group.style.pointerEvents = 'none';
+    group.style.zIndex = '3';
+    group.style.overflow = 'visible';
+
+    const isHorizontal = position === 'left' || position === 'right';
+    const edge = position === 'top' || position === 'left' ? 'start' : 'end';
+    const maskAngle = position === 'top' ? 'to bottom' : position === 'bottom' ? 'to top' : position === 'left' ? 'to right' : 'to left';
+    if(isHorizontal){
+      group.style.width = height;
+      group.style.height = '100%';
+      group.style[edge === 'start' ? 'left' : 'right'] = '0';
+      group.style[edge === 'start' ? 'top' : 'bottom'] = '0';
+    } else {
+      group.style.width = '100%';
+      group.style.height = height;
+      group.style[edge === 'start' ? 'top' : 'bottom'] = '0';
+    }
+
+    let frameId = 0;
+    let disposed = false;
+    function positionGroup(){
+      if(disposed) return;
+      if(!targetEl.isConnected){
+        cleanup();
+        return;
+      }
+      const targetRect = targetEl.getBoundingClientRect();
+      const groupHeight = group.getBoundingClientRect().height;
+      if(isHorizontal){
+        group.style.top = targetRect.top + 'px';
+        group.style.height = targetRect.height + 'px';
+        group.style[edge === 'start' ? 'left' : 'right'] = (edge === 'start' ? targetRect.left : window.innerWidth - targetRect.right) + 'px';
+      } else {
+        group.style.left = targetRect.left + 'px';
+        group.style.width = targetRect.width + 'px';
+        group.style.top = (edge === 'start' ? targetRect.top : targetRect.bottom - groupHeight) + 'px';
+      }
+    }
+    function schedulePosition(){
+      if(disposed || frameId) return;
+      frameId = requestAnimationFrame(() => {
+        frameId = 0;
+        positionGroup();
+      });
+    }
+    function cleanup(){
+      if(disposed) return;
+      disposed = true;
+      if(frameId) cancelAnimationFrame(frameId);
+      targetEl.removeEventListener('scroll', schedulePosition);
+      window.removeEventListener('resize', schedulePosition);
+      window.removeEventListener('beforeunload', cleanup);
+      if(observer) observer.disconnect();
+      if(resizeObserver) resizeObserver.disconnect();
+    }
+    const observer = new MutationObserver(() => {
+      if(!targetEl.isConnected) cleanup();
+      else schedulePosition();
+    });
+    observer.observe(document.body, { attributes:true, attributeFilter:['class','hidden','style'], childList:true, subtree:true });
+    const resizeObserver = typeof ResizeObserver === 'function' ? new ResizeObserver(schedulePosition) : null;
+    if(resizeObserver) resizeObserver.observe(targetEl);
+    targetEl.addEventListener('scroll', schedulePosition, { passive:true });
+    window.addEventListener('resize', schedulePosition, { passive:true });
+    window.addEventListener('load', schedulePosition, { once:true });
+    window.addEventListener('beforeunload', cleanup, { once:true });
+
+    for(let index = 0; index < divCount; index++){
+      const progress = divCount === 1 ? 1 : index / (divCount - 1);
+      const curveProgress = resolveGradualBlurCurve(progress, config.curve);
+      const intensity = config.exponential ? Math.pow(curveProgress, 2) : curveProgress;
+      const blur = Math.max(0, Math.round(strength * 16 * (0.35 + intensity * 0.65)));
+      const overlap = 34;
+      const maskStart = Math.max(0, Math.round(progress * 62 - overlap));
+      const maskEnd = Math.min(100, Math.max(maskStart + 42, Math.round(progress * 62 + 42)));
+      const maskMid = Math.round(maskStart + (maskEnd - maskStart) * .55);
+      const layer = document.createElement('div');
+      layer.className = 'gradual-blur-layer';
+      layer.style.opacity = String(opacity);
+      layer.style.backdropFilter = `blur(${blur}px)`;
+      layer.style.webkitBackdropFilter = `blur(${blur}px)`;
+      if(isHorizontal){
+        layer.style.width = height;
+        layer.style.height = '100%';
+        layer.style[edge === 'start' ? 'left' : 'right'] = '0';
+      } else {
+        layer.style.width = '100%';
+        layer.style.height = height;
+        layer.style[edge === 'start' ? 'top' : 'bottom'] = '0';
+      }
+      const mask = `linear-gradient(${maskAngle}, rgba(0,0,0,.98) 0%, rgba(0,0,0,.78) ${maskStart}%, rgba(0,0,0,.38) ${maskMid}%, rgba(0,0,0,0) ${maskEnd}%, rgba(0,0,0,0) 100%)`;
+      layer.style.maskImage = mask;
+      layer.style.webkitMaskImage = mask;
+      group.appendChild(layer);
+    }
+
+    group.__gradualBlurCleanup = cleanup;
+    targetEl.prepend(group);
+    positionGroup();
+    schedulePosition();
+    setTimeout(schedulePosition, 0);
+    setTimeout(schedulePosition, 250);
+    return group;
+  }
+
+  window.createGradualBlur = createGradualBlur;
+
+  function initContentAreaGradualBlur(){
+    const contentArea = document.querySelector('.content-area');
+    if(!contentArea) return;
+    createGradualBlur(contentArea);
+  }
+
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', initContentAreaGradualBlur, { once:true });
+  } else {
+    initContentAreaGradualBlur();
+  }
+})();
+</script>
 </body>
 </html>
