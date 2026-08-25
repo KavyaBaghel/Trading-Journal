@@ -9,7 +9,12 @@ param(
 
 $ErrorActionPreference = 'Stop'
 
-$rootPath = [System.IO.Path]::GetFullPath($Root)
+$rootPath = if ([System.IO.Path]::IsPathRooted($Root)) {
+  [System.IO.Path]::GetFullPath($Root)
+} else {
+  [System.IO.Path]::GetFullPath((Join-Path (Get-Location).Path $Root))
+}
+Write-Host "SERVER ROOT: $rootPath"
 $ipAddress = if ($ListenHost -eq '0.0.0.0' -or $ListenHost -eq '*') {
   [System.Net.IPAddress]::Any
 } elseif ($ListenHost -eq '127.0.0.1' -or $ListenHost -eq 'localhost') {
