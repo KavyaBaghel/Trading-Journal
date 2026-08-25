@@ -20251,5 +20251,249 @@ body:not(.firebase-auth-required) #journallApp > .sidebar .sidebox *{
   }
   })();
 </script>
+<script>
+(function(){
+  const PIXEL_SWAP_DEFAULTS = {
+    pixelSize: 14,
+    duration: 560,
+    color: '#f5b84a'
+  };
+
+  function ensurePixelSwapStyles(){
+    if(document.getElementById('pixel-swap-base-styles')) return;
+    const style = document.createElement('style');
+    style.id = 'pixel-swap-base-styles';
+    style.textContent = `
+      .pixel-swap-container { position: relative; }
+      .pixel-swap-stage {
+        position: absolute;
+        inset: 0;
+        z-index: 2;
+        pointer-events: none;
+        overflow: hidden;
+      }
+      .pixel-swap-cell {
+        position: absolute;
+        overflow: hidden;
+        pointer-events: none;
+        background: transparent;
+        will-change: background-color, opacity;
+      }
+      .pixel-swap-cell-content {
+        position: absolute;
+        top: 0;
+        left: 0;
+        box-sizing: border-box;
+        pointer-events: none;
+        overflow: hidden;
+      }
+      .pixel-swap-cell-content > * { pointer-events: none; }
+      @media (prefers-reduced-motion: reduce) {
+        .pixel-swap-cell { transition: none; }
+      }
+    `;
+    document.head.appendChild(style);
+  }
+
+  function coverScale(containerWidth, containerHeight, contentWidth, contentHeight){
+    const width = Math.max(1, Number(contentWidth) || 1);
+    const height = Math.max(1, Number(contentHeight) || 1);
+    const scale = Math.max(containerWidth / width, containerHeight / height);
+    return { scale, width: width * scale, height: height * scale };
+  }
+
+  function createPixelSwap(containerEl, { firstContent, secondContent, options } = {}){
+    if(!(containerEl instanceof HTMLElement)) return null;
+    ensurePixelSwapStyles();
+
+    const config = Object.assign({}, PIXEL_SWAP_DEFAULTS, options || {});
+    const pixelSize = Math.max(8, Math.min(24, Math.round(Number(config.pixelSize) || PIXEL_SWAP_DEFAULTS.pixelSize)));
+    const duration = Math.max(160, Math.round(Number(config.duration) || PIXEL_SWAP_DEFAULTS.duration));
+    const color = String(config.color || PIXEL_SWAP_DEFAULTS.color);
+    const oldCleanup = containerEl.__pixelSwapCleanup;
+    if(typeof oldCleanup === 'function') oldCleanup();
+
+    const firstMarkup = firstContent instanceof HTMLElement ? firstContent.outerHTML : String(firstContent || '');
+    const secondMarkup = secondContent instanceof HTMLElement ? secondContent.outerHTML : String(secondContent || '');
+    const stage = document.createElement('div');
+    stage.className = 'pixel-swap-stage';
+    stage.setAttribute('aria-hidden', 'true');
+    const originalChildren = [...containerEl.children];
+    originalChildren.forEach(child => { child.style.opacity = '0'; });
+    containerEl.classList.add('pixel-swap-container');
+    containerEl.appendChild(stage);
+
+    let cells = [];
+    let timers = [];
+    let resizeObserver = null;
+    let disposed = false;
+    let state = 'first';
+    let animationToken = 0;
+
+    function clearTimers(){
+      timers.forEach(timer => clearTimeout(timer));
+      timers = [];
+    }
+
+    function setCellState(cell, showSecond){
+      cell.firstElementChild.style.visibility = showSecond ? 'hidden' : 'visible';
+      cell.lastElementChild.style.visibility = showSecond ? 'visible' : 'hidden';
+      cell.style.backgroundColor = 'transparent';
+      cell.style.opacity = '1';
+    }
+
+    function applyInstant(nextState){
+      clearTimers();
+      state = nextState;
+      cells.forEach(cell => setCellState(cell, nextState === 'second'));
+    }
+
+    function rebuildGrid(){
+      if(disposed) return;
+      const width = containerEl.clientWidth;
+      const height = containerEl.clientHeight;
+      if(width <= 0 || height <= 0) return;
+
+      stage.innerHTML = '';
+      cells = [];
+      const contentSize = coverScale(width, height, width, height);
+      const columns = Math.max(1, Math.ceil(width / pixelSize));
+      const rows = Math.max(1, Math.ceil(height / pixelSize));
+      const actualCellWidth = width / columns;
+      const actualCellHeight = height / rows;
+      const padding = getComputedStyle(containerEl).padding;
+
+      for(let row = 0; row < rows; row++){
+        for(let column = 0; column < columns; column++){
+          const x = column * actualCellWidth;
+          const y = row * actualCellHeight;
+          const cell = document.createElement('div');
+          cell.className = 'pixel-swap-cell';
+          cell.style.left = `${x}px`;
+          cell.style.top = `${y}px`;
+          cell.style.width = `${actualCellWidth + 0.5}px`;
+          cell.style.height = `${actualCellHeight + 0.5}px`;
+          cell.style.color = color;
+          cell.style.opacity = '1';
+
+          const first = document.createElement('div');
+          first.className = 'pixel-swap-cell-content pixel-swap-cell-first';
+          first.innerHTML = firstMarkup;
+          first.style.width = `${contentSize.width}px`;
+          first.style.height = `${contentSize.height}px`;
+          first.style.padding = padding;
+          first.style.transform = `translate(${-x}px, ${-y}px)`;
+
+          const second = document.createElement('div');
+          second.className = 'pixel-swap-cell-content pixel-swap-cell-second';
+          second.innerHTML = secondMarkup;
+          second.style.width = `${contentSize.width}px`;
+          second.style.height = `${contentSize.height}px`;
+          second.style.padding = padding;
+          second.style.transform = `translate(${-x}px, ${-y}px)`;
+
+          cell.append(first, second);
+          stage.appendChild(cell);
+          cells.push(cell);
+        }
+      }
+      applyInstant(state);
+    }
+
+    function animateState(nextState){
+      if(disposed || nextState === state && !timers.length) return;
+      animationToken += 1;
+      const token = animationToken;
+      clearTimers();
+      const reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if(reduced){
+        applyInstant(nextState);
+        return;
+      }
+
+      const showSecond = nextState === 'second';
+      const order = [...cells].sort(() => Math.random() - 0.5);
+      const span = Math.max(80, duration * .7);
+      order.forEach((cell, index) => {
+        const delay = Math.round(index / Math.max(1, order.length - 1) * span + Math.random() * 34);
+        timers.push(setTimeout(() => {
+          if(disposed || token !== animationToken) return;
+          cell.style.transition = `background-color ${Math.max(70, duration * .16)}ms ease, opacity ${Math.max(100, duration * .28)}ms ease`;
+          cell.style.backgroundColor = color;
+          cell.style.opacity = '.82';
+          timers.push(setTimeout(() => {
+            if(disposed || token !== animationToken) return;
+            setCellState(cell, showSecond);
+            cell.style.opacity = '0';
+          }, Math.max(34, duration * .08)));
+        }, delay));
+      });
+      timers.push(setTimeout(() => {
+        if(disposed || token !== animationToken) return;
+        state = nextState;
+        cells.forEach(cell => setCellState(cell, showSecond));
+      }, span + duration * .22));
+    }
+
+    function onPointerEnter(){ animateState('second'); }
+    function onPointerLeave(){ animateState('first'); }
+    containerEl.addEventListener('pointerenter', onPointerEnter);
+    containerEl.addEventListener('pointerleave', onPointerLeave);
+    if(typeof ResizeObserver === 'function'){
+      resizeObserver = new ResizeObserver(() => requestAnimationFrame(rebuildGrid));
+      resizeObserver.observe(containerEl);
+    }
+
+    containerEl.__pixelSwapCleanup = function cleanup(){
+      if(disposed) return;
+      disposed = true;
+      animationToken += 1;
+      clearTimers();
+      if(resizeObserver) resizeObserver.disconnect();
+      containerEl.removeEventListener('pointerenter', onPointerEnter);
+      containerEl.removeEventListener('pointerleave', onPointerLeave);
+      originalChildren.forEach(child => { child.style.opacity = ''; });
+      stage.remove();
+      delete containerEl.__pixelSwapCleanup;
+    };
+    containerEl.__pixelSwapInitialized = true;
+    rebuildGrid();
+    return { stage, rebuild: rebuildGrid, setState: animateState, cleanup: containerEl.__pixelSwapCleanup };
+  }
+
+  window.createPixelSwap = createPixelSwap;
+
+  function enhancePixelSwapTile(tile){
+    if(!tile || tile.__pixelSwapInitialized) return;
+    const head = tile.querySelector(':scope > .metric-bento-head');
+    const body = tile.querySelector(':scope > .metric-bento-body');
+    if(!head || !body) return;
+    createPixelSwap(tile, {
+      firstContent: head.outerHTML,
+      secondContent: head.outerHTML + body.outerHTML,
+      options: { pixelSize: 14, duration: 560, color: '#f5b84a' }
+    });
+  }
+
+  function initPixelSwapTiles(){
+    document.querySelectorAll('#syncStatus .rr-tile, #todayMetrics .today-summary-tile, #goalsBox .goal-tile').forEach(enhancePixelSwapTile);
+  }
+
+  function startPixelSwapObserver(){
+    initPixelSwapTiles();
+    const observer = new MutationObserver(() => {
+      initPixelSwapTiles();
+    });
+    ['syncStatus','todayMetrics','goalsBox'].forEach(id => {
+      const root = document.getElementById(id);
+      if(root) observer.observe(root, { childList:true, subtree:true });
+    });
+    window.addEventListener('beforeunload', () => observer.disconnect(), { once:true });
+  }
+
+  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', startPixelSwapObserver, { once:true });
+  else startPixelSwapObserver();
+})();
+</script>
 </body>
 </html>
