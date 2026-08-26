@@ -5,4 +5,9 @@
 - [x] Add a read-only Firestore hook for the legacy `storage.viztrade_trades` and `storage.viztrade_trading_page_trades` data.
 - [x] Add a dev-only plain debug view with authentication state, trade counts, and a sample record shape.
 - [x] Build, lint, and confirm no data-write APIs occur in the new migration code.
-- [ ] Commit and push only the Phase 1 migration-folder changes to `dev`.
+- [x] Commit and push only the Phase 1 migration-folder changes to `dev`.
+- [x] Read the localStorage-hook handoff and identify the legacy storage keys and update events.
+- [x] Add the scoped localStorage-backed hook while leaving `useTrades.js` present and unused.
+- [x] Update the development debug view to use only the localStorage hook.
+- [x] Build, lint, manually verify the debug view, and confirm only `journall-react/` changed.
+- [ ] Commit and push the localStorage migration work to `dev` only.
