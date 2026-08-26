@@ -1,0 +1,8 @@
+- [x] Read the exact Phase 1 requirements from `pasted_content.txt`.
+- [x] Confirm the legacy app uses Google Auth and reads `users/{uid}/journallState/main` from Firestore.
+- [x] Install the Firebase browser SDK inside `journall-react/` only.
+- [x] Add an Auth context that matches legacy Google popup/redirect authentication and exposes the current user.
+- [x] Add a read-only Firestore hook for the legacy `storage.viztrade_trades` and `storage.viztrade_trading_page_trades` data.
+- [x] Add a dev-only plain debug view with authentication state, trade counts, and a sample record shape.
+- [x] Build, lint, and confirm no data-write APIs occur in the new migration code.
+- [ ] Commit and push only the Phase 1 migration-folder changes to `dev`.

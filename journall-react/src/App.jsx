@@ -1,5 +1,37 @@
-// Phase 0 design: Amber Terminal Ledger — near-black terminal surface, Signal Amber accents, no product data or routes.
+// Phase 1 debug: preserve the Phase 0 terminal shell and mount only a development-only Firebase read proof.
+import { AuthProvider } from './contexts/AuthContext'
+import { useAuth } from './hooks/useAuth'
+import { useTrades } from './hooks/useTrades'
 import './index.css'
+
+function FirebaseDebugView() {
+  const { error: authError, loading: authLoading, signInWithGoogle, user } = useAuth()
+  const trades = useTrades(user)
+
+  const debugData = {
+    authenticated: Boolean(user),
+    authLoading,
+    user: user
+      ? { uid: user.uid, email: user.email ?? null, displayName: user.displayName ?? null }
+      : null,
+    stateDocumentExists: trades.exists,
+    mainTradeCount: trades.mainTradeCount,
+    tradingPageTradeCount: trades.tradingPageTradeCount,
+    mergedTradeCount: trades.trades.length,
+    sampleRecordShape: trades.trades[0] ? Object.keys(trades.trades[0]).sort() : [],
+    legacyStorageKeys: trades.storageKeys,
+    authError: authError?.message ?? null,
+    tradeReadError: trades.error?.message ?? null,
+  }
+
+  return (
+    <section data-dev-only="firebase-debug">
+      <p>DEV ONLY / FIREBASE READ CHECK</p>
+      {!authLoading && !user ? <button type="button" onClick={signInWithGoogle}>Sign in with Google</button> : null}
+      <pre>{JSON.stringify(debugData, null, 2)}</pre>
+    </section>
+  )
+}
 
 function App() {
   return (
@@ -22,18 +54,24 @@ function App() {
         <div className="signal-rail" aria-hidden="true" />
 
         <div className="terminal-content">
-          <p className="eyebrow">PHASE 0 / MIGRATION FOUNDATION</p>
-          <h1>React surface initialized.</h1>
+          <p className="eyebrow">PHASE 1 / READ-ONLY DATA CHECK</p>
+          <h1>Firebase connection probe.</h1>
           <p className="status-copy">
-            The legacy vanilla app remains unchanged. This isolated Vite + React shell is ready for the Phase 1 data layer.
+            Development mode can authenticate with the existing Google flow and read the legacy Firestore trade state without changing it.
           </p>
 
           <div className="status-panel">
             <span className="status-indicator" aria-hidden="true" />
-            <span>THEME ONLINE</span>
+            <span>READ-ONLY MODE</span>
             <span className="status-separator" aria-hidden="true">/</span>
-            <span>AMBER TERMINAL</span>
+            <span>FIREBASE DEBUG</span>
           </div>
+
+          {import.meta.env.DEV ? (
+            <AuthProvider>
+              <FirebaseDebugView />
+            </AuthProvider>
+          ) : null}
         </div>
       </section>
     </main>
