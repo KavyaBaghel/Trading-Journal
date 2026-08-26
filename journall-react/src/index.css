@@ -1,0 +1,214 @@
+/* Phase 0 design: Amber Terminal Ledger — #010102 base with #f5b84a as the only accent; no purple. */
+@import "tailwindcss";
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-terminal: var(--terminal);
+  --color-terminal-border: var(--terminal-border);
+  --color-signal: var(--signal);
+  --color-muted: var(--muted);
+  --font-sans: var(--font-sans);
+  --font-mono: var(--font-mono);
+}
+
+:root {
+  --background: #010102;
+  --foreground: #f1ede4;
+  --terminal: #0b0a08;
+  --terminal-border: rgba(245, 184, 74, 0.18);
+  --signal: #f5b84a;
+  --muted: #a69f92;
+  --font-sans: "Segoe UI", Arial, sans-serif;
+  --font-mono: "Cascadia Mono", Consolas, monospace;
+  color: var(--foreground);
+  background: var(--background);
+  font-family: var(--font-sans);
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  min-width: 320px;
+  min-height: 100%;
+  margin: 0;
+}
+
+body {
+  min-height: 100vh;
+  background:
+    linear-gradient(rgba(245, 184, 74, 0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(245, 184, 74, 0.025) 1px, transparent 1px),
+    var(--background);
+  background-size: 36px 36px;
+}
+
+.terminal-shell {
+  position: relative;
+  width: min(100%, 980px);
+  min-height: min(580px, calc(100vh - 3rem));
+  overflow: hidden;
+  border: 1px solid var(--terminal-border);
+  border-radius: 18px;
+  background: color-mix(in srgb, var(--terminal) 92%, transparent);
+  box-shadow: 0 28px 72px rgba(0, 0, 0, 0.46);
+}
+
+.terminal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 60px;
+  padding: 0 20px;
+  border-bottom: 1px solid rgba(245, 184, 74, 0.12);
+  background: rgba(255, 255, 255, 0.015);
+}
+
+.brand-lockup,
+.status-panel {
+  display: flex;
+  align-items: center;
+}
+
+.brand-lockup {
+  gap: 10px;
+  color: var(--signal);
+}
+
+.brand-mark {
+  display: grid;
+  width: 26px;
+  height: 26px;
+  place-items: center;
+  border: 1px solid rgba(245, 184, 74, 0.72);
+  border-radius: 7px;
+  font-family: var(--font-mono);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.brand-name,
+.brand-context,
+.eyebrow,
+.status-panel {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+}
+
+.brand-divider {
+  width: 1px;
+  height: 14px;
+  background: rgba(245, 184, 74, 0.35);
+}
+
+.brand-context {
+  color: var(--muted);
+  font-weight: 500;
+}
+
+.window-controls {
+  display: flex;
+  gap: 7px;
+}
+
+.window-controls span {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: rgba(245, 184, 74, 0.22);
+}
+
+.window-controls span:first-child {
+  background: var(--signal);
+}
+
+.signal-rail {
+  position: absolute;
+  top: 60px;
+  bottom: 0;
+  left: 0;
+  width: 3px;
+  background: var(--signal);
+  box-shadow: 0 0 22px rgba(245, 184, 74, 0.7);
+}
+
+.terminal-content {
+  display: flex;
+  min-height: 520px;
+  flex-direction: column;
+  justify-content: center;
+  padding: 44px 46px 44px 50px;
+}
+
+.eyebrow {
+  margin: 0 0 18px;
+  color: var(--signal);
+}
+
+h1 {
+  max-width: 650px;
+  margin: 0;
+  color: var(--foreground);
+  font-size: clamp(2.4rem, 7vw, 5.4rem);
+  font-weight: 600;
+  letter-spacing: -0.065em;
+  line-height: 0.94;
+}
+
+.status-copy {
+  max-width: 500px;
+  margin: 26px 0 0;
+  color: var(--muted);
+  font-size: 1rem;
+  line-height: 1.7;
+}
+
+.status-panel {
+  width: fit-content;
+  gap: 10px;
+  margin-top: 42px;
+  padding: 11px 13px;
+  border: 1px solid rgba(245, 184, 74, 0.21);
+  border-radius: 9px;
+  background: rgba(245, 184, 74, 0.06);
+  color: var(--signal);
+}
+
+.status-indicator {
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  background: var(--signal);
+  box-shadow: 0 0 12px rgba(245, 184, 74, 0.9);
+}
+
+.status-separator {
+  color: rgba(245, 184, 74, 0.48);
+}
+
+@media (max-width: 640px) {
+  .terminal-shell {
+    min-height: calc(100vh - 2.5rem);
+    border-radius: 14px;
+  }
+
+  .terminal-content {
+    min-height: calc(100vh - 7.25rem);
+    padding: 38px 28px 38px 32px;
+  }
+
+  .status-panel {
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+}
