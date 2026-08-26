@@ -20189,7 +20189,8 @@ body:not(.firebase-auth-required) #journallApp > .sidebar .sidebox *{
       if(!targetEl.isConnected) cleanup();
       else schedulePosition();
     });
-    observer.observe(document.body, { attributes:true, attributeFilter:['class','hidden','style'], childList:true, subtree:true });
+    observer.observe(targetEl, { attributes:true, attributeFilter:['class','hidden','style'], childList:true });
+    if(targetEl.parentElement) observer.observe(targetEl.parentElement, { childList:true });
     const resizeObserver = typeof ResizeObserver === 'function' ? new ResizeObserver(schedulePosition) : null;
     if(resizeObserver) resizeObserver.observe(targetEl);
     targetEl.addEventListener('scroll', schedulePosition, { passive:true });
@@ -20325,6 +20326,9 @@ body:not(.firebase-auth-required) #journallApp > .sidebar .sidebox *{
     let cells = [];
     let timers = [];
     let resizeObserver = null;
+    let rebuildFrameId = 0;
+    let lastGridWidth = -1;
+    let lastGridHeight = -1;
     let disposed = false;
     let state = 'first';
     let animationToken = 0;
@@ -20347,55 +20351,71 @@ body:not(.firebase-auth-required) #journallApp > .sidebar .sidebox *{
       cells.forEach(cell => setCellState(cell, nextState === 'second'));
     }
 
+    function scheduleRebuild(){
+      if(disposed || rebuildFrameId) return;
+      rebuildFrameId = requestAnimationFrame(() => {
+        rebuildFrameId = 0;
+        rebuildGrid();
+      });
+    }
+
     function rebuildGrid(){
       if(disposed) return;
       const width = containerEl.clientWidth;
       const height = containerEl.clientHeight;
       if(width <= 0 || height <= 0) return;
+      if(width === lastGridWidth && height === lastGridHeight && cells.length) return;
 
-      stage.innerHTML = '';
-      cells = [];
+      const padding = getComputedStyle(containerEl).padding;
       const contentSize = coverScale(width, height, width, height);
       const columns = Math.max(1, Math.ceil(width / pixelSize));
       const rows = Math.max(1, Math.ceil(height / pixelSize));
       const actualCellWidth = width / columns;
       const actualCellHeight = height / rows;
-      const padding = getComputedStyle(containerEl).padding;
-
+      const cellPositions = [];
       for(let row = 0; row < rows; row++){
         for(let column = 0; column < columns; column++){
-          const x = column * actualCellWidth;
-          const y = row * actualCellHeight;
-          const cell = document.createElement('div');
-          cell.className = 'pixel-swap-cell';
-          cell.style.left = `${x}px`;
-          cell.style.top = `${y}px`;
-          cell.style.width = `${actualCellWidth + 0.5}px`;
-          cell.style.height = `${actualCellHeight + 0.5}px`;
-          cell.style.color = color;
-          cell.style.opacity = '1';
-
-          const first = document.createElement('div');
-          first.className = 'pixel-swap-cell-content pixel-swap-cell-first';
-          first.innerHTML = firstMarkup;
-          first.style.width = `${contentSize.width}px`;
-          first.style.height = `${contentSize.height}px`;
-          first.style.padding = padding;
-          first.style.transform = `translate(${-x}px, ${-y}px)`;
-
-          const second = document.createElement('div');
-          second.className = 'pixel-swap-cell-content pixel-swap-cell-second';
-          second.innerHTML = secondMarkup;
-          second.style.width = `${contentSize.width}px`;
-          second.style.height = `${contentSize.height}px`;
-          second.style.padding = padding;
-          second.style.transform = `translate(${-x}px, ${-y}px)`;
-
-          cell.append(first, second);
-          stage.appendChild(cell);
-          cells.push(cell);
+          cellPositions.push({
+            x: column * actualCellWidth,
+            y: row * actualCellHeight
+          });
         }
       }
+
+      lastGridWidth = width;
+      lastGridHeight = height;
+      stage.innerHTML = '';
+      cells = [];
+      cellPositions.forEach(({ x, y }) => {
+        const cell = document.createElement('div');
+        cell.className = 'pixel-swap-cell';
+        cell.style.left = `${x}px`;
+        cell.style.top = `${y}px`;
+        cell.style.width = `${actualCellWidth + 0.5}px`;
+        cell.style.height = `${actualCellHeight + 0.5}px`;
+        cell.style.color = color;
+        cell.style.opacity = '1';
+
+        const first = document.createElement('div');
+        first.className = 'pixel-swap-cell-content pixel-swap-cell-first';
+        first.innerHTML = firstMarkup;
+        first.style.width = `${contentSize.width}px`;
+        first.style.height = `${contentSize.height}px`;
+        first.style.padding = padding;
+        first.style.transform = `translate(${-x}px, ${-y}px)`;
+
+        const second = document.createElement('div');
+        second.className = 'pixel-swap-cell-content pixel-swap-cell-second';
+        second.innerHTML = secondMarkup;
+        second.style.width = `${contentSize.width}px`;
+        second.style.height = `${contentSize.height}px`;
+        second.style.padding = padding;
+        second.style.transform = `translate(${-x}px, ${-y}px)`;
+
+        cell.append(first, second);
+        stage.appendChild(cell);
+        cells.push(cell);
+      });
       applyInstant(state);
     }
 
@@ -20439,7 +20459,7 @@ body:not(.firebase-auth-required) #journallApp > .sidebar .sidebox *{
     containerEl.addEventListener('pointerenter', onPointerEnter);
     containerEl.addEventListener('pointerleave', onPointerLeave);
     if(typeof ResizeObserver === 'function'){
-      resizeObserver = new ResizeObserver(() => requestAnimationFrame(rebuildGrid));
+      resizeObserver = new ResizeObserver(scheduleRebuild);
       resizeObserver.observe(containerEl);
     }
 
@@ -20448,6 +20468,7 @@ body:not(.firebase-auth-required) #journallApp > .sidebar .sidebox *{
       disposed = true;
       animationToken += 1;
       clearTimers();
+      if(rebuildFrameId) cancelAnimationFrame(rebuildFrameId);
       if(resizeObserver) resizeObserver.disconnect();
       containerEl.removeEventListener('pointerenter', onPointerEnter);
       containerEl.removeEventListener('pointerleave', onPointerLeave);
