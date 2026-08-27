@@ -13,4 +13,8 @@ export default defineConfig({
       allow: [resolve(projectDirectory, '..')],
     },
   },
+  build: {
+    outDir: 'docs',
+    emptyOutDir: true,
+  },
 })

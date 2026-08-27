@@ -7,6 +7,7 @@
   --color-terminal: var(--terminal);
   --color-terminal-border: var(--terminal-border);
   --color-signal: var(--signal);
+  --color-primary: var(--primary);
   --color-muted: var(--muted);
   --font-sans: var(--font-sans);
   --font-mono: var(--font-mono);
@@ -18,6 +19,7 @@
   --terminal: #0b0a08;
   --terminal-border: rgba(245, 184, 74, 0.18);
   --signal: #f5b84a;
+  --primary: #494fdf;
   --muted: #a69f92;
   --font-sans: "Segoe UI", Arial, sans-serif;
   --font-mono: "Cascadia Mono", Consolas, monospace;
