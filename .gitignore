@@ -11,6 +11,7 @@ Thumbs.db
 .env.*
 dist/
 build/
+journall-react/docs/
 coverage/
 AGENTS.md
 CLAUDE.md
