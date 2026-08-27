@@ -1,27 +1,31 @@
 // Phase 1 debug: preserve the Phase 0 terminal shell and mount only a development-only Firebase read proof.
 import { AuthProvider } from './contexts/AuthContext'
 import { useAuth } from './hooks/useAuth'
-import { useLocalTrades } from './hooks/useLocalTrades'
+import { useLocalTradeStoreBridge } from './hooks/useLocalTradeStoreBridge'
+import { useTradeStore } from './store/useTradeStore'
 import './index.css'
 
 function FirebaseDebugView() {
   const { error: authError, loading: authLoading, signInWithGoogle, user } = useAuth()
-  const localTrades = useLocalTrades()
+  const refreshLocalStorage = useLocalTradeStoreBridge()
+  const tradeStore = useTradeStore()
 
   const debugData = {
-    activeTradeSource: 'localStorage',
+    activeTradeSource: tradeStore.source,
     localStorageOrigin: window.location.origin,
     authenticated: Boolean(user),
     authLoading,
     user: user
       ? { uid: user.uid, email: user.email ?? null, displayName: user.displayName ?? null }
       : null,
-    mainTradeCount: localTrades.mainTradeCount,
-    tradingPageTradeCount: localTrades.tradingPageTradeCount,
-    myTradesCount: localTrades.myTradesCount,
-    mergedTradeCount: localTrades.mergedTradeCount,
-    sampleRecordShape: localTrades.trades[0] ? Object.keys(localTrades.trades[0]).sort() : [],
-    legacySyncedStorageKeys: localTrades.syncedStorageKeys,
+    mainTradeCount: tradeStore.tradeCounts.main,
+    tradingPageTradeCount: tradeStore.tradeCounts.tradingPage,
+    myTradesCount: tradeStore.tradeCounts.myTrades,
+    mergedTradeCount: tradeStore.tradeCounts.merged,
+    sampleRecordShape: tradeStore.trades[0] ? Object.keys(tradeStore.trades[0]).sort() : [],
+    legacySyncedStorageKeys: tradeStore.syncedStorageKeys,
+    accountConfig: tradeStore.accountConfig,
+    localSnapshotStatus: tradeStore.status,
     firestoreHookStatus: 'Deprecated for Phase 1; retained in src/hooks/useTrades.js and not invoked.',
     authError: authError?.message ?? null,
   }
@@ -30,7 +34,7 @@ function FirebaseDebugView() {
     <section data-dev-only="firebase-debug">
       <p>DEV ONLY / FIREBASE READ CHECK</p>
       {!authLoading && !user ? <button type="button" onClick={signInWithGoogle}>Sign in with Google</button> : null}
-      <button type="button" onClick={localTrades.refresh}>Refresh local storage</button>
+      <button type="button" onClick={refreshLocalStorage}>Refresh local storage</button>
       <pre>{JSON.stringify(debugData, null, 2)}</pre>
     </section>
   )
