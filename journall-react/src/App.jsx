@@ -25,6 +25,7 @@ function FirebaseDebugView() {
     sampleRecordShape: tradeStore.trades[0] ? Object.keys(tradeStore.trades[0]).sort() : [],
     legacySyncedStorageKeys: tradeStore.syncedStorageKeys,
     accountConfig: tradeStore.accountConfig,
+    accountMetrics: tradeStore.accountMetrics,
     localSnapshotStatus: tradeStore.status,
     firestoreHookStatus: 'Deprecated for Phase 1; retained in src/hooks/useTrades.js and not invoked.',
     authError: authError?.message ?? null,

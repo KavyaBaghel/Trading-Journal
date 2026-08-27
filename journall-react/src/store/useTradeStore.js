@@ -1,5 +1,6 @@
 // Phase 1 data contract: non-persisted, read-only snapshots supplied by the existing localStorage hook.
 import { create } from 'zustand'
+import { deriveAccountMetrics } from '../lib/deriveAccountMetrics'
 
 const EMPTY_TRADE_COUNTS = Object.freeze({
   main: 0,
@@ -41,6 +42,7 @@ export const useTradeStore = create((set) => ({
   tradeCounts: EMPTY_TRADE_COUNTS,
   syncedStorageKeys: [],
   accountConfig: null,
+  accountMetrics: null,
   status: {
     hydrated: false,
     lastRefreshedAt: null,
@@ -51,12 +53,17 @@ export const useTradeStore = create((set) => ({
   replaceLocalSnapshot: (nextSnapshot) => {
     const snapshot = normalizeLocalSnapshot(nextSnapshot)
     const nextSignature = snapshotSignature(snapshot)
+    const accountMetrics = deriveAccountMetrics({
+      accountConfig: snapshot.accountConfig,
+      trades: snapshot.trades,
+    })
 
     set((current) => {
       if (current._snapshotSignature === nextSignature) return current
 
       return {
         ...snapshot,
+        accountMetrics,
         status: {
           hydrated: true,
           lastRefreshedAt: new Date().toISOString(),
