@@ -2,8 +2,9 @@
 import { useEffect } from 'react'
 import { MemoryRouter, Route, Routes, useNavigate } from 'react-router-dom'
 import { AuthProvider } from './contexts/AuthContext'
-import { useAuth } from './hooks/useAuth'
+import { ModalProvider } from './components/layout/ModalProvider'
 import { useLocalTradeStoreBridge } from './hooks/useLocalTradeStoreBridge'
+import { MinimalDebugView } from './components/layout/MinimalDebugView'
 import { AppShell } from './layouts/AppShell'
 import AICoach from './pages/AICoach'
 import AccountSettings from './pages/AccountSettings'
@@ -17,7 +18,6 @@ import Trades from './pages/Trades'
 import UploadData from './pages/UploadData'
 import UserProfile from './pages/UserProfile'
 import Widgets from './pages/Widgets'
-import { useTradeStore } from './store/useTradeStore'
 import './index.css'
 
 const VIEWS = [
@@ -55,71 +55,35 @@ function LegacyHashRouteSync() {
   return null
 }
 
-function FirebaseDebugView({ refreshLocalStorage }) {
-  const { error: authError, loading: authLoading, signInWithGoogle, user } = useAuth()
-  const tradeStore = useTradeStore()
-
-  const debugData = {
-    activeTradeSource: tradeStore.source,
-    localStorageOrigin: window.location.origin,
-    authenticated: Boolean(user),
-    authLoading,
-    user: user
-      ? { uid: user.uid, email: user.email ?? null, displayName: user.displayName ?? null }
-      : null,
-    mainTradeCount: tradeStore.tradeCounts.main,
-    tradingPageTradeCount: tradeStore.tradeCounts.tradingPage,
-    myTradesCount: tradeStore.tradeCounts.myTrades,
-    mergedTradeCount: tradeStore.tradeCounts.merged,
-    sampleRecordShape: tradeStore.trades[0] ? Object.keys(tradeStore.trades[0]).sort() : [],
-    legacySyncedStorageKeys: tradeStore.syncedStorageKeys,
-    accountConfig: tradeStore.accountConfig,
-    accountMetrics: tradeStore.accountMetrics,
-    localSnapshotStatus: tradeStore.status,
-    firestoreHookStatus: 'Deprecated for Phase 1; retained in src/hooks/useTrades.js and not invoked.',
-    authError: authError?.message ?? null,
-  }
-
-  return (
-    <section data-dev-only="firebase-debug">
-      <p>DEV ONLY / FIREBASE READ CHECK</p>
-      {!authLoading && !user ? <button type="button" onClick={signInWithGoogle}>Sign in with Google</button> : null}
-      <button type="button" onClick={refreshLocalStorage}>Refresh local storage</button>
-      <pre>{JSON.stringify(debugData, null, 2)}</pre>
-    </section>
-  )
-}
-
 function App() {
-  const refreshLocalStorage = useLocalTradeStoreBridge()
+  useLocalTradeStoreBridge()
 
   return (
-    <MemoryRouter initialEntries={['/tradingpage']}>
-      <LegacyHashRouteSync />
-      <AppShell views={VIEWS}>
-        <Routes>
-          <Route path="/tradingpage" element={<TodaysSummary />} />
-          <Route path="/dashboard" element={<Analytics />} />
-          <Route path="/grid" element={<Trades />} />
-          <Route path="/journalpage" element={<Journal />} />
-          <Route path="/calendar" element={<Calendar />} />
-          <Route path="/psychology" element={<Psychology />} />
-          <Route path="/goals" element={<Goals />} />
-          <Route path="/accountsettings" element={<AccountSettings />} />
-          <Route path="/ailab" element={<AICoach />} />
-          <Route path="/widgets" element={<Widgets />} />
-          <Route path="/userprofile" element={<UserProfile />} />
-          <Route path="/uploadcsv" element={<UploadData />} />
-          <Route path="*" element={<TodaysSummary />} />
-        </Routes>
-
-        {import.meta.env.DEV ? (
-          <AuthProvider>
-            <FirebaseDebugView refreshLocalStorage={refreshLocalStorage} />
-          </AuthProvider>
-        ) : null}
-      </AppShell>
-    </MemoryRouter>
+    <AuthProvider>
+      <ModalProvider>
+        <MemoryRouter initialEntries={['/tradingpage']}>
+          <LegacyHashRouteSync />
+          <AppShell views={VIEWS}>
+            <Routes>
+              <Route path="/tradingpage" element={<TodaysSummary />} />
+              <Route path="/dashboard" element={<Analytics />} />
+              <Route path="/grid" element={<Trades />} />
+              <Route path="/journalpage" element={<Journal />} />
+              <Route path="/calendar" element={<Calendar />} />
+              <Route path="/psychology" element={<Psychology />} />
+              <Route path="/goals" element={<Goals />} />
+              <Route path="/accountsettings" element={<AccountSettings />} />
+              <Route path="/ailab" element={<AICoach />} />
+              <Route path="/widgets" element={<Widgets />} />
+              <Route path="/userprofile" element={<UserProfile />} />
+              <Route path="/uploadcsv" element={<UploadData />} />
+              <Route path="*" element={<TodaysSummary />} />
+            </Routes>
+          </AppShell>
+        </MemoryRouter>
+        {import.meta.env.DEV ? <MinimalDebugView /> : null}
+      </ModalProvider>
+    </AuthProvider>
   )
 }
 

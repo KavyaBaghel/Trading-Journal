@@ -1,5 +1,10 @@
 // Phase 2 shell: restrained financial-terminal framing using only Journall's locked near-black, primary, and signal tokens.
 import { useLocation, useNavigate } from 'react-router-dom'
+import { AuthStatusBar } from '../components/layout/AuthStatusBar'
+import { MobileNav } from '../components/layout/MobileNav'
+import { ModalRoot } from '../components/layout/ModalRoot'
+import { AuthGate } from '../components/layout/AuthGate'
+import { AccountOnboardingGate } from '../components/layout/AccountOnboardingGate'
 
 function viewFromPath(views, pathname) {
   return views.find((view) => view.path === pathname) ?? views[0]
@@ -55,9 +60,7 @@ export function AppShell({ children, views }) {
             <p className="font-mono text-[10px] font-bold tracking-[0.16em] text-signal">JOURNALL / PHASE 2</p>
             <h1 className="mt-1 text-xl font-semibold tracking-[-0.03em] text-foreground">{activeView.label}</h1>
           </div>
-          <div className="rounded-[10px] border border-terminal-border bg-terminal px-3 py-2 font-mono text-[10px] tracking-[0.1em] text-muted">
-            FIREBASE STATUS / READ-ONLY
-          </div>
+          <AuthStatusBar />
         </div>
       </header>
 
@@ -71,9 +74,18 @@ export function AppShell({ children, views }) {
         <span className="hidden text-xs text-foreground sm:inline">Trader profile</span>
       </button>
 
-      <main className="px-5 py-8 md:ml-64 md:px-8">
-        <div className="mx-auto max-w-6xl">{children}</div>
+      <main className="px-5 py-8 md:ml-64 md:px-8 pb-16 md:pb-8">
+        <div className="mx-auto max-w-6xl">
+          <AuthGate>
+            <AccountOnboardingGate>
+              {children}
+            </AccountOnboardingGate>
+          </AuthGate>
+        </div>
       </main>
+
+      <MobileNav views={views} />
+      <ModalRoot />
     </div>
   )
 }
