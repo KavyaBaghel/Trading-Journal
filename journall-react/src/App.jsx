@@ -1,9 +1,59 @@
-// Phase 1 debug: preserve the Phase 0 terminal shell and mount only a development-only Firebase read proof.
+// Phase 2 routing: preserve Phase 1 data boundaries while mapping legacy tabs into a state-only React Router shell.
+import { useEffect } from 'react'
+import { MemoryRouter, Route, Routes, useNavigate } from 'react-router-dom'
 import { AuthProvider } from './contexts/AuthContext'
 import { useAuth } from './hooks/useAuth'
 import { useLocalTradeStoreBridge } from './hooks/useLocalTradeStoreBridge'
+import { AppShell } from './layouts/AppShell'
+import AICoach from './pages/AICoach'
+import AccountSettings from './pages/AccountSettings'
+import Analytics from './pages/Analytics'
+import Calendar from './pages/Calendar'
+import Goals from './pages/Goals'
+import Journal from './pages/Journal'
+import Psychology from './pages/Psychology'
+import TodaysSummary from './pages/TodaysSummary'
+import Trades from './pages/Trades'
+import UploadData from './pages/UploadData'
+import UserProfile from './pages/UserProfile'
+import Widgets from './pages/Widgets'
 import { useTradeStore } from './store/useTradeStore'
 import './index.css'
+
+const VIEWS = [
+  { id: 'tradingpage', label: "Today's Summary", path: '/tradingpage', shortLabel: '01' },
+  { id: 'dashboard', label: 'Analytics', path: '/dashboard', shortLabel: '02' },
+  { id: 'grid', label: 'Trades', path: '/grid', shortLabel: '03' },
+  { id: 'journalpage', label: 'Journal', path: '/journalpage', shortLabel: '04' },
+  { id: 'calendar', label: 'Calendar', path: '/calendar', shortLabel: '05' },
+  { id: 'psychology', label: 'Psychology', path: '/psychology', shortLabel: '06' },
+  { id: 'goals', label: 'Goals', path: '/goals', shortLabel: '07' },
+  { id: 'accountsettings', label: 'Account Settings', path: '/accountsettings', shortLabel: '08' },
+  { id: 'ailab', label: 'AI Coach', path: '/ailab', shortLabel: '09' },
+  { id: 'widgets', label: 'Widgets', path: '/widgets', shortLabel: '10' },
+  { id: 'userprofile', label: 'User Profile', path: '/userprofile', shortLabel: '11' },
+  { id: 'uploadcsv', label: 'Upload Data', path: '/uploadcsv', shortLabel: '12' },
+]
+
+const LEGACY_TAB_PATHS = Object.fromEntries(VIEWS.map((view) => [view.id, view.path]))
+
+function LegacyHashRouteSync() {
+  const navigate = useNavigate()
+
+  useEffect(() => {
+    function openLegacyHash() {
+      const legacyTab = window.location.hash.replace('#', '').trim()
+      const path = LEGACY_TAB_PATHS[legacyTab]
+      if (path) navigate(path, { replace: true })
+    }
+
+    openLegacyHash()
+    window.addEventListener('hashchange', openLegacyHash)
+    return () => window.removeEventListener('hashchange', openLegacyHash)
+  }, [navigate])
+
+  return null
+}
 
 function FirebaseDebugView() {
   const { error: authError, loading: authLoading, signInWithGoogle, user } = useAuth()
@@ -43,46 +93,32 @@ function FirebaseDebugView() {
 
 function App() {
   return (
-    <main className="min-h-screen bg-background px-5 py-6 text-foreground sm:px-8 sm:py-8">
-      <section className="terminal-shell" aria-label="Journall React migration scaffold">
-        <header className="terminal-header">
-          <div className="brand-lockup" aria-label="Journall React">
-            <span className="brand-mark" aria-hidden="true">J</span>
-            <span className="brand-name">JOURNALL</span>
-            <span className="brand-divider" aria-hidden="true" />
-            <span className="brand-context">REACT</span>
-          </div>
-          <div className="window-controls" aria-hidden="true">
-            <span />
-            <span />
-            <span />
-          </div>
-        </header>
+    <MemoryRouter initialEntries={['/tradingpage']}>
+      <LegacyHashRouteSync />
+      <AppShell views={VIEWS}>
+        <Routes>
+          <Route path="/tradingpage" element={<TodaysSummary />} />
+          <Route path="/dashboard" element={<Analytics />} />
+          <Route path="/grid" element={<Trades />} />
+          <Route path="/journalpage" element={<Journal />} />
+          <Route path="/calendar" element={<Calendar />} />
+          <Route path="/psychology" element={<Psychology />} />
+          <Route path="/goals" element={<Goals />} />
+          <Route path="/accountsettings" element={<AccountSettings />} />
+          <Route path="/ailab" element={<AICoach />} />
+          <Route path="/widgets" element={<Widgets />} />
+          <Route path="/userprofile" element={<UserProfile />} />
+          <Route path="/uploadcsv" element={<UploadData />} />
+          <Route path="*" element={<TodaysSummary />} />
+        </Routes>
 
-        <div className="signal-rail" aria-hidden="true" />
-
-        <div className="terminal-content">
-          <p className="eyebrow">PHASE 1 / READ-ONLY DATA CHECK</p>
-          <h1>Firebase connection probe.</h1>
-          <p className="status-copy">
-            Development mode can authenticate with the existing Google flow and read the legacy Firestore trade state without changing it.
-          </p>
-
-          <div className="status-panel">
-            <span className="status-indicator" aria-hidden="true" />
-            <span>READ-ONLY MODE</span>
-            <span className="status-separator" aria-hidden="true">/</span>
-            <span>FIREBASE DEBUG</span>
-          </div>
-
-          {import.meta.env.DEV ? (
-            <AuthProvider>
-              <FirebaseDebugView />
-            </AuthProvider>
-          ) : null}
-        </div>
-      </section>
-    </main>
+        {import.meta.env.DEV ? (
+          <AuthProvider>
+            <FirebaseDebugView />
+          </AuthProvider>
+        ) : null}
+      </AppShell>
+    </MemoryRouter>
   )
 }
 
