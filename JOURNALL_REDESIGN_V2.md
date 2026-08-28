@@ -33,6 +33,9 @@ visual/design layer is being redone, screen by screen, committed in separate pha
 |---|---|
 | Background | `#010102` (near-black) |
 | Primary accent | `#494fdf` (purple/violet) |
+| Signal accent | `#6B8FA3` (muted slate-blue) |
+| Profit | `#6FA88A` (soft sage green) |
+| Loss | `#B97466` (muted terracotta) |
 | Typography | Geist (`--sans` token) |
 | Card radius | `--radius-card` = 18px |
 | Control radius | `--radius-control` = 10px |
