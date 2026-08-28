@@ -55,9 +55,8 @@ function LegacyHashRouteSync() {
   return null
 }
 
-function FirebaseDebugView() {
+function FirebaseDebugView({ refreshLocalStorage }) {
   const { error: authError, loading: authLoading, signInWithGoogle, user } = useAuth()
-  const refreshLocalStorage = useLocalTradeStoreBridge()
   const tradeStore = useTradeStore()
 
   const debugData = {
@@ -92,6 +91,8 @@ function FirebaseDebugView() {
 }
 
 function App() {
+  const refreshLocalStorage = useLocalTradeStoreBridge()
+
   return (
     <MemoryRouter initialEntries={['/tradingpage']}>
       <LegacyHashRouteSync />
@@ -114,7 +115,7 @@ function App() {
 
         {import.meta.env.DEV ? (
           <AuthProvider>
-            <FirebaseDebugView />
+            <FirebaseDebugView refreshLocalStorage={refreshLocalStorage} />
           </AuthProvider>
         ) : null}
       </AppShell>
