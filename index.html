@@ -6632,8 +6632,8 @@ function accountMetrics(data=trades){
   const maxDrawdownRemaining = maxDrawdownAmount == null ? null : Math.max(0, maxDrawdownAmount - maxDrawdownUsed);
   let daysRemaining = null;
   if(config.phaseDeadline){
-    const end = new Date(config.phaseDeadline + 'T23:59:59');
-    if(!isNaN(end)) daysRemaining = Math.max(0, Math.ceil((end - new Date()) / 86400000));
+    const end = new Date(config.phaseDeadline + 'T23:59:59+05:30');
+    if(!isNaN(end)) daysRemaining = Math.max(0, Math.ceil((end - new Date(todayDateKey() + 'T00:00:00+05:30')) / 86400000));
   }
   return {config,s,todayTrades,todayPnl,accountSize,startBalance,currentBalance,profitTargetAmount,targetBalance,profitProgress,remainingToTarget,funded,maxDailyLossAmount,maxDrawdownAmount,dailyLossUsed,maxDrawdownUsed,maxDailyLossRemaining,maxDrawdownRemaining,daysRemaining};
 }
@@ -6699,7 +6699,7 @@ function buildStatTimeline(data=trades, m=accountMetrics(data)){
   const targetBalance = Number(m?.targetBalance) || 0;
   const dailyLossLimit = Number.isFinite(m?.maxDailyLossAmount) ? Number(m.maxDailyLossAmount) : null;
   const drawdownLimit = Number.isFinite(m?.maxDrawdownAmount) ? Number(m.maxDrawdownAmount) : null;
-  const deadlineRaw = m?.config?.phaseDeadline ? new Date(m.config.phaseDeadline + 'T23:59:59') : null;
+  const deadlineRaw = m?.config?.phaseDeadline ? new Date(m.config.phaseDeadline + 'T23:59:59+05:30') : null;
   const deadline = deadlineRaw && !Number.isNaN(deadlineRaw.getTime()) ? deadlineRaw : null;
   let runningPnl = 0;
 
@@ -6725,7 +6725,7 @@ function buildStatTimeline(data=trades, m=accountMetrics(data)){
       dailyLossUsed,
       dailyLossRemaining: dailyLossLimit == null ? null : Math.max(0, dailyLossLimit - dailyLossUsed),
       drawdownRemaining: drawdownLimit == null ? null : Math.max(0, drawdownLimit - maxDrawdownUsed),
-      daysRemaining: deadline ? Math.max(0, Math.ceil((deadline - new Date(dateKey + 'T23:59:59')) / 86400000)) : null
+      daysRemaining: deadline ? Math.max(0, Math.ceil((deadline - new Date(dateKey + 'T00:00:00+05:30')) / 86400000)) : null
     };
   });
 }
@@ -19652,7 +19652,7 @@ body:not(.firebase-auth-required) #journallApp > .sidebar .sidebox *{
       #journallApp #goals .goal-account-phase-grid .risk-calc-card {
         min-height: 190px !important;
         padding: 18px !important;
-        border: 1px solid var(--hairline) !important;
+        border: 1px solid #6B8FA3 !important;
         border-radius: var(--radius-card) !important;
         background: var(--surface-2) !important;
         box-shadow: 0 0 0 1px color-mix(in srgb, var(--primary) 4%, transparent) !important;
@@ -19662,15 +19662,15 @@ body:not(.firebase-auth-required) #journallApp > .sidebar .sidebox *{
       #journallApp #goals .goal-account-phase-grid .goal-tile:hover,
       #journallApp #goals .goal-account-phase-grid .risk-calc-card:hover {
         background: color-mix(in srgb, var(--primary) 6%, var(--surface-2)) !important;
-        border-color: color-mix(in srgb, var(--primary) 28%, var(--hairline)) !important;
+        border-color: color-mix(in srgb, var(--primary) 28%, #6B8FA3) !important;
         box-shadow: 0 10px 22px color-mix(in srgb, var(--primary) 10%, transparent) !important;
         transform: translateY(-2px) !important;
       }
 
       #journallApp #goals .goal-account-phase-grid .metric-bento-icon {
-        border-color: color-mix(in srgb, var(--primary) 30%, var(--hairline)) !important;
-        background: color-mix(in srgb, var(--primary) 12%, var(--surface-1)) !important;
-        color: var(--primary) !important;
+        border-color: #6B8FA3 !important;
+        background: var(--primary) !important;
+        color: var(--on-primary) !important;
       }
 
       #journallApp #goals .goal-account-phase-grid .metric-bento-label,
@@ -19696,7 +19696,7 @@ body:not(.firebase-auth-required) #journallApp > .sidebar .sidebox *{
       }
 
       #journallApp #goals .goal-account-phase-grid .bar {
-        background: var(--hairline) !important;
+        background: #6B8FA3 !important;
       }
 
       #journallApp #goals .goal-account-phase-grid .bar > div {
