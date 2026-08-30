@@ -15,7 +15,9 @@ journall-react/docs/
 coverage/
 AGENTS.md
 CLAUDE.md
+CLAUDE-HANDOFF-WORKFLOW.md
 
 .wrangler/
 .serena/
 local-backup-before-pull/
+
