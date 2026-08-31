@@ -1,4 +1,6 @@
 .app-profile/
+.app-profile-chrome/
+.chrome-app-profile/
 journal_db/
 __pycache__/
 node_modules/
