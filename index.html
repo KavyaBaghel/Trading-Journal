@@ -6569,7 +6569,7 @@ function toNumber(value, fallback=0){
   return Number.isFinite(n) ? n : fallback;
 }
 function clampNumber(value, min, max){ return Math.min(max, Math.max(min, Number(value) || 0)); }
-function isFundedPhase(phase=''){ return /funded|phase|challenge|prop/i.test(String(phase || '')); }
+function isFundedPhase(phase=''){ return /^funded$/i.test(String(phase || '').trim()); }
 function limitAmount(value, type, accountSize){
   const n = Number(value);
   if(!Number.isFinite(n) || n <= 0) return null;
