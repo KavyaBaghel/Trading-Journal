@@ -6565,8 +6565,14 @@ const DEFAULT_RISK_PERCENT = 1;
 let aiPropGoalGenerating = false;
 
 function toNumber(value, fallback=0){
-  const n = Number(value);
-  return Number.isFinite(n) ? n : fallback;
+  if(value === null || value === undefined) return fallback;
+  let s = String(value).replace(/\$/g,'').replace(/,/g,'').replace(/\s/g,'').trim();
+  if(s === '' || s === '-' || s.toLowerCase() === 'null') return fallback;
+  let negative = false;
+  if(s.startsWith('(') && s.endsWith(')')){ negative = true; s = s.slice(1,-1); }
+  const n = parseFloat(s);
+  if(!isFinite(n)) return fallback;
+  return negative ? -Math.abs(n) : n;
 }
 function clampNumber(value, min, max){ return Math.min(max, Math.max(min, Number(value) || 0)); }
 function isFundedPhase(phase=''){ return /^funded$/i.test(String(phase || '').trim()); }
@@ -7487,16 +7493,6 @@ function getColumn(row, headerMap, names, fallback=''){
   return fallback;
 }
 
-function toNumber(value){
-  if(value === null || value === undefined) return 0;
-  let s = String(value).replace(/\$/g,'').replace(/,/g,'').replace(/\s/g,'').trim();
-  if(s === '' || s === '-' || s.toLowerCase() === 'null') return 0;
-  let negative = false;
-  if(s.startsWith('(') && s.endsWith(')')){ negative = true; s = s.slice(1,-1); }
-  const n = parseFloat(s);
-  if(!isFinite(n)) return 0;
-  return negative ? -Math.abs(n) : n;
-}
 
 function parseCSVText(text){
   const rows = [];
