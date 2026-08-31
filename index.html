@@ -23,39 +23,6 @@ if(typeof selectTab === 'function') selectTab(btn.dataset.tab);
 });
 
 
-function getAIStats(){
-  const data = Array.isArray(trades) ? trades : [];
-  const total = data.length;
-  const pnl = data.reduce((a,t)=>a+(Number(t.pnl)||0),0);
-  const wins = data.filter(t=>tradeResult(Number(t.pnl)||0)==='profit');
-  const losses = data.filter(t=>tradeResult(Number(t.pnl)||0)==='loss');
-  const breakeven = data.filter(t=>tradeResult(Number(t.pnl)||0)==='breakeven');
-  const wr = total ? Math.round(wins.length/total*100) : 0;
-
-  const sessionMap = {};
-  const symbolMap = {};
-  const mistakeMap = {};
-
-  data.forEach(t=>{
-    const s = t.session || 'Unknown';
-    const sym = t.symbol || 'Unknown';
-    sessionMap[s] = (sessionMap[s] || 0) + (Number(t.pnl)||0);
-    symbolMap[sym] = (symbolMap[sym] || 0) + (Number(t.pnl)||0);
-    mistakes(t).forEach(m=>{
-      mistakeMap[m] = (mistakeMap[m] || 0) + 1;
-    });
-  });
-
-  const bestSession = Object.entries(sessionMap).sort((a,b)=>b[1]-a[1])[0] || ['No data',0];
-  const worstSession = Object.entries(sessionMap).sort((a,b)=>a[1]-b[1])[0] || ['No data',0];
-  const bestSymbol = Object.entries(symbolMap).sort((a,b)=>b[1]-a[1])[0] || ['No data',0];
-  const biggestMistake = Object.entries(mistakeMap).sort((a,b)=>b[1]-a[1])[0] || ['No mistake data',0];
-
-  const b2b = typeof getB2B === 'function' ? getB2B(data).length : 0;
-  const discipline = Math.max(0, Math.min(100, 100 - (biggestMistake[1] * 4) - (b2b * 3)));
-
-  return {data,total,pnl,wins,losses,breakeven,wr,bestSession,worstSession,bestSymbol,biggestMistake,b2b,discipline};
-}
 
 // --- LIVE TRADER CONTROLLER & UNJOURNALED TRADES LOGIC ---
 let cooldownInterval = null;
