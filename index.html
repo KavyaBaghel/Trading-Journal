@@ -6639,8 +6639,8 @@ function accountMetrics(data=trades){
   const maxDrawdownRemaining = maxDrawdownAmount == null ? null : Math.max(0, maxDrawdownAmount - maxDrawdownUsed);
   let daysRemaining = null;
   if(config.phaseDeadline){
-    const end = new Date(config.phaseDeadline + 'T23:59:59+05:30');
-    if(!isNaN(end)) daysRemaining = Math.max(0, Math.ceil((end - new Date(todayDateKey() + 'T00:00:00+05:30')) / 86400000));
+    const end = new Date(config.phaseDeadline + 'T00:00:00+05:30');
+    if(!isNaN(end)) daysRemaining = Math.max(0, Math.round((end - new Date(todayDateKey() + 'T00:00:00+05:30')) / 86400000));
   }
   return {config,s,todayTrades,todayPnl,accountSize,startBalance,currentBalance,profitTargetAmount,targetBalance,profitProgress,remainingToTarget,funded,maxDailyLossAmount,maxDrawdownAmount,dailyLossUsed,maxDrawdownUsed,maxDailyLossRemaining,maxDrawdownRemaining,daysRemaining};
 }
