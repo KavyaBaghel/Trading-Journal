@@ -5446,7 +5446,8 @@ function chartDoughnut(id, labels, data, colors, formatter='money'){
   const canvas = ensureCanvas(id);
   if(!canvas) return;
   destroy(id);
-  const safeColors = data.map((v,i)=> v === 0 ? '#8f8368' : colors[i % colors.length]);
+  const palette = Array.isArray(colors) ? colors : ['#f5b84a', '#6FA88A', '#B97466', '#6B8FA3', '#494fdf', '#8f8368'];
+  const safeColors = data.map((v,i)=> v === 0 ? '#8f8368' : palette[i % palette.length]);
   const total = data.reduce((a,b)=>a+Number(b || 0),0);
   charts[id]=new Chart(canvas,{
     type:'doughnut',
