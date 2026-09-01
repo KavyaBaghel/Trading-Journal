@@ -6531,6 +6531,7 @@ function renderGrid(){
 const ACCOUNT_CONFIG_KEY = 'journall_account_config_v1';
 const DEFAULT_RISK_PERCENT = 1;
 let aiPropGoalGenerating = false;
+let _cachedAccountConfig = null;
 
 function toNumber(value, fallback=0){
   if(value === null || value === undefined) return fallback;
@@ -6550,10 +6551,11 @@ function limitAmount(value, type, accountSize){
   return type === 'percent' ? accountSize * n / 100 : n;
 }
 function getAccountConfig(){
+  if(_cachedAccountConfig !== null) return _cachedAccountConfig;
   try{
     const raw = JSON.parse(localStorage.getItem(ACCOUNT_CONFIG_KEY) || 'null');
     if(!raw || !Number(raw.accountSize)) return null;
-    return {
+    _cachedAccountConfig = {
       accountSize:Number(raw.accountSize),
       phase:raw.phase || 'Phase 1',
       profitTarget:Number(raw.profitTarget) || 0,
@@ -6571,6 +6573,7 @@ function getAccountConfig(){
         : [],
       startDate:raw.startDate || new Date().toISOString().slice(0,10)
     };
+    return _cachedAccountConfig;
   }catch{ return null; }
 }
 function uploadedTradePnl(data=trades){
@@ -6899,6 +6902,7 @@ async function saveAccountSetup(){
   }
   const config = {accountSize,phase,profitTarget,profitTargetType:document.getElementById('profitTargetType')?.value || 'percent',maxDailyLoss,maxDailyLossType:document.getElementById('maxDailyLossType')?.value || 'percent',maxDrawdown,maxDrawdownType:document.getElementById('maxDrawdownType')?.value || 'percent',riskPercent,maxTradesPerDay,minRr,phaseDeadline:document.getElementById('phaseDeadlineInput')?.value || '',userSetupCriteria:readSetupCriteriaRows(),startDate:getAccountConfig()?.startDate || new Date().toISOString().slice(0,10)};
   localStorage.setItem(ACCOUNT_CONFIG_KEY, JSON.stringify(config));
+  _cachedAccountConfig = null;
   if(typeof window.journallSaveAccountSetupDoc === 'function'){
     try{
       if(msg) msg.textContent = 'Saving account setup...';
