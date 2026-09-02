@@ -3068,6 +3068,27 @@ tr:hover {
   color:#fff;
   text-shadow:0 0 10px rgba(73,79,223,.28);
 }
+.cooldown-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.48);
+  backdrop-filter: blur(7px);
+  z-index: 9998;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.cooldown-modal-backdrop.active {
+  display: flex;
+}
+.cooldown-modal-card {
+  width: min(460px, 96vw);
+  background: linear-gradient(180deg, rgba(16,21,33,.98), rgba(9,13,20,.98));
+  border: 1px solid var(--border2);
+  box-shadow: 0 30px 90px rgba(0,0,0,.48);
+  padding: 22px;
+}
 </style>
 <style>
 /* --- SYNCED BROKER HEADER CARD STYLES --- */
@@ -16359,8 +16380,8 @@ input{
 }
 </style>
 <!-- COOL-DOWN PAUSE MODAL -->
-<div id="cooldownModalBackdrop" class="quick-journal-backdrop">
-  <div class="quick-journal-modal" style="text-align:center; max-width:460px;">
+<div id="cooldownModalBackdrop" class="cooldown-modal-backdrop">
+  <div class="mistake-modal cooldown-modal-card" style="text-align:center; max-width:460px;">
     <span style="font-size:11px; font-weight:700; color:#ec4899; text-transform:uppercase; letter-spacing:0.05em;">Mindset Reset & Cooldown</span>
     <h3 style="margin:6px 0 0 0; font-size:22px; color:#fff;">15-Minute Pause</h3>
     <p style="font-size:13px; color:#94a3b8; margin-top:6px;">Breathe in slowly. Step away from your charts to clear emotion before taking any new trades.</p>
