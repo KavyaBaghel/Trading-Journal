@@ -30,7 +30,7 @@
   ],
   "app": {
     "entry": "index.html",
-    "localUrl": "http://127.0.0.1:8787/index.html",
+    "localUrl": "http://localhost:8787/index.html",
     "launcher": "Journall App.vbs",
     "chromeLauncher": "Journall Chrome.vbs",
     "fallbackLauncher": "Journall App.bat",
