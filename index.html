@@ -12069,6 +12069,7 @@ async function initFirebaseAuth(){
       return;
     }
     window.currentUser = user;
+    patchLocalStorageForCloud();
     rememberFirebaseUserProfile(user);
     renderUserProfile();
     cloudReady = false;
@@ -12083,6 +12084,7 @@ async function initFirebaseAuth(){
       await loadCloudState();
     }catch(err){
       console.error('Cloud load failed:', err);
+      cloudReady = true;
       window.setGateVisible(false);
       window.setAuthStatus(`Signed in. Journal opened locally; cloud sync needs Firebase setup: ${err?.message || err}`);
     }
