@@ -11909,7 +11909,6 @@ async function loadCloudState(){
   });
 
   cloudReady = true;
-  patchLocalStorageForCloud();
 
   const finalizeSignIn = () => {
     const uName = localStorage.getItem('journall_custom_username') || window.currentUser?.displayName || window.currentUser?.email || 'trader';
