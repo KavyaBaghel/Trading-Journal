@@ -11685,37 +11685,13 @@ function patchLocalStorageForCloud(){
 }
 
 function scheduleCloudSave(){
-  console.log('[Sync Debug] scheduleCloudSave called:', {
-    cloudReady,
-    hasUser: !!window.currentUser,
-    userUid: window.currentUser?.uid,
-    isLocalUser: window.currentUser?.uid === 'local_user',
-    hasDb: !!firestoreDb
-  });
-
-  if(!cloudReady || !window.currentUser || window.currentUser.uid === 'local_user' || !firestoreDb) {
-    console.log('[Sync Debug] Skipping cloud save - conditions not met');
-    return;
-  }
-  console.log('[Sync Debug] Scheduling cloud save in 900ms');
+  if(!cloudReady || !window.currentUser || window.currentUser.uid === 'local_user' || !firestoreDb) return;
   clearTimeout(syncTimer);
   syncTimer = setTimeout(saveCloudState, 900);
 }
 
 async function saveCloudState(){
-  console.log('[Sync Debug] saveCloudState executing:', {
-    cloudReady,
-    hasUser: !!window.currentUser,
-    userUid: window.currentUser?.uid,
-    isLocalUser: window.currentUser?.uid === 'local_user',
-    hasDb: !!firestoreDb
-  });
-
-  if(!cloudReady || !window.currentUser || window.currentUser.uid === 'local_user' || !firestoreDb) {
-    console.log('[Sync Debug] Aborting cloud save - conditions not met');
-    return;
-  }
-  console.log('[Sync Debug] Proceeding with cloud save operation');
+  if(!cloudReady || !window.currentUser || window.currentUser.uid === 'local_user' || !firestoreDb) return;
   const { doc, getDoc, setDoc, serverTimestamp } = await import(`https://www.gstatic.com/firebasejs/${firebaseSdkVersion}/firebase-firestore.js`);
   const ref = doc(firestoreDb, 'users', window.currentUser.uid, 'journallState', 'main');
   const snap = await getDoc(ref);
