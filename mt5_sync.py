@@ -192,8 +192,11 @@ def main():
             "notes": f"MT5 Sync (#{pid}) {comment}"
         })
 
+    account_info = mt5.account_info()
+    account_balance = account_info.balance if account_info else None
+    account_equity = account_info.equity if account_info else None
     mt5.shutdown()
-    print(json.dumps({"ok": True, "trades": reconstructed_trades}))
+    print(json.dumps({"ok": True, "trades": reconstructed_trades, "account_balance": account_balance, "account_equity": account_equity}))
 
 if __name__ == "__main__":
     main()
