@@ -11982,7 +11982,7 @@ async function initFirebaseAuth(){
   const initTimeout = setTimeout(()=>{
     window.setAuthLoading(false);
     window.setAuthStatus('Taking longer than usual - check your connection. Refresh to retry.');
-  }, 8000);
+  }, 20000);
 
   if(!hasFirebaseConfig){
     clearTimeout(initTimeout);
