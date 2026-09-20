@@ -16749,7 +16749,7 @@ input{
     }
     function syncMT5(){
       setStatus('⚡ Connecting to MetaTrader 5 via local server (port 8787)...');
-      var payload = JSON.stringify({ platform: 'mt5', days: 30 });
+      var payload = JSON.stringify({ platform: 'mt5', days: 365 });
       var candidates = ['http://localhost:8787/api/sync-broker'];
       (function tryNext(i){
         if(i >= candidates.length){
