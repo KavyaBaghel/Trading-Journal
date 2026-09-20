@@ -8672,6 +8672,7 @@ async function triggerBrokerSync(options = {}) {
     : ['http://localhost:8787/api/sync-broker'];
 
   let parsed = [];
+  let backendAccountBalance = null;
   try {
       let backendSuccess = false;
     // Allow the local desktop bridge (local-server.ps1 on :8787) for every platform
@@ -8716,6 +8717,9 @@ async function triggerBrokerSync(options = {}) {
           const data = await res.json().catch(() => ({}));
           if (res.ok && !data.error) {
             parsed = data.trades || [];
+            if (typeof data.account_balance === 'number' && Number.isFinite(data.account_balance)) {
+              backendAccountBalance = data.account_balance;
+            }
             backendSuccess = true;
             bridgeError = null;
             break;
@@ -8787,6 +8791,19 @@ async function triggerBrokerSync(options = {}) {
     }
 
     saveBrokerSyncSettings({ ...settingsSnapshot, lastSynced: new Date().toISOString(), date: new Date().toLocaleDateString() });
+
+    if (platform === 'mt5' && backendAccountBalance !== null) {
+        try {
+          const existingConfig = JSON.parse(localStorage.getItem('journall_account_config_v1') || 'null');
+          if (existingConfig) {
+            existingConfig.mt5CurrentBalance = backendAccountBalance;
+            existingConfig.mt5BalanceSource = 'mt5';
+            existingConfig.mt5BalanceTimestamp = Date.now();
+            localStorage.setItem('journall_account_config_v1', JSON.stringify(existingConfig));
+            _cachedAccountConfig = null;
+          }
+        } catch (_) {}
+      }
 
     if (!parsed.length) {
       if (status) status.innerHTML = `<strong>Sync complete.</strong><br>No new trades found in the last ${settingsSnapshot.days} days. Your broker settings are saved for automatic sync next time.`;
