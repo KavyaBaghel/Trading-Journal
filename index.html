@@ -5565,7 +5565,7 @@ function renderCharts(){
 
   const grossProfit = wins.reduce((a,t)=>a+Number(t.pnl || 0),0);
   const grossLoss = Math.abs(losses.reduce((a,t)=>a+Number(t.pnl || 0),0));
-  chartDoughnut('pnlPieChart',['Gross Profit','Gross Loss'],[+grossProfit.toFixed(2),+grossLoss.toFixed(2)]);
+  chartDoughnut('pnlPieChart',['Gross Profit','Gross Loss'],[+grossProfit.toFixed(2),+grossLoss.toFixed(2)],['#22c55e','#ef4444']);
   const pnlHelper = document.getElementById('pnlPieHelper');
   if(pnlHelper){
     const pf = grossLoss ? grossProfit / grossLoss : (grossProfit ? Infinity : 0);
