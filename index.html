@@ -6910,10 +6910,8 @@ function hideAccountSetupAfterSave(){
 }
 function ensureAccountOnboarding(){
   if(document.documentElement.classList.contains('firebase-auth-required')) return;
-  const done = localStorage.getItem('journall_onboarding_completed');
-  if(!done && !getAccountConfig()){
-    openAccountSetup();
-  }else if(getAccountConfig()){
+  // TEMPORARILY DISABLED: auto-showing the setup wizard, pending investigation into why it wrongly triggers. Manual "Edit setup" / "Set up account" buttons still work normally.
+  if(getAccountConfig()){
     const gate = document.getElementById('accountOnboardingGate');
     if(gate){ gate.hidden = true; gate.classList.remove('show','blocking'); }
   }
