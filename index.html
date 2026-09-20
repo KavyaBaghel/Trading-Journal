@@ -6936,7 +6936,7 @@ async function saveAccountSetup(){
     if(msg) msg.textContent = error.message;
     return;
   }
-  const config = {accountSize,phase,profitTarget,profitTargetType:document.getElementById('profitTargetType')?.value || 'percent',maxDailyLoss,maxDailyLossType:document.getElementById('maxDailyLossType')?.value || 'percent',maxDrawdown,maxDrawdownType:document.getElementById('maxDrawdownType')?.value || 'percent',riskPercent,maxTradesPerDay,minRr,phaseDeadline:document.getElementById('phaseDeadlineInput')?.value || '',userSetupCriteria:readSetupCriteriaRows(),startDate:getAccountConfig()?.startDate || new Date().toISOString().slice(0,10)};
+  const config = {...existingAccount,accountSize,phase,profitTarget,profitTargetType:document.getElementById('profitTargetType')?.value || 'percent',maxDailyLoss,maxDailyLossType:document.getElementById('maxDailyLossType')?.value || 'percent',maxDrawdown,maxDrawdownType:document.getElementById('maxDrawdownType')?.value || 'percent',riskPercent,maxTradesPerDay,minRr,phaseDeadline:document.getElementById('phaseDeadlineInput')?.value || '',userSetupCriteria:readSetupCriteriaRows(),startDate:existingAccount?.startDate || new Date().toISOString().slice(0,10)};
   localStorage.setItem(ACCOUNT_CONFIG_KEY, JSON.stringify(config));
   if(typeof window.journallSaveAccountSetupDoc === 'function'){
     try{
