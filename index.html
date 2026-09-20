@@ -4538,6 +4538,16 @@ tr:hover {
                 console.info('MT5 auto-sync: no trades returned.');
                 return;
             }
+
+            // Update account balance from MT5 sync response
+            if (typeof result.account_balance === 'number' && Number.isFinite(result.account_balance)) {
+                const existingConfig = JSON.parse(localStorage.getItem('journall_account_config_v1') || 'null');
+                if (existingConfig) {
+                    existingConfig.accountSize = result.account_balance;
+                    localStorage.setItem('journall_account_config_v1', JSON.stringify(existingConfig));
+                    _cachedAccountConfig = null;
+                }
+            }
             if (typeof mergeImportedTrades === 'function' && typeof trades !== 'undefined' && Array.isArray(trades)) {
                 trades = mergeImportedTrades(trades, mt5Trades);
                 filtered = [...trades];
@@ -16768,6 +16778,16 @@ input{
             loadTradesIntoApp(list, 'MetaTrader 5');
           } else {
             setStatus('✅ MT5 connected — no new closed trades in the last 30 days.');
+          }
+
+          // Update account balance from MT5 sync response
+          if (typeof data.account_balance === 'number' && Number.isFinite(data.account_balance)) {
+            const existingConfig = JSON.parse(localStorage.getItem('journall_account_config_v1') || 'null');
+            if (existingConfig) {
+              existingConfig.accountSize = data.account_balance;
+              localStorage.setItem('journall_account_config_v1', JSON.stringify(existingConfig));
+              _cachedAccountConfig = null;
+            }
           }
         }).catch(function(){ tryNext(i+1); });
       })(0);
