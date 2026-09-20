@@ -4525,7 +4525,7 @@ tr:hover {
             const response = await fetch(endpoint, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ platform: 'mt5', days: 30 }),
+                body: JSON.stringify({ platform: 'mt5', days: parseInt(document.getElementById('brokerSyncDays')?.value, 10) || 30 }),
                 cache: 'no-store'
             });
             if (!response.ok) {
