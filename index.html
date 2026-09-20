@@ -6602,7 +6602,10 @@ function getAccountConfig(){
       userSetupCriteria:Array.isArray(raw.userSetupCriteria)
         ? raw.userSetupCriteria.map(item=>String(item || '').trim()).filter(Boolean)
         : [],
-      startDate:raw.startDate || new Date().toISOString().slice(0,10)
+      startDate:raw.startDate || new Date().toISOString().slice(0,10),
+      mt5CurrentBalance:raw.mt5CurrentBalance,
+      mt5BalanceSource:raw.mt5BalanceSource,
+      mt5BalanceTimestamp:raw.mt5BalanceTimestamp
     };
   }catch{ return null; }
 }
