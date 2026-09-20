@@ -4513,7 +4513,7 @@ tr:hover {
             const response = await fetch(endpoint, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ platform: 'mt5', days: 30 }),
+                body: JSON.stringify({ platform: 'mt5', days: parseInt(document.getElementById('brokerSyncDays')?.value, 10) || 30 }),
                 cache: 'no-store'
             });
             if (!response.ok) {
@@ -16726,7 +16726,7 @@ input{
     }
     function syncMT5(){
       setStatus('⚡ Connecting to MetaTrader 5 via local server (port 8787)...');
-      var payload = JSON.stringify({ platform: 'mt5', days: 30 });
+      var payload = JSON.stringify({ platform: 'mt5', days: 365 });
       var candidates = ['http://localhost:8787/api/sync-broker'];
       (function tryNext(i){
         if(i >= candidates.length){
