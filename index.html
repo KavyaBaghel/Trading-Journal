@@ -4543,7 +4543,9 @@ tr:hover {
             if (typeof result.account_balance === 'number' && Number.isFinite(result.account_balance)) {
                 const existingConfig = JSON.parse(localStorage.getItem('journall_account_config_v1') || 'null');
                 if (existingConfig) {
-                    existingConfig.accountSize = result.account_balance;
+                    existingConfig.mt5CurrentBalance = result.account_balance;
+                    existingConfig.mt5BalanceSource = 'mt5';
+                    existingConfig.mt5BalanceTimestamp = Date.now();
                     localStorage.setItem('journall_account_config_v1', JSON.stringify(existingConfig));
                     _cachedAccountConfig = null;
                 }
@@ -6609,6 +6611,9 @@ function uploadedTradePnl(data=trades){
 }
 function syncedCurrentBalance(config, data=trades){
   if(!config) return 0;
+  if (config.mt5CurrentBalance !== undefined && config.mt5BalanceSource === 'mt5') {
+    return Number(config.mt5CurrentBalance);
+  }
   const accountSize = Number(config.accountSize) || 0;
   const list = Array.isArray(data) ? data : [];
   return accountSize + uploadedTradePnl(list);
@@ -16784,7 +16789,9 @@ input{
           if (typeof data.account_balance === 'number' && Number.isFinite(data.account_balance)) {
             const existingConfig = JSON.parse(localStorage.getItem('journall_account_config_v1') || 'null');
             if (existingConfig) {
-              existingConfig.accountSize = data.account_balance;
+              existingConfig.mt5CurrentBalance = data.account_balance;
+              existingConfig.mt5BalanceSource = 'mt5';
+              existingConfig.mt5BalanceTimestamp = Date.now();
               localStorage.setItem('journall_account_config_v1', JSON.stringify(existingConfig));
               _cachedAccountConfig = null;
             }
