@@ -12120,8 +12120,8 @@ async function initFirebaseAuth(){
 
   authModule.onAuthStateChanged(auth, async user=>{
     clearTimeout(initTimeout);
-    window.setAuthLoading(false);
     if(localStorage.getItem('journall_auth_bypassed') === '1'){
+      window.setAuthLoading(false);
       window.currentUser = { uid: 'local_user', displayName: 'Local Trader', email: 'local@journall.app' };
       window.openSignedInJournal('Opened locally. Cloud sync is disabled.');
       return;
@@ -12131,6 +12131,7 @@ async function initFirebaseAuth(){
     renderUserProfile();
     cloudReady = false;
     if(!user){
+      window.setAuthLoading(false);
       sessionStorage.removeItem('journall:cloud-loaded');
       window.setGateVisible(true);
       window.setAuthStatus('Sign in to use the website version.');
