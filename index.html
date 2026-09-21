@@ -11005,7 +11005,30 @@ function renderJournalPage(){
   }).join('');
 }
 
-function renderAll(){applyFilters();renderSide();renderAnalyticsBars();renderMetrics();renderPropChallengeDashboard();if(document.getElementById('mistakeModalBackdrop')?.classList.contains('active')) renderMistakeDashboard();renderInsights();renderCharts();renderWidgets();renderSetupPerformanceTracker();renderCalendarDayGrid();renderCalendar();renderHeatmap();renderGrid();renderGoals();renderProcess();renderTradingPage();renderJournalPage();renderPsychology();if(typeof refreshSignedInProfile==="function")refreshSignedInProfile();}
+function renderAll(){
+console.time('journall:renderAll:total');
+console.time('journall:renderAll:applyFilters');applyFilters();console.timeEnd('journall:renderAll:applyFilters');
+console.time('journall:renderAll:renderSide');renderSide();console.timeEnd('journall:renderAll:renderSide');
+console.time('journall:renderAll:renderAnalyticsBars');renderAnalyticsBars();console.timeEnd('journall:renderAll:renderAnalyticsBars');
+console.time('journall:renderAll:renderMetrics');renderMetrics();console.timeEnd('journall:renderAll:renderMetrics');
+console.time('journall:renderAll:renderPropChallengeDashboard');renderPropChallengeDashboard();console.timeEnd('journall:renderAll:renderPropChallengeDashboard');
+if(document.getElementById('mistakeModalBackdrop')?.classList.contains('active')) renderMistakeDashboard();
+console.time('journall:renderAll:renderInsights');renderInsights();console.timeEnd('journall:renderAll:renderInsights');
+console.time('journall:renderAll:renderCharts');renderCharts();console.timeEnd('journall:renderAll:renderCharts');
+console.time('journall:renderAll:renderWidgets');renderWidgets();console.timeEnd('journall:renderAll:renderWidgets');
+console.time('journall:renderAll:renderSetupPerformanceTracker');renderSetupPerformanceTracker();console.timeEnd('journall:renderAll:renderSetupPerformanceTracker');
+console.time('journall:renderAll:renderCalendarDayGrid');renderCalendarDayGrid();console.timeEnd('journall:renderAll:renderCalendarDayGrid');
+console.time('journall:renderAll:renderCalendar');renderCalendar();console.timeEnd('journall:renderAll:renderCalendar');
+console.time('journall:renderAll:renderHeatmap');renderHeatmap();console.timeEnd('journall:renderAll:renderHeatmap');
+console.time('journall:renderAll:renderGrid');renderGrid();console.timeEnd('journall:renderAll:renderGrid');
+console.time('journall:renderAll:renderGoals');renderGoals();console.timeEnd('journall:renderAll:renderGoals');
+console.time('journall:renderAll:renderProcess');renderProcess();console.timeEnd('journall:renderAll:renderProcess');
+console.time('journall:renderAll:renderTradingPage');renderTradingPage();console.timeEnd('journall:renderAll:renderTradingPage');
+console.time('journall:renderAll:renderJournalPage');renderJournalPage();console.timeEnd('journall:renderAll:renderJournalPage');
+console.time('journall:renderAll:renderPsychology');renderPsychology();console.timeEnd('journall:renderAll:renderPsychology');
+console.time('journall:renderAll:refreshSignedInProfile');if(typeof refreshSignedInProfile==="function")refreshSignedInProfile();console.timeEnd('journall:renderAll:refreshSignedInProfile');
+console.timeEnd('journall:renderAll:total');
+}
 
 
 function selectTab(tabId) {
