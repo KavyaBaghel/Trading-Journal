@@ -11509,7 +11509,7 @@ console.log('RENDER-TAG:11503 gateShowing=', document.getElementById('firebaseAu
     window.journalAlreadyOpened = true;
     window.setGateVisible(false);
 console.log('RENDER-TAG:11508 gateShowing=', document.getElementById('firebaseAuthGate')?.classList.contains('show'));
-    if(!window.__journallPostGateRenderDone){ window.__journallPostGateRenderDone = true; if(typeof window.renderAll === 'function') window.renderAll(); }
+    console.log('GUARD-CHECK:11512 flag=', window.__journallPostGateRenderDone); if(!window.__journallPostGateRenderDone){ window.__journallPostGateRenderDone = true; if(typeof window.renderAll === 'function') window.renderAll(); }
     setTimeout(() => {
       if (typeof restoreBrokerSyncSettingsToForm === 'function') restoreBrokerSyncSettingsToForm();
       if (typeof autoSyncSavedBrokerOnce === 'function') autoSyncSavedBrokerOnce();
@@ -12049,7 +12049,7 @@ console.log('RENDER-TAG:12040 gateShowing=', document.getElementById('firebaseAu
     window.setGateVisible(false);
     window.setAuthStatus(`Signed in as ${uName}`);
 console.log('RENDER-TAG:12046 gateShowing=', document.getElementById('firebaseAuthGate')?.classList.contains('show'));
-    if(!window.__journallPostGateRenderDone){ window.__journallPostGateRenderDone = true; if(typeof window.renderAll === 'function') window.renderAll(); }
+    console.log('GUARD-CHECK:12052 flag=', window.__journallPostGateRenderDone); if(!window.__journallPostGateRenderDone){ window.__journallPostGateRenderDone = true; if(typeof window.renderAll === 'function') window.renderAll(); }
     setTimeout(() => {
       if (typeof restoreBrokerSyncSettingsToForm === 'function') restoreBrokerSyncSettingsToForm();
       if (typeof autoSyncSavedBrokerOnce === 'function') autoSyncSavedBrokerOnce();
