@@ -4560,7 +4560,6 @@ tr:hover {
                 }
                 if (typeof saveTrades === 'function') saveTrades();
                 if (typeof persistTradeStores === 'function') persistTradeStores(trades);
-console.log('RENDER-TAG:4563 gateShowing=', document.getElementById('firebaseAuthGate')?.classList.contains('show'));
                 if (typeof renderAll === 'function' && !document.getElementById('firebaseAuthGate')?.classList.contains('show')) renderAll();
                 if (typeof scheduleCloudSave === 'function') scheduleCloudSave();
                 window.trades = trades;
@@ -11008,7 +11007,6 @@ function renderJournalPage(){
 }
 
 function renderAll(){
-console.trace('renderAll ENTRY, callCount=', (window.__renderAllCallCount = (window.__renderAllCallCount||0)+1));
 console.time('journall:renderAll:total');
 console.time('journall:renderAll:applyFilters');applyFilters();console.timeEnd('journall:renderAll:applyFilters');
 console.time('journall:renderAll:renderSide');renderSide();console.timeEnd('journall:renderAll:renderSide');
@@ -11484,7 +11482,6 @@ setTimeout(function() {
   if (window.currentUser && window.setGateVisible && !window.journalAlreadyOpened) {
     window.journalAlreadyOpened = true;
     window.setGateVisible(false);
-console.log('RENDER-TAG:11485 gateShowing=', document.getElementById('firebaseAuthGate')?.classList.contains('show'));
     if(typeof window.renderAll === 'function') window.renderAll();
     if(typeof ensureAccountOnboarding === 'function') ensureAccountOnboarding();
   }
@@ -11503,14 +11500,12 @@ window.openSignedInJournal = function(message){
     const uName = localStorage.getItem('journall_custom_username') || window.currentUser?.displayName || window.currentUser?.email || 'trader';
     window.setAuthStatus(`Signed in as ${uName}`);
     if (window.splashHoldActive) {
-console.log('RENDER-TAG:11503 gateShowing=', document.getElementById('firebaseAuthGate')?.classList.contains('show'));
       if(typeof window.renderAll === 'function') window.renderAll();
       return;
     }
     window.journalAlreadyOpened = true;
     window.setGateVisible(false);
-console.log('RENDER-TAG:11508 gateShowing=', document.getElementById('firebaseAuthGate')?.classList.contains('show'));
-    console.log('GUARD-CHECK:11512 flag=', window.__journallPostGateRenderDone); if(!window.__journallPostGateRenderDone){ window.__journallPostGateRenderDone = true; if(typeof window.renderAll === 'function') window.renderAll(); }
+    if(!window.__journallPostGateRenderDone){ window.__journallPostGateRenderDone = true; if(typeof window.renderAll === 'function') window.renderAll(); }
     setTimeout(() => {
       if (typeof restoreBrokerSyncSettingsToForm === 'function') restoreBrokerSyncSettingsToForm();
       if (typeof autoSyncSavedBrokerOnce === 'function') autoSyncSavedBrokerOnce();
@@ -12042,15 +12037,13 @@ async function loadCloudState(){
     const uName = localStorage.getItem('journall_custom_username') || window.currentUser?.displayName || window.currentUser?.email || 'trader';
     if (window.splashHoldActive) {
       window.setAuthStatus(`Signed in as ${uName}`);
-console.log('RENDER-TAG:12040 gateShowing=', document.getElementById('firebaseAuthGate')?.classList.contains('show'));
       if(typeof window.renderAll === 'function') window.renderAll();
       return;
     }
     window.journalAlreadyOpened = true;
     window.setGateVisible(false);
     window.setAuthStatus(`Signed in as ${uName}`);
-console.log('RENDER-TAG:12046 gateShowing=', document.getElementById('firebaseAuthGate')?.classList.contains('show'));
-    console.log('GUARD-CHECK:12052 flag=', window.__journallPostGateRenderDone); if(!window.__journallPostGateRenderDone){ window.__journallPostGateRenderDone = true; if(typeof window.renderAll === 'function') window.renderAll(); }
+    if(!window.__journallPostGateRenderDone){ window.__journallPostGateRenderDone = true; if(typeof window.renderAll === 'function') window.renderAll(); }
     setTimeout(() => {
       if (typeof restoreBrokerSyncSettingsToForm === 'function') restoreBrokerSyncSettingsToForm();
       if (typeof autoSyncSavedBrokerOnce === 'function') autoSyncSavedBrokerOnce();
