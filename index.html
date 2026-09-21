@@ -12060,9 +12060,9 @@ async function initFirebaseAuth(){
     return;
   }
 
-  const appModule = await import(`https://www.gstatic.com/firebasejs/${firebaseSdkVersion}/firebase-app.js`);
-  const authModule = await import(`https://www.gstatic.com/firebasejs/${firebaseSdkVersion}/firebase-auth.js`);
-  const firestoreModule = await import(`https://www.gstatic.com/firebasejs/${firebaseSdkVersion}/firebase-firestore.js`);
+  console.time('journall:sdk-imports'); const appModulePromise = import(`https://www.gstatic.com/firebasejs/${firebaseSdkVersion}/firebase-app.js`);
+  const authModulePromise = import(`https://www.gstatic.com/firebasejs/${firebaseSdkVersion}/firebase-auth.js`);
+  const firestoreModulePromise = import(`https://www.gstatic.com/firebasejs/${firebaseSdkVersion}/firebase-firestore.js`); const [appModule, authModule, firestoreModule] = await Promise.all([appModulePromise, authModulePromise, firestoreModulePromise]); console.timeEnd('journall:sdk-imports'); console.time('journall:imports-to-authstate');
   const app = appModule.initializeApp(firebaseConfig);
   const auth = authModule.getAuth(app);
   firestoreDb = firestoreModule.getFirestore(app);
@@ -12184,7 +12184,7 @@ async function initFirebaseAuth(){
     }, 2500);
   }
 
-  authModule.onAuthStateChanged(auth, async user=>{
+  authModule.onAuthStateChanged(auth, async user=>{ console.timeEnd('journall:imports-to-authstate'); console.time('journall:authstate-to-loaded');
     clearTimeout(initTimeout);
     if(localStorage.getItem('journall_auth_bypassed') === '1'){
       window.setAuthLoading(false);
@@ -12203,7 +12203,7 @@ async function initFirebaseAuth(){
       window.setAuthStatus('Sign in to use the website version.');
       return;
     }
-    window.openSignedInJournal('Signed in. Opening your journal...');
+    window.openSignedInJournal('Signed in. Opening your journal...'); console.timeEnd('journall:authstate-to-loaded');
     try{
       await loadCloudState();
     }catch(err){
