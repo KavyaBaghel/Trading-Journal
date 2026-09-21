@@ -11457,7 +11457,7 @@ document.querySelectorAll('.nav button').forEach(btn=>{
       const reason = textOnly(String(err?.message || err || 'Unknown cloud AI error.'));
       let fallback = 'Cloud AI is temporarily unavailable. Your journal is still available; try again after a moment.';
       try {
-        fallback = textOnly(localFallback(prompt));
+        fallback = localFallback(prompt);
       } catch (fallbackError) {
         console.error('Rule-based fallback failed:', fallbackError);
       }
