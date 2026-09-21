@@ -3506,7 +3506,7 @@ tr:hover {
   pointer-events: none;
   z-index: 0;
   opacity: .78;
-  mix-blend-mode: screen;
+  /* mix-blend-mode: screen; */
 }
 @media (prefers-reduced-motion: reduce) {
   #firebaseAuthGate .antigravity-login-bg { display: none; }
@@ -20166,7 +20166,7 @@ body:not(.firebase-auth-required) #journallApp > .sidebar .sidebox *{
     const particleColor = '#f5b84a';
     const isMobileDevice = (navigator.userAgentData && navigator.userAgentData.mobile === true) || /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent || '');
     const isLowCoreDevice = Number.isFinite(navigator.hardwareConcurrency) && navigator.hardwareConcurrency <= 4;
-    const particleCount = isMobileDevice || isLowCoreDevice ? 90 : 180;
+    const particleCount = isMobileDevice || isLowCoreDevice ? 45 : 90;
     const magnetRadiusFactor = .16;
     const ringRadiusFactor = .08;
     let width = 0;
@@ -20184,7 +20184,7 @@ body:not(.firebase-auth-required) #journallApp > .sidebar .sidebox *{
       const rect = gate.getBoundingClientRect();
       width = Math.max(1, rect.width || window.innerWidth);
       height = Math.max(1, rect.height || window.innerHeight);
-      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      const dpr = Math.min(window.devicePixelRatio || 1, 1);
       canvas.width = Math.round(width * dpr);
       canvas.height = Math.round(height * dpr);
       canvas.style.width = width + 'px';
@@ -20679,7 +20679,7 @@ body:not(.firebase-auth-required) #journallApp > .sidebar .sidebox *{
   // Each dot is a small spring: the cursor pushes it away, it pops toward the viewer (bigger, brighter),
   // then springs home. A click or tap sends a ripple through the grid. The logo tilts in 3D to face the
   // pointer on its own spring. The animation loop only runs while something is moving.
-  var GRID_GAP = 26;
+  var GRID_GAP = 42;
   var POINTER_RADIUS = 100;
   var WAVE_SPEED = 0.55;   // px per ms
   var WAVE_BAND = 46;
@@ -20711,7 +20711,7 @@ body:not(.firebase-auth-required) #journallApp > .sidebar .sidebox *{
     var r = root.getBoundingClientRect();
     gridW = Math.max(1, Math.round(r.width));
     gridH = Math.max(1, Math.round(r.height));
-    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    var dpr = Math.min(window.devicePixelRatio || 1, 1);
     canvas.width = Math.round(gridW * dpr);
     canvas.height = Math.round(gridH * dpr);
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
