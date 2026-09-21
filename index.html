@@ -5465,9 +5465,24 @@ function chartBar(id, labels, data){
 function chartDoughnut(id, labels, data, colors, formatter='money'){
   const canvas = ensureCanvas(id);
   if(!canvas) return;
-  destroy(id);
   const safeColors = data.map((v,i)=> v === 0 ? '#8f8368' : colors[i % colors.length]);
   const total = data.reduce((a,b)=>a+Number(b || 0),0);
+  if(charts[id] && charts[id].canvas === canvas && charts[id].config.type === 'doughnut'){
+    const chart = charts[id];
+    chart.data.labels = labels;
+    const ds = chart.data.datasets[0];
+    ds.data = data;
+    ds.backgroundColor = safeColors;
+    chart.options.plugins.tooltip.callbacks.label = (ctx)=>{
+      const value = Number(ctx.parsed || 0);
+      const pct = total ? ` (${((value / total) * 100).toFixed(1)}%)` : "";
+      const display = formatter === 'count' ? value.toLocaleString() : formatChartMoney(value);
+      return `${ctx.label}: ${display}${pct}`;
+    };
+    chart.update('none');
+    return;
+  }
+  destroy(id);
   charts[id]=new Chart(canvas,{
     type:'doughnut',
     data:{
