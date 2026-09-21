@@ -4561,7 +4561,7 @@ tr:hover {
                 if (typeof saveTrades === 'function') saveTrades();
                 if (typeof persistTradeStores === 'function') persistTradeStores(trades);
 console.log('RENDER-TAG:4563 gateShowing=', document.getElementById('firebaseAuthGate')?.classList.contains('show'));
-                if (typeof renderAll === 'function') renderAll();
+                if (typeof renderAll === 'function' && !document.getElementById('firebaseAuthGate')?.classList.contains('show')) renderAll();
                 if (typeof scheduleCloudSave === 'function') scheduleCloudSave();
                 window.trades = trades;
                 console.info('MT5 auto-sync: loaded ' + mt5Trades.length + ' trade(s).');
