@@ -4990,6 +4990,23 @@ function sorted(data=filtered){
   return result;
 }
 
+let _prevTradeCache = null, _prevTradeCacheKey = null;
+let _todayCountCache = null, _todayCountCacheKey = null;
+
+function todayOrdinalCount(t, data){
+  if(data !== _todayCountCacheKey){
+    const s = sorted(data);
+    _todayCountCache = new Map();
+    const counters = {};
+    s.forEach(x=>{
+      counters[x.date] = (counters[x.date]||0) + 1;
+      _todayCountCache.set(x, counters[x.date]);
+    });
+    _todayCountCacheKey = data;
+  }
+  return _todayCountCache.get(t) || 0;
+}
+
 function accountDailyLossLimitAmount(config=getAccountConfig()){
   if(!config) return null;
   return limitAmount(config.maxDailyLoss, config.maxDailyLossType || 'percent', toNumber(config.accountSize,0));
@@ -5003,9 +5020,13 @@ function accountMinRr(config=getAccountConfig()){
   return Number.isFinite(n) && n > 0 ? n : null;
 }
 function previousTradeFor(trade, data=filtered){
-  const s = sorted(data);
-  const i = s.indexOf(trade);
-  return i > 0 ? s[i-1] : null;
+  if(data !== _prevTradeCacheKey){
+    const s = sorted(data);
+    _prevTradeCache = new Map();
+    for(let i=1;i<s.length;i++) _prevTradeCache.set(s[i], s[i-1]);
+    _prevTradeCacheKey = data;
+  }
+  return _prevTradeCache.get(trade) || null;
 }
 function tradePlannedRr(t){
   const rr = Number(t.rr || t.riskReward || t.rewardRisk || 0);
@@ -5050,7 +5071,7 @@ function mistakes(t){
   if(prev && prevVol > 0 && vol > prevVol) m.push('Increased Lot Size');
   if(String(t.stopMoved || t.movedStop || t.slAdjusted || '').toLowerCase()==='yes') m.push('Moved Stop Loss');
   if(String(t.entryConfirmed || t.entryConfirmation || '').toLowerCase()==='no') m.push('No Confirmation Entry');
-  const todayCount = sorted(trades || []).filter(x=>x.date === t.date && x._openMs <= t._openMs).length;
+  const todayCount = todayOrdinalCount(t, trades || []);
   const maxTrades = accountMaxTrades();
   if(maxTrades && todayCount > maxTrades) m.push('Overtrading');
   if(rr != null && rr < minRr) m.push('No Patience');
