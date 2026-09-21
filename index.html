@@ -4977,7 +4977,12 @@ function resizeChartsSoon(){
 
 function destroy(id){ if(charts[id]) charts[id].destroy(); }
 
-function sorted(data=filtered){ return [...data].sort((a,b)=>new Date(a.openUtc)-new Date(b.openUtc)); }
+function sorted(data=filtered){
+  return data
+    .map(t => [t, new Date(t.openUtc).getTime()])
+    .sort((a,b) => a[1]-b[1])
+    .map(pair => pair[0]);
+}
 
 function accountDailyLossLimitAmount(config=getAccountConfig()){
   if(!config) return null;
