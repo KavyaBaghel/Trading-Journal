@@ -11093,7 +11093,7 @@ window.addEventListener('hashchange', openHashTab);
 });
 
 if(typeof window.journallReloadDataFromStorage === 'function') window.journallReloadDataFromStorage();
-renderAll();
+const __authGateShowingEarly = document.getElementById('firebaseAuthGate')?.classList.contains('show'); if(!__authGateShowingEarly){ renderAll(); }
 requestAnimationFrame(() => {
   openHashTab();
   requestAnimationFrame(() => {
