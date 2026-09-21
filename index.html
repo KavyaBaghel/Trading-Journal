@@ -11190,6 +11190,58 @@ function renderAISnapshot(){
   if(typeof applySharedStatCardTreatment === 'function') applySharedStatCardTreatment(el);
 }
 
+function aiRecentEvidence(s){
+  const recent = (s.data || []).slice(-25);
+  const loss = [...recent].reverse().find(t=>tradeResult(Number(t.pnl)||0)==='loss') || s.losses[s.losses.length-1];
+  const win = [...recent].reverse().find(t=>tradeResult(Number(t.pnl)||0)==='profit') || s.wins[s.wins.length-1];
+  const parts = [];
+  if(loss){
+    parts.push(`recent loss: ${loss.date || "unknown date"} ${loss.symbol || "symbol"} ${loss.side || ""} ${signedMoney(loss.pnl)}`);
+  }
+  if(win){
+    parts.push(`recent win: ${win.date || "unknown date"} ${win.symbol || "symbol"} ${win.side || ""} ${signedMoney(win.pnl)}`);
+  }
+  return parts.join(' | ') || 'recent trade evidence is limited';
+}
+
+function aiConfidence(s){
+  if(s.total >= 80) return 'high';
+  if(s.total >= 25) return 'medium';
+  return 'low';
+}
+
+function aiActionRule(topic, s){
+  const leak = s.biggestMistake[0] || 'rule break';
+  if(topic === "psychology") return `After any loss, wait 10 minutes, write the reason for the next trade, and only enter if it is not revenge/FOMO.`;
+  if(topic === "best") return `For the next session, only trade setups that match your ${s.bestSession[0]} / ${s.bestSymbol[0]} conditions.`;
+  if(topic === "weak") return `Block ${leak} first: if it appears before entry, the trade is invalid even if the chart looks good.`;
+  if(topic === "today") return `Today your only job is to reduce ${leak}; size and trade count come second.`;
+  return `Before entry, confirm setup, stop loss, risk amount, and reason. If one is missing, skip the trade.`;
+}
+
+function aiCoachResponse(topic, s, userPrompt){
+  const leak = s.biggestMistake[0] || 'No clear leak';
+  const leakCount = Number(s.biggestMistake[1] || 0);
+  const confidence = aiConfidence(s);
+  const evidence = aiRecentEvidence(s);
+  const pressure = s.pnl < 0 ? 'recovery pressure is active' : 'account pressure is controlled';
+  const diagnosisMap = {
+    weak: `Your main weakness is ${leak}. It appeared ${leakCount} times, and your weakest session is ${s.worstSession[0]} at ${signedMoney(s.worstSession[1])}.`,
+    psychology: `Your psychology risk is impulse after losses. I see ${s.b2b} back-to-back re-entry clusters, so the danger is chasing instead of waiting.`,
+    best: `Your cleanest area is ${s.bestSession[0]} session at ${signedMoney(s.bestSession[1])}, with ${s.bestSymbol[0]} as the strongest symbol/pair by P&L.`,
+    today: `Today should be a damage-control session: net P&L is ${signedMoney(s.pnl)}, win rate is ${s.wr}%, and ${pressure}.`,
+    performance: `Performance snapshot: ${s.total} trades, ${s.wr}% win rate, ${s.wins.length} wins, ${s.losses.length} losses, net ${signedMoney(s.pnl)}.`
+  };
+  const diagnosis = diagnosisMap[topic] || `I read your journal as a process problem first: ${s.total} trades, net ${signedMoney(s.pnl)}, win rate ${s.wr}%, main leak ${leak}.`;
+  return `
+    <strong>Trading Coach:</strong>
+    <div><strong>Diagnosis:</strong> ${diagnosis}</div>
+    <div><strong>Evidence:</strong> ${evidence}. Confidence: ${confidence} because I am using ${s.total} logged trades.</div>
+    <div><strong>Fix next:</strong> ${aiActionRule(topic, s)}</div>
+    <div><strong>Journal question:</strong> What did I feel right before the weakest trade, and did I follow my stop/risk rule before entering?</div>
+  `;
+}
+
 function aiAnswer(prompt){
   const q = String(prompt || '').toLowerCase();
   const s = getAIStats();
