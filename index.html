@@ -5340,7 +5340,6 @@ function cssVarValue(name, fallback=''){
 function chartLine(id, labels, data){
   const canvas = ensureCanvas(id);
   if(!canvas) return;
-  destroy(id);
   const numeric = data.map(v=>Number(v || 0));
   const primary = cssVarValue('--primary') || 'currentColor';
   const danger = cssVarValue('--danger') || primary;
@@ -5350,6 +5349,30 @@ function chartLine(id, labels, data){
   const min = Math.min(...numeric,0);
   const max = Math.max(...numeric,0);
   const spread = Math.max(1, Math.abs(max - min));
+  if(charts[id] && charts[id].canvas === canvas && charts[id].config.type === 'line'){
+    const chart = charts[id];
+    chart.data.labels = labels;
+    const ds = chart.data.datasets[0];
+    ds.data = data;
+    ds.borderColor = lineColor;
+    ds.pointBackgroundColor = lineColor;
+    ds.pointBorderColor = lineColor;
+    ds.backgroundColor = (ctx)=>{
+      const c2 = ctx.chart;
+      const area = c2?.chartArea;
+      const cx = c2?.ctx;
+      if(!area || !cx) return lineColor;
+      const gradient = cx.createLinearGradient(0, area.top, 0, area.bottom);
+      gradient.addColorStop(0, lineColor);
+      gradient.addColorStop(1, 'transparent');
+      return gradient;
+    };
+    chart.options.scales.y.suggestedMin = min - spread * .12;
+    chart.options.scales.y.suggestedMax = max + spread * .12;
+    chart.update('none');
+    return;
+  }
+  destroy(id);
   charts[id]=new Chart(canvas,{
     type:'line',
     data:{
