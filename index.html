@@ -11636,8 +11636,6 @@ let firestoreDb = null;
 let cloudReady = false;
 let syncTimer = null;
 let unsubscribeCloudSync = null;
-let cloudSaveInFlight = false;
-let cloudSaveQueuedAgain = false;
 window.journallGetFirebaseIdToken = async () => window.currentUser?.getIdToken ? window.currentUser.getIdToken() : null;
 window.journallAiProxyUrl = aiProxyConfig?.url || '';
 if(authRetryBtn) authRetryBtn.addEventListener('click', () => location.reload());
@@ -11839,12 +11837,6 @@ function scheduleCloudSave(){
 }
 
 async function saveCloudState(){
-  if(cloudSaveInFlight){
-    cloudSaveQueuedAgain = true;
-    return;
-  }
-  cloudSaveInFlight = true;
-  try{
   if(!cloudReady || !window.currentUser || window.currentUser.uid === 'local_user' || !firestoreDb) return;
   const { doc, getDoc, setDoc, serverTimestamp } = await import(`https://www.gstatic.com/firebasejs/${firebaseSdkVersion}/firebase-firestore.js`);
   const ref = doc(firestoreDb, 'users', window.currentUser.uid, 'journallState', 'main');
@@ -11862,13 +11854,6 @@ async function saveCloudState(){
   }, { merge: true });
   const uName = localStorage.getItem('journall_custom_username') || window.currentUser.displayName || window.currentUser.email || 'trader';
   setAuthStatus(`Signed in as ${uName} - synced`);
-  } finally {
-    cloudSaveInFlight = false;
-    if(cloudSaveQueuedAgain){
-      cloudSaveQueuedAgain = false;
-      scheduleCloudSave();
-    }
-  }
 }
 
 window.checkAndPromptUsername = function checkAndPromptUsername(callback) {
