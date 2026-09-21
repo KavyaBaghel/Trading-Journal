@@ -4980,7 +4980,7 @@ function destroy(id){ if(charts[id]) charts[id].destroy(); }
 
 function sorted(data=filtered){
   return data
-    .map(t => [t, new Date(t.openUtc).getTime()])
+    .map(t => [t, t._openMs])
     .sort((a,b) => a[1]-b[1])
     .map(pair => pair[0]);
 }
@@ -5040,12 +5040,12 @@ function mistakes(t){
   const rr = tradePlannedRr(t);
   const vol = Number(t.volume || t.lot || t.size || 0);
   const prevVol = prev ? Number(prev.volume || prev.lot || prev.size || 0) : 0;
-  const diffMinutes = prev ? (new Date(t.openUtc)-new Date(prev.openUtc))/60000 : Infinity;
+  const diffMinutes = prev ? (t._openMs-prev._openMs)/60000 : Infinity;
   if(prev && prev.pnl < 0 && diffMinutes >= 0 && diffMinutes <= 15) m.push('Revenge Trade');
   if(prev && prevVol > 0 && vol > prevVol) m.push('Increased Lot Size');
   if(String(t.stopMoved || t.movedStop || t.slAdjusted || '').toLowerCase()==='yes') m.push('Moved Stop Loss');
   if(String(t.entryConfirmed || t.entryConfirmation || '').toLowerCase()==='no') m.push('No Confirmation Entry');
-  const todayCount = sorted(trades || []).filter(x=>x.date === t.date && new Date(x.openUtc) <= new Date(t.openUtc)).length;
+  const todayCount = sorted(trades || []).filter(x=>x.date === t.date && x._openMs <= t._openMs).length;
   const maxTrades = accountMaxTrades();
   if(maxTrades && todayCount > maxTrades) m.push('Overtrading');
   if(rr != null && rr < minRr) m.push('No Patience');
