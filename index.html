@@ -16728,7 +16728,7 @@ input{
   background: linear-gradient(90deg, transparent, #a5b4fc, #ffffff 50%, #a5b4fc, transparent);
   box-shadow: 0 0 12px 2px rgba(129, 140, 248, 0.9);
   transform: translateX(-100%);
-  animation: journall-loading-sweep 3s cubic-bezier(0.4, 0.1, 0.6, 0.9) infinite;
+  animation: journall-loading-sweep 6s cubic-bezier(0.4, 0.1, 0.6, 0.9) infinite;
 }
 
 @keyframes journall-loading-sweep {
@@ -16749,7 +16749,7 @@ input{
   }
 
   #firebaseAuthLoading .journall-loading-progress-track::after {
-    animation-duration: 4.5s;
+    animation-duration: 9s;
   }
 }
 
@@ -20663,8 +20663,8 @@ body:not(.firebase-auth-required) #journallApp > .sidebar .sidebox *{
   var LOGGING_OUT_TEXT = 'Logging out securely...';
   var FALLBACK_TEXT = 'Loading Journall...';
   var LONG_WAIT_MS = 10000;
-  var NORMAL_STEP_MS = 3000;
-  var LONG_STEP_MS = 4000;
+  var NORMAL_STEP_MS = 6000;
+  var LONG_STEP_MS = 8000;
   var FADE_MS = 350;
 
   var running = false;
