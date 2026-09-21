@@ -5411,6 +5411,17 @@ function chartLine(id, labels, data){
 function chartBar(id, labels, data){
   const canvas = ensureCanvas(id);
   if(!canvas) return;
+  const barColors = data.map(v=>v>0?'#27a644':v<0?'#c0392b':'rgba(255,255,255,0.25)');
+  if(charts[id] && charts[id].canvas === canvas && charts[id].config.type === 'bar'){
+    const chart = charts[id];
+    chart.data.labels = labels;
+    const ds = chart.data.datasets[0];
+    ds.data = data;
+    ds.backgroundColor = barColors;
+    ds.borderColor = barColors;
+    chart.update('none');
+    return;
+  }
   destroy(id);
   charts[id]=new Chart(canvas,{
     type:'bar',
@@ -5419,8 +5430,8 @@ function chartBar(id, labels, data){
       datasets:[{
         label:'P&L',
         data,
-        backgroundColor:data.map(v=>v>0?'#27a644':v<0?'#c0392b':'rgba(255,255,255,0.25)'),
-        borderColor:data.map(v=>v>0?'#27a644':v<0?'#c0392b':'rgba(255,255,255,0.25)'),
+        backgroundColor:barColors,
+        borderColor:barColors,
         borderWidth:1,
         borderRadius:8
       }]
