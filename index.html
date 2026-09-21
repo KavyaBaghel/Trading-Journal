@@ -11008,6 +11008,7 @@ function renderJournalPage(){
 }
 
 function renderAll(){
+console.trace('renderAll ENTRY, callCount=', (window.__renderAllCallCount = (window.__renderAllCallCount||0)+1));
 console.time('journall:renderAll:total');
 console.time('journall:renderAll:applyFilters');applyFilters();console.timeEnd('journall:renderAll:applyFilters');
 console.time('journall:renderAll:renderSide');renderSide();console.timeEnd('journall:renderAll:renderSide');
