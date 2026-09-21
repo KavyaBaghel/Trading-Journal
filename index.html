@@ -10419,7 +10419,7 @@ function normalizeJournalSetup(value=''){
   if(key.includes('no confirmation') || key.includes('no confirm')) return 'No Confirmation Setup';
   return raw;
 }
-function tradeOpenTimeMs(trade){ const ms = new Date(trade?.openUtc || `${trade?.date || ''}T${trade?.time || '00:00'}`).getTime(); return Number.isFinite(ms) ? ms : 0; }
+function tradeOpenTimeMs(trade){ if(Number.isFinite(trade?._openMs)) return trade._openMs; const ms = new Date(trade?.openUtc || `${trade?.date || ''}T${trade?.time || '00:00'}`).getTime(); return Number.isFinite(ms) ? ms : 0; }
 function riskRewardRatio(trade){
   if(!trade || !Number(trade.entry) || !Number(trade.sl) || !Number(trade.tp)) return null;
   const entry=Number(trade.entry), sl=Number(trade.sl), tp=Number(trade.tp), side=String(trade.side||'').toUpperCase();
