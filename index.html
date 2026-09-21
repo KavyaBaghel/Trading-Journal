@@ -4673,6 +4673,7 @@ function normalizeImportedTrade(trade){
     session: timeFields.session,
     timestamp: timeFields.timestamp,
     openUtc: trade.openUtc || `${trade.date || new Date().toISOString().slice(0,10)}T${trade.time || '12:00:00'}`,
+    _openMs: new Date(trade.openUtc || `${trade.date || new Date().toISOString().slice(0,10)}T${trade.time || '12:00:00'}`).getTime(),
     entry,
     exit,
     sl: safeTradeNumber(trade.sl, 0),
