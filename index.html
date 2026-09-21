@@ -5499,7 +5499,8 @@ function chartBar(id, labels, data){
 function chartDoughnut(id, labels, data, colors, formatter='money'){
   const canvas = ensureCanvas(id);
   if(!canvas) return;
-  const safeColors = data.map((v,i)=> v === 0 ? '#8f8368' : colors[i % colors.length]);
+  const safeColorPalette = Array.isArray(colors) && colors.length ? colors : ['#5e6ad2','#27a644','#e5484d','#f5a623','#8a8f98'];
+  const safeColors = (Array.isArray(data) ? data : []).map((v,i)=> v === 0 ? '#8f8368' : safeColorPalette[i % safeColorPalette.length]);
   const total = data.reduce((a,b)=>a+Number(b || 0),0);
   if(charts[id] && charts[id].canvas === canvas && charts[id].config.type === 'doughnut'){
     const chart = charts[id];
