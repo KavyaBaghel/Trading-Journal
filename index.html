@@ -16673,12 +16673,10 @@ input{
   0%, 100% {
     opacity: 0.78;
     transform: scale(0.98);
-    filter: drop-shadow(0 0 0 transparent);
   }
   50% {
     opacity: 1;
     transform: scale(1.03);
-    filter: drop-shadow(0 0 14px var(--jl-glow));
   }
 }
 
@@ -16704,7 +16702,17 @@ input{
   height: 4px;
   border-radius: 999px;
   box-shadow: 0 0 8px rgba(99, 102, 241, 0.25);
+}
+
+#firebaseAuthLoading .journall-loading-progress::before {
+  content: "";
+  position: absolute;
+  inset: -6px;
+  border-radius: inherit;
+  box-shadow: 0 0 20px 2px rgba(99, 102, 241, 0.6);
+  opacity: 0;
   animation: journall-loading-halo 3.6s ease-in-out infinite;
+  pointer-events: none;
 }
 
 #firebaseAuthLoading .journall-loading-progress-track {
@@ -16737,8 +16745,8 @@ input{
 }
 
 @keyframes journall-loading-halo {
-  0%, 100% { box-shadow: 0 0 8px rgba(99, 102, 241, 0.25); }
-  50% { box-shadow: 0 0 20px 2px rgba(99, 102, 241, 0.6); }
+  0%, 100% { opacity: 0; }
+  50% { opacity: 1; }
 }
 
 /* Reduced motion: the bar keeps sweeping (it is the "still working" signal), just slower; the halo stops pulsing. */
