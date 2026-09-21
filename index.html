@@ -4978,11 +4978,16 @@ function resizeChartsSoon(){
 
 function destroy(id){ if(charts[id]) charts[id].destroy(); }
 
+let _sortedCache = null, _sortedCacheKey = null;
 function sorted(data=filtered){
-  return data
+  if (data === _sortedCacheKey) return _sortedCache;
+  const result = data
     .map(t => [t, t._openMs])
     .sort((a,b) => a[1]-b[1])
     .map(pair => pair[0]);
+  _sortedCacheKey = data;
+  _sortedCache = result;
+  return result;
 }
 
 function accountDailyLossLimitAmount(config=getAccountConfig()){
@@ -11065,8 +11070,12 @@ window.addEventListener('hashchange', openHashTab);
 
 if(typeof window.journallReloadDataFromStorage === 'function') window.journallReloadDataFromStorage();
 renderAll();
-openHashTab();
-syncMobileActiveTab();
+requestAnimationFrame(() => {
+  openHashTab();
+  requestAnimationFrame(() => {
+    syncMobileActiveTab();
+  });
+});
 
 document.querySelectorAll('.nav button').forEach(btn=>{
 btn.addEventListener('click', ()=>{
