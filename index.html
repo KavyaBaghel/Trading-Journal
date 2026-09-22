@@ -16783,6 +16783,77 @@ input{
 #journallApp .section.active { animation-name: journall-page-enter !important; }
 </style>
 
+
+<style id="journall-jl-redesign">
+#firebaseAuthGate .firebase-auth-card {
+  padding: 22px !important;
+  gap: 13px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  max-width: 340px !important;
+}
+.jl-logo-wrap { display: flex !important; align-items: center !important; justify-content: center !important; gap: 10px !important; }
+.jl-logo { display: inline-flex !important; align-items: center !important; gap: 10px !important; color: #6366f1 !important; animation: jl-pulse 2.6s ease-in-out infinite !important; }
+.jl-mark {
+  position: relative !important;
+  display: grid !important;
+  width: 44px !important;
+  height: 44px !important;
+  place-items: center !important;
+  border: 1px solid currentColor !important;
+  border-radius: 13px !important;
+  font-size: 26px !important;
+  font-weight: 800 !important;
+  line-height: 1 !important;
+  background: #0a0a0a !important;
+}
+.jl-wordmark { font-size: 30px !important; font-weight: 800 !important; letter-spacing: -0.04em !important; color: #f7f8f8 !important; }
+@keyframes jl-pulse { 0%, 100% { opacity: .8; } 50% { opacity: 1; filter: drop-shadow(0 0 14px rgba(99,102,241,.8)); } }
+.jl-heading { margin: 0 !important; text-align: center !important; }
+.jl-title { margin: 0 0 6px !important; font-size: 1.4rem !important; font-weight: 700 !important; letter-spacing: -0.01em !important; color: #f7f8f8 !important; }
+.jl-subtitle { margin: 0 !important; color: #8a95a6 !important; font-size: .95rem !important; }
+.jl-field { display: flex !important; flex-direction: column !important; gap: 5px !important; text-align: left !important; width: 100% !important; }
+.jl-field label { font-size: .78rem !important; color: #8a95a6 !important; }
+.jl-field input {
+  appearance: none !important;
+  box-sizing: border-box !important;
+  width: 100% !important;
+  border: 1px solid rgba(255,255,255,0.12) !important;
+  background: linear-gradient(180deg, rgba(255,255,255,0.045), rgba(255,255,255,0.01)) !important;
+  color: #f7f8f8 !important;
+  font-size: .95rem !important;
+  height: 46px !important;
+  padding: 0 14px !important;
+  border-radius: 13px !important;
+  outline: none !important;
+}
+.jl-field input:focus { border-color: #6366f1 !important; box-shadow: 0 0 0 3px rgba(99,102,241,0.16) !important; }
+.jl-error { min-height: 15px !important; font-size: .76rem !important; color: #f38ba0 !important; text-align: left !important; display: block !important; }
+.jl-field-row { position: relative !important; width: 100% !important; }
+.jl-field-row input { padding-right: 44px !important; }
+.jl-toggle-pw { position: absolute !important; right: 6px !important; top: 50% !important; transform: translateY(-50%) !important; width: 32px !important; height: 32px !important; display: grid !important; place-items: center !important; background: transparent !important; border: none !important; border-radius: 8px !important; color: #8a95a6 !important; cursor: pointer !important; }
+.jl-toggle-pw svg { width: 17px !important; height: 17px !important; }
+.jl-field-meta { display: flex !important; justify-content: flex-end !important; width: 100% !important; margin-top: -6px !important; }
+.jl-link { background: none !important; border: none !important; padding: 0 !important; font-size: .78rem !important; color: #8a95a6 !important; cursor: pointer !important; text-decoration: underline !important; }
+#bypassAuthBtn.jl-link { margin-top: 4px !important; min-height: 0 !important; background: none !important; border: none !important; box-shadow: none !important; font-weight: 400 !important; }
+.jl-btn { appearance: none !important; box-sizing: border-box !important; width: 100% !important; border: none !important; border-radius: 13px !important; font-size: .95rem !important; font-weight: 600 !important; height: 46px !important; padding: 0 16px !important; cursor: pointer !important; display: inline-flex !important; align-items: center !important; justify-content: center !important; gap: 9px !important; }
+.jl-btn-primary { background: linear-gradient(135deg, #6366f1, #7c7ff5) !important; color: #fff !important; box-shadow: 0 10px 26px -10px rgba(99,102,241,0.85) !important; }
+#firebaseGateSignInBtn.jl-btn-google {
+  background: linear-gradient(180deg, #ffffff, #f6f7fb) !important;
+  color: #1f1f1f !important;
+  border: 1px solid rgba(255,255,255,0.6) !important;
+  box-shadow: 0 10px 24px -12px rgba(0,0,0,0.55) !important;
+}
+.jl-spinner { width: 14px !important; height: 14px !important; border-radius: 50% !important; border: 2px solid rgba(255,255,255,0.4) !important; border-top-color: #fff !important; animation: jl-spin 700ms linear infinite !important; display: none !important; }
+.jl-btn.is-loading .jl-spinner { display: inline-block !important; }
+@keyframes jl-spin { to { transform: rotate(360deg); } }
+.jl-divider { display: flex !important; align-items: center !important; gap: 10px !important; color: #8a95a6 !important; font-size: .78rem !important; width: 100% !important; }
+.jl-divider::before, .jl-divider::after { content: "" !important; flex: 1 !important; height: 1px !important; background: rgba(255,255,255,0.09) !important; }
+.jl-status { min-height: 18px !important; font-size: .82rem !important; color: #8a95a6 !important; text-align: center !important; width: 100% !important; }
+.jl-status.is-success { color: #7fd6a5 !important; }
+.jl-footnote { color: #8a95a6 !important; font-size: .78rem !important; max-width: 320px !important; line-height: 1.5 !important; text-align: center !important; margin: 0 !important; }
+.jl-message { font-size: 13px !important; color: #8a95a6 !important; text-align: center !important; }
+</style>
 <style id="journall-pill-removal-final">
 /* ── FINAL: Remove pill/rectangle outline around logo on sign-in ── */
 .signin-copy::before,
