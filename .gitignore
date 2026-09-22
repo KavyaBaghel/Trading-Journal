@@ -18,3 +18,15 @@ CLAUDE.md
 .wrangler/
 .serena/
 local-backup-before-pull/
+
+.app-profile-chrome/
+index.html.backup*
+index.html.bak*
+index.html.before*
+index.html.audit_*
+myTrades_export.json
+loading-screen-reference.html
+apply-loading-screen.ps1
+CLAUDE-CODE-TASK-loading-screen-v3.md
+CLAUDE-HANDOFF-WORKFLOW.md
+ReportHistory-20318944.html
