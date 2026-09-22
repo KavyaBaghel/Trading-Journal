@@ -1,4 +1,4 @@
-﻿function corsHeaders(origin, env) {
+function corsHeaders(origin, env) {
   const localOrigins = ["http://127.0.0.1:8787", "http://localhost:8787"];
   // Electron and installed file-based apps send Origin: null. The Firebase ID
   // token is still verified for every request, so this only enables the same
@@ -74,7 +74,8 @@ async function handleAiCoach(request, env, cors) {
     },
     body: JSON.stringify({
       model: env.GROQ_MODEL || "openai/gpt-oss-20b",
-      max_tokens: mode === "generation" ? 500 : 450,
+      max_tokens: mode === "generation" ? 900 : 800,
+      reasoning: { effort: "low" },
       temperature: mode === "generation" ? 0.35 : 0.25,
       messages: [
         {
