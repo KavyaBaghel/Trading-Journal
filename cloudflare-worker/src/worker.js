@@ -74,8 +74,7 @@ async function handleAiCoach(request, env, cors) {
     },
     body: JSON.stringify({
       model: env.GROQ_MODEL || "openai/gpt-oss-20b",
-      max_tokens: mode === "generation" ? 900 : 800,
-      reasoning: { effort: "low" },
+      max_tokens: mode === "generation" ? 1400 : 1200,
       temperature: mode === "generation" ? 0.35 : 0.25,
       messages: [
         {
