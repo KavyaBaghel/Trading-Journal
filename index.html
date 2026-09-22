@@ -3334,38 +3334,41 @@ tr:hover {
 
     <div id="firebaseAuthLoading" class="login-loading"><div class="journall-loading-bg" aria-hidden="true"><span class="journall-bg-glow"></span><canvas class="journall-bg-canvas"></canvas><span class="journall-bg-spot-glow"></span></div><div class="journall-loading-tilt" id="loadingTilt"><div class="journall-loading-logo" role="img" aria-label="Journall"><span class="journall-loading-mark" id="loadingMark" aria-hidden="true">J</span><span class="journall-loading-wordmark" aria-hidden="true">Journall</span></div></div><p id="firebaseAuthLoadingText" class="journall-loading-subtitle">Loading Journall...</p><div class="journall-loading-progress" aria-hidden="true"><span class="journall-loading-progress-track"></span></div><button id="firebaseAuthRetryBtn" class="btn primary" type="button" hidden>Retry</button></div>
 <div class="firebase-auth-card journall-signin-card" hidden>
-    <section class="signin-copy" aria-label="Journall overview">
-      <div class="signin-brand-clean">
-        <div class="signin-symbol-wrapper">
-          <span class="signin-symbol-j">J</span>
-          <span class="signin-symbol-slash"></span>
+    <div class="jl-logo-wrap">
+      <div class="jl-logo" role="img" aria-label="Journall">
+        <span class="jl-mark">J</span>
+        <span class="jl-wordmark">Journall</span>
+      </div>
+    </div>
+    <div class="jl-heading">
+      <p class="jl-title">Welcome back</p>
+      <p class="jl-subtitle">Sign in to get back to your trades.</p>
+    </div>
+    <button id="firebaseGateSignInBtn" class="jl-btn jl-btn-google" type="button"><span id="googleBtnContent" class="jl-btn-google-content"><svg class="google-logo-svg" viewBox="0 0 24 24" width="18" height="18"><path fill="#EA4335" d="M12 5.04c1.7 0 3.2.6 4.4 1.8l3.3-3.3C17.7 1.6 15 1 12 1 7.3 1 3.4 3.7 1.5 7.7l3.9 3C6.3 7.7 8.9 5.04 12 5.04z"/><path fill="#4285F4" d="M23.5 12.3c0-.8-.1-1.7-.2-2.5H12v4.8h6.5c-.3 1.5-1.1 2.8-2.4 3.7l3.7 2.9c2.2-2 3.7-5 3.7-8.9z"/><path fill="#FBBC05" d="M5.4 14.7c-.3-.8-.4-1.7-.4-2.7s.1-1.9.4-2.7L1.5 6.3C.5 8.2 0 10.3 0 12.5s.5 4.3 1.5 6.2l3.9-3z"/><path fill="#34A853" d="M12 23c3.2 0 6-1.1 7.9-2.9l-3.7-2.9c-1.1.7-2.5 1.2-4.2 1.2-3.1 0-5.7-2.7-6.6-5.7L1.5 15.7C3.4 19.7 7.3 23 12 23z"/></svg><span>Sign in with Google</span></span></button>
+    <div class="jl-divider">or</div>
+    <form id="jlEmailForm" novalidate>
+      <div class="jl-field">
+        <label for="jlEmailInput">Email</label>
+        <input type="email" id="jlEmailInput" name="email" placeholder="you@example.com" autocomplete="email" required>
+        <span class="jl-error" id="jlEmailError"></span>
+      </div>
+      <div class="jl-field">
+        <label for="jlPasswordInput">Password</label>
+        <div class="jl-field-row">
+          <input type="password" id="jlPasswordInput" name="password" placeholder="Enter your password" autocomplete="current-password" required minlength="8">
+          <button type="button" class="jl-toggle-pw" id="jlTogglePw" aria-label="Show password" aria-pressed="false"><svg id="jlEyeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M1.5 12S5 5 12 5s10.5 7 10.5 7-3.5 7-10.5 7S1.5 12 1.5 12Z"/><circle cx="12" cy="12" r="3"/></svg></button>
         </div>
-        <div class="signin-brand-title">Journall</div>
+        <span class="jl-error" id="jlPasswordError"></span>
+        <div class="jl-field-meta">
+          <button type="button" class="jl-link" id="jlForgotBtn">Forgot password?</button>
+        </div>
       </div>
-      <div class="signin-kicker">AI-powered trading journal</div>
-      <h1>Sign in to Journall</h1>
-      <p class="signin-lede">Your personal trading discipline system. Data stays private to your account.</p>
-      <div class="signin-feature-grid">
-        <div class="signin-feature"><span>01</span><strong>Daily discipline</strong><p>Track P&L, rule breaks, risk limit, and next action.</p></div>
-        <div class="signin-feature"><span>02</span><strong>AI-powered review</strong><p>Review weak patterns, mistakes, and psychology from your own journal.</p></div>
-        <div class="signin-feature"><span>03</span><strong>Psychology check-ins</strong><p>Complete mind checks before planning or logging trades.</p></div><div class="signin-feature"><span>04</span><strong>Drawdown tracking</strong><p>Keep daily rules, risk limits, and account progress visible.</p></div>
-      </div>
-    </section>
-    <aside class="signin-panel" aria-label="Sign in">
-      <div class="signin-panel-top">
-        <span class="signin-status-dot"></span>
-        <span>Secure Google sign-in</span>
-      </div>
-      <div class="signin-preview-card">
-        <div class="signin-preview-row"><span>Risk control</span><strong>Custom limit</strong></div>
-        <div class="signin-preview-row"><span>Psychology</span><strong>Pre-trade check</strong></div>
-        <div class="signin-preview-row"><span>Review mode</span><strong>Rules + AI</strong></div>
-      </div>
-      <button id="firebaseGateSignInBtn" class="btn signin-google-btn" type="button" style="display:flex; align-items:center; justify-content:center; gap:10px; width:100%;"><span id="googleBtnContent" style="display:inline-flex; align-items:center; justify-content:center; gap:10px;"><svg class="google-logo-svg" viewBox="0 0 24 24" width="18" height="18" style="display:inline-block; vertical-align:middle;"><path fill="#EA4335" d="M12 5.04c1.7 0 3.2.6 4.4 1.8l3.3-3.3C17.7 1.6 15 1 12 1 7.3 1 3.4 3.7 1.5 7.7l3.9 3C6.3 7.7 8.9 5.04 12 5.04z"/><path fill="#4285F4" d="M23.5 12.3c0-.8-.1-1.7-.2-2.5H12v4.8h6.5c-.3 1.5-1.1 2.8-2.4 3.7l3.7 2.9c2.2-2 3.7-5 3.7-8.9z"/><path fill="#FBBC05" d="M5.4 14.7c-.3-.8-.4-1.7-.4-2.7s.1-1.9.4-2.7L1.5 6.3C.5 8.2 0 10.3 0 12.5s.5 4.3 1.5 6.2l3.9-3z"/><path fill="#34A853" d="M12 23c3.2 0 6-1.1 7.9-2.9l-3.7-2.9c-1.1.7-2.5 1.2-4.2 1.2-3.1 0-5.7-2.7-6.6-5.7L1.5 15.7C3.4 19.7 7.3 23 12 23z"/></svg><span>Sign in with Google</span></span></button>
-      <button id="bypassAuthBtn" class="btn" type="button" onclick="bypassAuthAndOpenLocal()" style="margin-top:10px; width:100%; border:1px solid rgba(255,255,255,0.08); background:rgba(255,255,255,0.02); color:#8a8f98; border-radius:var(--radius-control); min-height:44px; font-weight:600; cursor:pointer;">Use Offline</button>
-      <div id="firebaseGateMessage" class="firebase-auth-message">Checking website sign-in...</div>
-      <p class="signin-footnote">Use Journall privately with your own Google account. Your journal data stays tied to your sign-in.</p>
-    </aside>
+      <button type="submit" class="jl-btn jl-btn-primary" id="jlEmailBtn"><span class="jl-spinner" aria-hidden="true"></span><span class="jl-btn-label">Sign in</span></button>
+      <p class="jl-status" id="jlStatusText" aria-live="polite"></p>
+    </form>
+    <button id="bypassAuthBtn" class="jl-link" type="button" onclick="bypassAuthAndOpenLocal()">Use Offline</button>
+    <div id="firebaseGateMessage" class="jl-message">Checking website sign-in...</div>
+    <p class="jl-footnote">By continuing, you agree to Journall's Terms and Privacy Policy.</p>
   </div>
 </div>
 <div class="mobile-appbar" hidden>
