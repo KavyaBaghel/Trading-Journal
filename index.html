@@ -3365,7 +3365,7 @@ tr:hover {
 <style>
 </style>
 
-    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://unpkg.com/lucide@0.525.0"></script>
     <script src="https://unpkg.com/reicon/cdn/reicon.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
     <style>
@@ -11717,6 +11717,7 @@ window.journallAiProxyUrl = aiProxyConfig?.url || '';
 if(authRetryBtn) authRetryBtn.addEventListener('click', () => location.reload());
 
 function shouldSyncKey(key){
+  if (key === 'krishna_journal_form_draft' || key === 'krishna_psychology_form_draft') return false;
   return syncExactKeys.includes(key) || syncPrefixes.some(prefix=>key === prefix || key.startsWith(prefix));
 }
 
