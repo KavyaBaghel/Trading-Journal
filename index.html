@@ -11463,7 +11463,6 @@ window.triggerJournalSignOut = function(){
   window.setAuthLoading(true);
   window.setAuthStatus('Logging out securely...');
 
-  localStorage.removeItem('journall_auth_bypassed');
   window.currentUser = null;
   const btn = document.getElementById('firebaseSignOutBtn');
   if(btn) {
@@ -12044,7 +12043,6 @@ async function initFirebaseAuth(){
         try { unsubscribeCloudSync(); } catch(e) {}
         unsubscribeCloudSync = null;
       }
-      localStorage.removeItem('journall_auth_bypassed');
       window.currentUser = null;
       try {
         await authModule.signOut(auth);
@@ -12080,12 +12078,6 @@ async function initFirebaseAuth(){
 
   authModule.onAuthStateChanged(auth, async user=>{ console.timeEnd('journall:imports-to-authstate'); console.time('journall:authstate-to-loaded');
     clearTimeout(initTimeout);
-    if(localStorage.getItem('journall_auth_bypassed') === '1'){
-      window.setAuthLoading(false);
-      window.currentUser = { uid: 'local_user', displayName: 'Local Trader', email: 'local@journall.app' };
-      window.openSignedInJournal('Opened locally. Cloud sync is disabled.');
-      return;
-    }
     window.currentUser = user;
     rememberFirebaseUserProfile(user);
     renderUserProfile();
@@ -12109,10 +12101,6 @@ async function initFirebaseAuth(){
 
 initFirebaseAuth().catch(err=>{
   console.error('Firebase failed to start:', err);
-  if(localStorage.getItem('journall_auth_bypassed') === '1'){
-    setGateVisible(false);
-    return;
-  }
   setGateVisible(true);
   setAuthLoading(false);
   setAuthStatus('Network error - try again.');
