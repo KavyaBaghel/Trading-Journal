@@ -4522,6 +4522,7 @@ tr:hover {
     async function autoSyncFromMT5() {
         // Desktop app only - skip on real mobile browsers
         if (/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) return;
+        if (location.hostname !== 'localhost' && location.hostname !== '127.0.0.1') return;
         const endpoint = 'http://localhost:8787/api/sync-broker';
         try {
             const response = await fetch(endpoint, {
