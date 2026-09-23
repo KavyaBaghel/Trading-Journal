@@ -3301,19 +3301,33 @@ tr:hover {
 #firebaseAuthGate {
   background: #010102 !important;
 }
-#firebaseAuthGate .antigravity-login-bg {
+#firebaseAuthGate .jl-bg {
   position: fixed;
   inset: 0;
-  display: block;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
   z-index: 0;
-  opacity: .78;
-  /* mix-blend-mode: screen; */
+  pointer-events: none;
+  --mx: 50%;
+  --my: 45%;
+  --spot: 0;
+}
+#firebaseAuthGate .jl-bg > span { position: absolute; inset: 0; }
+#firebaseAuthGate .jl-bg-glow {
+  background: radial-gradient(circle at 50% 30%, rgba(99, 102, 241, 0.16), transparent 38%);
+}
+#firebaseAuthGate .jl-bg-canvas {
+  position: absolute; inset: 0; display: block; width: 100%; height: 100%;
+}
+#firebaseAuthGate .jl-bg-spot-glow {
+  background: radial-gradient(circle 130px at var(--mx) var(--my), rgba(99, 102, 241, 0.18), transparent 100%);
+  opacity: var(--spot);
+}
+#firebaseAuthGate .jl-bg::after {
+  content: "";
+  position: absolute; inset: 0;
+  background: radial-gradient(ellipse at center, transparent 45%, rgba(0, 0, 0, 0.6) 100%);
 }
 @media (prefers-reduced-motion: reduce) {
-  #firebaseAuthGate .antigravity-login-bg { display: none; }
+  #firebaseAuthGate .jl-bg-canvas { display: none; }
 }
 </style>
 </head>
@@ -3330,7 +3344,7 @@ tr:hover {
   </div>
 </div>
 <div id="firebaseAuthGate" class="firebase-auth-gate show">
-  <canvas class="antigravity-login-bg" aria-hidden="true"></canvas>
+  <div class="jl-bg" aria-hidden="true"><span class="jl-bg-glow"></span><canvas class="jl-bg-canvas"></canvas><span class="jl-bg-spot-glow"></span></div>
 
     <div id="firebaseAuthLoading" class="login-loading"><div class="journall-loading-bg" aria-hidden="true"><span class="journall-bg-glow"></span><canvas class="journall-bg-canvas"></canvas><span class="journall-bg-spot-glow"></span></div><div class="journall-loading-tilt" id="loadingTilt"><div class="journall-loading-logo" role="img" aria-label="Journall"><span class="journall-loading-mark" id="loadingMark" aria-hidden="true">J</span><span class="journall-loading-wordmark" aria-hidden="true">Journall</span></div></div><p id="firebaseAuthLoadingText" class="journall-loading-subtitle">Loading Journall...</p><div class="journall-loading-progress" aria-hidden="true"><span class="journall-loading-progress-track"></span></div><button id="firebaseAuthRetryBtn" class="btn primary" type="button" hidden>Retry</button></div>
 <div class="jl-logo-wrap">
@@ -16781,6 +16795,58 @@ input{
 .jl-footnote { color: #8a95a6 !important; font-size: .78rem !important; max-width: 320px !important; line-height: 1.5 !important; text-align: center !important; margin: 0 !important; }
 .jl-message { font-size: 13px !important; color: #8a95a6 !important; text-align: center !important; }
 </style>
+<style id="jl-signin-card-rebuild">
+.journall-signin-card {
+  width: 100% !important;
+  max-width: 340px !important;
+  min-height: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  grid-template-columns: none !important;
+  gap: 13px !important;
+  padding: 22px !important;
+  border-radius: 26px !important;
+  border: 1px solid rgba(255, 255, 255, 0.16) !important;
+  background:
+    radial-gradient(120% 100% at 18% -10%, rgba(129, 140, 248, 0.20), transparent 55%),
+    radial-gradient(100% 80% at 100% 120%, rgba(99, 102, 241, 0.12), transparent 60%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.09), rgba(255, 255, 255, 0.02)) !important;
+  backdrop-filter: blur(28px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(28px) saturate(180%) !important;
+  box-shadow:
+    0 30px 70px -24px rgba(0, 0, 0, 0.7),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.04),
+    inset 0 1px 0 rgba(255, 255, 255, 0.22),
+    inset 0 -40px 60px -48px rgba(99, 102, 241, 0.55) !important;
+  overflow: visible !important;
+  position: relative !important;
+  color: #f7f8f8 !important;
+}
+.journall-signin-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: radial-gradient(130% 65% at 12% 0%, rgba(255, 255, 255, 0.16), transparent 60%);
+  pointer-events: none;
+}
+.journall-signin-card::after {
+  content: "";
+  position: absolute;
+  left: 12%;
+  right: 12%;
+  bottom: -22px;
+  height: 44px;
+  background: radial-gradient(closest-side, rgba(99, 102, 241, 0.38), transparent 72%);
+  filter: blur(18px);
+  z-index: -1;
+  pointer-events: none;
+}
+.journall-signin-card > * { position: relative; z-index: 1; }
+@media (max-width: 900px) {
+  .journall-signin-card { border-radius: 22px !important; }
+}
+</style>
 <style id="journall-pill-removal-final">
 /* ── FINAL: Remove pill/rectangle outline around logo on sign-in ── */
 .signin-copy::before,
@@ -20141,225 +20207,257 @@ body:not(.firebase-auth-required) #journallApp > .sidebar .sidebox *{
     </style>
 <script>
 (function(){
-  function startLoginAntigravity(){
-    const gate = document.getElementById('firebaseAuthGate');
-    const canvas = gate && gate.querySelector('.antigravity-login-bg');
-    const motionApi = window.Motion;
-    if(!gate || !canvas || !motionApi || typeof motionApi.animate !== 'function' || typeof motionApi.motionValue !== 'function') return null;
-    if(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return null;
+  const gate = document.getElementById('firebaseAuthGate');
+  if (!gate) return;
+  const bgLayer = gate.querySelector('.jl-bg');
+  if (!bgLayer) return;
+  const bgCanvas = bgLayer.querySelector('.jl-bg-canvas');
+  const bgCtx = bgCanvas.getContext('2d');
+  const bgReduceMotion = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+  if (bgReduceMotion) return;
+  const MOVE = 1;
 
-    const ctx = canvas.getContext('2d');
-    if(!ctx) return null;
+  const GRID_GAP = 26;
+  const POINTER_RADIUS = 100;
+  const WAVE_SPEED = 0.55;
+  const WAVE_BAND = 46;
+  const WAVE_MAX = 420;
+  const BUCKETS = 8;
 
-    const cursorX = motionApi.motionValue(window.innerWidth / 2);
-    const cursorY = motionApi.motionValue(window.innerHeight / 2);
-    const particles = [];
-    const particleColor = '#f5b84a';
-    const isMobileDevice = (navigator.userAgentData && navigator.userAgentData.mobile === true) || /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent || '');
-    const isLowCoreDevice = Number.isFinite(navigator.hardwareConcurrency) && navigator.hardwareConcurrency <= 4;
-    const particleCount = isMobileDevice || isLowCoreDevice ? 45 : 90;
-    const magnetRadiusFactor = .16;
-    const ringRadiusFactor = .08;
-    let width = 0;
-    let height = 0;
-    let frameId = 0;
-    let lastPointerAt = performance.now();
-    let lastWidth = 0;
-    let lastHeight = 0;
-    let autoPhase = 0;
-    let autoControls = null;
-    let cursorAnimationX = null;
-    let cursorAnimationY = null;
+  let gridW = 0, gridH = 0;
+  let dots = [];
+  let restBuckets = [];
+  let waves = [];
+  let activeDots = [];
+  let bgRaf = null;
+  let lastFrameTime = 0;
 
-    function resize(){
-      const rect = gate.getBoundingClientRect();
-      width = Math.max(1, rect.width || window.innerWidth);
-      height = Math.max(1, rect.height || window.innerHeight);
-      const dpr = Math.min(window.devicePixelRatio || 1, 1);
-      canvas.width = Math.round(width * dpr);
-      canvas.height = Math.round(height * dpr);
-      canvas.style.width = width + 'px';
-      canvas.style.height = height + 'px';
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      if(lastWidth && lastHeight){
-        const sx = width / lastWidth;
-        const sy = height / lastHeight;
-        particles.forEach(p => {
-          p.cx *= sx; p.cy *= sy; p.mx *= sx; p.my *= sy;
-        });
-        cursorX.set(cursorX.get() * sx);
-        cursorY.set(cursorY.get() * sy);
-      } else {
-        cursorX.set(width / 2);
-        cursorY.set(height / 2);
-      }
-      lastWidth = width;
-      lastHeight = height;
-    }
+  const pointer = { x: 0, y: 0, vx: 0, vy: 0, active: false };
+  const glow = { x: 0, y: 0, o: 0 };
 
-    function seedParticles(){
-      particles.length = 0;
-      for(let i = 0; i < particleCount; i++){
-        const x = Math.random() * width;
-        const y = Math.random() * height;
-        const z = -10 + Math.random() * 20;
-        particles.push({
-          t: Math.random() * 100,
-          speed: .012 + Math.random() * .026,
-          mx: x,
-          my: y,
-          mz: z,
-          cx: x,
-          cy: y,
-          cz: z,
-          randomRadiusOffset: Math.random() - .5,
-          drift: Math.random() * Math.PI * 2
-        });
+  function clamp(v, lo, hi){ return Math.max(lo, Math.min(hi, v)); }
+
+  function edgeFade(t){
+    if (t < 0.55) return 1 - (t / 0.55) * 0.65;
+    if (t < 0.9) return 0.35 * (1 - (t - 0.55) / 0.35);
+    return 0;
+  }
+
+  function buildJlGrid(){
+    const r = gate.getBoundingClientRect();
+    gridW = Math.max(1, Math.round(r.width));
+    gridH = Math.max(1, Math.round(r.height));
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    bgCanvas.width = Math.round(gridW * dpr);
+    bgCanvas.height = Math.round(gridH * dpr);
+    bgCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+    const cols = Math.floor(gridW / GRID_GAP) + 1;
+    const rows = Math.floor(gridH / GRID_GAP) + 1;
+    const x0 = (gridW - (cols - 1) * GRID_GAP) / 2;
+    const y0 = (gridH - (rows - 1) * GRID_GAP) / 2;
+    const cx = gridW * 0.5, cy = gridH * 0.4;
+    const rx = gridW * 0.5 * Math.SQRT2, ry = gridH * 0.55 * Math.SQRT2;
+
+    dots = [];
+    restBuckets = [];
+    for (let b = 0; b < BUCKETS; b++) restBuckets.push([]);
+
+    for (let j = 0; j < rows; j++) {
+      for (let i = 0; i < cols; i++) {
+        const hx = x0 + i * GRID_GAP;
+        const hy = y0 + j * GRID_GAP;
+        const fade = edgeFade(Math.hypot((hx - cx) / rx, (hy - cy) / ry));
+        const d = { hx: hx, hy: hy, ox: 0, oy: 0, vx: 0, vy: 0, z: 0, vz: 0, fade: fade, on: false };
+        dots.push(d);
+        const bucket = Math.round(fade * (BUCKETS - 1));
+        if (bucket > 0) restBuckets[bucket].push(d);
       }
     }
+    drawJlGrid();
+  }
 
-    function moveCursor(x, y){
-      lastPointerAt = performance.now();
-      if(cursorAnimationX) cursorAnimationX.stop();
-      if(cursorAnimationY) cursorAnimationY.stop();
-      cursorAnimationX = motionApi.animate(cursorX, x, { type:'spring', stiffness:180, damping:28, mass:.7 });
-      cursorAnimationY = motionApi.animate(cursorY, y, { type:'spring', stiffness:180, damping:28, mass:.7 });
+  function drawJlGrid(){
+    bgCtx.clearRect(0, 0, gridW, gridH);
+    for (let b = 1; b < BUCKETS; b++) {
+      const list = restBuckets[b];
+      if (!list || !list.length) continue;
+      bgCtx.fillStyle = 'rgba(255,255,255,' + (0.09 * b / (BUCKETS - 1)).toFixed(3) + ')';
+      for (let k = 0; k < list.length; k++) {
+        const d = list[k];
+        if (!d.on) bgCtx.fillRect(d.hx - 1, d.hy - 1, 2, 2);
+      }
     }
 
-    function onPointerMove(event){ moveCursor(event.clientX, event.clientY); }
+    const cx0 = gridW * 0.5, cy0 = gridH * 0.4;
+    for (let k = 0; k < activeDots.length; k++) {
+      const d = activeDots[k];
+      const z = clamp(d.z, 0, 1.4);
+      const persp = 1 + z * 0.05;
+      const x = cx0 + (d.hx + d.ox - cx0) * persp;
+      const y = cy0 + (d.hy + d.oy - cy0) * persp;
+      const m = Math.min(1, z);
+      const rC = Math.round(255 - 90 * m);
+      const gC = Math.round(255 - 75 * m);
+      const bC = Math.round(255 - 3 * m);
+      const a = Math.min(1, 0.09 * d.fade + z * 0.85);
+      bgCtx.fillStyle = 'rgba(' + rC + ',' + gC + ',' + bC + ',' + a.toFixed(3) + ')';
+      bgCtx.beginPath();
+      bgCtx.arc(x, y, 1 + z * 2, 0, 6.2832);
+      bgCtx.fill();
+    }
+  }
 
-    function draw(){
-      const idle = performance.now() - lastPointerAt > 1800;
-      const targetX = idle ? width / 2 + Math.sin(autoPhase * Math.PI * 2) * width * .18 : cursorX.get();
-      const targetY = idle ? height / 2 + Math.cos(autoPhase * Math.PI * 4) * height * .16 : cursorY.get();
-      const magnetRadius = Math.max(70, Math.min(width, height) * magnetRadiusFactor);
-      const ringRadius = Math.max(34, Math.min(width, height) * ringRadiusFactor);
-      const waveAmplitude = Math.max(5, Math.min(width, height) * .012);
+  function physicsFrame(now){
+    bgRaf = null;
+    const dt = clamp((now - lastFrameTime) / 16.667, 0.2, 2.5) || 1;
+    lastFrameTime = now;
 
-      ctx.clearRect(0, 0, width, height);
-      particles.forEach(p => {
-        p.t += p.speed;
-        const projection = 1 - p.cz / 50;
-        const projectedX = targetX * projection;
-        const projectedY = targetY * projection;
-        const dx = p.mx - projectedX;
-        const dy = p.my - projectedY;
-        const distance = Math.hypot(dx, dy);
-        let targetParticleX = p.mx;
-        let targetParticleY = p.my;
-        let targetParticleZ = p.mz;
+    for (let w = waves.length - 1; w >= 0; w--) {
+      waves[w].r = (now - waves[w].t0) * WAVE_SPEED;
+      if (waves[w].r > WAVE_MAX + WAVE_BAND) waves.splice(w, 1);
+    }
 
-        if(distance < magnetRadius){
-          const angle = Math.atan2(dy, dx) + autoPhase * .35;
-          const wave = Math.sin(p.t * .4 + angle) * (waveAmplitude * .5);
-          const deviation = p.randomRadiusOffset * (waveAmplitude * .42);
-          const currentRingRadius = ringRadius + wave + deviation;
-          targetParticleX = projectedX + currentRingRadius * Math.cos(angle);
-          targetParticleY = projectedY + currentRingRadius * Math.sin(angle);
-          targetParticleZ = p.mz + Math.sin(p.t) * waveAmplitude * .25;
-        } else {
-          targetParticleX += Math.sin(p.t * .35 + p.drift) * .12;
-          targetParticleY += Math.cos(p.t * .28 + p.drift) * .12;
+    pointer.vx *= Math.pow(0.8, dt);
+    pointer.vy *= Math.pow(0.8, dt);
+
+    const R2 = POINTER_RADIUS * POINTER_RADIUS;
+    const damp = Math.pow(0.86, dt);
+    const dampZ = Math.pow(0.78, dt);
+    let motion = 0;
+    activeDots = [];
+
+    for (let n = 0; n < dots.length; n++) {
+      const d = dots[n];
+      let zTarget = 0;
+
+      if (pointer.active) {
+        const dx = d.hx + d.ox - pointer.x;
+        const dy = d.hy + d.oy - pointer.y;
+        const dd = dx * dx + dy * dy;
+        if (dd < R2) {
+          const dist = Math.sqrt(dd) || 0.001;
+          const q = 1 - dist / POINTER_RADIUS;
+          const push = q * q * 1.8 * MOVE * dt;
+          d.vx += (dx / dist) * push + pointer.vx * q * 0.05 * MOVE;
+          d.vy += (dy / dist) * push + pointer.vy * q * 0.05 * MOVE;
+          zTarget = Math.pow(q, 1.5);
         }
+      }
 
-        p.cx += (targetParticleX - p.cx) * .075;
-        p.cy += (targetParticleY - p.cy) * .075;
-        p.cz += (targetParticleZ - p.cz) * .075;
+      for (let w = 0; w < waves.length; w++) {
+        const wx = d.hx - waves[w].x;
+        const wy = d.hy - waves[w].y;
+        const dist = Math.sqrt(wx * wx + wy * wy) || 0.001;
+        const diff = Math.abs(dist - waves[w].r);
+        if (diff < WAVE_BAND && waves[w].r < WAVE_MAX) {
+          const q = 1 - diff / WAVE_BAND;
+          const amp = q * (1 - waves[w].r / WAVE_MAX) * 1.6 * dt;
+          d.vx += (wx / dist) * amp * MOVE;
+          d.vy += (wy / dist) * amp * MOVE;
+          d.vz += amp * 0.12;
+        }
+      }
 
-        const currentDistance = Math.hypot(p.cx - projectedX, p.cy - projectedY);
-        const ringDistance = Math.abs(currentDistance - ringRadius);
-        const ringFactor = Math.max(0, Math.min(1, 1 - ringDistance / Math.max(18, ringRadius * .7)));
-        const depth = .72 + Math.max(0, Math.min(1, (p.cz + 10) / 20)) * .5;
-        const length = (5 + ringFactor * 4) * depth;
-        const thickness = Math.max(.8, 1.1 * depth);
-        const opacity = Math.min(.78, (.12 + ringFactor * .72) * depth);
-        const particleAngle = Math.atan2(p.cy - projectedY, p.cx - projectedX) + Math.PI / 2;
+      d.vx += -d.ox * 0.055 * dt;
+      d.vy += -d.oy * 0.055 * dt;
+      d.vx *= damp;
+      d.vy *= damp;
+      d.ox += d.vx * dt;
+      d.oy += d.vy * dt;
 
-        if(opacity < .03) return;
-        ctx.save();
-        ctx.translate(p.cx, p.cy);
-        ctx.rotate(particleAngle);
-        ctx.globalAlpha = opacity;
-        ctx.fillStyle = particleColor;
-        ctx.shadowColor = particleColor;
-        ctx.shadowBlur = ringFactor > .25 ? 8 * depth : 3 * depth;
-        ctx.beginPath();
-        if(typeof ctx.roundRect === 'function') ctx.roundRect(-thickness / 2, -length / 2, thickness, length, thickness / 2);
-        else ctx.rect(-thickness / 2, -length / 2, thickness, length);
-        ctx.fill();
-        ctx.restore();
+      d.vz += (zTarget - d.z) * 0.16 * dt;
+      d.vz *= dampZ;
+      d.z += d.vz * dt;
+
+      const energy = Math.abs(d.ox) + Math.abs(d.oy) + Math.abs(d.vx) + Math.abs(d.vy) + Math.abs(d.z) + Math.abs(d.vz);
+      if (energy < 0.02) {
+        d.ox = d.oy = d.vx = d.vy = d.z = d.vz = 0;
+        d.on = false;
+      } else {
+        d.on = true;
+        activeDots.push(d);
+        motion += Math.abs(d.vx) + Math.abs(d.vy) + Math.abs(d.vz);
+      }
+    }
+
+    glow.x += (pointer.x - glow.x) * 0.2 * dt;
+    glow.y += (pointer.y - glow.y) * 0.2 * dt;
+    glow.o += ((pointer.active ? 1 : 0) - glow.o) * 0.16 * dt;
+    const glowMoving = Math.abs(pointer.x - glow.x) + Math.abs(pointer.y - glow.y) > 0.3 || Math.abs((pointer.active ? 1 : 0) - glow.o) > 0.01;
+    if (!glowMoving) { glow.x = pointer.x; glow.y = pointer.y; glow.o = pointer.active ? 1 : 0; }
+    bgLayer.style.setProperty('--mx', glow.x + 'px');
+    bgLayer.style.setProperty('--my', glow.y + 'px');
+    bgLayer.style.setProperty('--spot', glow.o);
+
+    drawJlGrid();
+
+    const keepGoing = motion > 0.05 || waves.length > 0 || glowMoving ||
+                      (!pointer.active && activeDots.length > 0);
+    bgRaf = keepGoing ? requestAnimationFrame(physicsFrame) : null;
+  }
+
+  function bgKick(){
+    if (!bgRaf) {
+      lastFrameTime = performance.now();
+      bgRaf = requestAnimationFrame(physicsFrame);
+    }
+  }
+
+  function localPoint(e){
+    const r = gate.getBoundingClientRect();
+    return { x: e.clientX - r.left, y: e.clientY - r.top };
+  }
+
+  function bgEnter(e){
+    const p = localPoint(e);
+    pointer.x = p.x; pointer.y = p.y;
+    pointer.vx = 0; pointer.vy = 0;
+    glow.x = p.x; glow.y = p.y;
+    pointer.active = true;
+    bgKick();
+  }
+
+  function bgMove(e){
+    const p = localPoint(e);
+    pointer.vx = clamp(p.x - pointer.x, -40, 40);
+    pointer.vy = clamp(p.y - pointer.y, -40, 40);
+    pointer.x = p.x; pointer.y = p.y;
+    pointer.active = true;
+    bgKick();
+  }
+
+  function bgLeave(){
+    pointer.active = false;
+    bgKick();
+  }
+
+  function bgDown(e){
+    bgEnter(e);
+    waves.push({ x: pointer.x, y: pointer.y, t0: performance.now(), r: 0 });
+    bgKick();
+  }
+
+  gate.addEventListener('pointerenter', bgEnter);
+  gate.addEventListener('pointerdown', bgDown);
+  gate.addEventListener('pointermove', bgMove);
+  gate.addEventListener('pointerleave', bgLeave);
+  gate.addEventListener('pointerup', function(e){ if (e.pointerType === 'touch') bgLeave(); });
+  gate.addEventListener('pointercancel', bgLeave);
+
+  function init(){
+    buildJlGrid();
+    if (window.ResizeObserver) {
+      const ro = new ResizeObserver(function(){
+        const r = gate.getBoundingClientRect();
+        if (Math.round(r.width) !== gridW || Math.round(r.height) !== gridH) buildJlGrid();
       });
-      frameId = requestAnimationFrame(draw);
+      ro.observe(gate);
     }
-
-    resize();
-    seedParticles();
-    const onResize = () => { resize(); if(!particles.length) seedParticles(); };
-    window.addEventListener('resize', onResize, { passive:true });
-    window.addEventListener('pointermove', onPointerMove, { passive:true });
-    autoControls = motionApi.animate(0, 1, { duration:12, repeat:Infinity, ease:'linear', onUpdate: latest => { autoPhase = latest; } });
-    frameId = requestAnimationFrame(draw);
-
-    return function stop(){
-      cancelAnimationFrame(frameId);
-      window.removeEventListener('resize', onResize);
-      window.removeEventListener('pointermove', onPointerMove);
-      if(autoControls) autoControls.stop();
-      if(cursorAnimationX) cursorAnimationX.stop();
-      if(cursorAnimationY) cursorAnimationY.stop();
-      ctx.clearRect(0, 0, width, height);
-    };
   }
 
-  function initLoginAntigravity(){
-    const gate = document.getElementById('firebaseAuthGate');
-    if(!gate) return;
-    let stop = null;
-    let motionLoading = false;
-
-    function isVisible(){
-      return gate.classList.contains('show') && !gate.hidden && getComputedStyle(gate).display !== 'none';
-    }
-
-    function loadMotion(onReady){
-      if(window.Motion && typeof window.Motion.animate === 'function' && typeof window.Motion.motionValue === 'function'){
-        onReady();
-        return;
-      }
-      const existingScript = document.querySelector('script[src="https://cdn.jsdelivr.net/npm/motion@latest/dist/motion.js"]');
-      if(existingScript){
-        existingScript.addEventListener('load', onReady, { once:true });
-        return;
-      }
-      motionLoading = true;
-      const script = document.createElement('script');
-      script.src = 'https://cdn.jsdelivr.net/npm/motion@latest/dist/motion.js';
-      script.async = true;
-      script.onload = () => { motionLoading = false; onReady(); };
-      script.onerror = () => { motionLoading = false; };
-      document.head.appendChild(script);
-    }
-
-    function sync(){
-      if(isVisible() && !stop && !motionLoading){
-        loadMotion(() => {
-          if(isVisible() && !stop) stop = startLoginAntigravity();
-        });
-      }
-      if(!isVisible() && stop){
-        stop();
-        stop = null;
-      }
-    }
-
-    sync();
-    const observer = new MutationObserver(sync);
-    observer.observe(gate, { attributes:true, attributeFilter:['class','hidden','style'] });
-    window.addEventListener('beforeunload', () => { observer.disconnect(); if(stop) stop(); }, { once:true });
-  }
-
-  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initLoginAntigravity, { once:true });
-  else initLoginAntigravity();
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init, { once: true });
+  else init();
 })();
 </script>
 <script>
