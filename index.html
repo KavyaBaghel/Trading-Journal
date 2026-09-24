@@ -12091,6 +12091,9 @@ async function initFirebaseAuth(){
     cloudReady = false;
     if(!user){
       window.setAuthLoading(false);
+      // Clear the initial "Checking website sign-in..." placeholder once auth has resolved to signed-out
+      const gateMsgEl = document.getElementById('firebaseGateMessage');
+      if(gateMsgEl && /^Checking website sign-in/i.test(gateMsgEl.textContent || '')) window.setAuthStatus('');
       sessionStorage.removeItem('journall:cloud-loaded');
       window.setGateVisible(true);
       return;
