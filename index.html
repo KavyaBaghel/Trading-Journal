@@ -3354,7 +3354,7 @@ tr:hover {
   <p class="jl-title">Welcome back</p>
   <p class="jl-subtitle">Sign in to get back to your trades.</p>
 </div>
-<form id="jlEmailForm" class="firebase-auth-card journall-signin-card" novalidate hidden>
+<form id="jlEmailForm" class="firebase-auth-card journall-signin-card" method="post" action="#" onsubmit="event.preventDefault();return false;" novalidate hidden>
   <button id="firebaseGateSignInBtn" class="jl-btn jl-btn-google" type="button"><span id="googleBtnContent" class="jl-btn-google-content"><svg class="google-logo-svg" viewBox="0 0 24 24" width="18" height="18"><path fill="#EA4335" d="M12 5.04c1.7 0 3.2.6 4.4 1.8l3.3-3.3C17.7 1.6 15 1 12 1 7.3 1 3.4 3.7 1.5 7.7l3.9 3C6.3 7.7 8.9 5.04 12 5.04z"/><path fill="#4285F4" d="M23.5 12.3c0-.8-.1-1.7-.2-2.5H12v4.8h6.5c-.3 1.5-1.1 2.8-2.4 3.7l3.7 2.9c2.2-2 3.7-5 3.7-8.9z"/><path fill="#FBBC05" d="M5.4 14.7c-.3-.8-.4-1.7-.4-2.7s.1-1.9.4-2.7L1.5 6.3C.5 8.2 0 10.3 0 12.5s.5 4.3 1.5 6.2l3.9-3z"/><path fill="#34A853" d="M12 23c3.2 0 6-1.1 7.9-2.9l-3.7-2.9c-1.1.7-2.5 1.2-4.2 1.2-3.1 0-5.7-2.7-6.6-5.7L1.5 15.7C3.4 19.7 7.3 23 12 23z"/></svg><span>Continue with Google</span></span></button>
   <div class="jl-divider">or</div>
   <div class="jl-field">
@@ -12117,6 +12117,46 @@ initFirebaseAuth().catch(err=>{
   setAuthLoading(false);
   setAuthStatus('Network error - try again.');
 });
+</script>
+<script id="journall-email-form-guard">
+/* Bug #2: the email/password form has no auth wiring yet. It must never submit natively:
+   a native GET submit puts ?email=...&password=... in the URL (history, logs, referrers). */
+(function(){
+  try{
+    var u = new URL(location.href);
+    if(u.searchParams.has('password') || u.searchParams.has('email')){
+      u.searchParams.delete('password');
+      u.searchParams.delete('email');
+      history.replaceState(null, '', u.pathname + u.search + u.hash);
+    }
+  }catch(e){}
+
+  var form = document.getElementById('jlEmailForm');
+  if(form){
+    form.addEventListener('submit', function(ev){
+      ev.preventDefault();
+      var pw = document.getElementById('jlPasswordInput');
+      if(pw) pw.value = '';
+      var status = document.getElementById('jlStatusText');
+      if(status) status.textContent = 'Email sign-in is not available yet. Use Continue with Google.';
+    });
+  }
+
+  var toggle = document.getElementById('jlTogglePw');
+  var input = document.getElementById('jlPasswordInput');
+  var icon = document.getElementById('jlEyeIcon');
+  if(toggle && input){
+    var EYE = '<path d="M1.5 12S5 5 12 5s10.5 7 10.5 7-3.5 7-10.5 7S1.5 12 1.5 12Z"/><circle cx="12" cy="12" r="3"/>';
+    var EYE_OFF = '<path d="M17.94 17.94A10.94 10.94 0 0 1 12 19C5 19 1.5 12 1.5 12a18.5 18.5 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 5c7 0 10.5 7 10.5 7a18.5 18.5 0 0 1-2.16 3.19"/><path d="M14.12 14.12a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/>';
+    toggle.addEventListener('click', function(){
+      var reveal = input.type === 'password';
+      input.type = reveal ? 'text' : 'password';
+      toggle.setAttribute('aria-pressed', reveal ? 'true' : 'false');
+      toggle.setAttribute('aria-label', reveal ? 'Hide password' : 'Show password');
+      if(icon) icon.innerHTML = reveal ? EYE_OFF : EYE;
+    });
+  }
+})();
 </script>
 
 
