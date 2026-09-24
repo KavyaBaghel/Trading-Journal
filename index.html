@@ -2590,14 +2590,6 @@ tr:hover {
   font-size:14px;
   margin:0;
 }
-.signin-copy {
-  background:
-    radial-gradient(circle at 20% 10%, rgba(94,106,210,.24), transparent 30%),
-    linear-gradient(135deg, rgba(94,106,210,.12), rgba(13,14,17,.98) 55%) !important;
-}
-.signin-feature-grid {
-  grid-template-columns:repeat(2,minmax(0,1fr)) !important;
-}
 /* JOURNALL_MAIN_LAYOUT_SPACING_FIX */
 #journallApp > .main {
   display: flex !important;
@@ -2616,27 +2608,10 @@ tr:hover {
 
 #journallApp #commandCenter.command-center {
   margin-top: 0 !important;
-}
-
-
-/* JOURNALL_REMOVE_RECTANGLE_BOX_PILL_FROM_LOGO */
-#firebaseAuthGate .signin-brand,
-#firebaseAuthGate .signin-brand *,
-#firebaseAuthGate .signin-brand > div,
-.firebase-auth-card .signin-brand,
-.firebase-auth-card .signin-brand *,
-.firebase-auth-card .signin-brand > div {
-  background: transparent !important;
-  background-color: transparent !important;
-  border: none !important;
-  border-radius: 0 !important;
-  box-shadow: none !important;
-  outline: none !important;
-}
+}/* JOURNALL_REMOVE_RECTANGLE_BOX_PILL_FROM_LOGO */
 
 #firebaseAuthGate .logo,
-.signin-brand .logo,
-.firebase-auth-card .logo {
+.firebase-auth-card .logo{
   background: transparent !important;
   border: none !important;
   box-shadow: none !important;
@@ -2665,19 +2640,6 @@ tr:hover {
   transition: opacity 0.25s ease !important;
   transform: translate3d(-1000px, -1000px, 0);
   will-change: transform, opacity !important;
-}
-
-
-.signin-brand-clean {
-  display: flex !important;
-  flex-direction: column !important;
-  align-items: center !important;
-  justify-content: center !important;
-  margin: 0 auto 28px !important;
-  padding: 0 !important;
-  background: transparent !important;
-  border: none !important;
-  box-shadow: none !important;
 }
 
 .signin-symbol-wrapper {
@@ -2712,18 +2674,6 @@ tr:hover {
   border-radius: 999px !important;
   transform: rotate(-28deg) !important;
   box-shadow: 0 0 14px rgba(16, 185, 129, 0.95), 0 0 28px rgba(16, 185, 129, 0.6) !important;
-}
-
-.signin-brand-title {
-  font-family: Inter, -apple-system, sans-serif !important;
-  font-size: 28px !important;
-  font-weight: 800 !important;
-  color: #ffffff !important;
-  letter-spacing: -0.02em !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  background: transparent !important;
-  border: none !important;
 }
 
 </style>
@@ -15062,53 +15012,6 @@ html.firebase-auth-required body{
   color:#f7f8f8!important;
   padding:0!important;
 }
-.signin-copy{
-  display:flex!important;
-  flex-direction:column!important;
-  justify-content:center!important;
-  padding:clamp(32px,6vw,72px)!important;
-  position:relative!important;
-}
-.signin-copy:before{display:none!important;content:none!important;}
-.signin-brand{
-  gap:14px!important;
-  margin-bottom:44px!important;
-  position:relative!important;
-  z-index:1!important;
-}
-.signin-brand .logo{
-  width:48px!important;
-  height:48px!important;
-  border-radius:14px!important;
-  background:transparent!important;
-  border:none!important;
-  box-shadow:none!important;
-}
-.signin-brand .brand-title{
-  color:#f7f8f8!important;
-  font-size:18px!important;
-  font-weight:700!important;
-  letter-spacing:-.04em!important;
-}
-.signin-brand .brand-sub{
-  color:#8a8f98!important;
-  font-size:13px!important;
-}
-.signin-kicker{
-  width:max-content!important;
-  color:#8a8f98!important;
-  border:1px solid rgba(255,255,255,.10)!important;
-  background:#16181d!important;
-  border-radius:999px!important;
-  padding:7px 12px!important;
-  font-size:12px!important;
-  font-weight:600!important;
-  letter-spacing:.06em!important;
-  text-transform:uppercase!important;
-  margin-bottom:18px!important;
-  position:relative!important;
-  z-index:1!important;
-}
 .journall-signin-card h1{
   max-width:760px!important;
   margin:0!important;
@@ -15119,120 +15022,6 @@ html.firebase-auth-required body{
   letter-spacing:-.065em!important;
   position:relative!important;
   z-index:1!important;
-}
-.signin-lede{
-  max-width:640px!important;
-  margin:22px 0 0!important;
-  color:#d0d6e0!important;
-  font-size:clamp(16px,1.7vw,20px)!important;
-  line-height:1.55!important;
-  position:relative!important;
-  z-index:1!important;
-}
-.signin-feature-grid{
-  display:grid!important;
-  grid-template-columns:repeat(3,minmax(0,1fr))!important;
-  gap:12px!important;
-  margin-top:42px!important;
-  position:relative!important;
-  z-index:1!important;
-}
-.signin-feature{
-  background:#0d0e11!important;
-  border:1px solid rgba(255,255,255,.09)!important;
-  border-radius:16px!important;
-  padding:16px!important;
-}
-.signin-feature span{
-  display:block!important;
-  color:#5e6ad2!important;
-  font-size:12px!important;
-  font-weight:700!important;
-  margin-bottom:12px!important;
-}
-.signin-feature strong{
-  display:block!important;
-  color:#f7f8f8!important;
-  font-size:14px!important;
-  font-weight:700!important;
-  margin-bottom:7px!important;
-}
-.signin-feature p{
-  margin:0!important;
-  color:#8a8f98!important;
-  font-size:13px!important;
-  line-height:1.45!important;
-}
-.signin-panel{
-  display:flex!important;
-  flex-direction:column!important;
-  justify-content:center!important;
-  padding:clamp(28px,4vw,56px)!important;
-  background:
-    linear-gradient(180deg,rgba(22,24,29,.96),rgba(13,14,17,.98))!important;
-  border-left:1px solid rgba(255,255,255,.08)!important;
-}
-.signin-panel-top{
-  display:flex!important;
-  align-items:center!important;
-  gap:10px!important;
-  color:#d0d6e0!important;
-  font-size:14px!important;
-  font-weight:600!important;
-  margin-bottom:22px!important;
-}
-.signin-status-dot{
-  width:10px!important;
-  height:10px!important;
-  border-radius:50%!important;
-  background:#27a644!important;
-  box-shadow:0 0 0 6px rgba(39,166,68,.12)!important;
-}
-.signin-preview-card{
-  background:#010102!important;
-  border:1px solid rgba(255,255,255,.10)!important;
-  border-radius:18px!important;
-  overflow:hidden!important;
-  margin-bottom:20px!important;
-}
-.signin-preview-row{
-  display:flex!important;
-  justify-content:space-between!important;
-  align-items:center!important;
-  gap:16px!important;
-  padding:17px 18px!important;
-  border-bottom:1px solid rgba(255,255,255,.08)!important;
-}
-.signin-preview-row:last-child{border-bottom:0!important}
-.signin-preview-row span{
-  color:#8a8f98!important;
-  font-size:13px!important;
-}
-.signin-preview-row strong{
-  color:#f7f8f8!important;
-  font-size:14px!important;
-  font-weight:700!important;
-  text-align:right!important;
-}
-.signin-google-btn{
-  width:100%!important;
-  height:54px!important;
-  display:flex!important;
-  align-items:center!important;
-  justify-content:center!important;
-  gap:12px!important;
-  background:#f7f8f8!important;
-  color:#010102!important;
-  border:1px solid #f7f8f8!important;
-  border-radius:14px!important;
-  font-size:15px!important;
-  font-weight:800!important;
-  letter-spacing:-.02em!important;
-  cursor:pointer!important;
-}
-.signin-google-btn:hover{
-  background:#d0d6e0!important;
-  border-color:#d0d6e0!important;
 }
 .google-mark{
   width:24px!important;
@@ -15253,34 +15042,17 @@ html.firebase-auth-required body{
   font-size:14px!important;
   line-height:1.45!important;
 }
-.signin-footnote{
-  margin:18px 0 0!important;
-  color:#8a8f98!important;
-  font-size:12px!important;
-  line-height:1.55!important;
-}
 @media(max-width:900px){
   .journall-signin-card{
     grid-template-columns:1fr!important;
     min-height:auto!important;
     border-radius:22px!important;
   }
-  .signin-copy{padding:30px!important}
-  .signin-copy:before{display:none!important}
-  .signin-panel{
-    border-left:0!important;
-    border-top:1px solid rgba(255,255,255,.08)!important;
-    padding:24px 30px 30px!important;
-  }
-  .signin-feature-grid{grid-template-columns:1fr!important;margin-top:28px!important}
   .journall-signin-card h1{font-size:42px!important;line-height:1!important}
 }
 @media(max-width:560px){
   .firebase-auth-gate.show{padding:12px!important;align-items:start!important}
-  .signin-copy,.signin-panel{padding:22px!important}
-  .signin-brand{margin-bottom:28px!important}
   .journall-signin-card h1{font-size:34px!important}
-  .signin-lede{font-size:15px!important}
 }
 /* PUBLIC_LOGIN_AND_PSYCH_STEP_FIX */
 .psych-progress .psych-step,
@@ -15322,9 +15094,7 @@ html.firebase-auth-required body{
   background: transparent !important;
   background-color: transparent !important;
 }
-.firebase-auth-card .signin-lede,
-.firebase-auth-card .signin-footnote,
-.firebase-auth-message {
+.firebase-auth-message{
   max-width: 100% !important;
 }
 
@@ -15701,9 +15471,7 @@ input{
   border-color: rgba(255,255,255,0.1) !important;
 }
 
-/* 9. Brand & Logo Sharp Box Removal & Glowing Logo Upgrade */
-.logo,
-.signin-brand .logo {
+/* 9. Brand & Logo Sharp Box Removal & Glowing Logo Upgrade */.logo{
   border-radius: 14px !important;
   background: transparent !important;
   border: none !important;
@@ -16022,55 +15790,7 @@ input{
     grid-template-columns: 1fr !important;
     gap: 12px !important;
   }
-}
-
-/* 15. Sign-in Brand Header Clean-up (Remove container box and keep logo only) */
-.signin-brand {
-  background: transparent !important;
-  border: none !important;
-  border-bottom: none !important;
-  box-shadow: none !important;
-  padding: 0 !important;
-  margin: 0 auto 32px !important;
-  width: auto !important;
-  display: flex !important;
-  flex-direction: column !important;
-  justify-content: center !important;
-  align-items: center !important;
-  gap: 16px !important;
-}
-
-.signin-brand::before,
-.signin-brand::after {
-  display: none !important;
-  content: none !important;
-}
-
-.signin-brand > div {
-  display: block !important;
-}
-
-.signin-brand .brand-title {
-  display: block !important;
-  font-size: 26px !important;
-  font-weight: 700 !important;
-  color: #ffffff !important;
-  letter-spacing: 0.03em !important;
-  margin-top: 8px !important;
-  font-family: var(--sans) !important;
-  text-shadow: 0 0 10px rgba(99, 102, 241, 0.25) !important;
-  text-align: center !important;
-}
-
-.signin-brand .brand-sub {
-  display: none !important;
-}
-
-.signin-brand .logo {
-  margin: 0 auto !important;
-  transform: scale(1.35) !important;
-  transform-origin: center !important;
-}
+}/* 15. Sign-in Brand Header Clean-up (Remove container box and keep logo only) */
 
 /* 16. Minimalist, Clean & Calm Sign-In overlay */
 .firebase-auth-gate {
@@ -16112,44 +15832,7 @@ input{
   height: 1px !important;
   background: linear-gradient(90deg, transparent, rgba(99, 102, 241, 0.45), rgba(52, 211, 153, 0.45), transparent) !important;
   display: block !important;
-}
-
-.firebase-auth-card .signin-copy {
-  display: flex !important;
-  flex-direction: column !important;
-  align-items: center !important;
-  width: 100% !important;
-  padding: 0 !important;
-  margin: 0 !important;
-  background: transparent !important;
-  border: none !important;
-  box-shadow: none !important;
-}
-
-/* Explicitly hide busy copy elements on sign-in page (Fix horizontal pill box) */
-.firebase-auth-card .signin-kicker,
-.firebase-auth-card .signin-copy h1,
-.firebase-auth-card .signin-copy .signin-lede,
-.firebase-auth-card .signin-copy .signin-feature-grid,
-.signin-kicker,
-.signin-lede,
-.signin-feature-grid {
-  display: none !important;
-}
-
-.firebase-auth-card .signin-panel {
-  width: 100% !important;
-  padding: 0 !important;
-  margin-top: 12px !important;
-  background: transparent !important;
-  border: none !important;
-}
-
-.firebase-auth-card .signin-panel-top,
-.firebase-auth-card .signin-preview-card,
-.firebase-auth-card .signin-footnote {
-  display: none !important;
-}
+}/* Explicitly hide busy copy elements on sign-in page (Fix horizontal pill box) */
 
 #firebaseGateSignInBtn {
   background: #000000 !important;
@@ -16236,18 +15919,7 @@ input{
 .logo:hover {
   animation-play-state: paused !important;
   transform: scale(1.1) !important;
-}
-
-/* Centered & Scaled Logo for Sign-In Card */
-.signin-brand .logo {
-  margin: 0 auto !important;
-  transform: scale(1.35) !important;
-  transform-origin: center !important;
-}
-
-.signin-brand .logo:hover {
-  transform: scale(1.45) !important;
-}
+}/* Centered & Scaled Logo for Sign-In Card */
 
 /* Live Logo Heartbeat Pulse (Animates brightness/neon glow opacity) */
 @keyframes logo-live-pulse {
@@ -16699,29 +16371,9 @@ input{
 
 
 
-<style id="journall-polish-v2">
-/* ── POLISH PASS: sign-in copy reveal, hero tagline, sidebar nav icons, empty states, install button ── */
-/* Reveal the headline and lede on the sign-in card so the page tells a story instead of showing a bare logo */
-#firebaseAuthGate .signin-copy h1,
-#firebaseAuthGate .signin-copy .signin-lede {
-  display: block !important;
-  color: #f7f8f8 !important;
-  margin-top: 14px !important;
-}
-#firebaseAuthGate .signin-copy h1 {
-  font-size: clamp(26px, 3.4vw, 34px) !important;
-  line-height: 1.15 !important;
-  letter-spacing: -.03em !important;
-  text-align: center !important;
-}
-#firebaseAuthGate .signin-copy .signin-lede {
-  font-size: 14px !important;
-  color: #8a8f98 !important;
-  text-align: center !important;
-}
+<style id="journall-polish-v2">/* ── POLISH PASS: sign-in copy reveal, hero tagline, sidebar nav icons, empty states, install button ── *//* Reveal the headline and lede on the sign-in card so the page tells a story instead of showing a bare logo */
 /* Slightly enlarge the sign-in logo and give the card breathing room for the headline */
 #firebaseAuthGate .firebase-auth-card { padding: 44px 38px !important; }
-.signin-brand .logo { transform: scale(1.5) !important; }
 /* Hero header: softer gradient edge and a subtle left accent bar */
 .hero, .top .hero {
   border-left: 3px solid var(--accent-purple) !important;
@@ -16887,31 +16539,14 @@ input{
   .journall-signin-card { border-radius: 22px !important; }
 }
 </style>
-<style id="journall-pill-removal-final">
-/* ── FINAL: Remove pill/rectangle outline around logo on sign-in ── */
-.signin-copy::before,
-.signin-copy:before {
-  display: none !important;
-  content: none !important;
-  border: none !important;
-}
-.signin-brand .logo,
-.firebase-auth-card .signin-brand .logo,
-#firebaseAuthGate .signin-brand .logo,
+<style id="journall-pill-removal-final">/* ── FINAL: Remove pill/rectangle outline around logo on sign-in ── */
 #firebaseAuthGate .logo,
-.signin-brand-clean,
-.signin-brand-clean *,
-.signin-symbol-wrapper {
+.signin-symbol-wrapper{
   background: transparent !important;
   background-color: transparent !important;
   border: none !important;
   box-shadow: none !important;
   outline: none !important;
-}
-.signin-copy {
-  background: transparent !important;
-  border: none !important;
-  box-shadow: none !important;
 }
 </style>
 
