@@ -2382,7 +2382,7 @@
     return {d:d,t:tm,side:t.side,ses:sesOf(+tm.slice(0,2)),en:en,ex:ex,why:why(t.reason),pnl:r2(t.pnl),lot:t.volume,
       sl:t.sl>0?t.sl:null,tag:'',j:false,sym:t.symbol,hold:hold,cost:0,_pos:posOf(t),_lk:liveKey(t)}}
   function buildImport(live){var kept=dedupe(live||[]);var closed=kept.map(toDesignTrade);
-    var lk={};(live||[]).forEach(function(t){var p=posOf(t),k=kept.filter(function(x){return posOf(x)===p})[0];if(k)lk[liveKey(t)]=closed[kept.indexOf(k)]});
+    var lk={};(live||[]).forEach(function(t){var p=posOf(t),k=p?kept.filter(function(x){return posOf(x)===p})[0]:(kept.indexOf(t)>=0?t:null);if(k)lk[liveKey(t)]=closed[kept.indexOf(k)]});  /* records with no position (report imports) map to themselves, never to another position-less record */
     return {file:'Journall live data',closed:closed,open:[],_lk:lk}}
   /* Journals: live entry -> design entry (id gets prefix L so write-back can find the live original). */
   function journalToDesign(e,imp){var tr=e.trade||{},f=e.fields||{},d=imp&&imp._lk[e.tradeKey];
@@ -2528,8 +2528,35 @@
   function toLive(t){var cost=t.cost||0,net=r2((t.pnl||0)+cost),o={id:'import-'+hash([t.d,t.t,t.sym,t.side,t.en,t.ex,t.lot].join('|')),date:t.d,time:t.t,symbol:t.sym,side:t.side,volume:t.lot,
     entry:t.en,exit:t.ex,sl:t.sl||0,rawProfit:t.pnl||0,commission:cost,pnl:net,reason:t.why||'Import',mistakes:[],notes:''};
     if(t.hold!=null)o.duration=t.hold/60;return o}
-  window.jlSaveImport=function(R){var recs=(R.closed||[]).map(toLive),added=merge(recs);
-    localStorage.setItem('jlOpenPositions',JSON.stringify(R.open||[]));return {added:added,total:recs.length}};
+  /* Step 6: a report import is the truth for its date range. (1) each report trade overlays its bridge twin (bridge record 'mt5-<position>' with the same symbol, side, entry and lot, nearest in time, within 12 h; the bridge stamps times wrongly, so time cannot match exactly); (2) bridge records inside the report's whole-day range that have no twin are deleted; (3) a report trade that already exists as an earlier import (fundingpips-mt5-* or import-*, same symbol/side/entry/lot, within 2 min) is skipped. Journals on a replaced bridge trade are re-linked to the new record. */
+  var BR=/^mt5-\d+$/;
+  function ms(t){var m=Date.parse(String(t.date)+'T'+String(t.time||'00:00:00')+'Z');return isFinite(m)?m:NaN}
+  function ots(t){return String(t.id).indexOf('fundingpips-mt5')===0&&/Z$/.test(t.openUtc||'')?Date.parse(t.openUtc)+19800000:ms(t)}  /* old imports store the CLOSE time; their OPEN time in IST is openUtc + 5:30 */
+  function sameTrade(a,b){return a.symbol===b.symbol&&a.side===b.side&&Math.abs(Number(a.entry)-Number(b.entry))<1e-6&&Math.abs(Number(a.volume)-Number(b.volume))<1e-6}
+  function replaceBridge(recs){var out={replaced:0,removed:0,skipped:0,relinked:0,fresh:recs};
+    if(!recs.length)return out;
+    var ds=recs.map(function(r){return r.date}).sort(),lo=ds[0],hi=ds[ds.length-1];
+    var cur=rd(TK[0]),gone={},link={},used={};
+    var others=cur.filter(function(t){return t&&typeof t==='object'&&!BR.test(String(t.id))});
+    var fresh=recs.filter(function(r){var rm=ms(r);
+      var dup=others.some(function(o){return sameTrade(o,r)&&Math.abs(ots(o)-rm)<=120000});if(dup)out.skipped++;return !dup});
+    fresh.forEach(function(r){var rm=ms(r),best=null,bd=1/0;
+      cur.forEach(function(t){if(!t||typeof t!=='object'||!BR.test(String(t.id))||used[t.id]||!sameTrade(t,r))return;
+        var d=Math.abs(ms(t)-rm);if(d<=43200000&&d<bd){best=t;bd=d}});
+      if(best){used[best.id]=1;gone[best.id]=1;link[JLAdapter.liveKey(best)]=r;out.replaced++}});
+    cur.forEach(function(t){if(!t||typeof t!=='object'||!BR.test(String(t.id))||gone[t.id])return;
+      if(String(t.date)>=lo&&String(t.date)<=hi){gone[t.id]=1;out.removed++}});
+    var kill=out.replaced+out.removed;
+    if(kill){TK.forEach(function(k){var a=rd(k).filter(function(t){return !(t&&gone[t.id])});localStorage.setItem(k,JSON.stringify(a))});
+      var LK='krishna_journal_page_entries',J=rd(LK),ch=false;
+      J.forEach(function(e){var r=e&&link[e.tradeKey];if(!r)return;
+        e.tradeKey=JLAdapter.liveKey(r);e.trade=e.trade||{};
+        ['date','time','symbol','side','entry','exit','pnl','volume','duration','sl'].forEach(function(f){if(r[f]!=null)e.trade[f]=r[f]});
+        out.relinked++;ch=true});
+      if(ch)localStorage.setItem(LK,JSON.stringify(J))}
+    out.fresh=fresh;return out}
+  window.jlSaveImport=function(R){var recs=(R.closed||[]).map(toLive),rp=replaceBridge(recs),added=merge(rp.fresh);
+    localStorage.setItem('jlOpenPositions',JSON.stringify(R.open||[]));return {added:added,total:recs.length,replaced:rp.replaced,removed:rp.removed,skipped:rp.skipped,relinked:rp.relinked}};
   function ago(ts){var d=Date.now()-ts;if(!(d>=0))return 'just now';var m=Math.floor(d/60000);if(m<1)return 'just now';if(m<60)return m+'m ago';var h=Math.floor(m/60);if(h<24)return h+'h ago';return Math.floor(h/24)+'d ago'}
   function last(){var s=rdo(SS),t=s&&s.lastSynced?Date.parse(s.lastSynced):NaN;return isFinite(t)?t:null}
   function T(id,txt){var e=document.getElementById(id);if(e)e.textContent=txt}
@@ -2541,18 +2568,20 @@
   document.addEventListener('DOMContentLoaded',function(){window.jlPaintSync();setInterval(window.jlPaintSync,30000)});
   window.jlSyncMt5=function(o){var btn=o.btn,ti=document.getElementById('udTitle');
     function msg(t){window.__jlSyncMsg=t;if(ti)ti.textContent=t}
-    function done(){window.__jlSyncBusy=false;btn.disabled=false;btn.textContent='\u27f3 Sync now'}
+    function done(){window.__jlSyncBusy=false;btn.disabled=false;btn.textContent='\u27f3 Sync balance'}
     window.__jlSyncBusy=true;window.__jlSyncMsg='';btn.disabled=true;btn.textContent='Syncing\u2026';msg('Connecting to MT5 bridge\u2026');
     var ac=typeof AbortController==='function'?new AbortController():null,to=ac&&setTimeout(function(){ac.abort()},45000);
     fetch('http://localhost:8787/api/sync-broker',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({platform:'mt5',days:30}),cache:'no-store',signal:ac?ac.signal:undefined})
     .then(function(r){return r.json()}).then(function(d){if(to)clearTimeout(to);
       if(d&&d.error){msg('MT5 error: '+d.error);done();return}
-      var list=d&&Array.isArray(d.trades)?d.trades:Array.isArray(d)?d:[],added=merge(list),bal=d&&typeof d.account_balance==='number'&&isFinite(d.account_balance)?d.account_balance:null;
-      if(bal!=null){var c=rdo(CK);if(c){c.mt5CurrentBalance=bal;c.mt5BalanceSource='mt5';c.mt5BalanceTimestamp=Date.now();localStorage.setItem(CK,JSON.stringify(c))}}
+      /* Krishna (29 Sep): Sync now fetches the account balance ONLY. Trades come only from MT5 report imports (the bridge stamps wrong times and P&L). Any trades in the bridge reply are ignored. */
+      var bal=d&&typeof d.account_balance==='number'&&isFinite(d.account_balance)?d.account_balance:null;
+      if(bal==null){msg('Bridge connected, but MT5 returned no balance. Trades come from report imports.');done();return}
+      var c=rdo(CK);if(c){c.mt5CurrentBalance=bal;c.mt5BalanceSource='mt5';c.mt5BalanceTimestamp=Date.now();localStorage.setItem(CK,JSON.stringify(c))}
       localStorage.setItem(SS,JSON.stringify({platform:'mt5',days:30,lastSynced:new Date().toISOString()}));
-      window.__jlSyncMsg=list.length?'Synced \u2014 '+added+' new trade'+(added===1?'':'s'):'Synced \u2014 no closed trades in the last 30 days';
+      window.__jlSyncMsg=c?'Synced \u2014 balance updated':'Synced \u2014 balance read (save Account Settings to keep it)';
       if(ti)ti.textContent=window.__jlSyncMsg;done();window.jlPaintSync();
-      if(added>0||bal!=null)setTimeout(function(){location.reload()},1200)})
+      if(c)setTimeout(function(){location.reload()},1200)})
     .catch(function(e){if(to)clearTimeout(to);done();
       msg(e&&e.name==='AbortError'?'MT5 bridge timed out (45 s). Is MetaTrader 5 open?':'MT5 bridge not reachable. Open MetaTrader 5, start the local bridge, then try again.')})}
 })();
@@ -3522,7 +3551,7 @@ document.addEventListener('input',e=>{if(cur&&RUN[cur.dataset.tool]&&cur.contain
         <div class="ud-status-sub">MT5 bridge · <b id="udSyncTxt">not synced yet</b></div>
       </div>
     </div>
-    <button class="gg-btn-solid" id="udSyncBtn" style="width:auto;padding:10px 18px">⟳ Sync now</button>
+    <button class="gg-btn-solid" id="udSyncBtn" style="width:auto;padding:10px 18px">⟳ Sync balance</button>
   </div>
 
   <div class="up-grid">
@@ -3648,8 +3677,8 @@ document.addEventListener('input',e=>{if(cur&&RUN[cur.dataset.tool]&&cur.contain
         if(R.err){ showResult(R.err, 'err'); return; }
         let S; try{ S = window.jlSaveImport(R); }
         catch(e){ showResult('Could not save the import in this browser.', 'err'); return; }
-        showResult('Imported '+S.total+' closed trade'+(S.total===1?'':'s')+' ('+S.added+' new) and '+R.open.length+' open position'+(R.open.length===1?'':'s')+' from '+file.name+'. Reloading…', 'ok');
-        setTimeout(()=>location.reload(), 1200);
+        showResult('Imported '+S.total+' closed trade'+(S.total===1?'':'s')+' ('+S.added+' new'+(S.replaced?', '+S.replaced+' bridge trade'+(S.replaced===1?'':'s')+' replaced':'')+(S.removed?', '+S.removed+' unmatched bridge trade'+(S.removed===1?'':'s')+' removed':'')+(S.skipped?', '+S.skipped+' already present':'')+(S.relinked?', '+S.relinked+' journal'+(S.relinked===1?'':'s')+' re-linked':'')+') and '+R.open.length+' open position'+(R.open.length===1?'':'s')+' from '+file.name+'. Reloading…', 'ok');
+        setTimeout(()=>location.reload(), (S.replaced||S.removed)?6000:1200);
       };
       reader.onerror = ()=> showResult('Could not read that file. Try again.', 'err');
       reader.readAsArrayBuffer(file);
