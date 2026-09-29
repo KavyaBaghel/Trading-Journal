@@ -197,6 +197,72 @@ async function handleCTraderSync(request, env, cors) {
   return json({ ok: true, trades }, 200, cors);
 }
 
+async function handleMarket(request, env, cors) {
+  const authHeader = request.headers.get("authorization") || "";
+  const idToken = authHeader.startsWith("Bearer ") ? authHeader.slice(7) : "";
+  if (!idToken) return json({ error: "Sign in required." }, 401, cors);
+  try {
+    await verifyFirebaseIdToken(idToken, env);
+  } catch (error) {
+    return json({ error: error.message || "Invalid or expired sign-in token." }, 401, cors);
+  }
+
+  // The Finnhub key is a Worker secret (wrangler secret put FINNHUB_KEY).
+  // It is never sent to the browser and never put in a URL.
+  const apiKey = env.FINNHUB_KEY;
+  if (!apiKey) return json({ error: "FINNHUB_KEY secret is not configured." }, 500, cors);
+
+  const body = await request.json().catch(() => ({}));
+  const isDate = (v) => /^\d{4}-\d{2}-\d{2}$/.test(String(v || "")) && !Number.isNaN(Date.parse(String(v)));
+  const dayStr = (d) => d.toISOString().slice(0, 10);
+  const from = isDate(body.from) ? String(body.from) : dayStr(new Date(Date.now() - 86400000));
+  const to = isDate(body.to) ? String(body.to) : dayStr(new Date(Date.now() + 14 * 86400000));
+  const span = (Date.parse(to) - Date.parse(from)) / 86400000;
+  if (!(span >= 0 && span <= 31)) return json({ error: "Date range must be between 0 and 31 days." }, 400, cors);
+
+  // status 0 = Finnhub could not be reached at all.
+  const finnhub = async (path, params) => {
+    try {
+      const response = await fetch(`https://finnhub.io/api/v1/${path}?${new URLSearchParams(params)}`, {
+        headers: { "X-Finnhub-Token": apiKey, "Accept": "application/json" }
+      });
+      const data = await response.json().catch(() => null);
+      return { status: response.status, data };
+    } catch (error) {
+      return { status: 0, data: null };
+    }
+  };
+
+  const [cal, news] = await Promise.all([
+    finnhub("calendar/economic", { from, to }),
+    finnhub("news", { category: "general" })
+  ]);
+
+  const events = cal.status === 200 && Array.isArray(cal.data?.economicCalendar)
+    ? cal.data.economicCalendar.slice(0, 500).map((e) => ({
+        time: String(e.time || ""),
+        country: String(e.country || ""),
+        impact: String(e.impact || ""),
+        event: String(e.event || ""),
+        actual: e.actual ?? null,
+        estimate: e.estimate ?? null,
+        prev: e.prev ?? null,
+        unit: String(e.unit || "")
+      }))
+    : [];
+  const items = news.status === 200 && Array.isArray(news.data)
+    ? news.data.slice(0, 30).map((n) => ({
+        id: n.id ?? null,
+        datetime: Number(n.datetime) || 0,
+        headline: String(n.headline || ""),
+        source: String(n.source || ""),
+        url: String(n.url || "")
+      }))
+    : [];
+
+  return json({ ok: true, calendar: { status: cal.status, events }, news: { status: news.status, items } }, 200, cors);
+}
+
 export default {
   async fetch(request, env) {
     const origin = request.headers.get("origin") || "";
@@ -216,6 +282,13 @@ export default {
         return await handleCTraderSync(request, env, cors);
       } catch (error) {
         return json({ error: error.message || "cTrader sync backend failed." }, 500, cors);
+      }
+    }
+    if (request.method === "POST" && url.pathname === "/market") {
+      try {
+        return await handleMarket(request, env, cors);
+      } catch (error) {
+        return json({ error: error.message || "Market backend failed." }, 500, cors);
       }
     }
     return json({ ok: true, service: "Journall AI Worker" }, 200, cors);
