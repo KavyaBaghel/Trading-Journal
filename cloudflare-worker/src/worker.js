@@ -101,7 +101,60 @@ async function handleAiCoach(request, env, cors) {
   return json({ text: text.trim() }, 200, cors);
 }
 
-async function handleMarket(request, env, cors) {
+// Free weekly calendar feed (Forex Factory export). No key. The feed only refreshes about once an hour and
+// rate-limits hard, so responses are cached at the edge for an hour and a failure returns status 0.
+async function ffCalendar(ctx) {
+  const FEEDS = [
+    "https://nfs.faireconomy.media/ff_calendar_thisweek.json",
+    "https://nfs.faireconomy.media/ff_calendar_nextweek.json"
+  ];
+  const cache = caches.default;
+  const pad = (n) => String(n).padStart(2, "0");
+  const grab = async (feedUrl) => {
+    const key = new Request(feedUrl);
+    let res = await cache.match(key);
+    if (!res) {
+      const live = await fetch(feedUrl, { headers: { "Accept": "application/json" } });
+      if (!live.ok) return { ok: false, rows: [] };
+      const text = await live.text();
+      if (!text.trim().startsWith("[")) return { ok: false, rows: [] }; // "Request Denied" HTML page
+      res = new Response(text, { headers: { "content-type": "application/json", "cache-control": "public, max-age=3600" } });
+      const put = cache.put(key, res.clone());
+      if (ctx && ctx.waitUntil) ctx.waitUntil(put); else await put;
+    }
+    const rows = await res.json().catch(() => null);
+    return { ok: Array.isArray(rows), rows: Array.isArray(rows) ? rows : [] };
+  };
+  try {
+    const parts = await Promise.all(FEEDS.map(grab));
+    if (!parts[0].ok) return { status: 0, events: [] }; // this week is required; next week is a bonus
+    const seen = new Set();
+    const events = [];
+    for (const e of parts.flatMap((x) => x.rows)) {
+      const d = new Date(e.date);
+      if (Number.isNaN(d.getTime())) continue;
+      const time = `${d.getUTCFullYear()}-${pad(d.getUTCMonth() + 1)}-${pad(d.getUTCDate())} ${pad(d.getUTCHours())}:${pad(d.getUTCMinutes())}:00`;
+      const id = `${time}|${e.country}|${e.title}`;
+      if (seen.has(id)) continue;
+      seen.add(id);
+      events.push({
+        time,
+        country: String(e.country || ""),
+        impact: String(e.impact || ""),
+        event: String(e.title || ""),
+        actual: e.actual ?? null, // the export carries no actuals
+        estimate: e.forecast === "" ? null : (e.forecast ?? null),
+        prev: e.previous === "" ? null : (e.previous ?? null),
+        unit: ""
+      });
+    }
+    return { status: 200, events: events.slice(0, 500) };
+  } catch (error) {
+    return { status: 0, events: [] };
+  }
+}
+
+async function handleMarket(request, env, cors, ctx) {
   const authHeader = request.headers.get("authorization") || "";
   const idToken = authHeader.startsWith("Bearer ") ? authHeader.slice(7) : "";
   if (!idToken) return json({ error: "Sign in required." }, 401, cors);
@@ -142,7 +195,7 @@ async function handleMarket(request, env, cors) {
     finnhub("news", { category: "general" })
   ]);
 
-  const events = cal.status === 200 && Array.isArray(cal.data?.economicCalendar)
+  let events = cal.status === 200 && Array.isArray(cal.data?.economicCalendar)
     ? cal.data.economicCalendar.slice(0, 500).map((e) => ({
         time: String(e.time || ""),
         country: String(e.country || ""),
@@ -164,11 +217,17 @@ async function handleMarket(request, env, cors) {
       }))
     : [];
 
-  return json({ ok: true, calendar: { status: cal.status, events }, news: { status: news.status, items } }, 200, cors);
+  let calStatus = cal.status;
+  let calSource = "finnhub";
+  if (calStatus !== 200) {
+    const ff = await ffCalendar(ctx);
+    if (ff.status === 200) { calStatus = 200; calSource = "forexfactory"; events = ff.events; }
+  }
+  return json({ ok: true, calendar: { status: calStatus, source: calSource, finnhubStatus: cal.status, events }, news: { status: news.status, items } }, 200, cors);
 }
 
 export default {
-  async fetch(request, env) {
+  async fetch(request, env, ctx) {
     const origin = request.headers.get("origin") || "";
     const cors = corsHeaders(origin, env);
     if (request.method === "OPTIONS") return new Response(null, { status: 204, headers: cors });
@@ -183,7 +242,7 @@ export default {
     }
     if (request.method === "POST" && url.pathname === "/market") {
       try {
-        return await handleMarket(request, env, cors);
+        return await handleMarket(request, env, cors, ctx);
       } catch (error) {
         return json({ error: error.message || "Market backend failed." }, 500, cors);
       }

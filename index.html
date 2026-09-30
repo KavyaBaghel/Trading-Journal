@@ -2743,7 +2743,7 @@
   <div class="session glass">
     <div class="session-top">
       <div class="l">MARKET SESSION</div>
-      <div class="now-txt mono" id="nowTxt">3h 20m into London</div>
+      <div class="now-txt mono" id="nowTxt">--</div>
     </div>
     <div class="sess-body" id="sessBody"></div>
     <div class="ticks"><span>00:00</span><span>06:00</span><span>12:00</span><span>18:00</span><span>24:00 UTC</span></div>
@@ -4341,9 +4341,46 @@ document.addEventListener('input',e=>{if(cur&&RUN[cur.dataset.tool]&&cur.contain
     overlay.appendChild(band);
   });
   const nowLine = document.createElement('div');
-  nowLine.className = 'now-line'; nowLine.style.left='62%'; nowLine.style.height = rowsH+'px';
-  nowLine.setAttribute('data-t','now · 12:41 IST');
+  nowLine.className = 'now-line'; nowLine.style.height = rowsH+'px';
   overlay.appendChild(nowLine);
+
+  // One live clock (UTC) drives the marker, the IST label and the pill.
+  const SESS_OPEN_UTC = {'Sydney':22,'Tokyo':0,'London':8,'New York':13};
+  function marketSessionState(d){
+    const h = d.getUTCHours() + d.getUTCMinutes()/60;
+    const dow = d.getUTCDay(); // 0 Sun ... 6 Sat
+    const closed = dow===6 || (dow===5 && h>=22) || (dow===0 && h<22);
+    let pill;
+    if(closed){ pill = 'Forex closed (weekend)'; }
+    else {
+      let best = null;
+      SESS.forEach(s=>{
+        const open = SESS_OPEN_UTC[s.name];
+        const active = s.spans.some(sp=>h>=sp[0] && h<sp[1]);
+        if(!active) return;
+        const el = (h - open + 24) % 24;
+        if(best===null || el < best.el) best = {name:s.name, el:el};
+      });
+      if(best){
+        const m = Math.floor(best.el*60);
+        pill = Math.floor(m/60)+'h '+String(m%60).padStart(2,'0')+'m into '+best.name;
+      } else { pill = 'Between sessions'; }
+    }
+    return {h:h, closed:closed, pill:pill};
+  }
+  function updateMarketSession(){
+    const d = new Date();
+    const st = marketSessionState(d);
+    let ist;
+    try { ist = new Intl.DateTimeFormat('en-GB',{timeZone:'Asia/Kolkata',hour:'2-digit',minute:'2-digit',hour12:false}).format(d); }
+    catch(e){ ist = '--:--'; }
+    nowLine.style.left = (st.h/24*100)+'%';
+    nowLine.setAttribute('data-t','now · '+ist+' IST');
+    const pillEl = document.getElementById('nowTxt');
+    if(pillEl) pillEl.textContent = st.pill;
+  }
+  updateMarketSession();
+  setInterval(updateMarketSession, 60000);
 
   // ---------- real trade data + equity curve (Today's Summary) ----------
   const WHY_LABEL = {SL:'Stop loss',TP:'Target hit',User:'Manual close'};
@@ -6413,7 +6450,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'){if(mpOpen)closeMont
     const idx = state.step - 1;
     const pct = Math.round((idx/(STEPS.length-1))*100);
     const full = state.step === STEPS.length;
-    return `<div class="progress-wrap top-progress${full?' full':''}" style="margin:14px 0 0">
+    return `<div class="progress-wrap top-progress${full?' full':''}" style="margin:10px 0 14px">
       <div class="progress-lg"><div class="fill" data-pid="overall" style="width:${pct}%"></div></div>
     </div>`;
   }
@@ -6437,12 +6474,12 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'){if(mpOpen)closeMont
           <div class="eyebrow">
             <span class="streak">${STEPS[state.step-1]}</span>
           </div>
-          ${overallProgressBar()}
           <h1>Psychology Command Room</h1>
           <p>Runs fully on this device · trade review</p>
         </div>
       </div>
       ${tabsHtml()}
+      ${overallProgressBar()}
       ${renderStatusNote()}
       ${reminderHtml}
       <section class="a-s">${body}</section>
@@ -7151,7 +7188,7 @@ window.__renderAnSetups=renderBoth;window.__renderAnEmotions=renderEmo;setTimeou
 <script>
 (function(){
   const $=id=>document.getElementById(id);
-  let cal=[], news=[], loaded=false, loading=false, calMsg='', newsMsg='';
+  let cal=[], news=[], loaded=false, loading=false, calMsg='', calSrc='', newsMsg='';
   const CCY_MAP={US:'USD',EU:'EUR',GB:'GBP',UK:'GBP',JP:'JPY',CA:'CAD',AU:'AUD',CN:'CNY',CH:'CHF',NZ:'NZD',DE:'EUR',FR:'EUR',IT:'EUR',ES:'EUR'};
   const impLvl=s=>{s=(s||'').toLowerCase();return s.indexOf('high')>-1?3:s.indexOf('med')>-1?2:s.indexOf('low')>-1?1:0};
   const impColor=l=>l===3?'var(--red)':l===2?'var(--accent-2)':l===1?'var(--green)':'rgba(255,255,255,.12)';
@@ -7203,7 +7240,7 @@ window.__renderAnSetups=renderBoth;window.__renderAnEmotions=renderEmo;setTimeou
       });
       body.innerHTML=html;
     }
-    if(note) note.textContent=loaded?('Showing '+rows.length+' event'+(rows.length===1?'':'s')+' via Finnhub. Free-tier data may lag or omit some releases.'):'Loading calendar…';
+    if(note) note.textContent=loaded?('Showing '+rows.length+' event'+(rows.length===1?'':'s')+(calSrc==='forexfactory'?' via Forex Factory (forecast/previous only, no actuals; updates hourly).':' via Finnhub. Free-tier data may lag or omit some releases.')):'Loading calendar…';
     renderKeyEvents();
   }
   function renderKeyEvents(){
@@ -7235,7 +7272,7 @@ window.__renderAnSetups=renderBoth;window.__renderAnEmotions=renderEmo;setTimeou
       const fmt=d=>d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
       const R=await window.jlMarketFetch({from:fmt(from),to:fmt(to)});
       const cs=R.calendar.status, ns=R.news.status;
-      cal=cs===200?R.calendar.events:[]; news=ns===200?R.news.items:[];
+      cal=cs===200?R.calendar.events:[]; news=ns===200?R.news.items:[]; calSrc=(R.calendar&&R.calendar.source)||'';
       const why=(what,c)=>c===200?'':c===403?what+' is not included in the current Finnhub plan.':c===429?'Finnhub rate limit reached, try again in a minute.':c===0?'Finnhub could not be reached.':what+' failed (code '+c+').';
       calMsg=why('The economic calendar',cs); newsMsg=why('Market news',ns);
       const cc=cs===200?0:(cs||-1), nc=ns===200?0:(ns||-1);
