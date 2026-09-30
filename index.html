@@ -2444,8 +2444,8 @@
       if(next!==JSON.stringify(rd(LK)))localStorage.setItem(LK,next);
     }catch(e){console.error('[Journall] journal write-back failed',e)}
   }
-  var prev=localStorage.setItem;
-  localStorage.setItem=function(k,v){prev.call(localStorage,k,v);if(k==='jlJournals')writeBack(v)};
+  var prev=Storage.prototype.setItem;
+  Storage.prototype.setItem=function(k,v){prev.call(this,k,v);if(this===localStorage&&k==='jlJournals')writeBack(v)};
 })();
 </script>
 <script id="jl-account-sync">
@@ -2481,8 +2481,8 @@
       var next=JSON.stringify(c);if(Object.keys(c).length&&next!==JSON.stringify(o||null)){localStorage.setItem(CK,next);window.__jlNeedsAccountSetup=!(n(c.accountSize)>0)}
     }catch(e){console.error('[Journall] account write-back failed',e)}
   }
-  var prev=localStorage.setItem;
-  localStorage.setItem=function(k,v){prev.call(localStorage,k,v);if(k===DK)writeBack(v)};
+  var prev=Storage.prototype.setItem;
+  Storage.prototype.setItem=function(k,v){prev.call(this,k,v);if(this===localStorage&&k===DK)writeBack(v)};
 })();
 </script>
 <script id="jl-profile">
