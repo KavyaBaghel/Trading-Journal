@@ -180,6 +180,7 @@ function Send-Response($Stream, [int]$Status, [string]$StatusText, [byte[]]$Body
     "Access-Control-Allow-Origin: *",
     "Access-Control-Allow-Methods: GET, POST, OPTIONS",
     "Access-Control-Allow-Headers: Content-Type, Authorization",
+    "Access-Control-Allow-Private-Network: true",
     "Cache-Control: no-store",
     "Connection: close",
     '',
