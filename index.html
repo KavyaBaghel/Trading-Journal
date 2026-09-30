@@ -3578,14 +3578,14 @@ document.addEventListener('input',e=>{if(cur&&RUN[cur.dataset.tool]&&cur.contain
     <div class="up-col">
       <div class="up-card glass up-reveal" style="animation-delay:110ms">
         <div class="up-card-head">🧾 What syncing keeps</div>
-        <div class="ud-note"><b>Entry, exit, size, session and symbol</b> come in automatically from MT5. Your journal notes, screenshots and psychology checks always stay local and are never overwritten by a sync.</div>
+        <div class="ud-note"><b>Sync balance</b> reads your account balance from MT5. <b>Trades come only from a report import</b> (export your MT5 history as .html or .csv and drop it below). Your journal notes, screenshots and psychology checks always stay local and are never overwritten.</div>
       </div>
       <div class="up-card glass up-reveal" style="animation-delay:150ms">
         <div class="up-card-head">🛠️ Bridge setup</div>
         <div class="ud-steps">
-          <div class="ud-step"><span class="ud-step-n">1</span><div><b>Run the local bridge</b><span class="ud-step-d">Start <code>mt5_sync.py</code> alongside your MT5 terminal.</span></div></div>
-          <div class="ud-step"><span class="ud-step-n">2</span><div><b>Keep MT5 signed in</b><span class="ud-step-d">The bridge reads live trades straight from the terminal.</span></div></div>
-          <div class="ud-step"><span class="ud-step-n">3</span><div><b>Leave this tab open</b><span class="ud-step-d">Journall pulls new trades automatically while connected.</span></div></div>
+          <div class="ud-step"><span class="ud-step-n">1</span><div><b>Run the local bridge</b><span class="ud-step-d">Start the local bridge (<code>local-server.ps1</code>) with MT5 open.</span></div></div>
+          <div class="ud-step"><span class="ud-step-n">2</span><div><b>Keep MT5 signed in</b><span class="ud-step-d">The bridge reads your account balance from the terminal.</span></div></div>
+          <div class="ud-step"><span class="ud-step-n">3</span><div><b>Press Sync balance</b><span class="ud-step-d">Sync runs when you press the button. It does not import trades.</span></div></div>
         </div>
       </div>
     </div>
