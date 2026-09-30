@@ -219,11 +219,39 @@ async function handleMarket(request, env, cors, ctx) {
 
   let calStatus = cal.status;
   let calSource = "finnhub";
-  if (calStatus !== 200) {
+  if (calStatus !== 200 || events.length === 0) {
     const ff = await ffCalendar(ctx);
-    if (ff.status === 200) { calStatus = 200; calSource = "forexfactory"; events = ff.events; }
+    if (ff.status === 200 && ff.events.length > 0) { calStatus = 200; calSource = "forexfactory"; events = ff.events; }
   }
-  return json({ ok: true, calendar: { status: calStatus, source: calSource, finnhubStatus: cal.status, events }, news: { status: news.status, items } }, 200, cors);
+  // Keep the last good calendar in the edge cache for 24 h. If every source comes back empty,
+  // serve that copy (stale:true) instead of an empty panel. calCache shows what happened:
+  // saved / hit / miss / error.
+  const lastKey = new Request("https://journall.invalid/last-good-calendar");
+  let calCache = "none";
+  let calSavedAt = null;
+  let calStale = false;
+  try {
+    if (calStatus === 200 && events.length > 0) {
+      calSavedAt = Date.now();
+      const put = caches.default.put(lastKey, new Response(JSON.stringify({ source: calSource, savedAt: calSavedAt, events }), {
+        headers: { "content-type": "application/json", "cache-control": "public, max-age=86400" }
+      }));
+      if (ctx && ctx.waitUntil) ctx.waitUntil(put); else await put;
+      calCache = "saved";
+    } else {
+      const hit = await caches.default.match(lastKey);
+      const saved = hit ? await hit.json().catch(() => null) : null;
+      if (saved && Array.isArray(saved.events) && saved.events.length > 0) {
+        calStatus = 200; calSource = String(saved.source || "finnhub"); events = saved.events;
+        calSavedAt = saved.savedAt || null; calStale = true; calCache = "hit";
+      } else {
+        calCache = "miss";
+      }
+    }
+  } catch (error) {
+    calCache = "error";
+  }
+  return json({ ok: true, calendar: { status: calStatus, source: calSource, finnhubStatus: cal.status, cache: calCache, stale: calStale, savedAt: calSavedAt, events }, news: { status: news.status, items } }, 200, cors);
 }
 
 export default {
