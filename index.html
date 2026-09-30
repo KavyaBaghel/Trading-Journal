@@ -3125,6 +3125,8 @@ window.__mountOpenPos=function(){const o=(window.__openTrades||[]).concat((windo
           <div class="gg-field"><span class="l">Phase deadline (optional)</span><input class="gg-select" id="ggDeadline" type="date"></div>
           <div class="gg-field"><span class="l">Max trades per day</span>
             <div class="gg-stepper"><button onclick="ggStep('mt',-1)">−</button><input id="ggMt" value="8" readonly><button onclick="ggStep('mt',1)">+</button></div></div>
+          <div class="gg-field"><span class="l">Day profit target</span>
+            <div class="gg-combo"><div class="gg-stepper" style="flex:1"><button onclick="ggStep('dpt',-1)">-</button><input id="ggDpt" value="0" readonly><button onclick="ggStep('dpt',1)">+</button></div><select id="ggDptUnit"><option>%</option><option>$</option></select></div></div>
         </div>
       </div>
       <div class="gg-tab-panel" data-p="risk" hidden>
@@ -3743,7 +3745,7 @@ document.addEventListener('input',e=>{if(cur&&RUN[cur.dataset.tool]&&cur.contain
   function ggLoadAccount(){
     let s = null;
     try{ s = JSON.parse(localStorage.getItem(ACC_KEY)); }catch(e){}
-    return Object.assign({balance:0, phase:'Phase 1', type:'funded', revWindowMin:15, profitTargetPct:0, maxDailyLossUSD:0, maxTradesPerDay:0, maxDrawdown:0, maxDrawdownUnit:'%', deadline:''}, s||{});
+    return Object.assign({balance:0, phase:'Phase 1', type:'funded', revWindowMin:15, profitTargetPct:0, maxDailyLossUSD:0, maxTradesPerDay:0, dayProfitTarget:0, dayProfitTargetUnit:'%', maxDrawdown:0, maxDrawdownUnit:'%', deadline:''}, s||{});
   }
   function ggApplyAccountDisplay(s){
     const heroPhase = document.getElementById('ggHeroPhase'); if(heroPhase) heroPhase.textContent = s.phase;
@@ -3802,10 +3804,10 @@ document.addEventListener('input',e=>{if(cur&&RUN[cur.dataset.tool]&&cur.contain
   window.jlRevWindowMin = Number(ggAccount.revWindowMin) || 15;
   window.jlProfitTargetUSD = Number(ggAccount.balance) * (Number(ggAccount.profitTargetPct)||0) / 100;
   window.jlDailyLossLimit = Number(ggAccount.maxDailyLossUSD) || 0;
-  window.jlMaxTradesPerDay = Number(ggAccount.maxTradesPerDay) || 0; window.jlStartBalance = Number(ggAccount.balance) || 0;
+  window.jlMaxTradesPerDay = Number(ggAccount.maxTradesPerDay) || 0; window.jlStartBalance = Number(ggAccount.balance) || 0; window.jlDayProfitTargetUSD = (ggAccount.dayProfitTargetUnit === '$') ? (Number(ggAccount.dayProfitTarget)||0) : Number(ggAccount.balance) * (Number(ggAccount.dayProfitTarget)||0) / 100;
 
-  const ggState = {sl:5, pv:.05, bal:ggAccount.balance, pt:ggAccount.profitTargetPct, mt:ggAccount.maxTradesPerDay, rpt:.5, rr:2, mdl:ggAccount.maxDailyLossUSD, mdd:Number(ggAccount.maxDrawdown)||0, revWin:ggAccount.revWindowMin};
-  const ggIds = {bal:'ggBal',pt:'ggPt',mt:'ggMt',rpt:'ggRpt',rr:'ggRr',mdl:'ggMdl',mdd:'ggMdd',revWin:'ggRevWin'};
+  const ggState = {sl:5, pv:.05, bal:ggAccount.balance, pt:ggAccount.profitTargetPct, mt:ggAccount.maxTradesPerDay, dpt:Number(ggAccount.dayProfitTarget)||0, rpt:.5, rr:2, mdl:ggAccount.maxDailyLossUSD, mdd:Number(ggAccount.maxDrawdown)||0, revWin:ggAccount.revWindowMin};
+  const ggIds = {bal:'ggBal',pt:'ggPt',mt:'ggMt',dpt:'ggDpt',rpt:'ggRpt',rr:'ggRr',mdl:'ggMdl',mdd:'ggMdd',revWin:'ggRevWin'};
   window.ggStep = function(id, d){
     ggState[id] = +(ggState[id] + d).toFixed(2);
     if(ggState[id] < 0) ggState[id] = 0;
@@ -3819,6 +3821,8 @@ document.addEventListener('input',e=>{if(cur&&RUN[cur.dataset.tool]&&cur.contain
   const ggPtEl = document.getElementById('ggPt'); if(ggPtEl) ggPtEl.value = ggAccount.profitTargetPct;
   const ggMdlEl = document.getElementById('ggMdl'); if(ggMdlEl) ggMdlEl.value = ggAccount.maxDailyLossUSD;
   const ggMtEl = document.getElementById('ggMt'); if(ggMtEl) ggMtEl.value = ggAccount.maxTradesPerDay;
+  const ggDptEl = document.getElementById('ggDpt'); if(ggDptEl) ggDptEl.value = ggState.dpt;
+  const ggDptUnitEl = document.getElementById('ggDptUnit'); if(ggDptUnitEl) ggDptUnitEl.value = ggAccount.dayProfitTargetUnit === '$' ? '$' : '%';
   const ggMddEl = document.getElementById('ggMdd'); if(ggMddEl) ggMddEl.value = ggState.mdd;
   const ggMddUnitEl = document.getElementById('ggMddUnit'); if(ggMddUnitEl) ggMddUnitEl.value = ggAccount.maxDrawdownUnit === '$' ? '$' : '%';
   if(ggMddUnitEl) ggMddUnitEl.addEventListener('change', ()=>{ if(window.__renderDDRing) window.__renderDDRing(); });
@@ -3851,6 +3855,8 @@ document.addEventListener('input',e=>{if(cur&&RUN[cur.dataset.tool]&&cur.contain
       profitTargetPct: ggState.pt,
       maxDailyLossUSD: ggState.mdl,
       maxTradesPerDay: ggState.mt,
+      dayProfitTarget: ggState.dpt,
+      dayProfitTargetUnit: ggDptUnitEl ? ggDptUnitEl.value : (ggAccount.dayProfitTargetUnit || '%'),
       maxDrawdown: ggState.mdd,
       maxDrawdownUnit: ggMddUnitEl ? ggMddUnitEl.value : (ggAccount.maxDrawdownUnit || '%'),
       deadline: ggDeadlineEl ? ggDeadlineEl.value : (ggAccount.deadline || '')
@@ -3859,7 +3865,7 @@ document.addEventListener('input',e=>{if(cur&&RUN[cur.dataset.tool]&&cur.contain
     window.jlRevWindowMin = Number(ggAccount.revWindowMin) || 15;
     window.jlProfitTargetUSD = Number(ggAccount.balance) * (Number(ggAccount.profitTargetPct)||0) / 100;
     window.jlDailyLossLimit = Number(ggAccount.maxDailyLossUSD) || 0;
-    window.jlMaxTradesPerDay = Number(ggAccount.maxTradesPerDay) || 0; window.jlStartBalance = Number(ggAccount.balance) || 0;
+    window.jlMaxTradesPerDay = Number(ggAccount.maxTradesPerDay) || 0; window.jlStartBalance = Number(ggAccount.balance) || 0; window.jlDayProfitTargetUSD = (ggAccount.dayProfitTargetUnit === '$') ? (Number(ggAccount.dayProfitTarget)||0) : Number(ggAccount.balance) * (Number(ggAccount.dayProfitTarget)||0) / 100;
     if(typeof window.jlRecomputeRevenge === 'function') window.jlRecomputeRevenge({rerender:true});
     if(typeof window.__renderToday === 'function') window.__renderToday();
     ggApplyAccountDisplay(ggAccount);
@@ -4507,7 +4513,7 @@ document.addEventListener('input',e=>{if(cur&&RUN[cur.dataset.tool]&&cur.contain
     const todayKey = getTradingDayIST();
     const rawToday = (window.__trades||[]).filter(t=>t.d===todayKey).slice().sort((a,b)=> a.t.localeCompare(b.t));
     const journals = window.__getJournals ? window.__getJournals() : [];
-    const targetUSD = Number(window.jlProfitTargetUSD) || 0;
+    const targetUSD = Number(window.jlDayProfitTargetUSD) || Number(window.jlProfitTargetUSD) || 0;
     const tradeLimit = Number(window.jlMaxTradesPerDay) || 0;
     const lossLimit = Number(window.jlDailyLossLimit) || 0;
     const hasL = lossLimit>0, hasT = tradeLimit>0, hasTg = targetUSD>0, fL = hasL?'$'+lossLimit.toFixed(0):'not set', fT = hasT?String(tradeLimit):'not set', fTg = hasTg?'$'+targetUSD.toFixed(0):'not set';
@@ -4888,7 +4894,7 @@ let lastRules=[0,0,0,0];
   // Account Settings ▸ Targets/Risk limits (window.jl*) at call time, with sane fallbacks —
   // one source of truth instead of a separate hardcoded copy per tab.
   function ruleLimits(){
-    return { loss: Number(window.jlDailyLossLimit)||0, trades: Number(window.jlMaxTradesPerDay)||0, target: Number(window.jlProfitTargetUSD)||0 };
+    return { loss: Number(window.jlDailyLossLimit)||0, trades: Number(window.jlMaxTradesPerDay)||0, target: Number(window.jlProfitTargetUSD)||0, dayTarget: Number(window.jlDayProfitTargetUSD)||0 };
   }
   // In-app heads-up (Profile switches): "Risk warnings" -> amber banner at 80% of the daily loss limit or
   // 1 trade before the max; "Daily rule reminders" -> before the first trade of the day, a note if the last
