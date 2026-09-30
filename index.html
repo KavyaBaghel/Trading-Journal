@@ -2527,6 +2527,7 @@
   /* design trade (from the CSV/HTML importer) -> live record. pnl is NET (profit + commission + swap), like the MT5 report. */
   function toLive(t){var cost=t.cost||0,net=r2((t.pnl||0)+cost),o={id:'import-'+hash([t.d,t.t,t.sym,t.side,t.en,t.ex,t.lot].join('|')),date:t.d,time:t.t,symbol:t.sym,side:t.side,volume:t.lot,
     entry:t.en,exit:t.ex,sl:t.sl||0,rawProfit:t.pnl||0,commission:cost,pnl:net,reason:t.why||'Import',mistakes:[],notes:''};
+    if(t.pos)o.position=t.pos;
     if(t.hold!=null)o.duration=t.hold/60;return o}
   /* Step 6: a report import is the truth for its date range. (1) each report trade overlays its bridge twin (bridge record 'mt5-<position>' with the same symbol, side, entry and lot, nearest in time, within 12 h; the bridge stamps times wrongly, so time cannot match exactly); (2) bridge records inside the report's whole-day range that have no twin are deleted; (3) a report trade that already exists as an earlier import (fundingpips-mt5-* or import-*, same symbol/side/entry/lot, within 2 min) is skipped. Journals on a replaced bridge trade are re-linked to the new record. */
   var BR=/^mt5-\d+$/;
@@ -2538,8 +2539,10 @@
     var ds=recs.map(function(r){return r.date}).sort(),lo=ds[0],hi=ds[ds.length-1];
     var cur=rd(TK[0]),gone={},link={},used={};
     var others=cur.filter(function(t){return t&&typeof t==='object'&&!BR.test(String(t.id))});
-    var fresh=recs.filter(function(r){var rm=ms(r);
-      var dup=others.some(function(o){return sameTrade(o,r)&&Math.abs(ots(o)-rm)<=120000});if(dup)out.skipped++;return !dup});
+    var usedO=[];
+    var fresh=recs.filter(function(r){var rm=ms(r),hit=-1;
+      for(var i=0;i<others.length;i++){var o=others[i];if(!usedO[i]&&sameTrade(o,r)&&Math.abs(ots(o)-rm)<=120000){hit=i;break}}
+      if(hit>=0){usedO[hit]=1;out.skipped++}return hit<0});
     fresh.forEach(function(r){var rm=ms(r),best=null,bd=1/0;
       cur.forEach(function(t){if(!t||typeof t!=='object'||!BR.test(String(t.id))||used[t.id]||!sameTrade(t,r))return;
         var d=Math.abs(ms(t)-rm);if(d<=43200000&&d<bd){best=t;bd=d}});
@@ -2555,7 +2558,9 @@
         out.relinked++;ch=true});
       if(ch)localStorage.setItem(LK,JSON.stringify(J))}
     out.fresh=fresh;return out}
-  window.jlSaveImport=function(R){var recs=(R.closed||[]).map(toLive),rp=replaceBridge(recs),added=merge(rp.fresh);
+  window.jlSaveImport=function(R){var recs=(R.closed||[]).map(toLive),seenId={};
+    recs.forEach(function(r,i){if(seenId[r.id]){r.id=r.id+'-p'+(r.position||('n'+i))}seenId[r.id]=1});
+    var rp=replaceBridge(recs),added=merge(rp.fresh);
     localStorage.setItem('jlOpenPositions',JSON.stringify(R.open||[]));return {added:added,total:recs.length,replaced:rp.replaced,removed:rp.removed,skipped:rp.skipped,relinked:rp.relinked}};
   function ago(ts){var d=Date.now()-ts;if(!(d>=0))return 'just now';var m=Math.floor(d/60000);if(m<1)return 'just now';if(m<60)return m+'m ago';var h=Math.floor(m/60);if(h<24)return h+'h ago';return Math.floor(h/24)+'d ago'}
   function last(){var s=rdo(SS),t=s&&s.lastSynced?Date.parse(s.lastSynced):NaN;return isFinite(t)?t:null}
@@ -3630,7 +3635,7 @@ document.addEventListener('input',e=>{if(cur&&RUN[cur.dataset.tool]&&cur.contain
       const C={ty:pick(['type','direction','side','action']),vol:pick(['volume','lots','lot','size','quantity']),sym:pick(['symbol','instrument','item']),
         ot:pick(['open time','opening time','time open','open date'],['time',0]),ct:pick(['close time','closing time','time close','close date'],['time',1]),
         op:pick(['open price','entry price','entry','price open'],['price',0]),cp:pick(['close price','exit price','exit','price close'],['price',1]),
-        cm:pick(['commission']),sw:pick(['swap']),pr:pick(['profit'])};
+        cm:pick(['commission']),sw:pick(['swap']),pr:pick(['profit']),pos:pick(['position','ticket'])};
       const miss=['ty','ot','op','pr'].filter(k=>C[k]<0);
       if(miss.length)return{err:'Missing column(s): '+miss.map(k=>({ty:'Type',ot:'Open time',op:'Open price',pr:'Profit'}[k])).join(', ')+'.'};
       const num=v=>{let x=String(v==null?'':v).replace(/\s/g,'');if(dl===';'&&x.includes(',')&&!x.includes('.'))x=x.replace(',','.');else x=x.replace(/,/g,'');const f=parseFloat(x);return isNaN(f)?null:f};
@@ -3641,7 +3646,7 @@ document.addEventListener('input',e=>{if(cur&&RUN[cur.dataset.tool]&&cur.contain
         const ty=(r[C.ty]||'').toLowerCase(),side=ty.startsWith('buy')?'BUY':ty.startsWith('sell')?'SELL':null;if(!side)continue;
         const o=dt(r[C.ot]),en=num(r[C.op]);if(!o||en==null)continue;
         const c=C.ct>=0?dt(r[C.ct]):null,ex=C.cp>=0?num(r[C.cp]):null,h=+o.t.slice(0,2);
-        const t={d:o.d,t:o.t,side,ses:h<8?'Asia':h<14?'London':'New York',en,ex:null,why:'',pnl:num(r[C.pr])||0,lot:C.vol>=0?(num(r[C.vol])||.01):.01,sl:null,tag:'',j:false,sym:(C.sym>=0&&r[C.sym])||'XAUUSD',hold:null,cost:(num(r[C.cm])||0)+(num(r[C.sw])||0)};
+        const t={d:o.d,t:o.t,side,ses:h<8?'Asia':h<14?'London':'New York',en,ex:null,why:'',pnl:num(r[C.pr])||0,lot:C.vol>=0?(num(r[C.vol])||.01):.01,sl:null,tag:'',j:false,pos:C.pos>=0?String(r[C.pos]||'').replace(/\D/g,''):'',sym:(C.sym>=0&&r[C.sym])||'XAUUSD',hold:null,cost:(num(r[C.cm])||0)+(num(r[C.sw])||0)};
         if(ex!=null&&ex!==0){t.ex=ex;t.hold=c?Math.max(0,Math.round((c.ms-o.ms)/1000)):null;closed.push(t)}else open.push(t); /* open position = no exit price */
       }
       closed.sort((a,b)=>a.d+a.t<b.d+b.t?1:-1);
