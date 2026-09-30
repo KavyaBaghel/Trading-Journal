@@ -7509,6 +7509,29 @@ function mergeJournalEntriesForSync(existingEntries, incomingEntries){
   });
 }
 
+function mergeImportedTrades(existingTrades, incomingTrades){
+  /* Union by trade id (fallback key: date|time|symbol|side|entry|pnl). Never throws. Local/incoming wins field-by-field, but user journal fields already on the stored copy are kept. */
+  const keyOf = t => {
+    if(!t || typeof t !== 'object') return '';
+    if(t.id != null && t.id !== '') return 'id:' + t.id;
+    return 'k:' + [t.date, t.time, t.symbol, t.side, t.entry != null ? t.entry : t.openPrice, t.pnl].join('|');
+  };
+  const merged = new Map();
+  (Array.isArray(existingTrades) ? existingTrades : []).forEach(t => { const k = keyOf(t); if(k) merged.set(k, t); });
+  (Array.isArray(incomingTrades) ? incomingTrades : []).forEach(t => {
+    const k = keyOf(t); if(!k) return;
+    const prev = merged.get(k);
+    if(!prev){ merged.set(k, t); return; }
+    const out = {...prev, ...t};
+    if(prev.notes && !t.notes) out.notes = prev.notes;
+    if(Array.isArray(prev.mistakes) && prev.mistakes.length && !(Array.isArray(t.mistakes) && t.mistakes.length)) out.mistakes = prev.mistakes;
+    if(prev.setup && !t.setup) out.setup = prev.setup;
+    if(prev.journaled || t.journaled) out.journaled = true;
+    merged.set(k, out);
+  });
+  return [...merged.values()].sort((a,b) => `${a.date || ''} ${a.time || ''}`.localeCompare(`${b.date || ''} ${b.time || ''}`));
+}
+
 function mergeSyncedStorageMaps(remoteStorage = {}, localStorageSnapshot = {}){
   const merged = {...remoteStorage};
   const keys = new Set([...Object.keys(remoteStorage || {}), ...Object.keys(localStorageSnapshot || {})]);
