@@ -94,10 +94,10 @@ async function handleAiCoach(request, env, cors) {
 
   const data = await completion.json().catch(() => ({}));
   if (!completion.ok) {
-    return json({ error: data?.error?.message || `OpenRouter returned ${completion.status}.` }, 502, cors);
+    return json({ error: data?.error?.message || `Groq returned ${completion.status}.` }, 502, cors);
   }
   const text = data?.choices?.[0]?.message?.content || "";
-  if (!text.trim()) return json({ error: "OpenRouter returned no response text." }, 502, cors);
+  if (!text.trim()) return json({ error: "Groq returned no response text." }, 502, cors);
   return json({ text: text.trim() }, 200, cors);
 }
 
