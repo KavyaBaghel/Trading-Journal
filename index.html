@@ -2534,15 +2534,19 @@
   function ms(t){var m=Date.parse(String(t.date)+'T'+String(t.time||'00:00:00')+'Z');return isFinite(m)?m:NaN}
   function ots(t){return String(t.id).indexOf('fundingpips-mt5')===0&&/Z$/.test(t.openUtc||'')?Date.parse(t.openUtc)+19800000:ms(t)}  /* old imports store the CLOSE time; their OPEN time in IST is openUtc + 5:30 */
   function sameTrade(a,b){return a.symbol===b.symbol&&a.side===b.side&&Math.abs(Number(a.entry)-Number(b.entry))<1e-6&&Math.abs(Number(a.volume)-Number(b.volume))<1e-6}
-  function replaceBridge(recs){var out={replaced:0,removed:0,skipped:0,relinked:0,fresh:recs};
+  function replaceBridge(recs){var out={replaced:0,removed:0,skipped:0,relinked:0,fresh:recs,matched:[]};
     if(!recs.length)return out;
     var ds=recs.map(function(r){return r.date}).sort(),lo=ds[0],hi=ds[ds.length-1];
     var cur=rd(TK[0]),gone={},link={},used={};
     var others=cur.filter(function(t){return t&&typeof t==='object'&&!BR.test(String(t.id))});
     var usedO=[];
-    var fresh=recs.filter(function(r){var rm=ms(r),hit=-1;
-      for(var i=0;i<others.length;i++){var o=others[i];if(!usedO[i]&&sameTrade(o,r)&&Math.abs(ots(o)-rm)<=120000){hit=i;break}}
-      if(hit>=0){usedO[hit]=1;out.skipped++}return hit<0});
+    /* Two passes so identical twin positions pair with their own result first (same exit and P&L), then any leftover match loosely. */
+    var hitOf=[];
+    recs.forEach(function(r,ri){var rm=ms(r);for(var i=0;i<others.length;i++){var o=others[i];
+      if(!usedO[i]&&sameTrade(o,r)&&Math.abs(ots(o)-rm)<=120000&&Math.abs(Number(o.exit)-Number(r.exit))<1e-6&&Math.abs(Number(o.pnl)-Number(r.pnl))<=0.005){hitOf[ri]=i;usedO[i]=1;break}}});
+    recs.forEach(function(r,ri){if(hitOf[ri]!=null)return;var rm=ms(r);for(var i=0;i<others.length;i++){var o=others[i];
+      if(!usedO[i]&&sameTrade(o,r)&&Math.abs(ots(o)-rm)<=120000){hitOf[ri]=i;usedO[i]=1;break}}});
+    var fresh=recs.filter(function(r,ri){if(hitOf[ri]!=null){out.skipped++;out.matched.push({old:others[hitOf[ri]],rec:r});return false}return true});
     fresh.forEach(function(r){var rm=ms(r),best=null,bd=1/0;
       cur.forEach(function(t){if(!t||typeof t!=='object'||!BR.test(String(t.id))||used[t.id]||!sameTrade(t,r))return;
         var d=Math.abs(ms(t)-rm);if(d<=43200000&&d<bd){best=t;bd=d}});
@@ -2558,10 +2562,27 @@
         out.relinked++;ch=true});
       if(ch)localStorage.setItem(LK,JSON.stringify(J))}
     out.fresh=fresh;return out}
+  /* Report wins: a report row that matches an existing (non-bridge) record refreshes that record's result fields (exit, P&L, commission, duration). The id, date, time and position never change. Journals follow the new trade key. Values within 0.005 count as equal, so re-importing the same report changes nothing. */
+  function refreshMatched(pairs){var out={updated:0,relinked:0},chg={},dif=function(a,b){return typeof a==='number'&&typeof b==='number'?Math.abs(a-b)>0.005:a!==b};
+    pairs.forEach(function(p){var o=p.old,r=p.rec;if(o&&r&&(dif(o.pnl,r.pnl)||dif(o.exit,r.exit)))chg[o.id]={rec:r,oldKey:JLAdapter.liveKey(o)}});
+    if(!Object.keys(chg).length)return out;
+    var link={};
+    TK.forEach(function(k){var a=rd(k),hit=false;
+      a.forEach(function(t){var c=t&&chg[t.id];if(!c)return;var r=c.rec;
+        t.exit=r.exit;t.pnl=r.pnl;if(r.rawProfit!=null)t.rawProfit=r.rawProfit;if(r.commission!=null)t.commission=r.commission;if(r.duration!=null)t.duration=r.duration;
+        hit=true;if(k===TK[0]){link[c.oldKey]=JLAdapter.liveKey(t);out.updated++}});
+      if(hit)localStorage.setItem(k,JSON.stringify(a))});
+    var LK='krishna_journal_page_entries',J=rd(LK),ch=false,live=rd(TK[0]);
+    J.forEach(function(e){var nk=e&&link[e.tradeKey];if(!nk)return;e.tradeKey=nk;e.trade=e.trade||{};
+      var t=live.filter(function(x){return x&&JLAdapter.liveKey(x)===nk})[0];
+      if(t)['exit','pnl','duration'].forEach(function(f){if(t[f]!=null)e.trade[f]=t[f]});
+      out.relinked++;ch=true});
+    if(ch)localStorage.setItem(LK,JSON.stringify(J));
+    return out}
   window.jlSaveImport=function(R){var recs=(R.closed||[]).map(toLive),seenId={};
     recs.forEach(function(r,i){if(seenId[r.id]){r.id=r.id+'-p'+(r.position||('n'+i))}seenId[r.id]=1});
-    var rp=replaceBridge(recs),added=merge(rp.fresh);
-    localStorage.setItem('jlOpenPositions',JSON.stringify(R.open||[]));return {added:added,total:recs.length,replaced:rp.replaced,removed:rp.removed,skipped:rp.skipped,relinked:rp.relinked}};
+    var rp=replaceBridge(recs),added=merge(rp.fresh),up=refreshMatched(rp.matched);
+    localStorage.setItem('jlOpenPositions',JSON.stringify(R.open||[]));return {added:added,total:recs.length,replaced:rp.replaced,removed:rp.removed,skipped:rp.skipped,relinked:rp.relinked+up.relinked,updated:up.updated}};
   function ago(ts){var d=Date.now()-ts;if(!(d>=0))return 'just now';var m=Math.floor(d/60000);if(m<1)return 'just now';if(m<60)return m+'m ago';var h=Math.floor(m/60);if(h<24)return h+'h ago';return Math.floor(h/24)+'d ago'}
   function last(){var s=rdo(SS),t=s&&s.lastSynced?Date.parse(s.lastSynced):NaN;return isFinite(t)?t:null}
   function T(id,txt){var e=document.getElementById(id);if(e)e.textContent=txt}
@@ -3682,8 +3703,8 @@ document.addEventListener('input',e=>{if(cur&&RUN[cur.dataset.tool]&&cur.contain
         if(R.err){ showResult(R.err, 'err'); return; }
         let S; try{ S = window.jlSaveImport(R); }
         catch(e){ showResult('Could not save the import in this browser.', 'err'); return; }
-        showResult('Imported '+S.total+' closed trade'+(S.total===1?'':'s')+' ('+S.added+' new'+(S.replaced?', '+S.replaced+' bridge trade'+(S.replaced===1?'':'s')+' replaced':'')+(S.removed?', '+S.removed+' unmatched bridge trade'+(S.removed===1?'':'s')+' removed':'')+(S.skipped?', '+S.skipped+' already present':'')+(S.relinked?', '+S.relinked+' journal'+(S.relinked===1?'':'s')+' re-linked':'')+') and '+R.open.length+' open position'+(R.open.length===1?'':'s')+' from '+file.name+'. Reloading…', 'ok');
-        setTimeout(()=>location.reload(), (S.replaced||S.removed)?6000:1200);
+        showResult('Imported '+S.total+' closed trade'+(S.total===1?'':'s')+' ('+S.added+' new'+(S.replaced?', '+S.replaced+' bridge trade'+(S.replaced===1?'':'s')+' replaced':'')+(S.removed?', '+S.removed+' unmatched bridge trade'+(S.removed===1?'':'s')+' removed':'')+(S.updated?', '+S.updated+' updated from the report':'')+(S.skipped?', '+S.skipped+' already present':'')+(S.relinked?', '+S.relinked+' journal'+(S.relinked===1?'':'s')+' re-linked':'')+') and '+R.open.length+' open position'+(R.open.length===1?'':'s')+' from '+file.name+'. Reloading…', 'ok');
+        setTimeout(()=>location.reload(), (S.replaced||S.removed||S.updated)?6000:1200);
       };
       reader.onerror = ()=> showResult('Could not read that file. Try again.', 'err');
       reader.readAsArrayBuffer(file);
@@ -7250,10 +7271,10 @@ window.__renderAnSetups=renderBoth;window.__renderAnEmotions=renderEmo;setTimeou
   }
   function renderKeyEvents(){
     const host=$('mkKeyEvents'); if(!host) return;
-    const now=new Date();
-    const upcoming=cal.filter(e=>new Date(e.time.replace(' ','T')+'Z')>=now && impLvl(e.impact)>=2)
+    const now=new Date(), ccy=state().ccy;
+    const upcoming=cal.filter(e=>new Date(e.time.replace(' ','T')+'Z')>=now && impLvl(e.impact)>=2 && (ccy==='all' || (CCY_MAP[e.country]||e.country)===ccy))
       .sort((a,b)=>new Date(a.time)-new Date(b.time)).slice(0,4);
-    if(!upcoming.length){ host.innerHTML='<div class="mk-k"><span>No high/medium-impact events found in range.</span></div>'; return; }
+    if(!upcoming.length){ host.innerHTML='<div class="mk-k"><span>No high/medium-impact '+(ccy==='all'?'':esc(ccy)+' ')+'events found in range.</span></div>'; return; }
     host.innerHTML=upcoming.map(e=>{
       const t=new Date(e.time.replace(' ','T')+'Z');
       return '<div class="mk-k"><b>'+esc(e.event||'Event')+'</b><span>Date: '+t.toLocaleDateString(undefined,{month:'short',day:'numeric'})+'</span><br><span>Time: '+t.toLocaleTimeString(undefined,{hour:'2-digit',minute:'2-digit'})+'</span></div>';
