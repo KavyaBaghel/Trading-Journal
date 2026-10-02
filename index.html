@@ -2376,6 +2376,19 @@
 <div id="firebaseGateMessage" class="jl-message">Checking website sign-in...</div>
 <p class="jl-footnote">By continuing, you agree to Journall's Terms and Privacy Policy.</p>
 </div>
+<script>
+/* Current balance: use the last MT5 sync (within 24h) when there is one, else starting balance + imported net P&L. */
+window.jlLiveBalance=function(Z){
+  var start=(Z&&Z.start)||0,base=start+((Z&&Z.net)||0);
+  try{
+    var c=JSON.parse(localStorage.getItem('journall_account_config_v1')||'null');
+    var v=c&&c.mt5BalanceSource==='mt5'?Number(c.mt5CurrentBalance):NaN;
+    var age=c?Date.now()-Number(c.mt5BalanceTimestamp||0):Infinity;
+    if(start>0&&isFinite(v)&&v>0&&age>=0&&age<86400000)return v;
+  }catch(e){}
+  return base;
+};
+</script>
 <script id="jl-adapter">
 /* Journall data adapter: live storage <-> new design. No DOM, no network. */
 (function(root){
@@ -3965,7 +3978,7 @@ document.addEventListener('input',e=>{if(cur&&RUN[cur.dataset.tool]&&cur.contain
     // goals were first drawn before the trade data existed, so redraw once the data is there
     if(!ggGoalsSynced && window.__A && window.__trades){ ggGoalsSynced = true; ggRenderGoals(); }
     if(ggAnimated) return; ggAnimated = true;
-    const _A=window.__A,_bal=_A.start+_A.net;
+    const _A=window.__A,_bal=window.jlLiveBalance?window.jlLiveBalance(_A):_A.start+_A.net;
     window.__jlJourneyPlayed = true;
     if(_A.start>0) ggCountUp(document.getElementById('ggBalVal'), _bal, '$', 1100); else document.getElementById('ggBalVal').textContent='Not set';
     setTimeout(()=>{ if(window.__renderJourney) window.__renderJourney(); }, 250);
@@ -7166,7 +7179,7 @@ set('psyYr',A.n?jlN(A.n,'trade')+' logged, '+A.wr.toFixed(0)+'% win rate, '+jlN(
 set('psyMeta',A.n?jlN(A.n,'trade')+' tracked \u00b7 '+A.wr.toFixed(0)+'% win rate \u00b7 '+m(A.net)+' net':'No trades tracked');})();</script>
 <script>(function(){const A=window.__A,$=id=>document.getElementById(id),tg=Math.round(window.jlProfitTargetUSD||0),bal=A.start+A.net,m=v=>'$'+v.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}),getMdd=function(){var e=document.getElementById('ggMdd'),v=Number(e&&e.value)||0,u=e&&e.closest('.gg-combo')&&e.closest('.gg-combo').querySelector('select');return u&&u.value==='$'?v:Number(window.jlStartBalance||0)*v/100},mdd0=getMdd();
 /* Balance scale: range = start - drawdown budget .. start + profit target; every marker, label and the red/green split come from those three numbers */
-window.__renderAnScale=function(b){const sc=document.querySelector('.a-scale');if(!sc)return;b=b==null?bal:b;
+window.__renderAnScale=function(b){const sc=document.querySelector('.a-scale');if(!sc)return;b=b==null?(window.jlLiveBalance?window.jlLiveBalance(A):bal):b;
   const lo=A.start-getMdd(),hi=A.start+tg,span=(hi-lo)||1,pc=v=>Math.max(0,Math.min(100,(v-lo)/span*100)),n0=v=>'$'+Math.round(v).toLocaleString('en-US'),mks=sc.querySelectorAll('.a-mk'),now=sc.querySelector('.a-now');
   const put=(i,v,t)=>{if(!mks[i])return;mks[i].style.left=pc(v)+'%';mks[i].querySelector('span').innerHTML=n0(v)+'<br>'+t};
   put(0,lo,'max drawdown');put(1,A.start,'start');put(2,hi,'target');
@@ -7175,7 +7188,7 @@ window.__renderAnScale=function(b){const sc=document.querySelector('.a-scale');i
 window.__renderAnScale();
 const set=(id,t)=>{const e=$(id);if(e)e.textContent=t};if(A.start>0){set('ggJEnd',tg>0?m(A.start+tg):'No target');set('ggJTogo',tg>0?(A.net>=tg?'target reached':m(tg-A.net)+' to go'):'No profit target set');}else{set('ggJEnd','\u2014');set('ggJTogo','Set your balance and profit target');}
 /* Hero balance bar: centred on the starting balance. Left half = loss side (start down to the max-drawdown floor), right half = profit side (start up to the profit target). Each side is scaled on its own, so the dot never pins to one end unless a limit is actually reached. */
-window.__renderJourney=function(){const Z=window.__A||A,start=Z.start,net=Z.net||0,tgt=Math.round(window.jlProfitTargetUSD||0),dd=getMdd(),b=start+net;
+window.__renderJourney=function(){const Z=window.__A||A,start=Z.start,tgt=Math.round(window.jlProfitTargetUSD||0),dd=getMdd(),b=window.jlLiveBalance?window.jlLiveBalance(Z):start+(Z.net||0),net=b-start;
   const dot=$('ggJourneyDot'),lf=$('ggJLossFill'),gf=$('ggJGainFill'),now=$('ggJNow');if(!dot)return;
   set('ggJFloor',start>0&&dd>0?m(start-dd):'\u2014');
   if(!(start>0)){dot.style.left='50%';if(now)now.style.left='50%';if(lf)lf.style.width='0%';if(gf)gf.style.width='0%';dot.classList.remove('neg','pos');return}
