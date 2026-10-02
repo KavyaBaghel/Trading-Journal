@@ -4,6 +4,7 @@ import os
 import site
 import datetime
 import subprocess
+import time
 
 # ── Dynamically add user site-packages so --user-installed packages are found ──
 try:
@@ -95,6 +96,28 @@ def main():
     if not mt5.initialize(timeout=30000, **init_params):
         err_code, err_desc = mt5.last_error()
         print(json.dumps({"error": f"MT5 connection failed: {err_desc} (Code {err_code}). Ensure MT5 is open."}))
+        sys.exit(0)
+
+    # Balance first: the terminal can take a few seconds to report its account
+    # after initialize(), so poll instead of reading it once at the very end.
+    account_info = None
+    for _ in range(20):
+        account_info = mt5.account_info()
+        if account_info is not None:
+            break
+        time.sleep(0.5)
+    if account_info is None:
+        err_code, err_desc = mt5.last_error()
+        ti = mt5.terminal_info()
+        connected = getattr(ti, "connected", None) if ti else None
+        company = getattr(ti, "company", "") if ti else ""
+        print(json.dumps({"error": (
+            f"MT5 is open but reports no account (last error: {err_desc}, code {err_code}; "
+            f"connected to broker: {connected}; terminal: {company}). "
+            "Log in to your trading account in MT5, check the connection indicator at the "
+            "bottom right, then press Sync balance again."
+        )}))
+        mt5.shutdown()
         sys.exit(0)
 
     now_local = datetime.datetime.now()
@@ -192,9 +215,8 @@ def main():
             "notes": f"MT5 Sync (#{pid}) {comment}"
         })
 
-    account_info = mt5.account_info()
-    account_balance = account_info.balance if account_info else None
-    account_equity = account_info.equity if account_info else None
+    account_balance = account_info.balance
+    account_equity = account_info.equity
     mt5.shutdown()
     print(json.dumps({"ok": True, "trades": reconstructed_trades, "account_balance": account_balance, "account_equity": account_equity}))
 
