@@ -199,6 +199,12 @@ def main():
         comment = last_deal.comment.strip()
         reason = "TP" if "tp" in comment.lower() else ("SL" if "sl" in comment.lower() else "User")
 
+        # MT5 deal times are SERVER wall-clock stored as an epoch. Reading them as UTC gives exactly
+        # the time MT5 and its HTML reports show, whatever time zone this PC is in.
+        _utc = datetime.timezone.utc
+        open_srv = datetime.datetime.fromtimestamp(first_deal.time, _utc)
+        close_srv = datetime.datetime.fromtimestamp(last_deal.time, _utc)
+
         reconstructed_trades.append({
             "id": f"mt5-{pid}",
             "date": exit_dt.strftime("%Y-%m-%d"),
@@ -212,6 +218,10 @@ def main():
             "reason": reason,
             "commission": round(sum(d.commission for d in group), 2),
             "swap": round(sum(d.swap for d in group), 2),
+            "profit": round(sum(d.profit for d in group), 2),
+            "openTime": open_srv.strftime("%Y-%m-%d %H:%M:%S"),
+            "closeTime": close_srv.strftime("%Y-%m-%d %H:%M:%S"),
+            "holdSec": max(0, int(last_deal.time - first_deal.time)),
             "notes": f"MT5 Sync (#{pid}) {comment}"
         })
 

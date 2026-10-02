@@ -2613,6 +2613,11 @@ window.jlLiveBalance=function(Z){
     recs.forEach(function(r,i){if(seenId[r.id]){r.id=r.id+'-p'+(r.position||('n'+i))}seenId[r.id]=1});
     var rp=replaceBridge(recs),added=merge(rp.fresh),up=refreshMatched(rp.matched);
     localStorage.setItem('jlOpenPositions',JSON.stringify(R.open||[]));return {added:added,total:recs.length,replaced:rp.replaced,removed:rp.removed,skipped:rp.skipped,relinked:rp.relinked+up.relinked,updated:up.updated}};
+  window.jlSaveSyncTrades=function(list){var have={};rd(TK[0]).forEach(function(t){if(t&&typeof t==='object'&&!BR.test(String(t.id))&&t.position)have[String(t.position)]=1});
+    var all=list||[],recs=all.map(toLive).filter(function(r){return !(r.position&&have[String(r.position)])}),seenId={};
+    recs.forEach(function(r,i){if(seenId[r.id]){r.id=r.id+'-p'+(r.position||('n'+i))}seenId[r.id]=1});
+    var rp=replaceBridge(recs),added=merge(rp.fresh);
+    return {added:added,total:all.length,known:all.length-recs.length,replaced:rp.replaced,removed:rp.removed,skipped:rp.skipped}};
   function ago(ts){var d=Date.now()-ts;if(!(d>=0))return 'just now';var m=Math.floor(d/60000);if(m<1)return 'just now';if(m<60)return m+'m ago';var h=Math.floor(m/60);if(h<24)return h+'h ago';return Math.floor(h/24)+'d ago'}
   function last(){var s=rdo(SS),t=s&&s.lastSynced?Date.parse(s.lastSynced):NaN;return isFinite(t)?t:null}
   function T(id,txt){var e=document.getElementById(id);if(e)e.textContent=txt}
@@ -2627,17 +2632,18 @@ window.jlLiveBalance=function(Z){
     function done(){window.__jlSyncBusy=false;btn.disabled=false;btn.textContent='\u27f3 Sync balance'}
     window.__jlSyncBusy=true;window.__jlSyncMsg='';btn.disabled=true;btn.textContent='Syncing\u2026';msg('Connecting to MT5 bridge\u2026');
     var ac=typeof AbortController==='function'?new AbortController():null,to=ac&&setTimeout(function(){ac.abort()},45000);
-    fetch('http://localhost:8787/api/sync-broker',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({platform:'mt5',days:30}),cache:'no-store',signal:ac?ac.signal:undefined})
+    fetch('http://localhost:8787/api/sync-broker',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({platform:'mt5',days:3}),cache:'no-store',signal:ac?ac.signal:undefined})
     .then(function(r){return r.json()}).then(function(d){if(to)clearTimeout(to);
       if(d&&d.error){msg('MT5 error: '+d.error);done();return}
-      /* Krishna (29 Sep): Sync now fetches the account balance ONLY. Trades come only from MT5 report imports (the bridge stamps wrong times and P&L). Any trades in the bridge reply are ignored. */
+      /* Sync reads the balance and adds recent trades. Trade times come from the bridge's openTime (MT5 server clock, same as a report), and a position already in the journal is never added twice. */
       var bal=d&&typeof d.account_balance==='number'&&isFinite(d.account_balance)?d.account_balance:null;
-      if(bal==null){msg('Bridge connected, but MT5 returned no balance. Trades come from report imports.');done();return}
+      if(bal==null){msg('Bridge connected, but MT5 returned no balance.');done();return}
+       var imp=null;try{imp=window.jlSaveSyncTrades((Array.isArray(d.trades)?d.trades:[]).map(function(t){if(!t||!t.openTime)return null;var p=String(t.openTime).split(' ');if(p.length<2)return null;return {d:p[0],t:p[1],side:t.side,en:t.openPrice,ex:t.closePrice,pnl:typeof t.profit==='number'?t.profit:t.pnl,cost:r2((t.commission||0)+(t.swap||0)),lot:t.volume,sym:t.symbol,pos:String(t.id||'').replace(/\D/g,''),hold:typeof t.holdSec==='number'?t.holdSec:null,sl:null,why:(t.reason==='TP'||t.reason==='SL')?t.reason:''}}).filter(Boolean))}catch(e){imp=null}
       var c=rdo(CK);if(c){c.mt5CurrentBalance=bal;c.mt5BalanceSource='mt5';c.mt5BalanceTimestamp=Date.now();localStorage.setItem(CK,JSON.stringify(c))}
       localStorage.setItem(SS,JSON.stringify({platform:'mt5',days:30,lastSynced:new Date().toISOString()}));
-      window.__jlSyncMsg=c?'Synced \u2014 balance updated':'Synced \u2014 balance read (save Account Settings to keep it)';
+      window.__jlSyncMsg=(c?'Synced, balance updated':'Synced, balance read (save Account Settings to keep it)')+(imp?(imp.added?', '+imp.added+' new trade'+(imp.added===1?'':'s'):', no new trades'):'');
       if(ti)ti.textContent=window.__jlSyncMsg;done();window.jlPaintSync();
-      if(c)setTimeout(function(){location.reload()},1200)})
+      if(c||(imp&&imp.added>0))setTimeout(function(){location.reload()},1200)})
     .catch(function(e){if(to)clearTimeout(to);done();
       msg(e&&e.name==='AbortError'?'MT5 bridge timed out (45 s). Is MetaTrader 5 open?':'MT5 bridge not reachable. Open MetaTrader 5, start the local bridge, then try again.')})}
 })();
@@ -3596,7 +3602,7 @@ document.addEventListener('input',e=>{if(cur&&RUN[cur.dataset.tool]&&cur.contain
     <div>
       <div class="eyebrow"><span class="pill">Broker &amp; import</span><span class="date mono" id="dateStrUp"></span></div>
       <h1>Upload Data</h1>
-      <p>Sync your MT5 balance, and import trades from a broker report.</p>
+      <p>Sync your MT5 balance and recent trades, or import a broker report.</p>
     </div>
     <div class="top-right"><div class="who"><span class="dot"></span><span data-user-name></span></div></div>
   </div>
@@ -3636,14 +3642,14 @@ document.addEventListener('input',e=>{if(cur&&RUN[cur.dataset.tool]&&cur.contain
     <div class="up-col">
       <div class="up-card glass up-reveal" style="animation-delay:110ms">
         <div class="up-card-head">🧾 What syncing keeps</div>
-        <div class="ud-note"><b>Sync balance</b> reads your account balance from MT5. <b>Trades come only from a report import</b> (export your MT5 history as .html or .csv and drop it below). Your journal notes, screenshots and psychology checks always stay local and are never overwritten.</div>
+        <div class="ud-note"><b>Sync balance</b> reads your account balance from MT5 and adds recent trades that are not in your journal yet. For older history, export your MT5 history as .html or .csv and drop it below; a report import stays the final word. Your journal notes, screenshots and psychology checks always stay local and are never overwritten.</div>
       </div>
       <div class="up-card glass up-reveal" style="animation-delay:150ms">
         <div class="up-card-head">🛠️ Bridge setup</div>
         <div class="ud-steps">
           <div class="ud-step"><span class="ud-step-n">1</span><div><b>Run the local bridge</b><span class="ud-step-d">Start the local bridge (<code>local-server.ps1</code>) with MT5 open.</span></div></div>
           <div class="ud-step"><span class="ud-step-n">2</span><div><b>Keep MT5 signed in</b><span class="ud-step-d">The bridge reads your account balance from the terminal.</span></div></div>
-          <div class="ud-step"><span class="ud-step-n">3</span><div><b>Press Sync balance</b><span class="ud-step-d">Sync runs when you press the button. It does not import trades.</span></div></div>
+          <div class="ud-step"><span class="ud-step-n">3</span><div><b>Press Sync balance</b><span class="ud-step-d">Sync runs when you press the button. It also adds recent trades.</span></div></div>
         </div>
       </div>
     </div>
