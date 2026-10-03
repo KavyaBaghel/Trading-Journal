@@ -8,7 +8,7 @@
 <meta name="mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-title" content="Journall"/>
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black"/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <link rel="icon" type="image/png" sizes="192x192" href="assets/icon-192.png"/>
@@ -9397,5 +9397,27 @@ initFirebaseAuth().catch(err=>{
   sync();
 })();
 </script>
+<style id="jl-mobile-polish">
+/* Mobile polish (phones): consistent gutters, compact cards, readable session chart, calendar toolbar that fits */
+@media (max-width:640px){
+  html{-webkit-text-size-adjust:100%}
+  body{-webkit-tap-highlight-color:transparent;overscroll-behavior-y:contain}
+  body .wrap{padding-left:14px;padding-right:14px;padding-bottom:calc(80px + env(safe-area-inset-bottom,0px))}
+  body .rings{gap:10px}
+  body .ring-card{padding:14px 16px;gap:14px}
+  body .ring-card svg{width:56px;height:56px}
+  body .session,body .panel{padding:16px}
+  body .session-top{flex-wrap:wrap;gap:8px;margin-bottom:36px}
+  body .sess-body{padding-left:66px}
+  body .sess-name{width:62px;left:-66px;white-space:nowrap;letter-spacing:0}
+  body .ticks{margin-left:66px}
+  body .row4{gap:10px}
+  body .cal-top{gap:10px}
+  #view-calendar .cal-nav{width:100%;flex-wrap:wrap;gap:8px}
+  #view-calendar .cal-nav .j-cb{flex:1 1 46%;min-width:0}
+  #view-calendar .cal-nav .j-cb select,#view-calendar .cal-nav .j-cb button{width:100%}
+  body .btn-primary,body .btn-ghost{min-height:44px}
+}
+</style>
 </body>
 </html>
