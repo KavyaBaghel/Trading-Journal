@@ -1111,6 +1111,61 @@
   .j-act{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
   .j-sm{padding:7px 14px;font-size:12.5px}
 
+  /* ---------- shared confirm dialog + undo toast ---------- */
+  .jl-dlg-scrim{position:fixed;inset:0;z-index:10000;display:flex;align-items:center;justify-content:center;padding:20px;
+    background:rgba(4,4,8,.62);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);animation:jlDlgBg .22s var(--ease-out) both}
+  .jl-dlg-scrim.out{animation:jlDlgBgOut .16s var(--ease) both;pointer-events:none}
+  .jl-dlg{width:min(410px,100%);padding:24px;border-radius:18px;border:1px solid var(--border-hi);
+    background:linear-gradient(160deg,rgba(255,255,255,.035),rgba(255,255,255,0) 40%),var(--panel);
+    box-shadow:0 30px 80px -20px rgba(0,0,0,.8);animation:jlDlgIn .36s var(--ease-out) both}
+  .jl-dlg-scrim.out .jl-dlg{animation:jlDlgOut .16s var(--ease) both}
+  .jl-dlg-ic{width:42px;height:42px;border-radius:12px;display:grid;place-items:center;margin-bottom:14px;
+    background:color-mix(in srgb,var(--red) 15%,transparent);border:1px solid color-mix(in srgb,var(--red) 30%,transparent)}
+  .jl-dlg-ic svg,.jl-toast-ic svg,.jl-toast-act svg{fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+  .jl-dlg-ic svg{width:19px;height:19px;stroke:var(--red)}
+  .jl-dlg h3{margin:0 0 6px;font-size:17px;font-weight:700;letter-spacing:-.01em}
+  .jl-dlg p{margin:0;color:var(--sub);font-size:13.5px;line-height:1.5}
+  .jl-dlg-pv{--c:var(--accent-2);display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:16px;padding:12px 14px;
+    border-radius:12px;background:var(--panel-2);border:1px solid var(--border);border-left:3px solid var(--c)}
+  .jl-dlg-pv b{display:block;font-size:13px;font-weight:650}
+  .jl-dlg-pv span{display:block;margin-top:2px;font-size:11.5px;color:var(--faint)}
+  .jl-dlg-pv em{font-style:normal;font-size:13px;font-weight:700;color:var(--c)}
+  .jl-dlg-act{display:flex;justify-content:flex-end;gap:10px;margin-top:22px}
+  .jl-dlg-act button:focus-visible{outline:2px solid var(--accent-2);outline-offset:2px}
+  .btn-primary.jl-dlg-yes.danger{background:linear-gradient(135deg,var(--red),#d9453a);box-shadow:0 6px 18px -4px rgba(240,104,92,.5)}
+  .btn-primary.jl-dlg-yes.danger:hover{box-shadow:0 10px 24px -4px rgba(240,104,92,.6)}
+  .btn-primary.jl-dlg-yes.danger:focus-visible{outline:2px solid var(--red);outline-offset:2px}
+  #jlToasts{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:10001;
+    display:flex;flex-direction:column;gap:10px;width:min(380px,calc(100vw - 28px));pointer-events:none}
+  .jl-toast{position:relative;overflow:hidden;pointer-events:auto;display:flex;align-items:center;gap:12px;padding:12px 12px 15px 14px;
+    border-radius:14px;background:var(--panel);border:1px solid var(--border-hi);box-shadow:0 18px 44px -14px rgba(0,0,0,.75);
+    animation:jlToastIn .4s var(--ease-out) both}
+  .jl-toast.out{animation:jlToastOut .2s var(--ease) both;pointer-events:none}
+  .jl-toast-ic{flex:none;width:30px;height:30px;border-radius:9px;display:grid;place-items:center;background:color-mix(in srgb,var(--c) 15%,transparent)}
+  .jl-toast-ic svg{width:15px;height:15px;stroke:var(--c)}
+  .jl-toast-tx{flex:1;min-width:0;font-size:13px;font-weight:650}
+  .jl-toast-tx small{display:block;margin-top:2px;font-size:11.5px;font-weight:500;color:var(--faint);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .jl-toast-act{flex:none;display:flex;align-items:center;gap:6px;padding:7px 12px;border-radius:9px;cursor:pointer;font:inherit;font-size:12.5px;font-weight:650;
+    color:var(--accent-2);background:rgba(124,108,240,.12);border:1px solid rgba(124,108,240,.32);-webkit-tap-highlight-color:transparent;
+    transition:background .3s var(--ease-out),border-color .3s var(--ease-out),transform .3s var(--ease-out)}
+  .jl-toast-act svg{width:13px;height:13px;stroke:currentColor}
+  .jl-toast-act:hover{background:rgba(124,108,240,.22);border-color:var(--accent-2)}
+  .jl-toast-act:active{transform:scale(.95)}
+  .jl-toast-act:focus-visible{outline:2px solid var(--accent-2);outline-offset:2px}
+  .jl-toast-bar{position:absolute;left:0;right:0;bottom:0;height:3px;background:rgba(255,255,255,.06)}
+  .jl-toast-bar i{display:block;height:100%;background:linear-gradient(90deg,var(--accent),var(--accent-2));transform-origin:left center;
+    animation:jlToastBar var(--d,5000ms) linear forwards}
+  @keyframes jlDlgBg{from{opacity:0}to{opacity:1}}
+  @keyframes jlDlgBgOut{to{opacity:0}}
+  @keyframes jlDlgIn{from{opacity:0;transform:translateY(14px) scale(.96)}to{opacity:1;transform:none}}
+  @keyframes jlDlgOut{to{opacity:0;transform:translateY(6px) scale(.98)}}
+  @keyframes jlToastIn{from{opacity:0;transform:translateY(16px) scale(.97)}to{opacity:1;transform:none}}
+  @keyframes jlToastOut{to{opacity:0;transform:translateY(8px) scale(.98)}}
+  @keyframes jlToastBar{from{transform:scaleX(1)}to{transform:scaleX(0)}}
+  @media (prefers-reduced-motion:reduce){
+    .jl-dlg-scrim,.jl-dlg,.jl-dlg-scrim.out,.jl-dlg-scrim.out .jl-dlg,.jl-toast,.jl-toast.out{animation-duration:.01ms}
+  }
+
   .j-chk{border:1px solid var(--border);border-radius:14px;padding:18px 20px;margin-top:24px;background:linear-gradient(160deg,rgba(124,108,240,.05),transparent 55%),rgba(255,255,255,.015)}
   .j-chk .a-s-head{margin-bottom:0}
   #jCheck{white-space:nowrap;flex:none}
@@ -5227,6 +5282,110 @@ window.__trades=T;window.__trRender=render;tabs();render();
 })();
 </script>
 <script>
+/* shared confirm dialog + undo toast: window.jlConfirm(opts) -> Promise<boolean>, window.jlToast(opts) */
+(function(){
+const P={
+  trash:'<path d="M4 7h16M10 11v6M14 11v6M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12M9 7V4h6v3"/>',
+  undo:'<path d="M9 14L4 9l5-5"/><path d="M4 9h10a6 6 0 0 1 0 12h-3"/>',
+  check:'<path d="M5 12l5 5 9-10"/>'
+};
+const svg=k=>'<svg viewBox="0 0 24 24" aria-hidden="true">'+P[k]+'</svg>';
+let closeOpen=null;
+
+window.jlConfirm=function(o){
+  o=o||{};
+  if(closeOpen)closeOpen(false);
+  return new Promise(function(resolve){
+    const prev=o.opener||document.activeElement,uid='jlDlg'+Date.now();
+    const scrim=document.createElement('div');scrim.className='jl-dlg-scrim';
+    const box=document.createElement('div');box.className='jl-dlg';
+    box.setAttribute('role','alertdialog');box.setAttribute('aria-modal','true');
+    box.setAttribute('aria-labelledby',uid+'t');box.setAttribute('aria-describedby',uid+'d');
+    const ic=document.createElement('div');ic.className='jl-dlg-ic';ic.innerHTML=svg('trash');
+    const h=document.createElement('h3');h.id=uid+'t';h.textContent=o.title||'Are you sure?';
+    const p=document.createElement('p');p.id=uid+'d';p.textContent=o.body||'';
+    box.append(ic,h,p);
+    if(o.preview){
+      const pv=document.createElement('div');pv.className='jl-dlg-pv';
+      if(o.preview.color)pv.style.setProperty('--c',o.preview.color);
+      const l=document.createElement('div'),b=document.createElement('b'),s=document.createElement('span');
+      b.textContent=o.preview.title||'';s.textContent=o.preview.sub||'';l.append(b,s);pv.append(l);
+      if(o.preview.value){const v=document.createElement('em');v.className='mono';v.textContent=o.preview.value;pv.append(v)}
+      box.append(pv);
+    }
+    const act=document.createElement('div');act.className='jl-dlg-act';
+    const no=document.createElement('button');no.type='button';no.className='btn-ghost';no.textContent=o.cancelText||'Cancel';
+    const yes=document.createElement('button');yes.type='button';yes.className='btn-primary jl-dlg-yes'+(o.danger?' danger':'');
+    yes.textContent=o.confirmText||'Confirm';
+    act.append(no,yes);box.append(act);scrim.append(box);document.body.append(scrim);
+    let done=false;
+    function finish(v){
+      if(done)return;done=true;closeOpen=null;
+      document.removeEventListener('keydown',onKey,true);
+      scrim.classList.add('out');setTimeout(function(){scrim.remove()},170);
+      try{if(prev&&prev.isConnected)prev.focus({preventScroll:true})}catch(_){}
+      resolve(v);
+    }
+    function onKey(e){
+      if(e.key==='Escape'){e.preventDefault();e.stopPropagation();finish(false);return}
+      if(e.key==='Tab'){
+        const f=[no,yes],i=f.indexOf(document.activeElement);
+        e.preventDefault();f[(i+(e.shiftKey?-1:1)+f.length)%f.length].focus();
+      }
+    }
+    document.addEventListener('keydown',onKey,true);
+    scrim.addEventListener('mousedown',function(e){if(e.target===scrim)finish(false)});
+    no.addEventListener('click',function(){finish(false)});
+    yes.addEventListener('click',function(){finish(true)});
+    closeOpen=finish;
+    no.focus({preventScroll:true});
+  });
+};
+
+window.jlToast=function(o){
+  o=o||{};
+  let host=document.getElementById('jlToasts');
+  if(!host){
+    host=document.createElement('div');host.id='jlToasts';
+    host.setAttribute('role','region');host.setAttribute('aria-label','Notifications');host.setAttribute('aria-live','polite');
+    document.body.append(host);
+  }
+  const dur=o.duration||5000,icon=o.icon||'check';
+  const t=document.createElement('div');t.className='jl-toast';t.setAttribute('role','status');
+  t.style.setProperty('--c',icon==='trash'?'var(--red)':'var(--green)');
+  const ic=document.createElement('span');ic.className='jl-toast-ic';ic.innerHTML=svg(icon);
+  const tx=document.createElement('div');tx.className='jl-toast-tx';tx.textContent=o.text||'';
+  if(o.sub){const s=document.createElement('small');s.textContent=o.sub;tx.append(s)}
+  t.append(ic,tx);
+  let btn=null;
+  if(o.actionText){
+    btn=document.createElement('button');btn.type='button';btn.className='jl-toast-act';
+    btn.innerHTML=svg('undo')+'<span></span>';btn.lastChild.textContent=o.actionText;t.append(btn);
+  }
+  if(o.progress!==false){
+    const bar=document.createElement('div');bar.className='jl-toast-bar';
+    var fill=document.createElement('i');fill.style.setProperty('--d',dur+'ms');bar.append(fill);t.append(bar);
+  }
+  host.append(t);
+  while(host.children.length>3)host.firstElementChild.remove();
+  let left=dur,start=0,timer=null,gone=false;
+  function dismiss(){if(gone)return;gone=true;clearTimeout(timer);t.classList.add('out');setTimeout(function(){t.remove()},210)}
+  function arm(){start=Date.now();timer=setTimeout(dismiss,left)}
+  function hold(){if(gone||!timer)return;clearTimeout(timer);timer=null;left-=Date.now()-start;if(fill)fill.style.animationPlayState='paused'}
+  function release(){if(gone||timer)return;if(fill)fill.style.animationPlayState='running';arm()}
+  t.addEventListener('pointerenter',function(e){if(e.pointerType==='mouse')hold()});
+  t.addEventListener('pointerleave',function(e){if(e.pointerType==='mouse')release()});
+  t.addEventListener('focusin',hold);t.addEventListener('focusout',release);
+  if(btn)btn.addEventListener('click',function(){
+    if(gone)return;dismiss();
+    try{if(o.onAction)o.onAction()}catch(_){}
+  });
+  arm();
+  return {dismiss:dismiss};
+};
+})();
+</script>
+<script>
 (function(){
 const $=id=>document.getElementById(id),T=window.__trades||[],DK='jlJournals';
 $('dateStrJ').textContent=new Date().toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
@@ -5383,7 +5542,16 @@ $('view-journal').addEventListener('click',e=>{const b=e.target.closest('button'
   if(b.parentNode.dataset.q!=null){cur.q[+b.parentNode.dataset.q]=d.v;yn();return}
   if(d.pick){$(d.pick).click();return}
   if(d.ed){const x=J.find(y=>y.id===d.ed);if(x)load(x);return}
-  if(d.del){if(confirm('Delete this journal?')){J=J.filter(x=>x.id!==d.del);save();sync()}return}
+  if(d.del){const x=J.find(y=>y.id===d.del);if(!x)return;
+    const k=x.pnl==null?'note':kind(x.pnl),ttl={win:'Win journal',loss:'Loss journal',be:'Break-even journal',note:'Free note'}[k];
+    window.jlConfirm({title:'Delete this journal?',body:'This removes the entry from this device. You get 5 seconds to undo it.',
+      preview:{title:ttl,sub:[x.date,x.sym,x.side].filter(Boolean).join(' · '),value:x.pnl==null?'':money(x.pnl),color:k==='note'?'var(--accent-2)':col(k)},
+      confirmText:'Delete',cancelText:'Keep it',danger:true,opener:b}).then(ok=>{
+      if(!ok)return;const i=J.findIndex(y=>y.id===x.id);if(i<0)return;
+      J.splice(i,1);save();sync();
+      window.jlToast({icon:'trash',text:'Journal deleted',sub:[ttl,x.sym].filter(Boolean).join(' · '),actionText:'Undo',duration:5000,
+        onAction:()=>{if(J.some(y=>y.id===x.id))return;J.splice(Math.min(i,J.length),0,x);save();sync();window.jlToast({icon:'check',text:'Journal restored',duration:2200,progress:false})}})});
+    return}
   if(pid==='jFilt'){filt=d.v;seg(b);fillSel();return}
   if(pid==='jRes'){jf=d.v;seg(b);renderList();return}
   ({jSave:saveJ,jNext:()=>step(1),jPrev:()=>step(-1),jCheck:check,jClear:()=>{blank();fields(null);paint();msg('')},jImpB:()=>$('jImpFile').click(),
