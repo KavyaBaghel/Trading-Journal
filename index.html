@@ -1130,6 +1130,15 @@
   .jl-dlg-pv b{display:block;font-size:13px;font-weight:650}
   .jl-dlg-pv span{display:block;margin-top:2px;font-size:11.5px;color:var(--faint)}
   .jl-dlg-pv em{font-style:normal;font-size:13px;font-weight:700;color:var(--c)}
+  .jl-dlg-ic.accent{background:color-mix(in srgb,var(--accent) 16%,transparent);border-color:color-mix(in srgb,var(--accent-2) 32%,transparent)}
+  .jl-dlg-ic.accent svg{stroke:var(--accent-2)}
+  .jl-dlg-in{display:block;width:100%;margin-top:16px;padding:11px 13px;border-radius:11px;background:var(--panel-2);border:1px solid var(--border-hi);
+    color:var(--text);font:inherit;font-size:14px;outline:none;transition:border-color .25s var(--ease-out),box-shadow .25s var(--ease-out)}
+  .jl-dlg-in::placeholder{color:var(--faint)}
+  .jl-dlg-in:focus{border-color:var(--accent-2);box-shadow:0 0 0 3px rgba(124,108,240,.22)}
+  .jl-dlg-in.shake{border-color:var(--red);animation:jlShake .32s var(--ease-out)}
+  .jl-dlg-ct{margin-top:6px;text-align:right;font-size:11px;color:var(--faint)}
+  @keyframes jlShake{20%{transform:translateX(-5px)}40%{transform:translateX(5px)}60%{transform:translateX(-3px)}80%{transform:translateX(3px)}}
   .jl-dlg-act{display:flex;justify-content:flex-end;gap:10px;margin-top:22px}
   .jl-dlg-act button:focus-visible{outline:2px solid var(--accent-2);outline-offset:2px}
   .btn-primary.jl-dlg-yes.danger{background:linear-gradient(135deg,var(--red),#d9453a);box-shadow:0 6px 18px -4px rgba(240,104,92,.5)}
@@ -5287,7 +5296,8 @@ window.__trades=T;window.__trRender=render;tabs();render();
 const P={
   trash:'<path d="M4 7h16M10 11v6M14 11v6M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12M9 7V4h6v3"/>',
   undo:'<path d="M9 14L4 9l5-5"/><path d="M4 9h10a6 6 0 0 1 0 12h-3"/>',
-  check:'<path d="M5 12l5 5 9-10"/>'
+  check:'<path d="M5 12l5 5 9-10"/>',
+  tag:'<path d="M3 12V4h8l10 10-8 8L3 12z"/><circle cx="7.5" cy="8.5" r="1"/>'
 };
 const svg=k=>'<svg viewBox="0 0 24 24" aria-hidden="true">'+P[k]+'</svg>';
 let closeOpen=null;
@@ -5301,10 +5311,20 @@ window.jlConfirm=function(o){
     const box=document.createElement('div');box.className='jl-dlg';
     box.setAttribute('role','alertdialog');box.setAttribute('aria-modal','true');
     box.setAttribute('aria-labelledby',uid+'t');box.setAttribute('aria-describedby',uid+'d');
-    const ic=document.createElement('div');ic.className='jl-dlg-ic';ic.innerHTML=svg('trash');
+    const ic=document.createElement('div');ic.className='jl-dlg-ic'+(o.icon&&o.icon!=='trash'?' accent':'');ic.innerHTML=svg(o.icon||'trash');
     const h=document.createElement('h3');h.id=uid+'t';h.textContent=o.title||'Are you sure?';
     const p=document.createElement('p');p.id=uid+'d';p.textContent=o.body||'';
     box.append(ic,h,p);
+    let inp=null;
+    if(o.input){
+      const max=o.input.maxLength||60;
+      inp=document.createElement('input');inp.type='text';inp.className='jl-dlg-in';inp.maxLength=max;
+      inp.autocomplete='off';inp.spellcheck=false;inp.placeholder=o.input.placeholder||'';inp.value=o.input.value||'';
+      inp.setAttribute('aria-labelledby',uid+'t');
+      const ct=document.createElement('div');ct.className='jl-dlg-ct mono';
+      const upd=function(){ct.textContent=inp.value.length+'/'+max};upd();inp.addEventListener('input',upd);
+      box.append(inp,ct);
+    }
     if(o.preview){
       const pv=document.createElement('div');pv.className='jl-dlg-pv';
       if(o.preview.color)pv.style.setProperty('--c',o.preview.color);
@@ -5324,22 +5344,35 @@ window.jlConfirm=function(o){
       document.removeEventListener('keydown',onKey,true);
       scrim.classList.add('out');setTimeout(function(){scrim.remove()},170);
       try{if(prev&&prev.isConnected)prev.focus({preventScroll:true})}catch(_){}
-      resolve(v);
+      resolve(v===false&&inp?null:v);
+    }
+    function submit(){
+      if(!inp){finish(true);return}
+      const v=inp.value.trim();
+      if(!v){inp.classList.remove('shake');void inp.offsetWidth;inp.classList.add('shake');inp.focus();return}
+      finish(v);
     }
     function onKey(e){
       if(e.key==='Escape'){e.preventDefault();e.stopPropagation();finish(false);return}
+      if(e.key==='Enter'&&inp&&document.activeElement===inp){e.preventDefault();submit();return}
       if(e.key==='Tab'){
-        const f=[no,yes],i=f.indexOf(document.activeElement);
+        const f=inp?[inp,no,yes]:[no,yes],i=f.indexOf(document.activeElement);
         e.preventDefault();f[(i+(e.shiftKey?-1:1)+f.length)%f.length].focus();
       }
     }
     document.addEventListener('keydown',onKey,true);
     scrim.addEventListener('mousedown',function(e){if(e.target===scrim)finish(false)});
     no.addEventListener('click',function(){finish(false)});
-    yes.addEventListener('click',function(){finish(true)});
+    yes.addEventListener('click',submit);
     closeOpen=finish;
-    no.focus({preventScroll:true});
+    (inp||no).focus({preventScroll:true});
   });
+};
+
+/* text prompt: resolves to the trimmed string, or null if cancelled */
+window.jlPrompt=function(o){
+  o=o||{};
+  return window.jlConfirm(Object.assign({icon:'tag',confirmText:'Add',cancelText:'Cancel'},o,{input:o.input||{}}));
 };
 
 window.jlToast=function(o){
@@ -7329,11 +7362,13 @@ function fillHero(){const s=(id,h)=>{const e=$(id);if(e)e.innerHTML=h};
         setTimeout(()=> tag.remove(), 200);
       });
       tagAdd.addEventListener('click', ()=>{
-        const label = prompt('Add a trading tag (e.g. a setup, rule, or style):');
-        if(!label) return;
-        const span = document.createElement('span');
-        span.className = 'up-tag'; span.textContent = label.trim().slice(0,40);
-        tagsHost.insertBefore(span, tagAdd);
+        window.jlPrompt({title:'Add a trading tag',body:'A short label for a setup, rule or style. It shows on your profile.',
+          input:{placeholder:'e.g. London breakout',maxLength:40},confirmText:'Add tag',opener:tagAdd}).then(label=>{
+          if(!label) return;
+          const span = document.createElement('span');
+          span.className = 'up-tag'; span.textContent = label.trim().slice(0,40);
+          tagsHost.insertBefore(span, tagAdd);
+        });
       });
     }
 
