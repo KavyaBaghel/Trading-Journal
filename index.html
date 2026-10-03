@@ -2488,7 +2488,7 @@ window.jlLiveBalance=function(Z){
       profitTargetPct:pt==null?null:(c.profitTargetType==='amount'?(size?r4(pt/size*100):null):pt),
       maxDailyLossUSD:pl==null?null:(c.maxDailyLossType==='percent'?(size?r4(pl*size/100):null):pl),maxDailyLossValue:pl,maxDailyLossUnit:c.maxDailyLossType==='percent'?'%':'$',
       maxWeeklyLossValue:wk,maxWeeklyLossUnit:c.maxWeeklyLossType==='percent'?'%':'$',maxWeeklyLossUSD:wk==null?null:(c.maxWeeklyLossType==='percent'?(size?r4(wk*size/100):null):wk),
-      maxTradesPerDay:n(c.maxTradesPerDay),dayProfitTarget:n(c.dayProfitTarget)||0,dayProfitTargetUnit:c.dayProfitTargetUnit==='$'?'$':'%',weeklyProfitTarget:n(c.weeklyProfitTarget)||0,weeklyProfitTargetUnit:c.weeklyProfitTargetUnit==='$'?'$':'%',maxDrawdown:dd,maxDrawdownUnit:c.maxDrawdownType==='amount'?'$':'%',deadline:c.phaseDeadline||''}}
+      maxTradesPerDay:n(c.maxTradesPerDay),dayProfitTarget:n(c.dayProfitTarget)||0,dayProfitTargetUnit:c.dayProfitTargetUnit==='$'?'$':'%',weeklyProfitTarget:n(c.weeklyProfitTarget)||0,weeklyProfitTargetUnit:c.weeklyProfitTargetUnit==='$'?'$':'%',riskPerTrade:n(c.riskPerTrade),minRr:n(c.minRr),maxDrawdown:dd,maxDrawdownUnit:c.maxDrawdownType==='amount'?'$':'%',deadline:c.phaseDeadline||''}}
   try{var c0=rdo();localStorage.setItem(DK,JSON.stringify(toDesign(c0)));window.__jlNeedsAccountSetup=!(c0&&n(c0.accountSize)>0)}
   catch(e){window.__jlNeedsAccountSetup=true;console.error('[Journall] account bootstrap failed',e)}
   function same(a,b,ks){return ks.every(function(k){return a[k]===b[k]||(typeof a[k]==='number'&&typeof b[k]==='number'&&Math.abs(a[k]-b[k])<1e-4)})}
@@ -2507,6 +2507,8 @@ window.jlLiveBalance=function(Z){
       if(d.dayProfitTargetUnit!==old.dayProfitTargetUnit)c.dayProfitTargetUnit=d.dayProfitTargetUnit==='$'?'$':'%';
       if(!same(d,old,['weeklyProfitTarget'])){var wp=n(d.weeklyProfitTarget);if(wp!=null)c.weeklyProfitTarget=wp}
       if(d.weeklyProfitTargetUnit!==old.weeklyProfitTargetUnit)c.weeklyProfitTargetUnit=d.weeklyProfitTargetUnit==='$'?'$':'%';
+      if(!same(d,old,['riskPerTrade'])){var rp=n(d.riskPerTrade);if(rp!=null)c.riskPerTrade=rp}
+      if(!same(d,old,['minRr'])){var mr=n(d.minRr);if(mr!=null)c.minRr=mr}
       if(!same(d,old,['deadline'])){c.phaseDeadline=d.deadline||''}
       if(d.type!==old.type)c.type=d.type;
       if(!same(d,old,['revWindowMin'])){var rw=n(d.revWindowMin);if(rw!=null)c.revWindowMin=rw}
@@ -3784,7 +3786,7 @@ document.addEventListener('input',e=>{if(cur&&RUN[cur.dataset.tool]&&cur.contain
   function ggLoadAccount(){
     let s = null;
     try{ s = JSON.parse(localStorage.getItem(ACC_KEY)); }catch(e){}
-    const a = Object.assign({balance:0, phase:'Phase 1', type:'funded', revWindowMin:15, profitTargetPct:0, maxDailyLossUSD:0, maxDailyLossUnit:'$', maxWeeklyLossUSD:0, maxWeeklyLossUnit:'$', maxTradesPerDay:0, dayProfitTarget:0, dayProfitTargetUnit:'%', weeklyProfitTarget:0, weeklyProfitTargetUnit:'%', maxDrawdown:0, maxDrawdownUnit:'%', deadline:''}, s||{});
+    const a = Object.assign({balance:0, phase:'Phase 1', type:'funded', revWindowMin:15, profitTargetPct:0, maxDailyLossUSD:0, maxDailyLossUnit:'$', maxWeeklyLossUSD:0, maxWeeklyLossUnit:'$', maxTradesPerDay:0, dayProfitTarget:0, dayProfitTargetUnit:'%', weeklyProfitTarget:0, weeklyProfitTargetUnit:'%', riskPerTrade:0.5, minRr:2, maxDrawdown:0, maxDrawdownUnit:'%', deadline:''}, s||{});
     if(a.maxDailyLossValue == null) a.maxDailyLossValue = Number(a.maxDailyLossUSD) || 0;
     if(a.maxWeeklyLossValue == null) a.maxWeeklyLossValue = Number(a.maxWeeklyLossUSD) || 0;
     return a;
@@ -3848,7 +3850,7 @@ document.addEventListener('input',e=>{if(cur&&RUN[cur.dataset.tool]&&cur.contain
   window.jlDailyLossLimit = Number(ggAccount.maxDailyLossUSD) || 0; window.jlWeeklyLossLimit = Number(ggAccount.maxWeeklyLossUSD) || 0;
   window.jlMaxTradesPerDay = Number(ggAccount.maxTradesPerDay) || 0; window.jlStartBalance = Number(ggAccount.balance) || 0; window.jlDayProfitTargetUSD = (ggAccount.dayProfitTargetUnit === '$') ? (Number(ggAccount.dayProfitTarget)||0) : Number(ggAccount.balance) * (Number(ggAccount.dayProfitTarget)||0) / 100; window.jlWeeklyProfitTargetUSD = (ggAccount.weeklyProfitTargetUnit === '$') ? (Number(ggAccount.weeklyProfitTarget)||0) : Number(ggAccount.balance) * (Number(ggAccount.weeklyProfitTarget)||0) / 100;
 
-  const ggState = {sl:5, pv:.05, bal:ggAccount.balance, pt:ggAccount.profitTargetPct, mt:ggAccount.maxTradesPerDay, dpt:Number(ggAccount.dayProfitTarget)||0, wpt:Number(ggAccount.weeklyProfitTarget)||0, rpt:.5, rr:2, mdl:Number(ggAccount.maxDailyLossValue)||0, mwl:Number(ggAccount.maxWeeklyLossValue)||0, mdd:Number(ggAccount.maxDrawdown)||0, revWin:ggAccount.revWindowMin};
+  const ggState = {sl:5, pv:.05, bal:ggAccount.balance, pt:ggAccount.profitTargetPct, mt:ggAccount.maxTradesPerDay, dpt:Number(ggAccount.dayProfitTarget)||0, wpt:Number(ggAccount.weeklyProfitTarget)||0, rpt:(Number(ggAccount.riskPerTrade)>0?Number(ggAccount.riskPerTrade):.5), rr:(Number(ggAccount.minRr)>0?Number(ggAccount.minRr):2), mdl:Number(ggAccount.maxDailyLossValue)||0, mwl:Number(ggAccount.maxWeeklyLossValue)||0, mdd:Number(ggAccount.maxDrawdown)||0, revWin:ggAccount.revWindowMin};
   const ggIds = {bal:'ggBal',pt:'ggPt',mt:'ggMt',dpt:'ggDpt',wpt:'ggWpt',rpt:'ggRpt',rr:'ggRr',mdl:'ggMdl',mwl:'ggMwl',mdd:'ggMdd',revWin:'ggRevWin'};
   // Loss limits can be $ or % of the starting balance; percent steps are a tenth of the dollar step.
   window.ggStep = function(id, d){
@@ -3873,6 +3875,8 @@ document.addEventListener('input',e=>{if(cur&&RUN[cur.dataset.tool]&&cur.contain
   const ggDptUnitEl = document.getElementById('ggDptUnit'); if(ggDptUnitEl) ggDptUnitEl.value = ggAccount.dayProfitTargetUnit === '$' ? '$' : '%';
   const ggWptEl = document.getElementById('ggWpt'); if(ggWptEl) ggWptEl.value = ggState.wpt;
   const ggWptUnitEl = document.getElementById('ggWptUnit'); if(ggWptUnitEl) ggWptUnitEl.value = ggAccount.weeklyProfitTargetUnit === '$' ? '$' : '%';
+  const ggRptEl = document.getElementById('ggRpt'); if(ggRptEl) ggRptEl.value = ggState.rpt;
+  const ggRrEl = document.getElementById('ggRr'); if(ggRrEl) ggRrEl.value = ggState.rr;
   const ggMddEl = document.getElementById('ggMdd'); if(ggMddEl) ggMddEl.value = ggState.mdd;
   const ggMddUnitEl = document.getElementById('ggMddUnit'); if(ggMddUnitEl) ggMddUnitEl.value = ggAccount.maxDrawdownUnit === '$' ? '$' : '%';
   if(ggMddUnitEl) ggMddUnitEl.addEventListener('change', ()=>{ if(window.__renderDDRing) window.__renderDDRing(); });
@@ -3914,6 +3918,8 @@ document.addEventListener('input',e=>{if(cur&&RUN[cur.dataset.tool]&&cur.contain
       dayProfitTargetUnit: ggDptUnitEl ? ggDptUnitEl.value : (ggAccount.dayProfitTargetUnit || '%'),
       weeklyProfitTarget: ggState.wpt,
       weeklyProfitTargetUnit: ggWptUnitEl ? ggWptUnitEl.value : (ggAccount.weeklyProfitTargetUnit || '%'),
+      riskPerTrade: ggState.rpt,
+      minRr: ggState.rr,
       maxDrawdown: ggState.mdd,
       maxDrawdownUnit: ggMddUnitEl ? ggMddUnitEl.value : (ggAccount.maxDrawdownUnit || '%'),
       deadline: ggDeadlineEl ? ggDeadlineEl.value : (ggAccount.deadline || '')
