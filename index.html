@@ -2176,6 +2176,46 @@
     .up-hero-left>div:not(.up-avatar-wrap){padding-top:38px}
   }
 
+  /* ---------- profile hero: smooth motion ---------- */
+  .up-cover:not([style*="background-image"]){background-size:140% 100%,140% 100%,100% 100%;background-repeat:no-repeat;
+    animation:upCoverDrift 18s ease-in-out infinite alternate}
+  @keyframes upCoverDrift{from{background-position:0% 0%,100% 0%,0 0}to{background-position:100% 8%,0% 5%,0 0}}
+  .up-hero::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;opacity:0;
+    background:radial-gradient(420px circle at var(--mx,50%) var(--my,30%),rgba(124,108,240,.14),transparent 65%);
+    transition:opacity .5s cubic-bezier(.22,.61,.36,1)}
+  .up-avatar-wrap{animation:upPop .9s cubic-bezier(.16,1,.3,1) .22s backwards}
+  .up-name-row{animation:upFade .8s cubic-bezier(.16,1,.3,1) .32s backwards}
+  .up-bio{animation:upFade .8s cubic-bezier(.16,1,.3,1) .4s backwards}
+  .up-meta{animation:upFade .8s cubic-bezier(.16,1,.3,1) .48s backwards}
+  .up-settings-wrap{animation:upFade .8s cubic-bezier(.16,1,.3,1) .56s backwards}
+  @keyframes upPop{from{opacity:0;scale:.8}}
+  @keyframes upFade{from{opacity:0}}
+  .up-avatar{transition:transform .5s cubic-bezier(.16,1,.3,1),box-shadow .5s cubic-bezier(.16,1,.3,1)}
+  .up-avatar-wrap::before{transition:inset .5s cubic-bezier(.16,1,.3,1)}
+  .up-avatar-badge{animation:upBadge 3.2s ease-out infinite}
+  @keyframes upBadge{0%,100%{box-shadow:0 0 8px -1px rgba(67,215,135,.7),0 0 0 0 rgba(67,215,135,.4)}60%{box-shadow:0 0 8px -1px rgba(67,215,135,.7),0 0 0 7px rgba(67,215,135,0)}}
+  .up-name[contenteditable],.up-bio{transition:background .3s cubic-bezier(.22,.61,.36,1),box-shadow .3s cubic-bezier(.22,.61,.36,1)}
+  .up-phase-chip{cursor:default;transition:transform .32s cubic-bezier(.22,.61,.36,1),background .32s cubic-bezier(.22,.61,.36,1),border-color .32s cubic-bezier(.22,.61,.36,1),box-shadow .32s cubic-bezier(.22,.61,.36,1)}
+  .up-edit{transition:transform .32s cubic-bezier(.22,.61,.36,1),background .32s cubic-bezier(.22,.61,.36,1),border-color .32s cubic-bezier(.22,.61,.36,1),box-shadow .32s cubic-bezier(.22,.61,.36,1)}
+  .up-edit svg{transition:transform .4s cubic-bezier(.16,1,.3,1)}
+  .up-edit:active{transform:scale(.96);transition-duration:.15s}
+  .up-settings-menu button{transition:background .25s cubic-bezier(.22,.61,.36,1)}
+  .up-settings-menu button .ic{display:inline-block;transition:transform .3s cubic-bezier(.16,1,.3,1)}
+  @media (hover:hover){
+    .up-hero:hover{transform:translateY(-2px)}
+    .up-hero:hover::after{opacity:1}
+    .up-avatar-wrap:hover .up-avatar{transform:scale(1.06);box-shadow:0 10px 28px -6px rgba(124,108,240,.8),inset 0 0 0 1px rgba(255,255,255,.22),0 0 0 4px var(--panel)}
+    .up-avatar-wrap:hover::before{inset:-8px}
+    .up-bio:hover{background:var(--panel-2)}
+    .up-phase-chip:hover{transform:translateY(-1px);background:rgba(124,108,240,.22);border-color:var(--accent-2);box-shadow:0 6px 16px -8px rgba(124,108,240,.7)}
+    .up-edit:hover{transform:translateY(-2px);box-shadow:0 8px 20px -8px rgba(124,108,240,.6)}
+    .up-edit:hover svg{transform:rotate(-14deg) scale(1.1)}
+    .up-settings-menu button:hover .ic{transform:translateX(2px) scale(1.12)}
+  }
+  @media (prefers-reduced-motion:reduce){
+    .up-cover,.up-avatar-badge,.up-avatar-wrap,.up-name-row,.up-bio,.up-meta,.up-settings-wrap{animation:none!important}
+  }
+
   .up-stats{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-bottom:14px}
   @media (max-width:900px){.up-stats{grid-template-columns:repeat(3,1fr)}}
   @media (max-width:560px){.up-stats{grid-template-columns:repeat(2,1fr)}}
@@ -5421,6 +5461,20 @@ window.jlToast=function(o){
   arm();
   return {dismiss:dismiss};
 };
+})();
+</script>
+<script>
+/* profile hero: cursor-following spotlight (sets --mx/--my, CSS does the rest) */
+(function(){
+if(!window.matchMedia||!matchMedia('(hover:hover)').matches)return;
+let raf=0,hero=null,x=0,y=0;
+document.addEventListener('pointermove',function(e){
+  if(e.pointerType!=='mouse')return;
+  const h=e.target.closest?e.target.closest('.up-hero'):null;
+  if(!h)return;
+  hero=h;const r=h.getBoundingClientRect();x=e.clientX-r.left;y=e.clientY-r.top;
+  if(!raf)raf=requestAnimationFrame(function(){raf=0;hero.style.setProperty('--mx',x+'px');hero.style.setProperty('--my',y+'px')});
+},{passive:true});
 })();
 </script>
 <script>
