@@ -1734,14 +1734,6 @@
     cursor:pointer;transition:border-color .28s cubic-bezier(.22,.61,.36,1),background .28s cubic-bezier(.22,.61,.36,1),box-shadow .28s cubic-bezier(.22,.61,.36,1)}
   .gg-select:hover{border-color:var(--accent-2)}
   .gg-select:focus-visible{outline:none;border-color:var(--accent-2);box-shadow:0 0 0 3px rgba(124,108,240,.22)}
-  .gg-msection-note{font-size:11.5px;color:var(--faint);margin-bottom:12px}
-  .gg-chip-list{display:flex;flex-direction:column;gap:8px}
-  .gg-chip{display:flex;align-items:center;gap:8px;background:var(--panel-2);border:1px solid var(--border);border-radius:9px;padding:4px 6px 4px 12px;animation:ggFade .45s var(--ease) both}
-  .gg-chip input{flex:1;background:none;border:none;color:var(--text);font-family:inherit;font-size:12.5px;padding:6px 0}
-  .gg-chip button{background:none;border:1px solid var(--border-hi);color:var(--faint);width:26px;height:26px;border-radius:7px;cursor:pointer;font-size:14px;transition:.22s var(--ease)}
-  .gg-chip button:hover{color:var(--red);border-color:var(--red)}
-  .gg-add-cond{margin-top:8px;background:none;border:1px dashed var(--border-hi);color:var(--sub);border-radius:9px;padding:9px;width:100%;font-family:inherit;font-size:12px;cursor:pointer;transition:.22s var(--ease)}
-  .gg-add-cond:hover{color:var(--accent-2);border-color:var(--accent-2)}
   .gg-setup-foot{display:flex;justify-content:flex-end;gap:10px;padding:14px 20px;border-top:1px solid var(--border)}
   .gg-setup-foot .gg-btn-solid,.gg-setup-foot .gg-btn-outline{width:auto;padding:9px 16px;margin:0}
 
@@ -3153,7 +3145,6 @@ window.__mountOpenPos=function(){const o=(window.__openTrades||[]).concat((windo
         <button class="gg-tab on" data-t="acc">Account</button>
         <button class="gg-tab" data-t="tgt">Targets</button>
         <button class="gg-tab" data-t="risk">Risk limits</button>
-        <button class="gg-tab" data-t="crit">Criteria</button>
       </div>
       <div class="gg-tab-panel" data-p="acc">
         <div class="gg-mgrid">
@@ -3190,17 +3181,10 @@ window.__mountOpenPos=function(){const o=(window.__openTrades||[]).concat((windo
             <div class="gg-combo"><div class="gg-stepper" style="flex:1"><button onclick="ggStep('mwl',-10)">−</button><input id="ggMwl" value="0" readonly><button onclick="ggStep('mwl',10)">+</button></div><select id="ggMwlUnit"><option>$</option><option>%</option></select></div></div>
           <div class="gg-field"><span class="l">Max overall drawdown</span>
             <div class="gg-combo"><div class="gg-stepper" style="flex:1"><button onclick="ggStep('mdd',-1)">−</button><input id="ggMdd" value="10" readonly><button onclick="ggStep('mdd',1)">+</button></div><select id="ggMddUnit"><option>%</option><option>$</option></select></div></div>
-        </div>
-      </div>
-      <div class="gg-tab-panel" data-p="crit" hidden>
-        <div class="gg-mgrid" style="margin-bottom:18px">
           <div class="gg-field"><span class="l">Revenge trade window (minutes)</span>
             <div class="gg-stepper"><button onclick="ggStep('revWin',-1)">−</button><input id="ggRevWin" value="15" readonly><button onclick="ggStep('revWin',1)">+</button></div>
             <small class="gg-field-note">A trade opened within this many minutes of a same-day loss closing is flagged as a revenge trade.</small></div>
         </div>
-        <div class="gg-msection-note">Write the exact conditions your Setup Scan should check. These are yours — Journall won't show fixed rules or personal numbers here.</div>
-        <div class="gg-chip-list" id="ggCondList"></div>
-        <button class="gg-add-cond" onclick="ggAddCond()">+ Add condition</button>
       </div>
       <div class="gg-setup-foot">
         <button class="gg-btn-outline" onclick="ggToggleSetup()">Cancel</button>
@@ -3984,17 +3968,6 @@ document.addEventListener('input',e=>{if(cur&&RUN[cur.dataset.tool]&&cur.contain
   ggSetFill(document.getElementById('ggSlSlider'));
   ggSetFill(document.getElementById('ggPvSlider'));
   ggCalcRisk();
-
-  let ggConds = ['One side confirmation','No Blockage','Risk limit','No losses back to ack in same hour, stop after 2','SL above candle','No c2c before 50 pips'];
-  function ggRenderConds(){
-    document.getElementById('ggCondList').innerHTML = ggConds.map((c,i)=>
-      '<div class="gg-chip" style="animation-delay:'+(i*.04)+'s"><input value="'+c.replace(/"/g,'&quot;')+'" oninput="ggConds['+i+']=this.value"><button onclick="ggRemoveCond('+i+')">−</button></div>'
-    ).join('');
-  }
-  window.ggConds = ggConds;
-  window.ggAddCond = function(){ ggConds.push(''); ggRenderConds(); };
-  window.ggRemoveCond = function(i){ ggConds.splice(i,1); ggRenderConds(); };
-  ggRenderConds();
 
   function ggCountUp(el, end, prefix, dur){
     const t0 = performance.now();
@@ -5111,7 +5084,7 @@ const col=k=>k==='win'?'var(--green)':k==='loss'?'var(--red)':'var(--faint)';
 const sec=t=>{const p=t.split(':');return +p[0]*3600+ +p[1]*60+ +p[2]};
 
 // ---------- revenge-trade detector ----------
-// Flags a trade opened within the cooldown window (user-set in Account Settings ▸ Criteria,
+// Flags a trade opened within the cooldown window (user-set in Account Settings ▸ Risk limits,
 // default 15 min) after a same-day loss closed.
 // Per your call: size doesn't factor into detection, only the quick re-entry inside the
 // cooldown does. It's computed here only to show alongside each flagged trade for context.
