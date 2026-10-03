@@ -2488,7 +2488,7 @@ window.jlLiveBalance=function(Z){
       profitTargetPct:pt==null?null:(c.profitTargetType==='amount'?(size?r4(pt/size*100):null):pt),
       maxDailyLossUSD:pl==null?null:(c.maxDailyLossType==='percent'?(size?r4(pl*size/100):null):pl),maxDailyLossValue:pl,maxDailyLossUnit:c.maxDailyLossType==='percent'?'%':'$',
       maxWeeklyLossValue:wk,maxWeeklyLossUnit:c.maxWeeklyLossType==='percent'?'%':'$',maxWeeklyLossUSD:wk==null?null:(c.maxWeeklyLossType==='percent'?(size?r4(wk*size/100):null):wk),
-      maxTradesPerDay:n(c.maxTradesPerDay),dayProfitTarget:n(c.dayProfitTarget)||0,dayProfitTargetUnit:c.dayProfitTargetUnit==='$'?'$':'%',weeklyProfitTarget:n(c.weeklyProfitTarget)||0,weeklyProfitTargetUnit:c.weeklyProfitTargetUnit==='$'?'$':'%',riskPerTrade:n(c.riskPerTrade),minRr:n(c.minRr),maxDrawdown:dd,maxDrawdownUnit:c.maxDrawdownType==='amount'?'$':'%',deadline:c.phaseDeadline||''}}
+      maxTradesPerDay:n(c.maxTradesPerDay),dayProfitTarget:n(c.dayProfitTarget)||0,dayProfitTargetUnit:c.dayProfitTargetUnit==='$'?'$':'%',weeklyProfitTarget:n(c.weeklyProfitTarget)||0,weeklyProfitTargetUnit:c.weeklyProfitTargetUnit==='$'?'$':'%',riskPerTrade:n(c.riskPerTrade),minRr:n(c.minRr),lotSize:n(c.lotSize)||0,tradeDuringNews:c.tradeDuringNews==='no'?'no':'yes',maxDrawdown:dd,maxDrawdownUnit:c.maxDrawdownType==='amount'?'$':'%',deadline:c.phaseDeadline||''}}
   try{var c0=rdo();localStorage.setItem(DK,JSON.stringify(toDesign(c0)));window.__jlNeedsAccountSetup=!(c0&&n(c0.accountSize)>0)}
   catch(e){window.__jlNeedsAccountSetup=true;console.error('[Journall] account bootstrap failed',e)}
   function same(a,b,ks){return ks.every(function(k){return a[k]===b[k]||(typeof a[k]==='number'&&typeof b[k]==='number'&&Math.abs(a[k]-b[k])<1e-4)})}
@@ -2509,6 +2509,8 @@ window.jlLiveBalance=function(Z){
       if(d.weeklyProfitTargetUnit!==old.weeklyProfitTargetUnit)c.weeklyProfitTargetUnit=d.weeklyProfitTargetUnit==='$'?'$':'%';
       if(!same(d,old,['riskPerTrade'])){var rp=n(d.riskPerTrade);if(rp!=null)c.riskPerTrade=rp}
       if(!same(d,old,['minRr'])){var mr=n(d.minRr);if(mr!=null)c.minRr=mr}
+      if(!same(d,old,['lotSize'])){var ls=n(d.lotSize);if(ls!=null)c.lotSize=ls}
+      if(d.tradeDuringNews!==old.tradeDuringNews)c.tradeDuringNews=d.tradeDuringNews==='no'?'no':'yes';
       if(!same(d,old,['deadline'])){c.phaseDeadline=d.deadline||''}
       if(d.type!==old.type)c.type=d.type;
       if(!same(d,old,['revWindowMin'])){var rw=n(d.revWindowMin);if(rw!=null)c.revWindowMin=rw}
@@ -3190,6 +3192,11 @@ window.__mountOpenPos=function(){const o=(window.__openTrades||[]).concat((windo
           <div class="gg-field"><span class="l">Revenge trade window (minutes)</span>
             <div class="gg-stepper"><button onclick="ggStep('revWin',-1)">−</button><input id="ggRevWin" value="15" readonly><button onclick="ggStep('revWin',1)">+</button></div>
             <small class="gg-field-note">A trade opened within this many minutes of a same-day loss closing is flagged as a revenge trade.</small></div>
+          <div class="gg-field"><span class="l">Lot size</span>
+            <div class="gg-stepper"><button onclick="ggStep('lot',-.01)">&minus;</button><input id="ggLot" value="0" readonly><button onclick="ggStep('lot',.01)">+</button></div>
+            <small class="gg-field-note">The lot size you trade. Any position with a different lot is flagged as a rule break in Today's Summary. 0 = off.</small></div>
+          <div class="gg-field"><span class="l">Trade during news?</span>
+            <select class="gg-select" id="ggNews"><option value="yes">Yes</option><option value="no">No (warn 30 min before news)</option></select></div>
         </div>
       </div>
       <div class="gg-setup-foot">
@@ -3786,7 +3793,7 @@ document.addEventListener('input',e=>{if(cur&&RUN[cur.dataset.tool]&&cur.contain
   function ggLoadAccount(){
     let s = null;
     try{ s = JSON.parse(localStorage.getItem(ACC_KEY)); }catch(e){}
-    const a = Object.assign({balance:0, phase:'Phase 1', type:'funded', revWindowMin:15, profitTargetPct:0, maxDailyLossUSD:0, maxDailyLossUnit:'$', maxWeeklyLossUSD:0, maxWeeklyLossUnit:'$', maxTradesPerDay:0, dayProfitTarget:0, dayProfitTargetUnit:'%', weeklyProfitTarget:0, weeklyProfitTargetUnit:'%', riskPerTrade:0.5, minRr:2, maxDrawdown:0, maxDrawdownUnit:'%', deadline:''}, s||{});
+    const a = Object.assign({balance:0, phase:'Phase 1', type:'funded', revWindowMin:15, profitTargetPct:0, maxDailyLossUSD:0, maxDailyLossUnit:'$', maxWeeklyLossUSD:0, maxWeeklyLossUnit:'$', maxTradesPerDay:0, dayProfitTarget:0, dayProfitTargetUnit:'%', weeklyProfitTarget:0, weeklyProfitTargetUnit:'%', riskPerTrade:0.5, minRr:2, lotSize:0, tradeDuringNews:'yes', maxDrawdown:0, maxDrawdownUnit:'%', deadline:''}, s||{});
     if(a.maxDailyLossValue == null) a.maxDailyLossValue = Number(a.maxDailyLossUSD) || 0;
     if(a.maxWeeklyLossValue == null) a.maxWeeklyLossValue = Number(a.maxWeeklyLossUSD) || 0;
     return a;
@@ -3850,8 +3857,8 @@ document.addEventListener('input',e=>{if(cur&&RUN[cur.dataset.tool]&&cur.contain
   window.jlDailyLossLimit = Number(ggAccount.maxDailyLossUSD) || 0; window.jlWeeklyLossLimit = Number(ggAccount.maxWeeklyLossUSD) || 0;
   window.jlMaxTradesPerDay = Number(ggAccount.maxTradesPerDay) || 0; window.jlStartBalance = Number(ggAccount.balance) || 0; window.jlDayProfitTargetUSD = (ggAccount.dayProfitTargetUnit === '$') ? (Number(ggAccount.dayProfitTarget)||0) : Number(ggAccount.balance) * (Number(ggAccount.dayProfitTarget)||0) / 100; window.jlWeeklyProfitTargetUSD = (ggAccount.weeklyProfitTargetUnit === '$') ? (Number(ggAccount.weeklyProfitTarget)||0) : Number(ggAccount.balance) * (Number(ggAccount.weeklyProfitTarget)||0) / 100;
 
-  const ggState = {sl:5, pv:.05, bal:ggAccount.balance, pt:ggAccount.profitTargetPct, mt:ggAccount.maxTradesPerDay, dpt:Number(ggAccount.dayProfitTarget)||0, wpt:Number(ggAccount.weeklyProfitTarget)||0, rpt:(Number(ggAccount.riskPerTrade)>0?Number(ggAccount.riskPerTrade):.5), rr:(Number(ggAccount.minRr)>0?Number(ggAccount.minRr):2), mdl:Number(ggAccount.maxDailyLossValue)||0, mwl:Number(ggAccount.maxWeeklyLossValue)||0, mdd:Number(ggAccount.maxDrawdown)||0, revWin:ggAccount.revWindowMin};
-  const ggIds = {bal:'ggBal',pt:'ggPt',mt:'ggMt',dpt:'ggDpt',wpt:'ggWpt',rpt:'ggRpt',rr:'ggRr',mdl:'ggMdl',mwl:'ggMwl',mdd:'ggMdd',revWin:'ggRevWin'};
+  const ggState = {sl:5, pv:.05, bal:ggAccount.balance, pt:ggAccount.profitTargetPct, mt:ggAccount.maxTradesPerDay, dpt:Number(ggAccount.dayProfitTarget)||0, wpt:Number(ggAccount.weeklyProfitTarget)||0, rpt:(Number(ggAccount.riskPerTrade)>0?Number(ggAccount.riskPerTrade):.5), rr:(Number(ggAccount.minRr)>0?Number(ggAccount.minRr):2), mdl:Number(ggAccount.maxDailyLossValue)||0, mwl:Number(ggAccount.maxWeeklyLossValue)||0, mdd:Number(ggAccount.maxDrawdown)||0, revWin:ggAccount.revWindowMin, lot:Number(ggAccount.lotSize)||0};
+  const ggIds = {bal:'ggBal',pt:'ggPt',mt:'ggMt',dpt:'ggDpt',wpt:'ggWpt',rpt:'ggRpt',rr:'ggRr',mdl:'ggMdl',mwl:'ggMwl',mdd:'ggMdd',revWin:'ggRevWin',lot:'ggLot'};
   // Loss limits can be $ or % of the starting balance; percent steps are a tenth of the dollar step.
   window.ggStep = function(id, d){
     if(id === 'mdl' || id === 'mwl'){ const u = document.getElementById(id === 'mdl' ? 'ggMdlUnit' : 'ggMwlUnit'); if(u && u.value === '%') d = d/10; }
@@ -3877,6 +3884,9 @@ document.addEventListener('input',e=>{if(cur&&RUN[cur.dataset.tool]&&cur.contain
   const ggWptUnitEl = document.getElementById('ggWptUnit'); if(ggWptUnitEl) ggWptUnitEl.value = ggAccount.weeklyProfitTargetUnit === '$' ? '$' : '%';
   const ggRptEl = document.getElementById('ggRpt'); if(ggRptEl) ggRptEl.value = ggState.rpt;
   const ggRrEl = document.getElementById('ggRr'); if(ggRrEl) ggRrEl.value = ggState.rr;
+  const ggLotEl = document.getElementById('ggLot'); if(ggLotEl) ggLotEl.value = ggState.lot;
+  const ggNewsEl = document.getElementById('ggNews'); if(ggNewsEl) ggNewsEl.value = ggAccount.tradeDuringNews === 'no' ? 'no' : 'yes';
+  window.jlLotSize = Number(ggAccount.lotSize) || 0; window.jlTradeDuringNews = ggAccount.tradeDuringNews === 'no' ? 'no' : 'yes';
   const ggMddEl = document.getElementById('ggMdd'); if(ggMddEl) ggMddEl.value = ggState.mdd;
   const ggMddUnitEl = document.getElementById('ggMddUnit'); if(ggMddUnitEl) ggMddUnitEl.value = ggAccount.maxDrawdownUnit === '$' ? '$' : '%';
   if(ggMddUnitEl) ggMddUnitEl.addEventListener('change', ()=>{ if(window.__renderDDRing) window.__renderDDRing(); });
@@ -3920,6 +3930,8 @@ document.addEventListener('input',e=>{if(cur&&RUN[cur.dataset.tool]&&cur.contain
       weeklyProfitTargetUnit: ggWptUnitEl ? ggWptUnitEl.value : (ggAccount.weeklyProfitTargetUnit || '%'),
       riskPerTrade: ggState.rpt,
       minRr: ggState.rr,
+      lotSize: ggState.lot,
+      tradeDuringNews: (ggNewsEl && ggNewsEl.value === 'no') ? 'no' : 'yes',
       maxDrawdown: ggState.mdd,
       maxDrawdownUnit: ggMddUnitEl ? ggMddUnitEl.value : (ggAccount.maxDrawdownUnit || '%'),
       deadline: ggDeadlineEl ? ggDeadlineEl.value : (ggAccount.deadline || '')
@@ -3929,6 +3941,7 @@ document.addEventListener('input',e=>{if(cur&&RUN[cur.dataset.tool]&&cur.contain
     window.jlProfitTargetUSD = Number(ggAccount.balance) * (Number(ggAccount.profitTargetPct)||0) / 100;
     window.jlDailyLossLimit = Number(ggAccount.maxDailyLossUSD) || 0; window.jlWeeklyLossLimit = Number(ggAccount.maxWeeklyLossUSD) || 0;
     window.jlMaxTradesPerDay = Number(ggAccount.maxTradesPerDay) || 0; window.jlStartBalance = Number(ggAccount.balance) || 0; window.jlDayProfitTargetUSD = (ggAccount.dayProfitTargetUnit === '$') ? (Number(ggAccount.dayProfitTarget)||0) : Number(ggAccount.balance) * (Number(ggAccount.dayProfitTarget)||0) / 100; window.jlWeeklyProfitTargetUSD = (ggAccount.weeklyProfitTargetUnit === '$') ? (Number(ggAccount.weeklyProfitTarget)||0) : Number(ggAccount.balance) * (Number(ggAccount.weeklyProfitTarget)||0) / 100;
+    window.jlLotSize = Number(ggAccount.lotSize) || 0; window.jlTradeDuringNews = ggAccount.tradeDuringNews === 'no' ? 'no' : 'yes';
     if(typeof window.jlRecomputeRevenge === 'function') window.jlRecomputeRevenge({rerender:true});
     if(typeof window.__renderToday === 'function') window.__renderToday();
     if(typeof window.jlPaintRules === 'function') window.jlPaintRules();
@@ -4564,6 +4577,7 @@ document.addEventListener('input',e=>{if(cur&&RUN[cur.dataset.tool]&&cur.contain
     const targetUSD = Number(window.jlDayProfitTargetUSD) || Number(window.jlProfitTargetUSD) || 0;
     const tradeLimit = Number(window.jlMaxTradesPerDay) || 0;
     const tradeCount = new Set(rawToday.map(t=>t.d+'|'+t.t+'|'+t.sym+'|'+t.side)).size; /* partial closes share one open time = one trade */
+    try{ if(typeof window.__jlExtraRules === 'function') window.__jlExtraRules(rawToday); }catch(e){}
     const lossLimit = Number(window.jlDailyLossLimit) || 0;
     const hasL = lossLimit>0, hasT = tradeLimit>0, hasTg = targetUSD>0, fL = hasL?'$'+lossLimit.toFixed(0):'not set', fT = hasT?String(tradeLimit):'not set', fTg = hasTg?'$'+targetUSD.toFixed(0):'not set';
 
@@ -7220,6 +7234,50 @@ w.querySelector('.top').after(c)}})();</script>
   s('psyRlTrades',N>0?N+' \u2014 quality over volume, every session.':'Not set. Add it in Account Settings.');
   s('psyRlCool',R>0?R+' minutes minimum, chart closed, no exceptions.':'Not set. Add it in Account Settings.')};
   window.jlPaintRules()})();</script>
+<script>(function(){
+  var lastToday=[];
+  function host(){
+    var h=document.getElementById('jlExtraRules'); if(h) return h;
+    var a=document.getElementById('ruleAlert'); if(!a||!a.parentNode) return null;
+    h=document.createElement('div'); h.id='jlExtraRules'; a.parentNode.insertBefore(h,a); return h;
+  }
+  function line(color,title,msg){
+    var d=document.createElement('div');
+    d.style.cssText='border:1px solid '+color+';border-radius:10px;padding:10px 12px;margin:0 0 10px;font-size:13px;line-height:1.4;background:rgba(255,255,255,.04)';
+    var b=document.createElement('b'); b.style.color=color; b.textContent=title;
+    var s=document.createElement('div'); s.style.opacity='.85'; s.textContent=msg;
+    d.appendChild(b); d.appendChild(s); return d;
+  }
+  function lotBreaks(L){
+    var g={}, order=[];
+    lastToday.forEach(function(t){
+      var lot=Number(t&&t.lot); if(!t||!(lot>0)) return;
+      var k=t.d+'|'+t.t+'|'+t.sym+'|'+t.side;
+      if(!g[k]){ g[k]={t:t.t,side:t.side,lot:0}; order.push(k); }
+      g[k].lot+=lot;
+    });
+    var bad=[];
+    order.forEach(function(k){ var tot=Math.round(g[k].lot*100)/100; if(tot!==L) bad.push({t:String(g[k].t).slice(0,5),side:g[k].side,lot:tot}); });
+    return bad;
+  }
+  function paint(){
+    var h=host(); if(!h) return;
+    while(h.firstChild) h.removeChild(h.firstChild);
+    var L=Math.round((Number(window.jlLotSize)||0)*100)/100;
+    if(L>0){
+      var bad=lotBreaks(L);
+      if(bad.length){
+        h.appendChild(line('var(--red)','Lot size rule broken',
+          bad.length+' position'+(bad.length>1?'s':'')+' not at '+L.toFixed(2)+' lot: '+
+          bad.slice(0,3).map(function(b){return b.t+' '+b.side+' '+b.lot.toFixed(2)}).join(', ')+(bad.length>3?' ...':'')));
+      }
+    }
+    var nw=(typeof window.jlNewsWarning==='function')?window.jlNewsWarning():null;
+    if(nw) h.appendChild(line('var(--amber)','No trading: news in '+nw.mins+' min',(nw.ccy?nw.ccy+' ':'')+nw.event+'. Stay out until it passes.'));
+  }
+  window.__jlExtraRules=function(rows){ if(rows) lastToday=rows; paint(); };
+  setInterval(paint,30000); setTimeout(paint,2000);
+})();</script>
 <script>(function(){const A=window.__A,m=v=>(v<0?'-$':'+$')+Math.abs(v).toFixed(2),set=(id,h)=>{const e=document.getElementById(id);if(e)e.textContent=h};
 const rv=(window.__trades||[]).filter(t=>t.rev).length;
 set('psyYr',A.n?jlN(A.n,'trade')+' logged, '+A.wr.toFixed(0)+'% win rate, '+jlN(rv,'revenge trade')+' flagged, '+A.mt+' tagged with a mistake.':'No trades logged in this dataset yet.');
@@ -7406,6 +7464,18 @@ window.__renderAnSetups=renderBoth;window.__renderAnEmotions=renderEmo;setTimeou
     loaded=true; loading=false;
     renderCalendar(); renderNews();
   }
+  window.jlNewsWarning=function(){
+    if(window.jlTradeDuringNews!=='no'||!loaded||!cal.length)return null;
+    const now=Date.now(), ccy=state().ccy; let best=null;
+    cal.forEach(e=>{
+      if(impLvl(e.impact)<2)return;
+      if(ccy!=='all'&&(CCY_MAP[e.country]||e.country)!==ccy)return;
+      const t=new Date(String(e.time).replace(' ','T')+'Z').getTime();
+      if(!isFinite(t)||t<now||t-now>30*60000)return;
+      if(!best||t<best.t)best={t:t,e:e};
+    });
+    return best?{event:best.e.event||'News event',ccy:(CCY_MAP[best.e.country]||best.e.country||''),mins:Math.max(1,Math.ceil((best.t-now)/60000))}:null;
+  };
   function wireChips(){
     ['mkRangeChips','mkImpactChips','mkCcyChips'].forEach(id=>{
       const host=$(id); if(!host||host.dataset.wired) return; host.dataset.wired='1';
@@ -7427,6 +7497,14 @@ window.__renderAnSetups=renderBoth;window.__renderAnEmotions=renderEmo;setTimeou
     if(!loaded) fetchAll(); else { renderCalendar(); renderNews(); setStatus(lastStat[0], lastStat[1]); }
   }
   window.__mountMarketTab = mount;
+  /* News rule: when "Trade during news?" is No, load the calendar in the background (no need to open the Market tab). */
+  let ensT = 0;
+  window.__jlEnsureNews = function(){
+    if(window.jlTradeDuringNews !== 'no' || loading) return;
+    const now = Date.now();
+    if(!loaded || now - ensT > (cal.length ? 30 : 5) * 60000){ ensT = now; fetchAll().catch(function(){}); }
+  };
+  setInterval(window.__jlEnsureNews, 60000); setTimeout(window.__jlEnsureNews, 4000);
   /* Direct load / refresh: route() ran at the top of the page, before these tabs' scripts defined their mount
      functions, so mount the tab that is open now (each mount is idempotent). */
   (function(){ const k = {psychology:'__mountPsychologyTab', ai:'__mountAiCoach', profile:'__mountUserProfile', market:'__mountMarketTab'}[(location.hash||'').slice(1)];
