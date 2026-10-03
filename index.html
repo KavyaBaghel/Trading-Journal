@@ -4,6 +4,11 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <meta name="theme-color" content="#0b0b0c"/>
+<link rel="manifest" href="manifest.webmanifest"/>
+<meta name="mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-title" content="Journall"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <link rel="icon" type="image/png" sizes="192x192" href="assets/icon-192.png"/>
@@ -7719,11 +7724,11 @@ window.__renderAnSetups=renderBoth;window.__renderAnEmotions=renderEmo;setTimeou
 (function(){
   let deferredInstallPrompt = null;
   const installBtn = document.getElementById('androidInstallBtn');
-  /* The old build registered ./service-worker.js, a file that does not exist in the repo. Drop it, and remove any leftover
-     worker registered under THIS app's path only (the origin also hosts other GitHub Pages projects). */
+  /* Register the offline app-shell worker (service-worker.js). Network-first for pages, so pushed updates show up on next open. */
   if ('serviceWorker' in navigator && location.protocol !== 'file:') {
-    const base = location.origin + location.pathname.replace(/[^\/]*$/, '');
-    navigator.serviceWorker.getRegistrations().then(rs => rs.forEach(r => { if (r.scope.indexOf(base) === 0) r.unregister(); })).catch(() => {});
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('service-worker.js').catch(() => {});
+    });
   }
   window.addEventListener('beforeinstallprompt', event => {
     event.preventDefault();
