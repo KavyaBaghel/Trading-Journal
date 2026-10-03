@@ -1,0 +1,62 @@
+--- CURRENT STRUCTURE (lines ~3336-3371) ---
+<div class="firebase-auth-card journall-signin-card" hidden>
+    <div class="jl-logo-wrap">...</div>          <!-- NESTED - WRONG -->
+    <div class="jl-heading">...</div>           <!-- NESTED - WRONG -->
+    <button id="firebaseGateSignInBtn" ...>Sign in with Google</button> <!-- WRONG TEXT -->
+    <div class="jl-divider">or</div>
+    <form id="jlEmailForm" novalidate>...</form>  <!-- FORM INSIDE CARD -->
+    <div id="firebaseGateMessage" class="jl-message">...</div> <!-- STATUS OUTSIDE FORM -->
+    <p class="jl-footnote">...</p>               <!-- NESTED - WRONG -->
+</div>
+
+--- TARGET STRUCTURE (matching reference) ---
+<div class="firebase-auth-card journall-signin-card" hidden>
+    <!-- FORM IS THE CARD ITSELF -->
+    <form id="jlEmailForm" class="journall-card" novalidate>
+        <button type="button" class="journall-btn journall-btn-google" id="firebaseGateSignInBtn">
+            <span>Continue with Google</span>  <!-- FIXED TEXT -->
+        </button>
+        <div class="journall-divider">or</div>
+        <div class="journall-field">
+            <label for="jlEmailInput">Email</label>
+            <input type="email" id="jlEmailInput" ...>
+            <span class="journall-error" id="jlEmailError"></span>
+        </div>
+        <div class="journall-field">
+            <label for="jlPasswordInput">Password</label>
+            <div class="journall-field-row">
+                <input type="password" id="jlPasswordInput" ...>
+                <button type="button" class="journall-toggle-pw" ...></button>
+            </div>
+            <span class="journall-error" id="jlPasswordError"></span>
+            <div class="journall-field-meta">
+                <button type="button" class="journall-link" id="jlForgotBtn">Forgot password?</button>
+            </div>
+        </div>
+        <button type="submit" class="journall-btn journall-btn-primary" id="jlEmailBtn">
+            <span class="journall-btn-label">Sign in</span>
+        </button>
+        <p class="journall-status" id="jlStatusText" aria-live="polite"></p>  <!-- STATUS INSIDE FORM -->
+    </form>
+</div>
+
+<!-- SIBLING ELEMENTS (MOVED OUTSIDE CARD) -->
+<div class="jl-logo-wrap">...</div>              <!-- NOW SIBLING -->
+<div class="jl-heading">...</div>               <!-- NOW SIBLING -->
+<p class="jl-footnote">...</p>                  <!-- NOW SIBLING -->
+
+--- CSS CHANGES NEEDED ---
+1. Update #firebaseAuthGate padding to 24px (matching reference #journallLogin)
+2. Update .journall-card CSS:
+   - max-width: 340px
+   - padding: 22px
+   - border-radius: 26px
+3. Update .jl-title margin: 0 0 6px
+4. Update .jl-subtitle margin: 0
+5. Update field gap to 5px
+6. Consolidate duplicate CSS rules for .firebase-auth-card / .journall-signin-card
+
+--- JAVASCRIPT CHANGES NEEDED ---
+1. Add form submit handler with preventDefault()
+2. Update element references to match new structure
+3. Change Google button text to "Continue with Google"
