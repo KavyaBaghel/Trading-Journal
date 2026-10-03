@@ -4563,6 +4563,7 @@ document.addEventListener('input',e=>{if(cur&&RUN[cur.dataset.tool]&&cur.contain
     const journals = window.__getJournals ? window.__getJournals() : [];
     const targetUSD = Number(window.jlDayProfitTargetUSD) || Number(window.jlProfitTargetUSD) || 0;
     const tradeLimit = Number(window.jlMaxTradesPerDay) || 0;
+    const tradeCount = new Set(rawToday.map(t=>t.d+'|'+t.t+'|'+t.sym+'|'+t.side)).size; /* partial closes share one open time = one trade */
     const lossLimit = Number(window.jlDailyLossLimit) || 0;
     const hasL = lossLimit>0, hasT = tradeLimit>0, hasTg = targetUSD>0, fL = hasL?'$'+lossLimit.toFixed(0):'not set', fT = hasT?String(tradeLimit):'not set', fTg = hasTg?'$'+targetUSD.toFixed(0):'not set';
 
@@ -4601,14 +4602,14 @@ document.addEventListener('input',e=>{if(cur&&RUN[cur.dataset.tool]&&cur.contain
       pnlDetail.innerHTML='<span class="tag win">'+wins.length+'W</span><span class="tag loss">'+losses.length+'L</span>';
       lossNum.textContent='$'+lossUsed.toFixed(2)+' / '+fL; lossSub.textContent=hasL?'$'+Math.max(0,lossLimit-lossUsed).toFixed(2)+' room left':'No loss limit set';
       {const lr=hasL?lossUsed/lossLimit:0; ringLoss.style.setProperty('--off',239-239*Math.min(1,lr)); ringLoss.style.stroke=lr>.9?'var(--red)':lr>=.6?'var(--warn)':'var(--green)';} lossDetail.textContent=losses.length+' losing trade(s) today';
-      tradesNum.textContent=trades.length+' / '+fT; ringTrades.style.setProperty('--off',239-239*(hasT?Math.min(1,trades.length/tradeLimit):0)); tradesDetail.textContent=hasT?Math.max(0,tradeLimit-trades.length)+' slots remaining':'No trade limit set';
-      const breaksNow = (hasL&&lossUsed>=lossLimit?1:0) + (hasT&&trades.length>=tradeLimit?1:0);
+      tradesNum.textContent=tradeCount+' / '+fT; ringTrades.style.setProperty('--off',239-239*(hasT?Math.min(1,tradeCount/tradeLimit):0)); tradesDetail.textContent=hasT?Math.max(0,tradeLimit-tradeCount)+' slots remaining':'No trade limit set';
+      const breaksNow = (hasL&&lossUsed>=lossLimit?1:0) + (hasT&&tradeCount>=tradeLimit?1:0);
       if(breaksNow>0){ bestAction.textContent='Stop for today'; bestActionMeta.textContent='A daily rule has been reached'; }
       else if(hasTg&&pnlTotal>=targetUSD){ bestAction.textContent='Target reached'; bestActionMeta.textContent='Consider stopping for the day'; }
       else { bestAction.textContent='Continue your plan'; bestActionMeta.textContent=trades.length+' trade(s) so far · '+pnlPct+'% of target'; }
       statusVal.textContent='On pace'; statusDot.style.background='var(--amber)'; statusDot.classList.remove('danger'); statusMeta.textContent=hasTg?pnlPct+'% of daily target reached':'Profit target not set';
       updateRuleAlert(lossUsed, trades.length);
-      const remainingTarget=Math.max(0,targetUSD-pnlTotal), remainingSlots=Math.max(0,tradeLimit-trades.length);
+      const remainingTarget=Math.max(0,targetUSD-pnlTotal), remainingSlots=Math.max(0,tradeLimit-tradeCount);
       if(!hasT||!hasTg){ riskVal.textContent='\u2014'; riskMeta.textContent='Set a profit target and trade limit in Account Settings'; }
       else if(remainingSlots>0){ riskVal.textContent='$'+(remainingTarget/remainingSlots).toFixed(2); riskMeta.textContent='Based on $'+remainingTarget.toFixed(2)+' remaining target over '+remainingSlots+' trade(s) left'; }
       else { riskVal.textContent='$0.00'; riskMeta.textContent='No trade slots remaining today'; }
