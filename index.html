@@ -6132,6 +6132,13 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'){if(mpOpen)closeMont
   const CRUMB = ["mind","setup","checklist","live trade","journal"];
   const progressAnim = {}; // remembers each progress bar's last rendered % so re-renders animate smoothly instead of snapping
 
+  // Default room content. Edits made with the pencil buttons are saved on this device and override these.
+  const SETUP_DEFAULTS = [{"k": "req_1", "t": "Both side confirmation"}, {"k": "req_2", "t": "No blockage"}, {"k": "req_3", "t": "No losses back to back; if lost 1, stop for this session"}, {"k": "req_4", "t": "SL above candle and under 40 pips"}, {"k": "req_5", "t": "No c2c before 70 pips"}, {"k": "req_6", "t": "If 1 confirmed and another doesn't, and no blockage on both, you can still take the trade"}];
+  const CHECKLIST_DEFAULTS = [{"k": "news", "t": "News Checked", "d": "No high-impact USD news within 30 minutes"}, {"k": "emotion2", "t": "Emotion Calm", "d": "Still calm right before pulling the trigger."}, {"k": "rulesmet", "t": "Plan Rules Met", "d": "Entering only because my plan and risk rules are fully met — not because I want action."}, {"k": "risklimit", "t": "Risk Under Limit", "d": "Lot is 0.02 and risk is about $10 or less"}, {"k": "entry", "t": "Entry Confirmed", "d": "Price action confirms the entry on the setup's confirmed candle or timeframe close."}, {"k": "signal", "t": "Confirmation Signal", "d": "Daily stop not hit: under 4 trades, under 2 losses, week above -$80"}, {"k": "exit", "t": "Exit Plan Set", "d": "SL behind structure, TP at least 2R, and the 1.5R partial planned, all written before entry"}];
+  const LIVE_DEFAULTS = [{"k": "live1", "t": "No SL or TP changes.", "d": "Once the trade is live, the stop and target stay where the plan set them. The only change allowed is the move at 1.5R below. Never widen the SL, never remove it."}, {"k": "live2", "t": "At +$7.50 (1.5R), close 0.01 and move SL to entry +$1.", "d": "Wait for a 5M candle close beyond +$7.50. Close half, move the SL on the rest to entry plus $1, then leave the runner to $12-15 or the next structure level."}, {"k": "live3", "t": "Follow the written exit plan.", "d": "Scale or exit only according to the plan written before entry. Never on impulse, and never because price \"feels\" like it will reverse."}];
+  const DEBRIEF_DEFAULTS = [{"k": "d1", "t": "Screenshot the trade.", "d": "Save the chart before emotion edits the memory."}, {"k": "d2", "t": "Stop trading for 1 minute.", "d": "Do nothing. Breathe. Do not instantly re-enter."}, {"k": "d3", "t": "If loss happens, take 5 minutes.", "d": "Feel it, then journal why the loss happened."}, {"k": "d4", "t": "Write violated rule for tomorrow.", "d": "Tomorrow dashboard will remind you what not to repeat."}];
+  const COOLDOWN_DEFAULT_MIN = [5, 10, 15];
+
   let MIND_ITEMS = [
     {k:"sleep", t:"Sleep clear", d:"I am not tired, foggy, or forcing trades."},
     {k:"emotion", t:"Emotion calm", d:"No anger, fear, revenge, FOMO, or excitement spike."},
@@ -6141,37 +6148,37 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'){if(mpOpen)closeMont
     {k:"journal", t:"Journal commitment", d:"After the trade I will screenshot, pause, and journal honestly."},
   ];
 
-  let SETUP_REQS = [
-    {k:"req_default", t:"Valid setup forming"}
-  ];
+  let SETUP_REQS = SETUP_DEFAULTS.map(r=>({...r}));
 
-  let CHECKLIST_ITEMS = [
-    {k:"news", t:"News Checked", d:"No high-impact news in the next window."},
-    {k:"emotion2", t:"Emotion Calm", d:"Still calm right before pulling the trigger."},
-    {k:"rulesmet", t:"Plan Rules Met", d:"Entering only because my plan and risk rules are fully met — not because I want action."},
-    {k:"risklimit", t:"Risk Under Limit", d:"Position size matches my saved account rules — this exact risk is accepted."},
-    {k:"entry", t:"Entry Confirmed", d:"Price action confirms the entry on the setup's confirmed candle or timeframe close."},
-    {k:"signal", t:"Confirmation Signal", d:"The signal you rely on has actually printed."},
-    {k:"exit", t:"Exit Plan Set", d:"SL, TP and management plan written before entry."},
-  ];
+  let CHECKLIST_ITEMS = CHECKLIST_DEFAULTS.map(r=>({...r}));
+  let DEBRIEF_ITEMS = DEBRIEF_DEFAULTS.map(r=>({...r}));
 
   const COOLDOWN_MS = 2 * 60 * 60 * 1000; // 2 hours between trades
-  const COOLDOWN_OPTIONS_MIN = [5, 10, 15]; // selectable post-trade pause lengths (Cooldown step)
+  let COOLDOWN_OPTIONS_MIN = COOLDOWN_DEFAULT_MIN.slice(); // selectable post-trade pause lengths (Cooldown step), editable
 
-  // Storage fallback: window.storage only exists inside Claude's artifact preview.
+  // Storage: window.storage only exists inside Claude's artifact preview. On the live site the room lists
+  // (everything you can edit with the pencil buttons) are kept in localStorage so edits survive a reload;
+  // session progress stays in memory only, as before.
+  const PERSIST_KEYS = ['mind:items','setup:requirements','checklist:items','live:rules','debrief:items','cooldown:options'];
+  const LS_PREFIX = 'jlPsy:';
   const memoryStore = {};
   const STORAGE = (typeof window !== 'undefined' && window.storage) ? window.storage : {
-    async get(key){ return (key in memoryStore) ? {key, value: memoryStore[key]} : null; },
-    async set(key, value){ memoryStore[key] = value; return {key, value}; },
-    async delete(key){ delete memoryStore[key]; return {key, deleted:true}; },
+    async get(key){
+      if(PERSIST_KEYS.indexOf(key) > -1){ try{ const v = localStorage.getItem(LS_PREFIX + key); if(v !== null) return {key, value: v}; }catch(e){} }
+      return (key in memoryStore) ? {key, value: memoryStore[key]} : null;
+    },
+    async set(key, value){
+      if(PERSIST_KEYS.indexOf(key) > -1){ try{ localStorage.setItem(LS_PREFIX + key, value); }catch(e){} }
+      memoryStore[key] = value; return {key, value};
+    },
+    async delete(key){
+      if(PERSIST_KEYS.indexOf(key) > -1){ try{ localStorage.removeItem(LS_PREFIX + key); }catch(e){} }
+      delete memoryStore[key]; return {key, deleted:true};
+    },
     async list(){ return {keys: Object.keys(memoryStore)}; }
   };
 
-  let LIVE_RULES = [
-    {k:"live1", t:"No SL or TP changes.", d:"Once the trade is live, stop loss and take profit stay exactly where the plan set them — not moved for comfort, not moved for more."},
-    {k:"live2", t:"Unclear setup? Move to breakeven at 1:2 — don't exit manually.", d:"If the setup becomes unclear, shift SL to breakeven once price reaches 1:2 RR, then let TP and SL play out untouched."},
-    {k:"live3", t:"Follow the written exit plan.", d:"Scale or exit only according to the planned management rules — never on impulse."},
-  ];
+  let LIVE_RULES = LIVE_DEFAULTS.map(r=>({...r}));
 
   let state = {
     step: 1,
@@ -6183,6 +6190,8 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'){if(mpOpen)closeMont
     checklist: Object.fromEntries(CHECKLIST_ITEMS.map(i=>[i.k,false])),
     checklistEditing: false,
     liveEditing: false,
+    debriefEditing: false,
+    cooldownEditing: false,
     debriefNote: "",
     reminder: null,
     lastTradeCompletedAt: null,
@@ -6236,6 +6245,21 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'){if(mpOpen)closeMont
       if(l && l.value){
         const parsed = JSON.parse(l.value);
         if(Array.isArray(parsed) && parsed.length) LIVE_RULES = parsed;
+      }
+    }catch(e){}
+    try{
+      const d = await STORAGE.get('debrief:items', false);
+      if(d && d.value){
+        const parsed = JSON.parse(d.value);
+        if(Array.isArray(parsed) && parsed.length) DEBRIEF_ITEMS = parsed;
+      }
+    }catch(e){}
+    try{
+      const c = await STORAGE.get('cooldown:options', false);
+      if(c && c.value){
+        const parsed = JSON.parse(c.value);
+        if(Array.isArray(parsed) && parsed.length) COOLDOWN_OPTIONS_MIN = parsed.map(Number).filter(n=>n>0);
+        if(!COOLDOWN_OPTIONS_MIN.length) COOLDOWN_OPTIONS_MIN = COOLDOWN_DEFAULT_MIN.slice();
       }
     }catch(e){}
     try{
@@ -6389,7 +6413,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'){if(mpOpen)closeMont
   }
   async function saveRequirements(){
     SETUP_REQS = SETUP_REQS.filter(r=>r.t && r.t.trim().length>0);
-    if(SETUP_REQS.length===0) SETUP_REQS = [{k:'req_default', t:'Valid setup forming'}];
+    if(SETUP_REQS.length===0) SETUP_REQS = SETUP_DEFAULTS.map(r=>({...r}));
     try{ await STORAGE.set('setup:requirements', JSON.stringify(SETUP_REQS), false); }catch(e){}
     syncSetupState();
     state.setupEditing = false;
@@ -6403,7 +6427,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'){if(mpOpen)closeMont
         const parsed = JSON.parse(req.value);
         if(Array.isArray(parsed) && parsed.length) SETUP_REQS = parsed;
       } else {
-        SETUP_REQS = [{k:'req_default', t:'Valid setup forming'}];
+        SETUP_REQS = SETUP_DEFAULTS.map(r=>({...r}));
       }
     }catch(e){}
     syncSetupState();
@@ -6450,15 +6474,6 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'){if(mpOpen)closeMont
   }
 
   // ---- Pre-Trade Checklist: editable rules ----
-  const CHECKLIST_DEFAULTS = [
-    {k:"news", t:"News Checked", d:"No high-impact news in the next window."},
-    {k:"emotion2", t:"Emotion Calm", d:"Still calm right before pulling the trigger."},
-    {k:"rulesmet", t:"Plan Rules Met", d:"Entering only because my plan and risk rules are fully met — not because I want action."},
-    {k:"risklimit", t:"Risk Under Limit", d:"Position size matches my saved account rules — this exact risk is accepted."},
-    {k:"entry", t:"Entry Confirmed", d:"Price action confirms the entry on the setup's confirmed candle or timeframe close."},
-    {k:"signal", t:"Confirmation Signal", d:"The signal you rely on has actually printed."},
-    {k:"exit", t:"Exit Plan Set", d:"SL, TP and management plan written before entry."},
-  ];
   function toggleChecklistEdit(){ state.checklistEditing = !state.checklistEditing; render(); }
   function addChecklistItem(){ CHECKLIST_ITEMS.push({k:'chk_'+Date.now(), t:'', d:''}); render(); }
   function removeChecklistItem(k){ CHECKLIST_ITEMS = CHECKLIST_ITEMS.filter(r=>r.k!==k); delete state.checklist[k]; render(); }
@@ -6489,11 +6504,6 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'){if(mpOpen)closeMont
   }
 
   // ---- Live Trade Rules: editable rules ----
-  const LIVE_DEFAULTS = [
-    {k:"live1", t:"No SL or TP changes.", d:"Once the trade is live, stop loss and take profit stay exactly where the plan set them — not moved for comfort, not moved for more."},
-    {k:"live2", t:"Unclear setup? Move to breakeven at 1:2 — don't exit manually.", d:"If the setup becomes unclear, shift SL to breakeven once price reaches 1:2 RR, then let TP and SL play out untouched."},
-    {k:"live3", t:"Follow the written exit plan.", d:"Scale or exit only according to the planned management rules — never on impulse."},
-  ];
   function toggleLiveEdit(){ state.liveEditing = !state.liveEditing; render(); }
   function addLiveRule(){ LIVE_RULES.push({k:'live_'+Date.now(), t:'', d:''}); render(); }
   function removeLiveRule(k){ LIVE_RULES = LIVE_RULES.filter(r=>r.k!==k); render(); }
@@ -6520,6 +6530,54 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'){if(mpOpen)closeMont
     state.liveEditing = false;
     render();
   }
+
+  // ---- After Trade (Debrief): editable items ----
+  function toggleDebriefEdit(){ state.debriefEditing = !state.debriefEditing; render(); }
+  function addDebriefItem(){ DEBRIEF_ITEMS.push({k:'deb_'+Date.now(), t:'', d:''}); render(); }
+  function removeDebriefItem(k){ DEBRIEF_ITEMS = DEBRIEF_ITEMS.filter(r=>r.k!==k); render(); }
+  function editDebriefText(k, val){ const r = DEBRIEF_ITEMS.find(r=>r.k===k); if(r) r.t = val; }
+  function editDebriefDesc(k, val){ const r = DEBRIEF_ITEMS.find(r=>r.k===k); if(r) r.d = val; }
+  async function saveDebriefItems(){
+    DEBRIEF_ITEMS = DEBRIEF_ITEMS.filter(r=>r.t && r.t.trim().length>0);
+    if(DEBRIEF_ITEMS.length===0) DEBRIEF_ITEMS = DEBRIEF_DEFAULTS.map(r=>({...r}));
+    try{ await STORAGE.set('debrief:items', JSON.stringify(DEBRIEF_ITEMS), false); }catch(e){}
+    state.debriefEditing = false;
+    saveState();
+    render();
+  }
+  async function cancelEditDebriefItems(){
+    try{
+      const d = await STORAGE.get('debrief:items', false);
+      if(d && d.value){
+        const parsed = JSON.parse(d.value);
+        DEBRIEF_ITEMS = (Array.isArray(parsed) && parsed.length) ? parsed : DEBRIEF_DEFAULTS.map(r=>({...r}));
+      } else {
+        DEBRIEF_ITEMS = DEBRIEF_DEFAULTS.map(r=>({...r}));
+      }
+    }catch(e){}
+    state.debriefEditing = false;
+    render();
+  }
+
+  // ---- Cooldown: editable pause lengths (minutes) ----
+  let COOLDOWN_DRAFT = [];
+  function toggleCooldownEdit(){
+    state.cooldownEditing = !state.cooldownEditing;
+    COOLDOWN_DRAFT = COOLDOWN_OPTIONS_MIN.map(String);
+    render();
+  }
+  function addCooldownOption(){ COOLDOWN_DRAFT.push(''); render(); }
+  function removeCooldownOption(i){ COOLDOWN_DRAFT.splice(i,1); render(); }
+  function editCooldownOption(i, val){ COOLDOWN_DRAFT[i] = val; }
+  async function saveCooldownOptions(){
+    const vals = COOLDOWN_DRAFT.map(v=>Math.round(Number(v))).filter(n=>isFinite(n) && n>=1 && n<=240);
+    const uniq = Array.from(new Set(vals)).sort((a,b)=>a-b);
+    COOLDOWN_OPTIONS_MIN = uniq.length ? uniq : COOLDOWN_DEFAULT_MIN.slice();
+    try{ await STORAGE.set('cooldown:options', JSON.stringify(COOLDOWN_OPTIONS_MIN), false); }catch(e){}
+    state.cooldownEditing = false;
+    render();
+  }
+  function cancelEditCooldown(){ state.cooldownEditing = false; render(); }
 
   // ---- shared interactive progress bar ----
   function slugPid(s){ return 'p-'+String(s||'bar').toLowerCase().replace(/[^a-z0-9]+/g,'-'); }
@@ -6588,6 +6646,8 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'){if(mpOpen)closeMont
       checklist: Object.fromEntries(CHECKLIST_ITEMS.map(i=>[i.k,false])),
       checklistEditing: false,
       liveEditing: false,
+      debriefEditing: false,
+      cooldownEditing: false,
       debriefNote: "",
       reminder: state.reminder,
       lastTradeCompletedAt: state.lastTradeCompletedAt,
@@ -6795,16 +6855,38 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'){if(mpOpen)closeMont
   }
 
   function renderDebriefStep(){
+    if(state.debriefEditing){
+      return `
+        <div class="a-s-head">
+          <div class="a-s-ttl"><span class="a-s-ic">${rowIcon('d1')}</span><h3>After Trade</h3></div>
+          <span class="pill">editing</span>
+        </div>
+        <div class="sub" style="margin:4px 0 16px">Write the exact steps you follow right after a trade closes.</div>
+        ${DEBRIEF_ITEMS.map(r=>`
+          <div class="psy-edit-row" style="align-items:flex-start">
+            <div style="flex:1;display:flex;flex-direction:column;gap:6px">
+              <input class="j-in" type="text" value="${(r.t||"").replace(/&/g,'&amp;').replace(/"/g,'&quot;')}" placeholder="Step title" data-act="edit-debrief-text" data-k="${r.k}">
+              <input class="j-in" type="text" value="${(r.d||"").replace(/&/g,'&amp;').replace(/"/g,'&quot;')}" placeholder="Description (optional)" data-act="edit-debrief-desc" data-k="${r.k}">
+            </div>
+            <div class="psy-rm" data-act="remove-debrief" data-k="${r.k}">${xIcon()}</div>
+          </div>`).join("")}
+        <div class="psy-add" data-act="add-debrief">${plusIcon()} Add step</div>
+        <div class="psy-actions">
+          <button class="btn-ghost" data-act="cancel-edit-debrief">Cancel</button>
+          <button class="btn-primary" data-act="save-debrief">Save steps</button>
+        </div>`;
+    }
+    const esc = s => String(s==null?"":s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
     return `
       <div class="a-s-head">
         <div class="a-s-ttl"><span class="a-s-ic">${rowIcon('d1')}</span><h3>After Trade</h3></div>
-        <span class="pill">mandatory pause</span>
+        <div style="display:flex;gap:7px;align-items:center">
+          <span class="pill">mandatory pause</span>
+          <div class="psy-icon-btn" data-act="debrief-edit-toggle">${editIcon()}</div>
+        </div>
       </div>
       <div class="sub" style="margin:4px 0 6px">A mandatory pause before the next decision.</div>
-      <div class="psy-info"><span class="ic">${rowIcon('d1')}</span><div><b>Screenshot the trade.</b><span>Save the chart before emotion edits the memory.</span></div></div>
-      <div class="psy-info"><span class="ic">${rowIcon('d2')}</span><div><b>Stop trading for 1 minute.</b><span>Do nothing. Breathe. Do not instantly re-enter.</span></div></div>
-      <div class="psy-info"><span class="ic">${rowIcon('d3')}</span><div><b>If loss happens, take 5 minutes.</b><span>Feel it, then journal why the loss happened.</span></div></div>
-      <div class="psy-info"><span class="ic">${rowIcon('d4')}</span><div><b>Write violated rule for tomorrow.</b><span>Tomorrow dashboard will remind you what not to repeat.</span></div></div>
+      ${DEBRIEF_ITEMS.map(r=>`<div class="psy-info"><span class="ic">${rowIcon(r.k)}</span><div><b>${esc(r.t)}</b><span>${esc(r.d)}</span></div></div>`).join("")}
       <textarea class="j-ta" id="debrief-input" placeholder="Rule violated / tomorrow reminder..." data-act="debrief-input" style="margin-top:14px">${state.debriefNote||""}</textarea>
       <button class="btn-primary psy-full" style="margin-top:12px" data-act="complete-debrief">Complete Live Trade</button>
       <div class="psy-actions">
@@ -6815,10 +6897,31 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'){if(mpOpen)closeMont
 
   function renderCooldownStep(){
     if(!state.cooldownDurationMs){
+      if(state.cooldownEditing){
+        return `
+        <div class="a-s-head">
+          <div class="a-s-ttl"><span class="a-s-ic">${rowIcon('d2')}</span><h3>Cooldown</h3></div>
+          <span class="pill">editing</span>
+        </div>
+        <div class="sub" style="margin:4px 0 16px">Set the pause lengths you can pick after a trade, in minutes (1 to 240).</div>
+        ${COOLDOWN_DRAFT.map((v,i)=>`
+          <div class="psy-edit-row">
+            <input class="j-in" type="number" inputmode="numeric" min="1" max="240" step="1" value="${String(v).replace(/"/g,'&quot;')}" placeholder="Minutes" data-act="edit-cd" data-i="${i}">
+            <div class="psy-rm" data-act="remove-cd" data-i="${i}">${xIcon()}</div>
+          </div>`).join("")}
+        <div class="psy-add" data-act="add-cd">${plusIcon()} Add pause length</div>
+        <div class="psy-actions">
+          <button class="btn-ghost" data-act="cancel-edit-cd">Cancel</button>
+          <button class="btn-primary" data-act="save-cd">Save lengths</button>
+        </div>`;
+      }
       return `
         <div class="a-s-head">
           <div class="a-s-ttl"><span class="a-s-ic">${rowIcon('d2')}</span><h3>Cooldown</h3></div>
-          <span class="pill">mandatory pause</span>
+          <div style="display:flex;gap:7px;align-items:center">
+            <span class="pill">mandatory pause</span>
+            <div class="psy-icon-btn" data-act="cooldown-edit-toggle">${editIcon()}</div>
+          </div>
         </div>
         <div class="sub" style="margin:4px 0 14px">Trade logged. How much time do you need before you're clear to plan the next one?</div>
         <div class="psy-cd-picks" style="display:flex;gap:9px;flex-wrap:wrap;margin-bottom:16px">
@@ -6928,6 +7031,16 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'){if(mpOpen)closeMont
     else if(act==='complete-debrief') completeDebrief();
     else if(act==='start-next-trade') startNextTrade();
     else if(act==='pick-cooldown') pickCooldownDuration(+t.dataset.min);
+    else if(act==='debrief-edit-toggle') toggleDebriefEdit();
+    else if(act==='remove-debrief') removeDebriefItem(t.dataset.k);
+    else if(act==='add-debrief') addDebriefItem();
+    else if(act==='cancel-edit-debrief') cancelEditDebriefItems();
+    else if(act==='save-debrief') saveDebriefItems();
+    else if(act==='cooldown-edit-toggle') toggleCooldownEdit();
+    else if(act==='remove-cd') removeCooldownOption(+t.dataset.i);
+    else if(act==='add-cd') addCooldownOption();
+    else if(act==='cancel-edit-cd') cancelEditCooldown();
+    else if(act==='save-cd') saveCooldownOptions();
   }
   function handleInput(e){
     const t = e.target.closest('[data-act]');
@@ -6940,6 +7053,9 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'){if(mpOpen)closeMont
     else if(act==='edit-checklist-desc') editChecklistDesc(t.dataset.k, t.value);
     else if(act==='edit-live-text') editLiveText(t.dataset.k, t.value);
     else if(act==='edit-live-desc') editLiveDesc(t.dataset.k, t.value);
+    else if(act==='edit-debrief-text') editDebriefText(t.dataset.k, t.value);
+    else if(act==='edit-debrief-desc') editDebriefDesc(t.dataset.k, t.value);
+    else if(act==='edit-cd') editCooldownOption(+t.dataset.i, t.value);
     else if(act==='debrief-input') state.debriefNote = t.value;
   }
 
