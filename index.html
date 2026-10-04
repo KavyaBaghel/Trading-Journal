@@ -11,8 +11,11 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black"/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-<link rel="icon" type="image/png" sizes="192x192" href="assets/icon-192.png"/>
-<link rel="apple-touch-icon" href="assets/icon-192.png"/>
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg?v=20261004"/>
+<link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png?v=20261004"/>
+<link rel="icon" type="image/png" sizes="192x192" href="assets/icon-192.png?v=20261004"/>
+<link rel="shortcut icon" href="assets/app-icon.ico?v=20261004"/>
+<link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png?v=20261004"/>
 <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet"/>
 <title>Journall</title>
@@ -2433,6 +2436,7 @@
 #jlDesign{height:100%}
 #jlDesign[hidden]{display:none !important}
 </style>
+<style id="journall-logo-img">.logo>img,.jl-mark>img,.journall-loading-mark>img{display:block;width:100%;height:100%;object-fit:cover;pointer-events:none;-webkit-user-drag:none;user-select:none}.logo>img{border-radius:10px}.jl-mark>img,.journall-loading-mark>img{border-radius:12px}</style>
 </head>
 <body>
 <button id="androidInstallBtn" class="android-install-btn" type="button" hidden>Install Journall</button>
@@ -2449,10 +2453,10 @@
 <div id="firebaseAuthGate" class="firebase-auth-gate show">
   <div class="jl-bg" aria-hidden="true"><span class="jl-bg-glow"></span><canvas class="jl-bg-canvas"></canvas><span class="jl-bg-spot-glow"></span></div>
 
-    <div id="firebaseAuthLoading" class="login-loading"><div class="journall-loading-bg" aria-hidden="true"><span class="journall-bg-glow"></span><canvas class="journall-bg-canvas"></canvas><span class="journall-bg-spot-glow"></span></div><div class="journall-loading-tilt" id="loadingTilt"><div class="journall-loading-logo" role="img" aria-label="Journall"><span class="journall-loading-mark" id="loadingMark" aria-hidden="true">J</span><span class="journall-loading-wordmark" aria-hidden="true">Journall</span></div></div><p id="firebaseAuthLoadingText" class="journall-loading-subtitle">Loading Journall...</p><div class="journall-loading-progress" aria-hidden="true"><span class="journall-loading-progress-track"></span></div><button id="firebaseAuthRetryBtn" class="btn primary" type="button" hidden>Retry</button></div>
+    <div id="firebaseAuthLoading" class="login-loading"><div class="journall-loading-bg" aria-hidden="true"><span class="journall-bg-glow"></span><canvas class="journall-bg-canvas"></canvas><span class="journall-bg-spot-glow"></span></div><div class="journall-loading-tilt" id="loadingTilt"><div class="journall-loading-logo" role="img" aria-label="Journall"><span class="journall-loading-mark" id="loadingMark" aria-hidden="true"><img src="assets/icon-192.png?v=20261004" alt="" decoding="async"/></span><span class="journall-loading-wordmark" aria-hidden="true">Journall</span></div></div><p id="firebaseAuthLoadingText" class="journall-loading-subtitle">Loading Journall...</p><div class="journall-loading-progress" aria-hidden="true"><span class="journall-loading-progress-track"></span></div><button id="firebaseAuthRetryBtn" class="btn primary" type="button" hidden>Retry</button></div>
 <div class="jl-logo-wrap">
   <div class="jl-logo" role="img" aria-label="Journall">
-    <span class="jl-mark">J</span>
+    <span class="jl-mark"><img src="assets/icon-192.png?v=20261004" alt="" decoding="async"/></span>
     <span class="jl-wordmark">Journall</span>
   </div>
 </div>
@@ -2843,7 +2847,7 @@ window.jlLiveBalance=function(Z){
 <div class="app" id="app">
 <aside class="sidebar" id="sidebar" aria-label="Main navigation">
   <div class="sb-brand">
-    <div class="logo">J</div><span class="brand-name">JOURNALL</span>
+    <div class="logo"><img src="assets/icon-192.png?v=20261004" alt="Journall" width="34" height="34" decoding="async"/></div><span class="brand-name">JOURNALL</span>
   </div>
   <nav class="sb-nav" id="sbNav"></nav>
   <div class="rules">
