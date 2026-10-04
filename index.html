@@ -7331,6 +7331,50 @@ function fillHero(){const s=(id,h)=>{const e=$(id);if(e)e.innerHTML=h};
   window.jlUserName = loadName;
   window.jlRefreshName = ()=>applyName(loadName());
   applyName(loadName());
+
+  // ---------- profile photo / banner: shrink, show, and keep across reloads ----------
+  // Kept on this device only (not in the cloud-synced keys) so big images can never break cloud save.
+  const IMG_KEY = {avatar:'jlimg_profile_avatar_v1', cover:'jlimg_profile_cover_v1'};
+  const paintProfileImg = (kind, url)=>{
+    const el = document.querySelector(kind==='avatar' ? '.up-avatar' : '.up-cover');
+    if(!el || !url) return;
+    el.style.backgroundImage = 'url("' + url + '")';
+    el.style.backgroundSize = 'cover';
+    el.style.backgroundPosition = 'center';
+    el.style.backgroundRepeat = 'no-repeat';
+    if(kind==='avatar') el.textContent = '';
+  };
+  const shrinkImage = (file, maxSide, quality)=> new Promise((res, rej)=>{
+    const u = URL.createObjectURL(file), img = new Image();
+    img.onload = ()=>{
+      try{
+        const k = Math.min(1, maxSide / Math.max(img.naturalWidth, img.naturalHeight));
+        const w = Math.max(1, Math.round(img.naturalWidth * k)), h = Math.max(1, Math.round(img.naturalHeight * k));
+        const c = document.createElement('canvas'); c.width = w; c.height = h;
+        const g = c.getContext('2d'); g.fillStyle = '#0b0b12'; g.fillRect(0, 0, w, h); g.drawImage(img, 0, 0, w, h);
+        res(c.toDataURL('image/jpeg', quality));
+      }catch(err){ rej(err); }
+      finally{ URL.revokeObjectURL(u); }
+    };
+    img.onerror = ()=>{ URL.revokeObjectURL(u); rej(new Error('decode')); };
+    img.src = u;
+  });
+  window.jlProfileImgFromFile = (file, kind)=>{
+    const toast = (o)=>{ try{ if(window.jlToast) window.jlToast(o); }catch(err){} };
+    return shrinkImage(file, kind==='avatar' ? 512 : 1600, kind==='avatar' ? 0.85 : 0.8).then(url=>{
+      paintProfileImg(kind, url);
+      let kept = true;
+      try{ localStorage.setItem(IMG_KEY[kind], url); }catch(err){ kept = false; }
+      if(kept) toast({text: kind==='avatar' ? 'Profile photo updated' : 'Banner updated', duration: 3000});
+      else toast({text: 'Shown for now, but not saved', sub: 'Browser storage is full on this device.', icon: 'trash', duration: 5000});
+    }).catch(()=>{
+      toast({text: 'Could not use that image', sub: 'Try a JPG or PNG file.', icon: 'trash', duration: 4000});
+    });
+  };
+  ['avatar','cover'].forEach(k=>{
+    try{ const u = localStorage.getItem(IMG_KEY[k]); if(u && u.indexOf('data:image/') === 0) paintProfileImg(k, u); }catch(err){}
+  });
+
   const nameEl = $('upName');
   if(nameEl){
     nameEl.addEventListener('keydown', e=>{ if(e.key==='Enter'){ e.preventDefault(); nameEl.blur(); } });
@@ -7385,35 +7429,19 @@ function fillHero(){const s=(id,h)=>{const e=$(id);if(e)e.innerHTML=h};
       document.addEventListener('click', closeMenu);
       document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeMenu(); });
 
-      const readAsImage = (input, onLoad)=>{
+      const readAsImage = (input, kind)=>{
         input.addEventListener('change', e=>{
           const file = e.target.files && e.target.files[0];
-          if(!file) return;
-          const reader = new FileReader();
-          reader.onload = ()=> onLoad(reader.result);
-          reader.readAsDataURL(file);
           input.value = '';
+          if(file) window.jlProfileImgFromFile(file, kind);
         });
       };
 
       settingsMenu.querySelector('[data-act="avatar"]').addEventListener('click', ()=>{ closeMenu(); avatarInput.click(); });
       settingsMenu.querySelector('[data-act="cover"]').addEventListener('click', ()=>{ closeMenu(); coverInput.click(); });
 
-      readAsImage(avatarInput, (url)=>{
-        const avatar = document.querySelector('.up-avatar');
-        if(!avatar) return;
-        avatar.style.backgroundImage = 'url(' + url + ')';
-        avatar.style.backgroundSize = 'cover';
-        avatar.style.backgroundPosition = 'center';
-        avatar.textContent = '';
-      });
-      readAsImage(coverInput, (url)=>{
-        const cover = document.querySelector('.up-cover');
-        if(!cover) return;
-        cover.style.backgroundImage = 'url(' + url + ')';
-        cover.style.backgroundSize = 'cover';
-        cover.style.backgroundPosition = 'center';
-      });
+      readAsImage(avatarInput, 'avatar');
+      readAsImage(coverInput, 'cover');
     }
 
     // ---------- trading identity tags ----------
