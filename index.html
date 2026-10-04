@@ -7345,6 +7345,14 @@ function fillHero(){const s=(id,h)=>{const e=$(id);if(e)e.innerHTML=h};
     return '';
   };
   const paintProfileImg = (kind, url)=>{
+    if(kind==='avatar' && url){
+      document.querySelectorAll('.who .dot').forEach(d=>{
+        d.style.backgroundImage = 'url("' + url + '")';
+        d.style.backgroundSize = 'cover';
+        d.style.backgroundPosition = 'center';
+        d.style.backgroundRepeat = 'no-repeat';
+      });
+    }
     const el = document.querySelector(kind==='avatar' ? '.up-avatar' : '.up-cover');
     if(!el || !url || el.__jlImg === url) return;
     el.__jlImg = url;
