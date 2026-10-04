@@ -7329,51 +7329,94 @@ function fillHero(){const s=(id,h)=>{const e=$(id);if(e)e.innerHTML=h};
     const av = $('upAvatar'); if(av && !av.style.backgroundImage) av.textContent = (name.trim().charAt(0) || '?').toUpperCase();
   };
   window.jlUserName = loadName;
-  window.jlRefreshName = ()=>applyName(loadName());
+  window.jlRefreshName = ()=>{ applyName(loadName()); if(window.jlPaintProfileImgs) window.jlPaintProfileImgs(); };
   applyName(loadName());
 
-  // ---------- profile photo / banner: shrink, show, and keep across reloads ----------
-  // Kept on this device only (not in the cloud-synced keys) so big images can never break cloud save.
-  const IMG_KEY = {avatar:'jlimg_profile_avatar_v1', cover:'jlimg_profile_cover_v1'};
+  // ---------- profile photo / banner: shrink, show, keep, and sync across devices ----------
+  // Stored under journall_* keys so the existing cloud sync carries them. Images are shrunk hard, and if the
+  // synced data would get too close to Firestore's 1 MB document limit they stay on this device instead.
+  const SYNC_KEY = {avatar:'journall_profile_avatar_img', cover:'journall_profile_cover_img'};
+  const DEV_KEY = {avatar:'jlimg_profile_avatar_dev', cover:'jlimg_profile_cover_dev'};
+  const LEGACY_KEY = {avatar:'jlimg_profile_avatar_v1', cover:'jlimg_profile_cover_v1'};
+  const SYNC_BUDGET = 800000;
+  const IMG_OK = /^data:image\/(jpeg|png|webp|gif);base64,[A-Za-z0-9+\/=]+$/;
+  const storedImg = (kind)=>{
+    try{ for(const k of [DEV_KEY[kind], SYNC_KEY[kind], LEGACY_KEY[kind]]){ const u = localStorage.getItem(k); if(u && IMG_OK.test(u)) return u; } }catch(err){}
+    return '';
+  };
   const paintProfileImg = (kind, url)=>{
     const el = document.querySelector(kind==='avatar' ? '.up-avatar' : '.up-cover');
-    if(!el || !url) return;
+    if(!el || !url || el.__jlImg === url) return;
+    el.__jlImg = url;
     el.style.backgroundImage = 'url("' + url + '")';
     el.style.backgroundSize = 'cover';
     el.style.backgroundPosition = 'center';
     el.style.backgroundRepeat = 'no-repeat';
     if(kind==='avatar') el.textContent = '';
   };
-  const shrinkImage = (file, maxSide, quality)=> new Promise((res, rej)=>{
-    const u = URL.createObjectURL(file), img = new Image();
-    img.onload = ()=>{
-      try{
-        const k = Math.min(1, maxSide / Math.max(img.naturalWidth, img.naturalHeight));
-        const w = Math.max(1, Math.round(img.naturalWidth * k)), h = Math.max(1, Math.round(img.naturalHeight * k));
-        const c = document.createElement('canvas'); c.width = w; c.height = h;
-        const g = c.getContext('2d'); g.fillStyle = '#0b0b12'; g.fillRect(0, 0, w, h); g.drawImage(img, 0, 0, w, h);
-        res(c.toDataURL('image/jpeg', quality));
-      }catch(err){ rej(err); }
-      finally{ URL.revokeObjectURL(u); }
-    };
-    img.onerror = ()=>{ URL.revokeObjectURL(u); rej(new Error('decode')); };
-    img.src = u;
+  window.jlPaintProfileImgs = ()=>{ ['avatar','cover'].forEach(k=>{ const u = storedImg(k); if(u) paintProfileImg(k, u); }); };
+  const loadImg = (src)=> new Promise((res, rej)=>{
+    const img = new Image();
+    img.onload = ()=>res(img);
+    img.onerror = ()=>rej(new Error('decode'));
+    img.src = src;
   });
+  const encodeImg = (img, kind)=>{
+    const maxSide = kind==='avatar' ? 320 : 1100, cap = kind==='avatar' ? 45000 : 130000;
+    const tries = [[1,0.85],[1,0.7],[0.8,0.65],[0.65,0.6],[0.5,0.55]];
+    let out = '';
+    for(const [sc, q] of tries){
+      const k = Math.min(1, maxSide * sc / Math.max(img.naturalWidth, img.naturalHeight));
+      const w = Math.max(1, Math.round(img.naturalWidth * k)), h = Math.max(1, Math.round(img.naturalHeight * k));
+      const c = document.createElement('canvas'); c.width = w; c.height = h;
+      const g = c.getContext('2d'); g.fillStyle = '#0b0b12'; g.fillRect(0, 0, w, h); g.drawImage(img, 0, 0, w, h);
+      out = c.toDataURL('image/jpeg', q);
+      if(out.length <= cap) break;
+    }
+    return out;
+  };
+  // returns 'cloud' (syncs to other devices), 'device' (this browser only) or 'none'
+  const commitImg = (kind, url)=>{
+    let where = 'none';
+    const bytes = window.jlSyncedStateBytes ? window.jlSyncedStateBytes(SYNC_KEY[kind], url) : Infinity;
+    if(bytes <= SYNC_BUDGET){
+      try{ localStorage.setItem(SYNC_KEY[kind], url); localStorage.removeItem(DEV_KEY[kind]); where = 'cloud'; }catch(err){}
+    }
+    if(where === 'none'){
+      try{ localStorage.setItem(DEV_KEY[kind], url); where = 'device'; }catch(err){}
+    }
+    paintProfileImg(kind, url);
+    return where;
+  };
   window.jlProfileImgFromFile = (file, kind)=>{
     const toast = (o)=>{ try{ if(window.jlToast) window.jlToast(o); }catch(err){} };
-    return shrinkImage(file, kind==='avatar' ? 512 : 1600, kind==='avatar' ? 0.85 : 0.8).then(url=>{
-      paintProfileImg(kind, url);
-      let kept = true;
-      try{ localStorage.setItem(IMG_KEY[kind], url); }catch(err){ kept = false; }
-      if(kept) toast({text: kind==='avatar' ? 'Profile photo updated' : 'Banner updated', duration: 3000});
+    const u = URL.createObjectURL(file);
+    return loadImg(u).then(img=>{
+      const where = commitImg(kind, encodeImg(img, kind));
+      const what = kind==='avatar' ? 'Profile photo updated' : 'Banner updated';
+      if(where === 'cloud') toast({text: what, sub: 'Synced to your other devices.', duration: 3500});
+      else if(where === 'device') toast({text: what, sub: 'Saved on this device only, cloud storage is nearly full.', duration: 5000});
       else toast({text: 'Shown for now, but not saved', sub: 'Browser storage is full on this device.', icon: 'trash', duration: 5000});
     }).catch(()=>{
       toast({text: 'Could not use that image', sub: 'Try a JPG or PNG file.', icon: 'trash', duration: 4000});
+    }).finally(()=>URL.revokeObjectURL(u));
+  };
+  window.jlPaintProfileImgs();
+  // one-time upgrade of images saved by the earlier device-only version: shrink them and move them to the synced key
+  const migrateLegacyImgs = ()=>{
+    ['avatar','cover'].forEach(kind=>{
+      try{
+        const old = localStorage.getItem(LEGACY_KEY[kind]);
+        if(!old) return;
+        if(localStorage.getItem(SYNC_KEY[kind]) || localStorage.getItem(DEV_KEY[kind]) || !IMG_OK.test(old)){ localStorage.removeItem(LEGACY_KEY[kind]); return; }
+        loadImg(old).then(img=>{
+          if(commitImg(kind, encodeImg(img, kind)) !== 'none') localStorage.removeItem(LEGACY_KEY[kind]);
+        }).catch(()=>{});
+      }catch(err){}
     });
   };
-  ['avatar','cover'].forEach(k=>{
-    try{ const u = localStorage.getItem(IMG_KEY[k]); if(u && u.indexOf('data:image/') === 0) paintProfileImg(k, u); }catch(err){}
-  });
+  if(document.readyState === 'complete') setTimeout(migrateLegacyImgs, 0);
+  else window.addEventListener('load', ()=>setTimeout(migrateLegacyImgs, 0));
 
   const nameEl = $('upName');
   if(nameEl){
@@ -7986,6 +8029,11 @@ function collectLocalState(){
   }
   return storage;
 }
+
+/* size in bytes of what the cloud save would hold (optionally with one key set to a new value) - used by the profile photo/banner to stay under Firestore's 1 MB document limit */
+window.jlSyncedStateBytes = function(key, value){
+  try{ const s = collectLocalState(); if(key) s[key] = value; return new Blob([JSON.stringify(s)]).size; }catch(err){ return Infinity; }
+};
 
 function parseSyncValue(value){
   if(typeof value !== 'string' || !value.trim()) return null;
