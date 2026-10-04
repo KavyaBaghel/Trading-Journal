@@ -9507,5 +9507,37 @@ initFirebaseAuth().catch(err=>{
   body .btn-primary,body .btn-ghost{min-height:44px}
 }
 </style>
+<style id="jlTopCss">
+#jlTop{position:fixed;right:calc(20px + env(safe-area-inset-right,0px));bottom:calc(20px + env(safe-area-inset-bottom,0px));z-index:900;width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;padding:0;cursor:pointer;color:var(--text);
+  background:linear-gradient(160deg,rgba(255,255,255,.06),rgba(255,255,255,0) 60%),var(--panel-2);border:1px solid var(--border-hi);box-shadow:0 10px 28px -10px rgba(0,0,0,.7);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);
+  opacity:0;transform:translateY(14px) scale(.9);visibility:hidden;pointer-events:none;
+  transition:opacity .35s cubic-bezier(.16,1,.3,1),transform .35s cubic-bezier(.16,1,.3,1),visibility 0s linear .35s,border-color .25s cubic-bezier(.22,.61,.36,1),box-shadow .25s cubic-bezier(.22,.61,.36,1)}
+#jlTop.show{opacity:1;transform:none;visibility:visible;pointer-events:auto;transition-delay:0s}
+#jlTop:hover{border-color:var(--accent);box-shadow:0 12px 30px -8px rgba(124,108,240,.55)}
+#jlTop.show:active{transform:scale(.94)}
+#jlTop:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+#jlTop svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;transition:transform .25s cubic-bezier(.22,.61,.36,1)}
+#jlTop:hover svg{transform:translateY(-2px)}
+@media print{#jlTop{display:none}}
+</style>
+<script>(function(){
+  if(document.getElementById('jlTop')) return;
+  var b=document.createElement('button'); b.id='jlTop'; b.type='button'; b.title='Back to top'; b.tabIndex=-1;
+  b.setAttribute('aria-label','Back to top');
+  b.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7"/></svg>';
+  document.body.appendChild(b);
+  var on=false, ticking=false;
+  function update(){
+    ticking=false;
+    var y=window.scrollY||document.documentElement.scrollTop||0, want=y>500;
+    if(want!==on){ on=want; b.classList.toggle('show',on); b.tabIndex=on?0:-1; }
+  }
+  window.addEventListener('scroll',function(){ if(!ticking){ ticking=true; requestAnimationFrame(update); } },{passive:true});
+  b.addEventListener('click',function(){
+    var rm=document.body.classList.contains('rm')||(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+    window.scrollTo({top:0,behavior:rm?'auto':'smooth'});
+  });
+  update();
+})();</script>
 </body>
 </html>
