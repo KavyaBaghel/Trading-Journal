@@ -2573,7 +2573,7 @@ window.jlLiveBalance=function(Z){
     var des=rd(LK).filter(function(e){return e&&typeof e==='object'&&e.id!=null}).map(function(e){return A.journalToDesign(e,imp)});
     if(des.length)localStorage.setItem('jlJournals',JSON.stringify(des));else localStorage.removeItem('jlJournals');
   }catch(e){try{localStorage.removeItem('jlJournals')}catch(_){}console.error('[Journall] journal bootstrap failed',e)}
-  function writeBack(v){
+  function writeBack(v,oldV){
     try{
       var J=JSON.parse(v);if(!Array.isArray(J))return;
       var by={};rd(LK).forEach(function(e){if(e&&e.id!=null)by[String(e.id)]=e});
@@ -2581,12 +2581,21 @@ window.jlLiveBalance=function(Z){
         var id=lid(d.id),o=by[id]||null;
         if(o&&same(d,A.journalToDesign(o,imp)))return o;      // unchanged: keep the live original byte-for-byte
         var e=A.journalToLive(d,o,imp);if(!o)e.id=/^\d+$/.test(id)?Number(id):id;return e});
+      /* deletions: remember them so cloud sync cannot bring a deleted journal back from another device (d:1 deleted, d:0 restored) */
+      try{
+        var TKD='journall_deleted_journals',tomb={},ts=Date.now(),tch=false,newIds={},oldL=[];
+        try{var tv=JSON.parse(localStorage.getItem(TKD)||'null');if(tv&&typeof tv==='object'&&!Array.isArray(tv))tomb=tv}catch(_){}
+        try{var ov=JSON.parse(oldV||'null');if(Array.isArray(ov))oldL=ov}catch(_){}
+        J.forEach(function(d){if(d&&d.id!=null){var k=lid(d.id);newIds[k]=1;if(tomb[k]&&tomb[k].d===1){tomb[k]={t:ts,d:0};tch=true}}});
+        oldL.forEach(function(d){if(!d||d.id==null)return;var k=lid(d.id);if(!newIds[k]&&!(tomb[k]&&tomb[k].d===1)){tomb[k]={t:ts,d:1};tch=true}});
+        if(tch)localStorage.setItem(TKD,JSON.stringify(tomb));
+      }catch(_){}
       var next=JSON.stringify(out);
       if(next!==JSON.stringify(rd(LK)))localStorage.setItem(LK,next);
     }catch(e){console.error('[Journall] journal write-back failed',e)}
   }
   var prev=Storage.prototype.setItem;
-  Storage.prototype.setItem=function(k,v){prev.call(this,k,v);if(this===localStorage&&k==='jlJournals')writeBack(v)};
+  Storage.prototype.setItem=function(k,v){var old=(this===localStorage&&k==='jlJournals')?this.getItem('jlJournals'):null;prev.call(this,k,v);if(this===localStorage&&k==='jlJournals')writeBack(v,old)};
 })();
 </script>
 <script id="jl-account-sync">
@@ -8113,11 +8122,33 @@ function mergeImportedTrades(existingTrades, incomingTrades){
   return [...merged.values()].sort((a,b) => `${a.date || ''} ${a.time || ''}`.localeCompare(`${b.date || ''} ${b.time || ''}`));
 }
 
+const JOURNAL_TOMB_KEY = 'journall_deleted_journals';
+const JOURNAL_LIST_KEY = 'krishna_journal_page_entries';
+
+function mergeJournalTombstones(a, b){
+  /* {journalId: {t: timestamp, d: 1 deleted | 0 restored}} - the newest decision per id wins */
+  const out = {};
+  [parseSyncValue(a), parseSyncValue(b)].forEach(obj => {
+    if(!obj || typeof obj !== 'object' || Array.isArray(obj)) return;
+    Object.entries(obj).forEach(([id, v]) => {
+      if(!v || typeof v !== 'object' || !Number.isFinite(Number(v.t))) return;
+      const prevT = out[id];
+      if(!prevT || Number(v.t) >= Number(prevT.t)) out[id] = {t: Number(v.t), d: v.d === 1 ? 1 : 0};
+    });
+  });
+  return out;
+}
+
 function mergeSyncedStorageMaps(remoteStorage = {}, localStorageSnapshot = {}){
   const merged = {...remoteStorage};
+  const tombs = mergeJournalTombstones(remoteStorage?.[JOURNAL_TOMB_KEY], localStorageSnapshot?.[JOURNAL_TOMB_KEY]);
   const keys = new Set([...Object.keys(remoteStorage || {}), ...Object.keys(localStorageSnapshot || {})]);
   keys.forEach(key => {
     if(!shouldSyncKey(key)) return;
+    if(key === JOURNAL_TOMB_KEY){
+      if(Object.keys(tombs).length) merged[key] = JSON.stringify(tombs);
+      return;
+    }
     const remoteVal = remoteStorage?.[key];
     const localVal = localStorageSnapshot?.[key];
 
@@ -8157,6 +8188,14 @@ function mergeSyncedStorageMaps(remoteStorage = {}, localStorageSnapshot = {}){
 
     merged[key] = localVal;
   });
+  /* drop journals that were deleted on any device, whichever side still holds them */
+  if(typeof merged[JOURNAL_LIST_KEY] === 'string'){
+    const list = parseSyncValue(merged[JOURNAL_LIST_KEY]);
+    if(Array.isArray(list)){
+      const kept = list.filter(e => !(e && e.id != null && tombs[String(e.id)] && tombs[String(e.id)].d === 1));
+      if(kept.length !== list.length) merged[JOURNAL_LIST_KEY] = JSON.stringify(kept);
+    }
+  }
   return merged;
 }
 
