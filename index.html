@@ -2982,10 +2982,10 @@ window.jlLiveBalance=function(Z){
       <div class="meta" id="riskMeta">Based on $701.92 remaining target</div>
     </div>
     <div class="card glass">
-      <div class="card-head"><span class="l">TOMORROW'S RULE</span>
+      <div class="card-head"><span class="l">TODAY'S FOCUS</span>
         <svg viewBox="0 0 24 24"><path d="M4 4h16v16H4z"/><path d="M8 9h8M8 13h5"/></svg></div>
-      <div class="v" style="color:var(--faint);font-weight:500">No saved rule</div>
-      <div class="meta">Set one below after review</div>
+      <div class="v" id="focusVal" style="color:var(--faint);font-weight:500">No saved rule</div>
+      <div class="meta" id="focusMeta">Set one below after review</div>
     </div>
   </div>
 
@@ -3011,7 +3011,8 @@ window.jlLiveBalance=function(Z){
       </ul>
       <div class="rule-box">
         <div class="l">TOMORROW'S RULE</div>
-        <input type="text" placeholder="e.g. Only trade the London open">
+        <input type="text" id="ruleInput" maxlength="200" autocomplete="off" placeholder="e.g. Only trade the London open">
+        <div class="meta" id="ruleNote">Shows as Today's focus after the 06:00 IST reset</div>
       </div>
     </div>
     <div class="panel glass">
@@ -5234,6 +5235,61 @@ let lastRules=[0,0,0,0];
   updateRuleCountdown();
   setInterval(updateRuleCountdown, 1000);
 </script>
+<script id="jl-focus-rule">
+(function(){
+  var KEY='krishna_tomorrow_rule', KEEP=30;
+  var inp=document.getElementById('ruleInput'), note=document.getElementById('ruleNote'),
+      val=document.getElementById('focusVal'), meta=document.getElementById('focusMeta');
+  if(!inp||!val||!meta) return;
+  var HINT=note?note.textContent:'';
+  var curDay='', timer=null;
+  function dayKey(){ return typeof window.getTradingDayIST==='function' ? window.getTradingDayIST() : ''; }
+  function read(){
+    try{ var m=JSON.parse(localStorage.getItem(KEY)||'null'); return (m&&typeof m==='object'&&!Array.isArray(m))?m:{}; }
+    catch(e){ return {}; }
+  }
+  function fmt(d){
+    var p=d.split('-');
+    return new Date(Date.UTC(+p[0],+p[1]-1,+p[2])).toLocaleDateString('en-US',{month:'short',day:'numeric',timeZone:'UTC'});
+  }
+  function paint(){
+    var t=dayKey(), m=read(), best='';
+    Object.keys(m).forEach(function(d){ if(d<t && typeof m[d]==='string' && m[d] && d>best) best=d; });
+    if(best){
+      val.textContent=m[best]; val.style.color=''; val.style.fontWeight='';
+      meta.textContent='Saved '+fmt(best);
+    }else{
+      val.textContent='No saved rule'; val.style.color='var(--faint)'; val.style.fontWeight='500';
+      meta.textContent='Set one below after review';
+    }
+  }
+  function loadInput(){
+    var t=dayKey(), m=read();
+    inp.value=(typeof m[t]==='string')?m[t]:'';
+  }
+  function save(){
+    var t=dayKey(); if(!t) return;
+    var m=read(), text=inp.value.trim();
+    if(text) m[t]=text; else delete m[t];
+    Object.keys(m).sort().slice(0,-KEEP).forEach(function(d){ delete m[d]; });
+    try{ localStorage.setItem(KEY, JSON.stringify(m)); }catch(e){ return; }
+    if(note) note.textContent=text?'Saved. Shows as Today\u2019s focus after the 06:00 IST reset':HINT;
+    paint();
+  }
+  inp.addEventListener('input',function(){ clearTimeout(timer); timer=setTimeout(save,500); });
+  inp.addEventListener('blur',function(){ clearTimeout(timer); save(); });
+  inp.addEventListener('keydown',function(e){ if(e.key==='Enter'){ clearTimeout(timer); save(); inp.blur(); } });
+  function tick(){
+    var t=dayKey();
+    if(t!==curDay){ curDay=t; loadInput(); if(note) note.textContent=HINT; }
+    else if(document.activeElement!==inp){ var m=read(); var v=(typeof m[t]==='string')?m[t]:''; if(inp.value!==v) inp.value=v; }
+    paint();
+  }
+  document.addEventListener('visibilitychange',function(){ if(!document.hidden) tick(); });
+  window.addEventListener('storage',function(e){ if(e.key===KEY) tick(); });
+  tick(); setInterval(tick,30000);
+})();
+</script>
 <script>
 (function(){
 const $=id=>document.getElementById(id);
@@ -6887,8 +6943,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'){if(mpOpen)closeMont
       </div>
       <div class="sub" style="margin:4px 0 6px">A mandatory pause before the next decision.</div>
       ${DEBRIEF_ITEMS.map(r=>`<div class="psy-info"><span class="ic">${rowIcon(r.k)}</span><div><b>${esc(r.t)}</b><span>${esc(r.d)}</span></div></div>`).join("")}
-      <textarea class="j-ta" id="debrief-input" placeholder="Rule violated / tomorrow reminder..." data-act="debrief-input" style="margin-top:14px">${state.debriefNote||""}</textarea>
-      <button class="btn-primary psy-full" style="margin-top:12px" data-act="complete-debrief">Complete Live Trade</button>
+      <button class="btn-primary psy-full" style="margin-top:14px" data-act="complete-debrief">Complete Live Trade</button>
       <div class="psy-actions">
         <button class="btn-ghost" data-act="goto" data-n="4">Back</button>
         <a href="https://kavyabaghel.github.io/Trading-Journal" target="_blank" style="flex:1;min-width:120px;text-decoration:none;display:block"><button class="btn-ghost" type="button" style="width:100%">Open Journal</button></a>
