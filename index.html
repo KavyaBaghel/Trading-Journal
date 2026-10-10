@@ -3012,7 +3012,7 @@ window.jlLiveBalance=function(Z){
       <div class="rule-box">
         <div class="l">TOMORROW'S RULE</div>
         <input type="text" id="ruleInput" maxlength="200" autocomplete="off" placeholder="e.g. Only trade the London open">
-        <div class="meta" id="ruleNote">Shows as Today's focus after the 06:00 IST reset</div>
+        <button type="button" class="btn-primary j-sm" id="ruleSave" style="margin-top:10px">Save rule</button>
       </div>
     </div>
     <div class="panel glass">
@@ -5238,56 +5238,60 @@ let lastRules=[0,0,0,0];
 <script id="jl-focus-rule">
 (function(){
   var KEY='krishna_tomorrow_rule', KEEP=30;
-  var inp=document.getElementById('ruleInput'), note=document.getElementById('ruleNote'),
+  var inp=document.getElementById('ruleInput'), btn=document.getElementById('ruleSave'),
       val=document.getElementById('focusVal'), meta=document.getElementById('focusMeta');
-  if(!inp||!val||!meta) return;
-  var HINT=note?note.textContent:'';
-  var curDay='', timer=null;
+  if(!inp||!btn||!val||!meta) return;
   function dayKey(){ return typeof window.getTradingDayIST==='function' ? window.getTradingDayIST() : ''; }
   function read(){
     try{ var m=JSON.parse(localStorage.getItem(KEY)||'null'); return (m&&typeof m==='object'&&!Array.isArray(m))?m:{}; }
     catch(e){ return {}; }
   }
-  function fmt(d){
-    var p=d.split('-');
-    return new Date(Date.UTC(+p[0],+p[1]-1,+p[2])).toLocaleDateString('en-US',{month:'short',day:'numeric',timeZone:'UTC'});
+  function pad(n){ return String(n).padStart(2,'0'); }
+  function parse(d){ var p=d.split('-'); return new Date(Date.UTC(+p[0],+p[1]-1,+p[2])); }
+  function iso(dt){ return dt.getUTCFullYear()+'-'+pad(dt.getUTCMonth()+1)+'-'+pad(dt.getUTCDate()); }
+  /* a rule saved on trading day d becomes active on the next weekday: Mon-Thu -> next day, Fri/Sat/Sun -> Monday */
+  function activeDay(d){
+    var dt=parse(d);
+    do{ dt.setUTCDate(dt.getUTCDate()+1); }while(dt.getUTCDay()===0||dt.getUTCDay()===6);
+    return iso(dt);
   }
+  function fmt(d){ return parse(d).toLocaleDateString('en-US',{month:'short',day:'numeric',timeZone:'UTC'}); }
   function paint(){
-    var t=dayKey(), m=read(), best='';
-    Object.keys(m).forEach(function(d){ if(d<t && typeof m[d]==='string' && m[d] && d>best) best=d; });
-    if(best){
-      val.textContent=m[best]; val.style.color=''; val.style.fontWeight='';
-      meta.textContent='Saved '+fmt(best);
+    var t=dayKey(); if(!t) return;
+    var m=read(), shown='', pend='';
+    Object.keys(m).forEach(function(d){
+      if(typeof m[d]!=='string'||!m[d]) return;
+      if(activeDay(d)<=t){ if(d>shown) shown=d; } else if(d>pend) pend=d;
+    });
+    if(shown){
+      val.textContent=m[shown]; val.style.color=''; val.style.fontWeight='';
+      meta.textContent='Saved '+fmt(shown);
     }else{
       val.textContent='No saved rule'; val.style.color='var(--faint)'; val.style.fontWeight='500';
       meta.textContent='Set one below after review';
     }
-  }
-  function loadInput(){
-    var t=dayKey(), m=read();
-    inp.value=(typeof m[t]==='string')?m[t]:'';
+    if(pend){
+      inp.value=m[pend]; inp.disabled=true; inp.style.opacity='.55'; inp.style.cursor='not-allowed';
+      btn.style.display='none';
+    }else{
+      if(inp.disabled) inp.value='';
+      inp.disabled=false; inp.style.opacity=''; inp.style.cursor='';
+      btn.style.display='';
+    }
   }
   function save(){
-    var t=dayKey(); if(!t) return;
-    var m=read(), text=inp.value.trim();
-    if(text) m[t]=text; else delete m[t];
+    var t=dayKey(), text=inp.value.trim();
+    if(!t||!text||inp.disabled) return;
+    var m=read(); m[t]=text;
     Object.keys(m).sort().slice(0,-KEEP).forEach(function(d){ delete m[d]; });
     try{ localStorage.setItem(KEY, JSON.stringify(m)); }catch(e){ return; }
-    if(note) note.textContent=text?'Saved. Shows as Today\u2019s focus after the 06:00 IST reset':HINT;
     paint();
   }
-  inp.addEventListener('input',function(){ clearTimeout(timer); timer=setTimeout(save,500); });
-  inp.addEventListener('blur',function(){ clearTimeout(timer); save(); });
-  inp.addEventListener('keydown',function(e){ if(e.key==='Enter'){ clearTimeout(timer); save(); inp.blur(); } });
-  function tick(){
-    var t=dayKey();
-    if(t!==curDay){ curDay=t; loadInput(); if(note) note.textContent=HINT; }
-    else if(document.activeElement!==inp){ var m=read(); var v=(typeof m[t]==='string')?m[t]:''; if(inp.value!==v) inp.value=v; }
-    paint();
-  }
-  document.addEventListener('visibilitychange',function(){ if(!document.hidden) tick(); });
-  window.addEventListener('storage',function(e){ if(e.key===KEY) tick(); });
-  tick(); setInterval(tick,30000);
+  btn.addEventListener('click',save);
+  inp.addEventListener('keydown',function(e){ if(e.key==='Enter'){ e.preventDefault(); save(); } });
+  document.addEventListener('visibilitychange',function(){ if(!document.hidden) paint(); });
+  window.addEventListener('storage',function(e){ if(e.key===KEY) paint(); });
+  paint(); setInterval(paint,30000);
 })();
 </script>
 <script>
