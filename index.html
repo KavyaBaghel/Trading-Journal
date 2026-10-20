@@ -1330,12 +1330,12 @@
   #view-calendar .cal-legend em{width:7px;height:7px;border-radius:50%;display:inline-block}
 
   /* ---- weekday header ---- */
-  #view-calendar .cal-days{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:9px}
+  #view-calendar .cal-days{display:grid;grid-template-columns:repeat(7,1fr);gap:10px;margin-bottom:9px}
   #view-calendar .cal-dh{font-size:10px;font-weight:700;letter-spacing:.08em;color:var(--faint);text-align:center;
     padding:6px 0;background:rgba(255,255,255,.02);border-radius:9px}
 
   /* ---- month grid: real calendar cells ---- */
-  #view-calendar .cal-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:26px}
+  #view-calendar .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:10px;margin-bottom:26px}
   .ldg-row{position:relative;display:flex;flex-direction:column;gap:7px;min-height:128px;border-radius:14px;
     padding:12px 13px 11px;background:linear-gradient(160deg,rgba(255,255,255,.03),rgba(255,255,255,0) 55%),rgba(255,255,255,.015);
     border:1px solid var(--border);overflow:hidden;
@@ -1372,7 +1372,15 @@
   .ldg-badge.best{color:var(--silver);background:rgba(199,203,214,.13);border:1px solid rgba(199,203,214,.28)}
   .ldg-badge.worst{color:var(--red);background:rgba(240,104,92,.13);border:1px solid rgba(240,104,92,.25)}
 
-  /* week subtotal — spans the full 5-column grid */
+  /* weekend cells — fixed "Weekly review" slot on Sat/Sun, shows that week's net result */
+  .ldg-row.ldg-wk{border-style:dashed;background:linear-gradient(160deg,rgba(124,108,240,.07),rgba(255,255,255,0) 60%),rgba(255,255,255,.012)}
+  .ldg-row.ldg-wk.pos::before{background:var(--green);box-shadow:0 0 10px -1px rgba(67,215,135,.7)}
+  .ldg-row.ldg-wk.neg::before{background:var(--red);box-shadow:0 0 10px -1px rgba(240,104,92,.7)}
+  .ldg-row.ldg-wk:focus-visible{outline:2px solid var(--accent-2);outline-offset:2px}
+  .ldg-wk-lbl{order:1;font-family:"IBM Plex Mono",monospace;font-size:10px;font-weight:700;letter-spacing:.04em;color:var(--accent-2)}
+  .ldg-wk.upcoming .ldg-pnl{color:var(--faint);font-size:12px;font-weight:600}
+
+  /* week subtotal — spans the full 7-column grid */
   .ldg-sub{grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;gap:14px;
     padding:9px 16px;font-family:"IBM Plex Mono",monospace;font-size:10.5px;color:var(--faint);
     background:rgba(255,255,255,.025);border:1px dashed var(--border);border-radius:10px}
@@ -1472,7 +1480,7 @@
     background:var(--panel-2);border:1px dashed var(--border);border-radius:14px}
 
   @media(max-width:900px){
-    #view-calendar .cal-days,#view-calendar .cal-grid{grid-template-columns:repeat(5,minmax(78px,1fr))}
+    #view-calendar .cal-days,#view-calendar .cal-grid{grid-template-columns:repeat(7,minmax(64px,1fr))}
   }
   @media(max-width:680px){
     #view-calendar .cal-days,#view-calendar .cal-grid{grid-template-columns:repeat(2,1fr)}
@@ -3229,7 +3237,7 @@ window.__mountOpenPos=function(){const o=(window.__openTrades||[]).concat((windo
 <div class="cal-eq-chart" id="cEqChart"></div>
 </section>
 <div class="cal-legend"><span><em style="background:var(--green)"></em>Profit day</span><span><em style="background:var(--red)"></em>Loss day</span><span><em style="background:var(--faint)"></em>Break-even / no result</span><span><em style="background:var(--amber);border-radius:5px"></em>Over the 8-trade limit</span></div>
-<div class="cal-days"><div class="cal-dh">MON</div><div class="cal-dh">TUE</div><div class="cal-dh">WED</div><div class="cal-dh">THU</div><div class="cal-dh">FRI</div></div>
+<div class="cal-days"><div class="cal-dh">MON</div><div class="cal-dh">TUE</div><div class="cal-dh">WED</div><div class="cal-dh">THU</div><div class="cal-dh">FRI</div><div class="cal-dh cal-dh-wk">SAT</div><div class="cal-dh cal-dh-wk">SUN</div></div>
 <div class="cal-grid" id="cGrid"></div>
 <section class="a-s cal-flat">
 <div class="a-s-head"><div class="a-s-ttl"><span class="a-s-ic"><svg viewBox="0 0 24 24"><path d="M4 19V9M12 19V5M20 19v-7"/></svg></span><h3>Day-of-week performance</h3></div></div>
@@ -5982,7 +5990,23 @@ function renderGrid(){
   }).join('');
 
   const DOWS=['MON','TUE','WED','THU','FRI'];
+  const lastDom=new Date(vy,vm+1,0).getDate(), todayMid=new Date(today.getFullYear(),today.getMonth(),today.getDate());
   $('cGrid').innerHTML=rows.map((r,wi)=>{
+    const ds=r.filter(d=>d!=null), wt=ds.reduce((s,d)=>s+(dm[d]?dm[d].t:0),0), wp=ds.reduce((s,d)=>s+(dm[d]?dm[d].pnl:0),0);
+    const monD=ds.length?ds[0]-r.indexOf(ds[0]):null; // date-of-month of this week's Monday (may be <1 on the first row)
+    const wkCell=(off)=>{ // off: 5 = Saturday, 6 = Sunday
+      if(monD==null)return '<div class="ldg-pad"></div>';
+      const d=monD+off; if(d<1||d>lastDom)return '<div class="ldg-pad"></div>';
+      const over=new Date(vy,vm,monD+5)<=todayMid, isToday=isTodayMonth&&d===today.getDate();
+      const cls=over&&wt?(wp>0?' pos':wp<0?' neg':''):'';
+      const col=wp>0?'var(--green)':wp<0?'var(--red)':'var(--faint)';
+      const res=!over?'Upcoming':wt?money(wp):'No trades';
+      return '<div class="ldg-row ldg-wk'+(isToday?' today':'')+cls+(over?'':' upcoming')+'" data-wk="'+wi+'" role="button" tabindex="0" aria-label="Weekly review, week '+(wi+1)+'">'+
+        '<div class="ldg-d"><b>'+d+'</b><small>'+(off===5?'SAT':'SUN')+'</small></div>'+
+        '<div class="ldg-wk-lbl">Weekly review</div>'+
+        '<div class="ldg-pnl"'+(over&&wt?' style="color:'+col+'"':'')+'>'+res+'</div>'+
+        '<div class="ldg-meta">'+(over?(wt?'Week '+(wi+1)+' &middot; '+jlN(wt,'trade'):'Week '+(wi+1)):'Week '+(wi+1)+' result after Fri')+'</div></div>';
+    };
     const dayRows=r.map((d,i)=>{
       if(d==null)return '<div class="ldg-pad"></div>';
       const v=dm[d], isToday=isTodayMonth&&d===today.getDate();
@@ -5995,8 +6019,7 @@ function renderGrid(){
       return '<div class="ldg-row'+(isToday?' today':'')+pnlCls+'" data-d="'+d+'"><div class="ldg-d"><b>'+d+'</b><small>'+DOWS[i]+'</small></div>'+bar+
         '<div class="ldg-meta">'+v.t+' tr &middot; '+v.w+'W/'+v.l+'L/'+v.be+'BE'+flags+'</div>'+
         '<div class="ldg-pnl" style="color:'+(v.pnl>0?'var(--green)':v.pnl<0?'var(--red)':'var(--faint)')+'">'+money(v.pnl)+'</div></div>';
-    }).join('');
-    const ds=r.filter(d=>d!=null), wt=ds.reduce((s,d)=>s+(dm[d]?dm[d].t:0),0), wp=ds.reduce((s,d)=>s+(dm[d]?dm[d].pnl:0),0);
+    }).join('')+wkCell(5)+wkCell(6);
     const sub=ds.length?'<div class="ldg-sub" data-week="'+wi+'"><div>WEEK '+(wi+1)+'</div><i>subtotal</i><b>'+jlN(wt,'trade')+'</b><span class="m-pnl" style="color:'+(wp>0?'var(--green)':wp<0?'var(--red)':'var(--faint)')+'">'+(wt?money(wp):'—')+'</span></div>':'';
     return dayRows+sub;
   }).join('');
@@ -6132,6 +6155,9 @@ function openDayPanel(d){
 }
 function closeDayPanel(){document.body.classList.remove('dp-open');$('dayPanel').setAttribute('aria-hidden','true');dpOpen=false}
 $('cGrid').addEventListener('click',e=>{const row=e.target.closest('.ldg-row[data-d]');if(!row)return;openDayPanel(+row.dataset.d)});
+function jumpToWeek(el){const sub=document.querySelector('#cGrid .ldg-sub[data-week="'+el.dataset.wk+'"]');if(!sub)return;sub.scrollIntoView({behavior:'smooth',block:'center'});sub.classList.add('flash');setTimeout(()=>sub.classList.remove('flash'),1400)}
+$('cGrid').addEventListener('click',e=>{const wk=e.target.closest('.ldg-wk[data-wk]');if(wk)jumpToWeek(wk)});
+$('cGrid').addEventListener('keydown',e=>{if(e.key!=='Enter'&&e.key!==' ')return;const wk=e.target.closest('.ldg-wk[data-wk]');if(wk){e.preventDefault();jumpToWeek(wk)}});
 $('dpClose').addEventListener('click',closeDayPanel);
 $('dayPanelScrim').addEventListener('click',closeDayPanel);
 $('dpList').addEventListener('click',e=>{
