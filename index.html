@@ -1401,6 +1401,17 @@
   .ldg-wk.upcoming .ldg-pnl{color:var(--sub);font-size:13px;font-weight:600;text-shadow:none}
   @keyframes jlWkBar{from{transform:scaleY(0)}to{transform:scaleY(1)}}
   @media(prefers-reduced-motion:no-preference){.ldg-wk-spark i:not(.e){animation:jlWkBar .7s cubic-bezier(.16,1,.3,1) both}}
+  .ldg-row.ldg-wk{overflow:hidden;transition:border-color .25s cubic-bezier(.22,.61,.36,1),box-shadow .35s cubic-bezier(.22,.61,.36,1)}
+  .ldg-row.ldg-wk::after{content:"";position:absolute;inset:0;pointer-events:none;border-radius:inherit;background:linear-gradient(115deg,transparent 38%,rgba(255,255,255,.08) 50%,transparent 62%);transform:translateX(-130%);transition:transform .9s cubic-bezier(.16,1,.3,1)}
+  .ldg-row.ldg-wk:hover::after{transform:translateX(130%)}
+  .ldg-wk-spark{padding-bottom:3px;border-bottom:1px solid rgba(255,255,255,.08)}
+  .ldg-wk-spark i{transition:filter .25s cubic-bezier(.22,.61,.36,1),opacity .25s}
+  .ldg-row.ldg-wk:hover .ldg-wk-spark i:not(.e){filter:brightness(1.25) drop-shadow(0 0 5px currentColor);opacity:1}
+  .ldg-wk-days{order:2;display:flex;gap:4px;margin-top:-4px;font-family:"IBM Plex Mono",monospace;font-size:8px;font-weight:600;letter-spacing:.04em;color:var(--faint)}
+  .ldg-wk-days span{flex:1;text-align:center}
+  .ldg-wk-days span:nth-child(n+6){opacity:.5}
+  .ldg-wk .ldg-pnl{font-variant-numeric:tabular-nums}
+  .ldg-wk .ldg-meta{font-size:10px;color:var(--sub)}
 
   /* week subtotal — spans the full 7-column grid */
   .ldg-sub{grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;gap:14px;
@@ -6088,12 +6099,15 @@ function renderGrid(){
       const cls=over&&wt?(wp>0?' pos':wp<0?' neg':''):'';
       const col=wp>0?'var(--green)':wp<0?'var(--red)':'var(--faint)';
       const res=!over?'Upcoming':wt?money(wp):'No trades';
-      const meta=over?(wt?jlN(wt,'trade'):''):'Result after Fri';
+      const gd=r.filter(dn=>dn!=null&&dm[dn]&&dm[dn].pnl>0).length, ad=r.filter(dn=>dn!=null&&dm[dn]).length;
+      const meta=over?(wt?jlN(wt,'trade')+' &middot; '+gd+'/'+ad+' green':''):'Result after Fri';
       const vals=r.map(dn=>(dn!=null&&dm[dn])?dm[dn].pnl:null), mx=Math.max(1e-9,...vals.filter(v=>v!=null).map(v=>Math.abs(v)));
-      const spark='<div class="ldg-wk-spark" aria-hidden="true">'+vals.map((v,k)=>v==null?'<i class="e"></i>':'<i style="height:'+Math.max(14,Math.abs(v)/mx*100)+'%;color:'+(v>0?'var(--green)':v<0?'var(--red)':'var(--faint)')+';animation-delay:'+(k*60)+'ms"></i>').join('')+'</div>';
+      const NM=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+      const spark='<div class="ldg-wk-spark" aria-hidden="true">'+vals.map((v,k)=>v==null?'<i class="e"></i>':'<i title="'+NM[k]+' '+money(v)+'" style="height:'+Math.max(14,Math.abs(v)/mx*100)+'%;color:'+(v>0?'var(--green)':v<0?'var(--red)':'var(--faint)')+';animation-delay:'+(k*60)+'ms"></i>').join('')+'</div>';
+      const daysRow='<div class="ldg-wk-days" aria-hidden="true">'+['M','T','W','T','F','S','S'].map(x=>'<span>'+x+'</span>').join('')+'</div>';
       return '<div class="ldg-row ldg-wk'+(isToday?' today':'')+cls+(over?'':' upcoming')+'" data-wk="'+wi+'" role="button" tabindex="0" aria-label="Weekly review, week '+(wi+1)+'">'+
         '<div class="ldg-d"><b>'+d+'</b><small>'+(off===5?'SAT':'SUN')+'</small><span class="ldg-wk-pill">W'+(wi+1)+'</span></div>'+
-        spark+
+        spark+daysRow+
         '<div class="ldg-pnl"'+(over&&wt?' style="color:'+col+'"':'')+'>'+res+'</div>'+
         (meta?'<div class="ldg-meta">'+meta+'</div>':'')+'</div>';
     };
