@@ -3234,6 +3234,9 @@ window.jlLiveBalance=function(Z){
  <section class="a-s"><div class="a-s-head"><div class="a-s-ttl"><span class="a-s-ic"><svg viewBox="0 0 24 24"><path d="M7 4 3 8l4 4M3 8h14M17 12l4 4-4 4M21 16H7"/></svg></span><h3>Back-to-back re-entries</h3></div></div><div class="sub" style="margin-left:38px">Revenge clusters</div><div class="a-plot" id="cRE"></div>
   <div class="a-read">Each bar is a trade taken right after another. Tight red runs are revenge clusters.</div></section>
 </div>
+<div class="a-h"><div class="a-h-t"><span class="a-h-ic"><svg viewBox="0 0 24 24"><path d="M7 4 3 8l4 4M3 8h14M17 12l4 4-4 4M21 16H7"/></svg></span><h2>Revenge trades</h2></div><p id="aRevSub">Trades opened soon after a loss, compared with the rest.</p></div>
+<div class="a-kp" id="aRev"></div>
+<div class="a-read" id="aRevR"></div>
 
 <div class="a-h"><div class="a-h-t"><span class="a-h-ic"><svg viewBox="0 0 24 24"><path d="M4 4h16v16H4z"/><path d="M8 9h8M8 13h5"/></svg></span><h2>Setups</h2></div><p>Performance by setup, from your saved journals.</p></div>
 <section class="a-s"><div style="overflow-x:auto"><table><thead><tr><th>SETUP</th><th>TRADES</th><th>WIN RATE</th><th>NET P&amp;L</th><th>AVG</th><th>BEST</th><th>WORST</th><th>RESULT MIX</th></tr></thead>
@@ -5056,6 +5059,39 @@ const $ = id => document.getElementById(id);
     $('cRE').innerHTML=s+'</svg>';
     scrub($('cRE').querySelector('svg'),W,pl,pr,N,(i,e)=>{if(i>=0)showTip(e,'<div class="th">Re-entry #'+(i+1)+'</div><div class="tr"><span>P&amp;L</span><b style="color:'+(ST[i]<0?'var(--red)':'var(--green)')+'">'+money(ST[i])+'</b></div>')});
   })();
+
+  // revenge trades card: reads the existing t.rev flag (jlRecomputeRevenge), no new rule
+  /*RV-PURE-START*/
+  function revStats(T){
+    const rev=[],rest=[];
+    (T||[]).forEach(t=>{(t&&t.rev?rev:rest).push(t)});
+    const sum=a=>a.reduce((x,t)=>x+(Number(t.pnl)||0),0);
+    const lots=a=>a.map(t=>Number(t.lot)).filter(v=>isFinite(v)&&v>0);
+    const avg=a=>{const l=lots(a);return l.length?l.reduce((x,v)=>x+v,0)/l.length:null};
+    return {n:rev.length,total:rev.length+rest.length,net:sum(rev),lotRev:avg(rev),lotRest:avg(rest)};
+  }
+  /*RV-PURE-END*/
+  (function(){
+    const kp=$('aRev');if(!kp)return;
+    const st=revStats(window.__trades||[]),win=Number(window.jlRevWindowMin)||15;
+    const sub=$('aRevSub');if(sub)sub.textContent='Trades opened within '+win+' minutes of a loss, compared with the rest.';
+    const lotTxt=v=>v==null?'-':v.toFixed(2);
+    kp.innerHTML=[
+      ['Revenge trades',String(st.n),'var(--text)',st.total?(st.total?(st.n/st.total*100).toFixed(1):'0.0')+'% of '+jlN(st.total,'trade'):'No trades yet'],
+      ['Revenge net P&L',st.n?money(st.net):'-',st.n?(st.net<0?'var(--red)':st.net>0?'var(--green)':'var(--text)'):'var(--text)','Total across revenge trades'],
+      ['Avg lot, revenge',lotTxt(st.lotRev),'var(--text)','Revenge trades only'],
+      ['Avg lot, other trades',lotTxt(st.lotRest),'var(--text)','All non-revenge trades']
+    ].map(k=>'<div><span>'+k[0]+'</span><b style="color:'+k[2]+'">'+k[1]+'</b><small>'+k[3]+'</small></div>').join('');
+    const r=$('aRevR');
+    if(r){
+      if(!st.n)r.textContent='No revenge trades flagged in this dataset.';
+      else if(st.lotRev!=null&&st.lotRest!=null){
+        const d=st.lotRev-st.lotRest;
+        r.textContent=Math.abs(d)<.005?'Revenge trades used about the same lot size as your other trades.':d>0?'Revenge trades used a larger lot than your other trades on average.':'Revenge trades used a smaller lot than your other trades on average.';
+      } else r.textContent='';
+    }
+  })();
+
 
   // heatmap: + = net-profit hour, - = net-loss hour, value = trade count (hours 0-17)
   (function(){const HM=window.__A.hm;
