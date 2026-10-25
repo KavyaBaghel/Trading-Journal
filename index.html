@@ -8845,7 +8845,11 @@ window.__renderJourney=function(){const Z=window.__A||A,start=Z.start,tgt=Math.r
   dot.style.left=pos+'%';if(now)now.style.left=Math.max(10,Math.min(90,pos))+'%';
   dot.classList.toggle('neg',net<0);dot.classList.toggle('pos',net>0);
   if(window.__jlJourneyPlayed){const bv=$('ggBalVal');if(bv)bv.textContent=m(b)}};
-window.__renderDDRing=function(){if(window.__renderJourney)window.__renderJourney();if(window.__renderAnScale)window.__renderAnScale();if(window.__renderAnRadar)window.__renderAnRadar();const md=getMdd();set('ggDDv',md>0?m(Math.max(0,md-A.dd)):'Not set');set('ggDDm',md>0?m(A.dd)+' of '+m(md)+' used':'No max drawdown set');window.ggRingTone(document.getElementById('ggGaugeDD'),md>0?A.dd/md:0)};window.__renderDDRing();
+window.__renderDDRing=function(){if(window.__renderJourney)window.__renderJourney();if(window.__renderAnScale)window.__renderAnScale();if(window.__renderAnRadar)window.__renderAnRadar();const md=getMdd(),Z=window.__A||A,st=Z.start||0,gg=document.getElementById('ggGaugeDD');
+  /* Static drawdown: floor = starting balance minus the limit. Buffer = how far the balance is above that floor right now. */
+  if(!(md>0)){set('ggDDv','Not set');set('ggDDm','No max drawdown set');window.ggRingTone(gg,0)}
+  else if(!(st>0)){set('ggDDv','Not set');set('ggDDm','Set your starting balance');window.ggRingTone(gg,0)}
+  else{const bl=window.jlLiveBalance?window.jlLiveBalance(Z):st+(Z.net||0),fl=st-md,used=Math.max(0,Math.min(md,st-bl));set('ggDDv',m(Math.max(0,bl-fl)));set('ggDDm',m(used)+' of '+m(md)+' used, floor '+m(fl));window.ggRingTone(gg,used/md)}};window.__renderDDRing();
 const h=A.negHold&&A.negHold[0];set('aicRuleNote',h?'Sub-1-minute holds cost $'+h[1].toFixed(2)+' in this data.':'Hold time is not tracked yet, so timing leaks are not measured.');})();</script>
 <script>(function(){
 /* Analytics > Daily drawdown card: limit from the saved setup, used = net loss of the current
