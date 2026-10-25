@@ -3240,6 +3240,9 @@ window.jlLiveBalance=function(Z){
 <div class="a-h"><div class="a-h-t"><span class="a-h-ic"><svg viewBox="0 0 24 24"><path d="M3 12h4l3-8 4 16 3-8h4"/></svg></span><h2>Overtrading</h2></div><p id="aOvSub">Days that reached your daily trade limit, compared with the rest.</p></div>
 <div class="a-kp" id="aOv"></div>
 <div class="a-read" id="aOvR"></div>
+<div class="a-h"><div class="a-h-t"><span class="a-h-ic"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span><h2>Weak times</h2></div><p>Weekdays and hours with a net loss and at least 3 trades.</p></div>
+<section class="a-s"><div style="overflow-x:auto"><table><thead><tr><th>WHEN</th><th>TYPE</th><th>TRADES</th><th>NET P&amp;L</th><th>AVG</th></tr></thead>
+<tbody id="aWt"></tbody></table></div></section>
 
 <div class="a-h"><div class="a-h-t"><span class="a-h-ic"><svg viewBox="0 0 24 24"><path d="M4 4h16v16H4z"/><path d="M8 9h8M8 13h5"/></svg></span><h2>Setups</h2></div><p>Performance by setup, from your saved journals.</p></div>
 <section class="a-s"><div style="overflow-x:auto"><table><thead><tr><th>SETUP</th><th>TRADES</th><th>WIN RATE</th><th>NET P&amp;L</th><th>AVG</th><th>BEST</th><th>WORST</th><th>RESULT MIX</th></tr></thead>
@@ -5143,6 +5146,41 @@ const $ = id => document.getElementById(id);
     }
   }
   renderOver();setTimeout(renderOver,2000);setTimeout(renderOver,6000);
+
+  // weak times card: weekdays and hours with a net loss and at least 3 trades (a trade = one position)
+  /*WT-PURE-START*/
+  function weakTimes(T,minTrades){
+    minTrades=Number(minTrades)||3;
+    var DN=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'],pos={},order=[];
+    (T||[]).forEach(function(t){
+      if(!t||!t.d||t.t==null)return;
+      var h=parseInt(String(t.t).slice(0,2),10),dt=new Date(t.d+'T00:00:00Z');
+      if(!isFinite(h)||isNaN(dt.getTime()))return;
+      var k=t.d+'|'+t.t+'|'+t.sym+'|'+t.side,p=pos[k];
+      if(!p){p=pos[k]={h:h,dow:DN[dt.getUTCDay()],net:0};order.push(k)}
+      p.net+=Number(t.pnl)||0;
+    });
+    var byD={},byH={};
+    order.forEach(function(k){
+      var p=pos[k],a=byD[p.dow]||(byD[p.dow]={k:p.dow,n:0,net:0}),b=byH[p.h]||(byH[p.h]={k:p.h,n:0,net:0});
+      a.n++;a.net+=p.net;b.n++;b.net+=p.net;
+    });
+    var flag=function(o){return Object.keys(o).map(function(x){return o[x]}).filter(function(x){return x.n>=minTrades&&x.net<-0.005}).sort(function(a,b){return a.net-b.net})};
+    return {total:order.length,days:flag(byD),hours:flag(byH)};
+  }
+  /*WT-PURE-END*/
+  window.jlWeakTimes=weakTimes;
+  function renderWeak(){
+    const body=$('aWt');if(!body)return;
+    const st=weakTimes(window.__trades||[],3);
+    const rows=st.days.map(x=>[x.k,'Weekday',x]).concat(st.hours.map(x=>[String(x.k).padStart(2,'0')+':00','Hour',x]));
+    if(!rows.length){
+      body.innerHTML='<tr><td colspan="5" style="color:var(--faint);padding:18px 12px">'+(st.total?'No weekday or hour has a net loss with at least 3 trades.':'No trades yet.')+'</td></tr>';
+      return;
+    }
+    body.innerHTML=rows.map(r=>{const x=r[2];return '<tr><td style="font-weight:600">'+r[0]+'</td><td>'+r[1]+'</td><td class="mono">'+x.n+'</td><td class="mono" style="color:var(--red)">'+money(x.net)+'</td><td class="mono" style="color:var(--red)">'+money(x.net/x.n)+'</td></tr>'}).join('');
+  }
+  renderWeak();setTimeout(renderWeak,2000);setTimeout(renderWeak,6000);
 
 
   // heatmap: + = net-profit hour, - = net-loss hour, value = trade count (hours 0-17)
