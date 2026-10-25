@@ -6092,7 +6092,7 @@ function renderGrid(){
       return '<div class="ldg-row'+(isToday?' today':'')+pnlCls+'" data-d="'+d+'"><div class="ldg-d"><b>'+d+'</b><small>'+DOWS[i]+'</small></div>'+bar+
         '<div class="ldg-meta">'+v.t+' tr &middot; '+v.w+'W/'+v.l+'L/'+v.be+'BE'+flags+'</div>'+
         '<div class="ldg-pnl" style="color:'+(v.pnl>0?'var(--green)':v.pnl<0?'var(--red)':'var(--faint)')+'">'+money(v.pnl)+'</div></div>';
-    }).join('')+'<div class="ldg-pad"></div><div class="ldg-pad"></div>'; /* Saturday and Sunday stay empty (no Weekly review cell) */
+    }).join('')+wkCell(5)+wkCell(6); /* Weekly review cell on both Saturday and Sunday */
     const sub=ds.length?'<div class="ldg-sub" data-week="'+wi+'"><div>WEEK '+(wi+1)+'</div><i>subtotal</i><b>'+jlN(wt,'trade')+'</b><span class="m-pnl" style="color:'+(wp>0?'var(--green)':wp<0?'var(--red)':'var(--faint)')+'">'+(wt?money(wp):'—')+'</span></div>':'';
     return dayRows+sub;
   }).join('');
