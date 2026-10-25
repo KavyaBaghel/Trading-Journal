@@ -2868,9 +2868,14 @@ window.jlLiveBalance=function(Z){
 /* Step 4: Market data comes from the Worker /market route. The Finnhub key lives only in the Worker (FINNHUB_KEY secret). */
 (function(){
   window.jlMarketFetch=async function(o){
-    var ep=String(window.journallAiProxyUrl||'').trim();
+    /* On page load this can run before the Firebase module has set the backend URL / finished sign-in, so wait up to 12 s instead of failing at once. */
+    var sleep=function(ms){return new Promise(function(r){setTimeout(r,ms)})},t0=Date.now(),ep='',tok=null;
+    while(Date.now()-t0<12000){
+      ep=String(window.journallAiProxyUrl||'').trim();
+      if(ep&&window.journallGetFirebaseIdToken){ try{tok=await window.journallGetFirebaseIdToken()}catch(e){tok=null} if(tok)break; }
+      await sleep(300);
+    }
     if(!ep||ep.indexOf('YOUR_WORKERS_SUBDOMAIN')>=0)throw new Error('Market backend is not configured.');
-    var tok=window.journallGetFirebaseIdToken?await window.journallGetFirebaseIdToken():null;
     if(!tok)throw new Error('Sign in again to load market data.');
     var ac=new AbortController(),to=setTimeout(function(){ac.abort()},15000),r;
     try{r=await fetch(ep.replace(/\/+$/,'')+'/market',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+tok},body:JSON.stringify({from:o.from,to:o.to}),signal:ac.signal})}
@@ -2964,7 +2969,7 @@ window.jlLiveBalance=function(Z){
         <circle class="ring-val" id="ringLoss" cx="44" cy="44" r="38" stroke="var(--green)" style="--off:239"/>
       </svg>
       <div>
-        <div class="ring-label">DAILY LOSS USED</div>
+        <div class="ring-label">WEEK LOSS USED</div>
         <div class="ring-num" id="lossNum">$0 / $20</div>
         <div class="ring-sub" id="lossSub">Full room left</div>
         <div class="ring-detail" id="lossDetail"></div>
@@ -2976,7 +2981,7 @@ window.jlLiveBalance=function(Z){
         <circle class="ring-val" id="ringTrades" cx="44" cy="44" r="38" stroke="var(--accent-2)" style="--off:239"/>
       </svg>
       <div>
-        <div class="ring-label">TRADES TAKEN</div>
+        <div class="ring-label">WEEK TRADES</div>
         <div class="ring-num" id="tradesNum">0 / 8</div>
         <div class="ring-sub" id="tradesSub">0 rule breaks</div>
         <div class="ring-detail" id="tradesDetail"></div>
@@ -4744,27 +4749,52 @@ document.addEventListener('input',e=>{if(cur&&RUN[cur.dataset.tool]&&cur.contain
     return {net, wins, losses, worked, toFix, rule};
   }
 
-  // ---------- weekly P&L card (Mon-Sun, same 06:00 IST trading-day rule as the rest of the app) ----------
+  // ---------- weekly cards (Mon-Sun, 06:00 IST trading day). Limits = daily limit x active days (Mon-Fri = 5). ----------
   function updateWeekCard(todayKey){
-    const numEl = document.getElementById('pnlNum'); if(!numEl) return;
+    if(!document.getElementById('pnlNum')) return;
+    const ACTIVE_DAYS = 5;
     const p = todayKey.split('-').map(Number), dt = new Date(Date.UTC(p[0],p[1]-1,p[2])), dow = (dt.getUTCDay()+6)%7;
     const iso = ms => new Date(ms).toISOString().slice(0,10);
     const ws = iso(dt.getTime()-dow*864e5), we = iso(dt.getTime()+(6-dow)*864e5);
     const rows = (window.__trades||[]).filter(t=>t && t.d && t.d>=ws && t.d<=we && isFinite(Number(t.pnl)));
+    const kind = v => window.jlKind(Number(v));
+    const money = v => (v<0?'-$':'$')+Math.abs(v).toFixed(2);
+    const set = (id,v) => { const el=document.getElementById(id); if(el) el.textContent=v; };
+    const dayTgt = Number(window.jlDayProfitTargetUSD)||0, dayLoss = Number(window.jlDailyLossLimit)||0, dayTrades = Number(window.jlMaxTradesPerDay)||0;
+    const wkTgt = Number(window.jlWeeklyProfitTargetUSD) || dayTgt*ACTIVE_DAYS;
+    const wkLoss = Number(window.jlWeeklyLossLimit) || dayLoss*ACTIVE_DAYS;
+    const wkTrades = dayTrades*ACTIVE_DAYS;
+    const byDay = {}, seen = {};
+    rows.forEach(t=>{ const d = byDay[t.d]||(byDay[t.d]={loss:0,keys:{}}); const v=Number(t.pnl); if(v<0) d.loss-=v; d.keys[t.d+'|'+t.t+'|'+t.sym+'|'+t.side]=1; seen[t.d+'|'+t.t+'|'+t.sym+'|'+t.side]=1; });
+    const activeDays = Object.keys(byDay).length;
     const net = rows.reduce((s,t)=>s+Number(t.pnl),0);
-    const W = rows.filter(t=>window.jlKind(Number(t.pnl))==='win').length, L = rows.filter(t=>window.jlKind(Number(t.pnl))==='loss').length;
-    const days = new Set(rows.map(t=>t.d)).size;
-    const tgt = Number(window.jlWeeklyProfitTargetUSD)||0, lim = Number(window.jlWeeklyLossLimit)||0;
-    const pct = tgt>0 ? Math.min(100, Math.max(0, Math.round(net/tgt*100))) : 0;
-    numEl.textContent = (net<0?'-$':'$')+Math.abs(net).toFixed(2);
-    numEl.style.color = net<0 ? 'var(--red)' : '';
-    document.getElementById('pnlSub').textContent = tgt>0 ? pct+'% of $'+tgt.toFixed(0)+' weekly target' : 'Weekly target not set';
-    const ring = document.getElementById('ringPnl');
-    ring.style.setProperty('--off', 239-239*(pct/100));
-    ring.style.stroke = net<0 ? 'var(--red)' : 'var(--green)';
+    const W = rows.filter(t=>kind(t.pnl)==='win').length, L = rows.filter(t=>kind(t.pnl)==='loss').length;
+    const lossUsed = rows.reduce((s,t)=>Number(t.pnl)<0?s-Number(t.pnl):s,0);
+    const tradeCount = Object.keys(seen).length;
+    const broken = Object.keys(byDay).filter(d=>(dayLoss>0&&byDay[d].loss>=dayLoss)||(dayTrades>0&&Object.keys(byDay[d].keys).length>dayTrades)).length;
+    const ring = (id,frac,color) => { const el=document.getElementById(id); if(!el) return; el.style.setProperty('--off',239-239*Math.max(0,Math.min(1,frac))); if(color) el.style.stroke=color; };
+
+    /* 1 - weekly profit */
+    const pct = wkTgt>0 ? Math.min(100,Math.max(0,Math.round(net/wkTgt*100))) : 0;
+    const n1 = document.getElementById('pnlNum'); n1.textContent = money(net); n1.style.color = net<0?'var(--red)':'';
+    set('pnlSub', wkTgt>0 ? pct+'% of $'+wkTgt.toFixed(0)+' weekly target'+(Number(window.jlWeeklyProfitTargetUSD)?'':' ($'+dayTgt.toFixed(0)+' x '+ACTIVE_DAYS+' days)') : 'No weekly or daily target set');
+    ring('ringPnl', pct/100, net<0?'var(--red)':'var(--green)');
     document.getElementById('pnlDetail').innerHTML = rows.length
-      ? '<span class="tag win">'+W+'W</span><span class="tag loss">'+L+'L</span> <span style="color:var(--faint)">'+days+' day'+(days===1?'':'s')+(lim>0&&net<0?' · $'+Math.abs(net).toFixed(0)+' / $'+lim.toFixed(0)+' loss limit':'')+'</span>'
+      ? '<span class="tag win">'+W+'W</span><span class="tag loss">'+L+'L</span> <span style="color:var(--faint)">'+activeDays+' of '+ACTIVE_DAYS+' days active</span>'
       : '<span style="color:var(--faint)">No trades this week</span>';
+
+    /* 2 - weekly loss used */
+    set('lossNum', '$'+lossUsed.toFixed(2)+' / '+(wkLoss>0?'$'+wkLoss.toFixed(0):'not set'));
+    const lr = wkLoss>0 ? lossUsed/wkLoss : 0;
+    set('lossSub', wkLoss>0 ? '$'+Math.max(0,wkLoss-lossUsed).toFixed(2)+' room left'+(Number(window.jlWeeklyLossLimit)?'':' ($'+dayLoss.toFixed(0)+' x '+ACTIVE_DAYS+' days)') : 'No loss limit set');
+    ring('ringLoss', lr, lr>.9?'var(--red)':lr>=.6?'var(--warn)':'var(--green)');
+    set('lossDetail', L+' losing trade'+(L===1?'':'s')+' this week');
+
+    /* 3 - weekly trades */
+    set('tradesNum', tradeCount+' / '+(wkTrades>0?wkTrades:'not set'));
+    ring('ringTrades', wkTrades>0 ? tradeCount/wkTrades : 0);
+    set('tradesSub', broken+' day'+(broken===1?'':'s')+' broke a daily rule');
+    set('tradesDetail', wkTrades>0 ? Math.max(0,wkTrades-tradeCount)+' slots left ('+dayTrades+' x '+ACTIVE_DAYS+' days)'+(activeDays?' · avg '+(tradeCount/activeDays).toFixed(1)+'/day':'') : 'No trade limit set');
   }
 
   function setState(){
@@ -4858,6 +4888,7 @@ document.addEventListener('input',e=>{if(cur&&RUN[cur.dataset.tool]&&cur.contain
   }
 
   let lastState = null;
+  window.__jlWeekCards = function(){ try{ updateWeekCard(getTradingDayIST()); }catch(e){} };
   function renderToday(){ lastState = setState(); }
 
   // ---------- post-session review ----------
@@ -5209,7 +5240,7 @@ let lastRules=[0,0,0,0];
     const lim = ruleLimits();
     const lossBroken = lim.loss>0 && lossUsed >= lim.loss, tradeBroken = lim.trades>0 && n >= lim.trades;
     const breaks = (lossBroken?1:0) + (tradeBroken?1:0);
-    tradesSub.textContent = breaks + ' rule break' + (breaks!==1?'s':'');
+    if(typeof window.__jlWeekCards==='function') window.__jlWeekCards(); /* weekly cards own the rings; daily breaks still drive the banner below */
     const alertEl = document.getElementById('ruleAlert');
     lastAlertArgs = [lossUsed, n]; alertBroken = breaks > 0;
     if(breaks > 0){
