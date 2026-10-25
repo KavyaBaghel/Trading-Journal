@@ -3294,6 +3294,9 @@ window.__mountOpenPos=function(){const o=(window.__openTrades||[]).concat((windo
 <section class="a-s" id="jDraftSec" style="display:none"><div class="a-s-head"><div class="a-s-ttl"><span class="a-s-ic"><svg viewBox="0 0 24 24"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg></span><h3>Drafts</h3></div><span class="pill" id="jDraftPill"></span></div>
 <div class="sub" style="margin:4px 0 12px">Your form saves itself as you type. One draft is kept, and it goes away once you save the journal.</div>
 <div id="jDraftBody"></div></section>
+<section class="a-s" id="djHist"><div class="a-s-head"><div class="a-s-ttl"><h3>Daily journal history</h3></div><span class="pill" id="djhCnt"></span></div>
+<div class="sub" style="margin:4px 0 12px">Read only. Write today's entry in Today's Summary.</div>
+<div id="djhBody"></div><button type="button" class="btn-ghost j-sm" id="djhMore" hidden>Show more days</button></section>
 </div>
 <aside class="a-s j-side">
 <div class="a-s-head"><h3>Saved journals</h3><span class="pill" id="jCnt"></span></div>
@@ -8529,6 +8532,76 @@ setInterval(function(){ if(today()!==day&&!editing()) render(); },60000);
 setTimeout(function(){ if(!editing()) render(); },1500);
 render();
 })();</script>
+<style id="jl-daily-journal-history-css">
+.djh-day{border:1px solid var(--border,rgba(255,255,255,.1));border-radius:12px;margin-bottom:8px;background:rgba(255,255,255,.02)}
+.djh-day>summary{list-style:none;cursor:pointer;display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;padding:11px 14px}
+.djh-day>summary::-webkit-details-marker{display:none}
+.djh-day>summary b{font-size:13.5px}
+.djh-tag{font-size:11px;font-weight:600;padding:2px 9px;border-radius:99px;background:rgba(255,255,255,.07);color:var(--faint,#8b93a7)}
+.djh-tag.y{background:color-mix(in srgb,var(--green,#43d787) 18%,transparent);color:var(--green,#43d787)}
+.djh-tag.p{background:color-mix(in srgb,var(--amber,#f5b84a) 18%,transparent);color:var(--amber,#f5b84a)}
+.djh-tag.n{background:color-mix(in srgb,var(--red,#f0685c) 18%,transparent);color:var(--red,#f0685c)}
+.djh-body{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px 22px;padding:2px 14px 14px}
+.djh-col h4{margin:0 0 8px;font-size:11px;letter-spacing:.09em;text-transform:uppercase;color:var(--faint,#8b93a7)}
+.djh-row{margin-bottom:8px}
+.djh-row small{display:block;font-size:10.5px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--faint,#8b93a7);margin-bottom:2px}
+.djh-row span{font-size:13px;white-space:pre-wrap;overflow-wrap:anywhere}
+.djh-none{color:var(--faint,#8b93a7);font-size:12.5px;padding:6px 0}
+#rcDj .djh-body{padding:0}
+@media(max-width:600px){.djh-body{grid-template-columns:1fr}}
+</style>
+<script id="jl-daily-journal-history">(function(){
+/* Read-only view of past daily journal entries. Data comes from krishna_daily_journal, written by the Daily journal panel. */
+var KEY='krishna_daily_journal';
+/*DH-PURE-START*/
+var DN=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'],MN=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+function esc(v){return String(v==null?'':v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;')}
+function dhLabel(day){var m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(String(day||''));if(!m)return String(day||'');var d=new Date(Date.UTC(+m[1],+m[2]-1,+m[3]));return DN[d.getUTCDay()]+' '+(+m[3])+' '+MN[d.getUTCMonth()]+' '+m[1]}
+var PRE=['mood','plan','rules','sleep','focus'],POST=['mood','followed','well','fix'];
+function pick(part,fields){var o={},n=0;if(part&&typeof part==='object'&&!Array.isArray(part))fields.forEach(function(f){var v=part[f];if(typeof v==='number'&&isFinite(v)){o[f]=v;n++}else if(typeof v==='string'&&v.trim()){o[f]=v;n++}});return n?o:null}
+function dhEntry(raw){if(!raw||typeof raw!=='object'||Array.isArray(raw))return null;var pre=pick(raw.pre,PRE),post=pick(raw.post,POST);return(pre||post)?{pre:pre,post:post}:null}
+function dhDays(map){var out=[];if(!map||typeof map!=='object'||Array.isArray(map))return out;
+  Object.keys(map).forEach(function(k){if(!/^\d{4}-\d{2}-\d{2}$/.test(k))return;var e=dhEntry(map[k]);if(e){e.day=k;out.push(e)}});
+  out.sort(function(a,b){return a.day<b.day?1:a.day>b.day?-1:0});return out}
+function row(l,v){return '<div class="djh-row"><small>'+l+'</small><span>'+esc(v)+'</span></div>'}
+function col(title,rows){return '<div class="djh-col"><h4>'+title+'</h4>'+(rows.length?rows.join(''):'<div class="djh-none">Nothing saved</div>')+'</div>'}
+function dhBody(e){
+  var a=e.pre||{},b=e.post||{},L={plan:'Plan for the day',rules:'Rules I will not break',well:'What went well',fix:'What to fix tomorrow'},r1=[],r2=[];
+  if(a.mood)r1.push(row('Mood',a.mood));if(a.plan)r1.push(row(L.plan,a.plan));if(a.rules)r1.push(row(L.rules,a.rules));
+  if(a.sleep!=null)r1.push(row('Sleep',a.sleep+' / 5'));if(a.focus!=null)r1.push(row('Focus',a.focus+' / 5'));
+  if(b.mood)r2.push(row('Mood',b.mood));if(b.followed)r2.push(row('Followed my rules',b.followed));if(b.well)r2.push(row(L.well,b.well));if(b.fix)r2.push(row(L.fix,b.fix));
+  return '<div class="djh-body">'+col('Before session',r1)+col('After session',r2)+'</div>';
+}
+function dhTags(e){var t=[],a=e.pre||{},b=e.post||{};
+  if(a.mood)t.push('<span class="djh-tag">Before: '+esc(a.mood)+'</span>');
+  if(b.mood)t.push('<span class="djh-tag">After: '+esc(b.mood)+'</span>');
+  if(b.followed)t.push('<span class="djh-tag '+({Yes:'y',Partly:'p',No:'n'}[b.followed]||'')+'">Rules: '+esc(b.followed)+'</span>');
+  return t.join('')}
+/*DH-PURE-END*/
+function readMap(){try{var o=JSON.parse(localStorage.getItem(KEY)||'{}');return(o&&typeof o==='object'&&!Array.isArray(o))?o:{}}catch(_){return{}}}
+window.jlDjView=function(day){
+  var map=readMap(),e=dhEntry(map[day]);if(!e)return '';
+  return '<div class="panel-head"><h2>Daily journal</h2><span class="hint">Read only</span></div>'+dhBody(e);
+};
+var STEP=30,shown=STEP;
+function today(){return typeof window.getTradingDayIST==='function'?window.getTradingDayIST():''}
+function render(){
+  var body=document.getElementById('djhBody');if(!body)return;
+  var days=dhDays(readMap()),cnt=document.getElementById('djhCnt'),more=document.getElementById('djhMore'),td=today();
+  if(cnt)cnt.textContent=days.length+(days.length===1?' day':' days');
+  if(!days.length){body.innerHTML='<div class="djh-none">No daily journal entries yet.</div>';if(more)more.hidden=true;return}
+  body.innerHTML=days.slice(0,shown).map(function(e){
+    return '<details class="djh-day"><summary><b>'+esc(dhLabel(e.day))+(e.day===td?' (today)':'')+'</b>'+dhTags(e)+'</summary>'+dhBody(e)+'</details>'}).join('');
+  if(more)more.hidden=days.length<=shown;
+}
+var mb=document.getElementById('djhMore');if(mb)mb.addEventListener('click',function(){shown+=STEP;render()});
+var view=document.getElementById('view-journal');
+if(view&&typeof MutationObserver==='function')new MutationObserver(function(){if(!view.hidden)render()}).observe(view,{attributes:true,attributeFilter:['hidden']});
+window.addEventListener('storage',function(ev){if(!ev.key||ev.key===KEY)render()});
+document.addEventListener('visibilitychange',function(){if(!document.hidden)render()});
+setTimeout(render,1500);render();
+})();</script>
+
 <script>(function(){const A=window.__A,m=v=>(v<0?'-$':'+$')+Math.abs(v).toFixed(2),set=(id,h)=>{const e=document.getElementById(id);if(e)e.textContent=h};
 const rv=(window.__trades||[]).filter(t=>t.rev).length;
 set('psyYr',A.n?jlN(A.n,'trade')+' logged, '+A.wr.toFixed(0)+'% win rate, '+jlN(rv,'revenge trade')+' flagged, '+A.mt+' tagged with a mistake.':'No trades logged in this dataset yet.');
@@ -9566,7 +9639,7 @@ window.__renderAnSetups=renderBoth;window.__renderAnEmotions=renderEmo;setTimeou
         '<div class="rr-tile"><div class="l">MOOD</div><div class="v">'+esc(mood)+'</div></div>'+
         '<div class="rr-tile"><div class="l">ENDING STREAK</div><div class="v">'+streak+'</div></div>'+
       '</div></div>'+
-      '<div class="panel glass rc-sim" id="rcSim">'+simHtml(key)+'</div>'+
+      '<div class="panel glass rc-sim" id="rcSim">'+simHtml(key)+'</div>'+(function(){var h=typeof window.jlDjView==='function'?window.jlDjView(key):'';return h?'<div class="panel glass" id="rcDj">'+h+'</div>':''})()+
       '<div class="panel glass"><div class="tbl-head"><h2 style="margin:0">Trades this day</h2><span class="pill">'+plural(rows.length,'trade')+'</span></div><div style="overflow-x:auto"><table><thead><tr><th style="width:32px"></th><th>TIME</th><th>SYMBOL</th><th>SIDE</th><th>SESSION</th><th>ENTRY</th><th>EXIT</th><th>DURATION</th><th>P&amp;L</th><th>REASON</th></tr></thead><tbody>'+rowsHtml+'</tbody></table></div></div>';
   }
   function show(){
