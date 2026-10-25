@@ -3334,7 +3334,7 @@ window.__mountOpenPos=function(){const o=(window.__openTrades||[]).concat((windo
 <div class="cal-eq-top"><span class="l">MONTH EQUITY CURVE</span><span class="v" id="cEqV"></span></div>
 <div class="cal-eq-chart" id="cEqChart"></div>
 </section>
-<div class="cal-legend"><span><em style="background:var(--green)"></em>Profit day</span><span><em style="background:var(--red)"></em>Loss day</span><span><em style="background:var(--faint)"></em>Break-even / no result</span><span><em style="background:var(--amber);border-radius:5px"></em>Over the 8-trade limit</span></div>
+<div class="cal-legend"><span><em style="background:var(--green)"></em>Profit day</span><span><em style="background:var(--red)"></em>Loss day</span><span><em style="background:var(--faint)"></em>Break-even / no result</span><span><em style="background:var(--amber);border-radius:5px"></em><i id="calLegLim" style="font-style:normal">Over the trade limit</i></span></div>
 <div class="cal-days"><div class="cal-dh">MON</div><div class="cal-dh">TUE</div><div class="cal-dh">WED</div><div class="cal-dh">THU</div><div class="cal-dh">FRI</div><div class="cal-dh cal-dh-wk">SAT</div><div class="cal-dh cal-dh-wk">SUN</div></div>
 <div class="cal-grid" id="cGrid"></div>
 <section class="a-s cal-flat">
@@ -6198,7 +6198,7 @@ const $=id=>document.getElementById(id);
 $('dateStrC').textContent=new Date().toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
 const money=v=>(v<0?'-$':'+$')+Math.abs(v).toFixed(2);
 const MONTHS=['January','February','March','April','May','June','July','August','September','October','November','December'];
-const TRADE_LIMIT=8, LOSS_LIMIT=20;
+const TL=()=>Number(window.jlMaxTradesPerDay)||0, LL=()=>Number(window.jlDailyLossLimit)||0;
 
 // Day stats are computed from real trades (window.__trades — the same array the Trades
 // and Journal tabs use), not a separate hand-authored dataset. This is intentionally
@@ -6330,6 +6330,7 @@ function monthDays(y,m){ // returns array of week-rows, each 5 cells (Mon..Fri) 
 }
 
 function renderGrid(){
+  const lgEl=document.getElementById('calLegLim'); if(lgEl) lgEl.textContent=TL()>0?'Over the '+TL()+'-trade limit':'Over the trade limit';
   const dm=fill(vy,vm), rows=monthDays(vy,vm);
   const active=Object.keys(dm).map(Number), vals=active.map(k=>dm[k]);
   const trades=vals.reduce((s,v)=>s+v.t,0), net=vals.reduce((s,v)=>s+v.pnl,0);
@@ -6430,10 +6431,10 @@ function renderGrid(){
       if(d==null)return '<div class="ldg-pad"></div>';
       const v=dm[d], isToday=isTodayMonth&&d===today.getDate();
       if(!v)return '<div class="ldg-row'+(isToday?' today':'')+'"><div class="ldg-d"><b>'+d+'</b><small>'+DOWS[i]+'</small></div><div class="ldg-empty">No trades</div></div>';
-      const over=v.t>TRADE_LIMIT, brk=v.pnl<=-LOSS_LIMIT;
+      const over=TL()>0&&v.t>TL(), brk=LL()>0&&v.pnl<=-LL();
       const pct=Math.min(50,Math.abs(v.pnl)/maxAbs*50);
       const bar='<div class="ldg-bar-track"><div class="ldg-bar" style="'+(v.pnl>=0?'left:50%':'right:50%')+';width:'+pct+'%;color:'+(v.pnl>0?'var(--green)':v.pnl<0?'var(--red)':'var(--faint)')+'"></div></div>';
-      const flags=(over?'<span class="ldg-badge ot" title="Over the 8-trade limit">OT</span>':'')+(brk?'<span class="ldg-badge rb" title="Breached the $20 daily loss limit">RB</span>':'')+(d===best&&v.pnl>0?'<span class="ldg-badge best">Best</span>':d===worst&&v.pnl<0?'<span class="ldg-badge worst">Worst</span>':'');
+      const flags=(over?'<span class="ldg-badge ot" title="Over the '+TL()+'-trade limit">OT</span>':'')+(brk?'<span class="ldg-badge rb" title="Breached the $'+LL()+' daily loss limit">RB</span>':'')+(d===best&&v.pnl>0?'<span class="ldg-badge best">Best</span>':d===worst&&v.pnl<0?'<span class="ldg-badge worst">Worst</span>':'');
       const pnlCls=v.pnl>0?' pos':v.pnl<0?' neg':'';
       return '<div class="ldg-row'+(isToday?' today':'')+pnlCls+'" data-d="'+d+'"><div class="ldg-d"><b>'+d+'</b><small>'+DOWS[i]+'</small></div>'+bar+
         '<div class="ldg-meta">'+v.t+' tr &middot; '+v.w+'W/'+v.l+'L/'+v.be+'BE'+flags+'</div>'+
@@ -6445,10 +6446,10 @@ function renderGrid(){
 
   // insights
   const ins=[];
-  const overDays=active.filter(k=>dm[k].t>TRADE_LIMIT);
-  const brkDays=active.filter(k=>dm[k].pnl<=-LOSS_LIMIT);
-  if(overDays.length)ins.push(['var(--amber)','<b>Overtrading:</b> '+overDays.length+' of '+active.length+' active days went over the '+TRADE_LIMIT+'-trade limit.<span>'+MONTHS[vm]+' '+(worst||overDays[0])+' alone had '+(dm[worst]?dm[worst].t:dm[overDays[0]].t)+' trades and the month\'s '+(dm[worst]&&dm[worst].pnl<0?'worst result':'heaviest session')+'.</span>']);
-  if(brkDays.length)ins.push(['var(--red)','<b>Loss limit:</b> '+brkDays.length+' day'+(brkDays.length>1?'s':'')+' breached the $'+LOSS_LIMIT+' daily loss limit ('+brkDays.map(d=>MONTHS[vm].slice(0,3)+' '+d).join(', ')+'), costing '+money(brkDays.reduce((s,d)=>s+dm[d].pnl,0))+' between them.<span>That alone is more than the month\'s net result.</span>']);
+  const overDays=active.filter(k=>TL()>0&&dm[k].t>TL());
+  const brkDays=active.filter(k=>LL()>0&&dm[k].pnl<=-LL());
+  if(overDays.length)ins.push(['var(--amber)','<b>Overtrading:</b> '+overDays.length+' of '+active.length+' active days went over the '+TL()+'-trade limit.<span>'+MONTHS[vm]+' '+(worst||overDays[0])+' alone had '+(dm[worst]?dm[worst].t:dm[overDays[0]].t)+' trades and the month\'s '+(dm[worst]&&dm[worst].pnl<0?'worst result':'heaviest session')+'.</span>']);
+  if(brkDays.length)ins.push(['var(--red)','<b>Loss limit:</b> '+brkDays.length+' day'+(brkDays.length>1?'s':'')+' breached the $'+LL()+' daily loss limit ('+brkDays.map(d=>MONTHS[vm].slice(0,3)+' '+d).join(', ')+'), costing '+money(brkDays.reduce((s,d)=>s+dm[d].pnl,0))+' between them.<span>That alone is more than the month\'s net result.</span>']);
   if(best)ins.push(['var(--green)','<b>Best day:</b> '+MONTHS[vm]+' '+best+' ('+money(dm[best].pnl)+') on '+jlN(dm[best].t,'trade')+', '+jlN(dm[best].l,'loss','losses')+'.<span>Whatever changed that day is worth repeating.</span>']);
   let streak=0,maxStreak=0,streakEnd=null;
   active.slice().sort((a,b)=>a-b).forEach(d=>{ if(dm[d].pnl<0){streak++; if(streak>maxStreak){maxStreak=streak;streakEnd=d} } else streak=0 });
