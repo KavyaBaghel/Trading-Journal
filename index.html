@@ -2971,7 +2971,7 @@ window.jlLiveBalance=function(Z){
 <div class="scrim" id="scrim"></div>
 <button class="menu-btn" id="menuBtn" aria-label="Open menu"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
 <main class="main">
-<div class="jl-circuit" id="jlCircuit" role="alert" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 9v4M12 17h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg><div><b>Circuit breaker tripped</b><span id="jlCircuitWhy"></span><small id="jlCircuitWait"></small></div></div>
+<div class="jl-circuit" id="jlCircuit" role="alert" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 9v4M12 17h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg><div><b id="jlCircuitTitle">Circuit breaker tripped</b><span id="jlCircuitWhy"></span><small id="jlCircuitWait"></small></div></div>
 <div class="view" id="view-summary">
 <div class="wrap">
 
@@ -8274,14 +8274,40 @@ function msUntilReset(nowMs){
   if(r<=nowMs)r+=86400000;return r-nowMs;
 }
 function fmtWait(ms){var m=Math.max(1,Math.ceil(ms/60000)),h=Math.floor(m/60);return h?h+'h '+(m%60)+'m':m+'m'}
+function weakNowEval(st,nowMs){
+  var DN=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'],s=new Date(nowMs+19800000),h=s.getUTCHours(),dw=DN[s.getUTCDay()],parts=[];
+  var m=function(x){return (x.net<0?'-':'')+'$'+Math.abs(x.net).toFixed(2)};
+  ((st&&st.days)||[]).forEach(function(x){if(x.k===dw)parts.push(dw+' is a weak weekday for you: net '+m(x)+' over '+x.n+' trades')});
+  ((st&&st.hours)||[]).forEach(function(x){if(x.k===h)parts.push('The '+String(h).padStart(2,'0')+':00 IST hour is weak for you: net '+m(x)+' over '+x.n+' trades')});
+  return{warn:parts.length>0,parts:parts,hour:h,dow:dw};
+}
 /*CB-PURE-END*/
+function weakNow(){
+  try{
+    if(typeof window.jlWeakTimes!=='function')return{warn:false,parts:[]};
+    var off=null;
+    try{var s=JSON.parse(localStorage.getItem('jlAccountSettings')||'null');if(s&&s.brokerUtcOffset!==''&&s.brokerUtcOffset!=null&&isFinite(Number(s.brokerUtcOffset)))off=Number(s.brokerUtcOffset)}catch(e){}
+    return weakNowEval(window.jlWeakTimes(window.__trades||[],3,off),Date.now());
+  }catch(e){return{warn:false,parts:[]}}
+}
 function paint(){
   var el=document.getElementById('jlCircuit');if(!el)return;
   var key=typeof window.getTradingDayIST==='function'?window.getTradingDayIST():'';
   var rows=(window.__trades||[]).filter(function(t){return t&&t.d===key});
   var kindFn=typeof window.jlKind==='function'?window.jlKind:function(p){return p<0?'loss':p>0?'win':'be'};
   var r=circuitEval(rows,{lossLimit:Number(window.jlDailyLossLimit)||0,tradeLimit:Number(window.jlMaxTradesPerDay)||0,maxConsec:Number(window.jlMaxConsecLosses)||0,revLimit:2},kindFn);
-  if(!r.tripped){el.hidden=true;return}
+  var ttl=document.getElementById('jlCircuitTitle');
+  if(!r.tripped){
+    var wk=weakNow();
+    if(wk.warn){
+      if(ttl)ttl.textContent='Weak time to trade';
+      document.getElementById('jlCircuitWhy').textContent=wk.parts.join('. ')+'.';
+      document.getElementById('jlCircuitWait').textContent='Based on your past trades. Nothing is blocked.';
+      el.hidden=false;return;
+    }
+    el.hidden=true;return;
+  }
+  if(ttl)ttl.textContent='Circuit breaker tripped';
   document.getElementById('jlCircuitWhy').textContent=r.why.join('. ')+'.';
   document.getElementById('jlCircuitWait').textContent='Stay out of the market until the 06:00 IST reset, in '+fmtWait(msUntilReset(Date.now()))+'.';
   el.hidden=false;
