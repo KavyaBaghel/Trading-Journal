@@ -11563,6 +11563,23 @@ initFirebaseAuth().catch(err=>{
   body .btn-primary,body .btn-ghost{min-height:44px}
 }
 </style>
+<style id="jl-touch-focus-css">
+/* Touch targets and keyboard focus for the newer cards (Study notes, rule card, daily journal, share). Additive block. */
+@media (max-width:640px),(pointer:coarse){
+  #pbRoot .pb-tab,#pbRoot .pb-chip,#pbRoot .pb-del,#pbRoot .pb-in,
+  .aic-rule-edit input,.aic-rule-edit .gg-btn-outline,#aicMark,
+  #djPanel .dj-chip,.jls-btn{min-height:44px}
+  #pbRoot .pb-tab{padding-left:16px;padding-right:16px}
+  #pbRoot .pb-chip{display:inline-flex;align-items:center}
+  #pbRoot .pb-item>summary,.djh-day>summary{min-height:44px}
+  .jls-x{width:44px;height:44px}
+}
+#pbRoot .pb-tab:focus-visible,#pbRoot .pb-chip:focus-visible,#pbRoot .pb-del:focus-visible,
+#pbRoot .pb-in:focus-visible,#pbRoot .j-ta:focus-visible,#pbRoot .pb-item>summary:focus-visible,
+.aic-rule-edit input:focus-visible,.aic-rule-edit .gg-btn-outline:focus-visible,#aicMark:focus-visible,
+#djPanel .dj-chip:focus-visible,#djPanel .dj-ta:focus-visible,.djh-day>summary:focus-visible,
+.jls-x:focus-visible,.jls-btn:focus-visible,.jls-sw input:focus-visible{outline:2px solid var(--accent-2);outline-offset:2px}
+</style>
 <style id="jlTopCss">
 #jlTop{position:fixed;right:calc(20px + env(safe-area-inset-right,0px));bottom:calc(20px + env(safe-area-inset-bottom,0px));z-index:900;width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;padding:0;cursor:pointer;color:var(--text);
   background:linear-gradient(160deg,rgba(255,255,255,.06),rgba(255,255,255,0) 60%),var(--panel-2);border:1px solid var(--border-hi);box-shadow:0 10px 28px -10px rgba(0,0,0,.7);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);
