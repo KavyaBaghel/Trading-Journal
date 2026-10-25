@@ -3256,6 +3256,13 @@ window.__mountOpenPos=function(){const o=(window.__openTrades||[]).concat((windo
 </section>
 <div class="cal-months" id="cMonths"></div>
 </div></div>
+<div class="view" id="view-recap" hidden><div class="wrap">
+<div class="cal-top">
+  <div><div class="eyebrow"><span class="date mono" id="rcEyebrow"></span></div><h1 id="rcTitle">Day recap</h1><p id="rcSub"></p></div>
+  <div class="cal-nav"><button type="button" class="cal-now" id="rcBack">Back to calendar</button></div>
+</div>
+<div id="rcBody"></div>
+</div></div>
 <div class="view" id="view-psychology" hidden><div class="wrap psy-layout" style="max-width:960px">
   <div id="psyHost"></div>
   <aside class="psy-side">
@@ -6216,7 +6223,7 @@ function openDayPanel(d){
   document.body.classList.add('dp-open'); $('dayPanel').setAttribute('aria-hidden','false'); dpOpen=true;
 }
 function closeDayPanel(){document.body.classList.remove('dp-open');$('dayPanel').setAttribute('aria-hidden','true');dpOpen=false}
-$('cGrid').addEventListener('click',e=>{const row=e.target.closest('.ldg-row[data-d]');if(!row)return;openDayPanel(+row.dataset.d)});
+$('cGrid').addEventListener('click',e=>{const row=e.target.closest('.ldg-row[data-d]');if(!row)return;if(window.__openDayRecap){window.__openDayRecap(vy+'-'+String(vm+1).padStart(2,'0')+'-'+String(+row.dataset.d).padStart(2,'0'))}else{openDayPanel(+row.dataset.d)}});
 function jumpToWeek(el){const sub=document.querySelector('#cGrid .ldg-sub[data-week="'+el.dataset.wk+'"]');if(!sub)return;sub.scrollIntoView({behavior:'smooth',block:'center'});sub.classList.add('flash');setTimeout(()=>sub.classList.remove('flash'),1400)}
 $('cGrid').addEventListener('click',e=>{const wk=e.target.closest('.ldg-wk[data-wk]');if(wk)jumpToWeek(wk)});
 $('cGrid').addEventListener('keydown',e=>{if(e.key!=='Enter'&&e.key!==' ')return;const wk=e.target.closest('.ldg-wk[data-wk]');if(wk){e.preventDefault();jumpToWeek(wk)}});
@@ -8438,6 +8445,165 @@ window.__renderAnSetups=renderBoth;window.__renderAnEmotions=renderEmo;setTimeou
   setInterval(tick,30000); setTimeout(tick,1500); setTimeout(tick,5000); tick();
 })();
 </script>
+<style id="jl-day-recap-css">
+#view-recap tbody tr[data-i]{cursor:pointer}
+#view-recap tbody tr[data-i]:hover td{background:rgba(255,255,255,.03)}
+#view-recap .rc-empty{padding:28px 6px;color:var(--faint);font-size:14px}
+</style>
+<script id="jl-day-recap">
+/* Day recap: picking a day in the Calendar opens that day in the Today's Summary layout with the date at the top.
+   Every number is computed from window.__trades for that IST trading day. Live-only parts of Today's Summary
+   (checklist, tomorrow's rule box, session clock, review generator) are not shown for a past day. */
+(function(){
+  var view=document.getElementById('view-recap'); if(!view) return;
+  var $=function(id){ return document.getElementById(id); };
+  var WHY={SL:'Stop loss',TP:'Target hit',User:'Manual close'};
+  function esc(v){ return String(v==null?'':v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
+  function money(v){ return (v<0?'-$':'+$')+Math.abs(v).toFixed(2); }
+  function dollars(v){ return (v<0?'-$':'$')+Math.abs(v).toFixed(2); }
+  function kind(p){ return typeof window.jlKind==='function' ? window.jlKind(Number(p)) : (p>0?'win':p<0?'loss':'be'); }
+  function plural(n,w){ return n+' '+w+(n===1?'':'s'); }
+  function fixed(v){ v=Number(v); return isFinite(v)?v.toFixed(2):'—'; }
+  function parseKey(k){ var p=k.split('-'); return new Date(Date.UTC(+p[0],+p[1]-1,+p[2])); }
+  function ringCard(label,num,numColor,sub,detail,frac,color){
+    var off=239-239*Math.max(0,Math.min(1,frac));
+    return '<div class="ring-card glass"><svg width="76" height="76" viewBox="0 0 88 88"><circle class="ring-track" cx="44" cy="44" r="38"/><circle class="ring-val" cx="44" cy="44" r="38" stroke="'+color+'" style="--off:'+off+'"/></svg><div><div class="ring-label">'+label+'</div><div class="ring-num"'+(numColor?' style="color:'+numColor+'"':'')+'>'+esc(num)+'</div><div class="ring-sub">'+esc(sub)+'</div><div class="ring-detail">'+detail+'</div></div></div>';
+  }
+  function card(label,v,meta,color){
+    return '<div class="card glass"><div class="card-head"><span class="l">'+label+'</span></div><div class="v"'+(color?' style="color:'+color+'"':'')+'>'+esc(v)+'</div><div class="meta">'+esc(meta)+'</div></div>';
+  }
+  function smoothPath(pts){
+    var d='M'+pts[0].x+','+pts[0].y+' ';
+    for(var i=0;i<pts.length-1;i++){
+      var p0=pts[i-1]||pts[i], p1=pts[i], p2=pts[i+1], p3=pts[i+2]||p2;
+      d+='C'+(p1.x+(p2.x-p0.x)/6)+','+(p1.y+(p2.y-p0.y)/6)+' '+(p2.x-(p3.x-p1.x)/6)+','+(p2.y-(p3.y-p1.y)/6)+' '+p2.x+','+p2.y+' ';
+    }
+    return d;
+  }
+  function curveHtml(rows){
+    var W=420,H=180,pl=40,pr=10,pt=18,pb=25,bal=0;
+    var ser=[{sym:null,pnl:0,bal:0,time:'Day start'}];
+    rows.forEach(function(t){ var p=Number(t.pnl); bal+=p; ser.push({sym:t.sym,side:t.side,pnl:p,bal:bal,time:String(t.t).slice(0,5)}); });
+    var vals=ser.map(function(s){ return s.bal; });
+    var mn=Math.min.apply(null,[0].concat(vals))-8, mx=Math.max.apply(null,vals)+8;
+    var pts=ser.map(function(s,i){ return {x:pl+i*(W-pl-pr)/(ser.length-1), y:pt+(mx-s.bal)/(mx-mn)*(H-pt-pb), s:s}; });
+    var line=smoothPath(pts), area=line+' L'+pts[pts.length-1].x+','+(H-pb)+' L'+pts[0].x+','+(H-pb)+' Z';
+    var grid='';
+    [mx,mx-(mx-mn)/3,mx-(mx-mn)*2/3,mn].forEach(function(v,i){
+      var y=pt+(i*(H-pt-pb)/3);
+      grid+='<line x1="'+pl+'" y1="'+y+'" x2="'+(W-pr)+'" y2="'+y+'"/><text x="0" y="'+(y+3)+'" class="chart-yl">'+(v>=0?'+$':'-$')+Math.abs(v).toFixed(0)+'</text>';
+    });
+    var dots='';
+    pts.forEach(function(p,i){
+      var c=p.s.sym===null?'var(--accent-2)':(p.s.pnl>=0?'var(--green)':'var(--red)');
+      if(i===pts.length-1) dots+='<circle class="chart-pt-halo" cx="'+p.x+'" cy="'+p.y+'" r="4" stroke="'+c+'"/>';
+      var tip=p.s.sym===null?'Day start':esc(p.s.sym)+' '+esc(p.s.side)+' '+money(p.s.pnl)+' · balance '+dollars(p.s.bal)+' · '+p.s.time;
+      dots+='<circle class="chart-pt" cx="'+p.x+'" cy="'+p.y+'" r="3.5" fill="'+c+'"/><circle class="chart-hit" pointer-events="all" cx="'+p.x+'" cy="'+p.y+'" r="13"><title>'+tip+'</title></circle>';
+    });
+    var lo=Math.min.apply(null,vals), hi=Math.max.apply(null,vals);
+    return '<div class="chart-wrap"><svg width="100%" height="180" viewBox="0 0 420 180"><defs><linearGradient id="rcg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="var(--green)" stop-opacity=".3"/><stop offset="100%" stop-color="var(--green)" stop-opacity="0"/></linearGradient></defs><g class="chart-grid">'+grid+'</g><path d="'+area+'" fill="url(#rcg)" stroke="none"/><path class="chart-line" d="'+line+'"/>'+dots+'</svg></div>'+
+      '<div class="chart-stats"><span class="s">Day low <b style="color:'+(lo<0?'var(--red)':'var(--green)')+'">'+dollars(lo)+'</b></span><span class="s">Day high <b style="color:'+(hi<0?'var(--red)':'var(--green)')+'">'+dollars(hi)+'</b></span></div>';
+  }
+  function render(key){
+    var dt=parseKey(key);
+    var long=dt.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric',timeZone:'UTC'});
+    $('rcTitle').textContent=long; $('rcEyebrow').textContent='IST trading day · '+key;
+    document.title=dt.toLocaleDateString('en-US',{month:'short',day:'numeric',timeZone:'UTC'})+' recap — Journall';
+    var rows=(window.__trades||[]).filter(function(t){ return t&&t.d===key&&isFinite(Number(t.pnl)); }).slice().sort(function(a,b){ return String(a.t).localeCompare(String(b.t)); });
+    if(!rows.length){ $('rcSub').textContent='Day recap'; $('rcBody').innerHTML='<div class="panel glass"><div class="rc-empty">No trades logged on this day.</div></div>'; return; }
+    var lossLimit=Number(window.jlDailyLossLimit)||0, tradeLimit=Number(window.jlMaxTradesPerDay)||0, target=Number(window.jlDayProfitTargetUSD)||Number(window.jlProfitTargetUSD)||0;
+    var hasL=lossLimit>0, hasT=tradeLimit>0, hasTg=target>0;
+    var seen={}; rows.forEach(function(t){ seen[t.d+'|'+t.t+'|'+t.sym+'|'+t.side]=1; });
+    var tradeCount=Object.keys(seen).length;
+    var wins=rows.filter(function(t){ return kind(t.pnl)==='win'; }), losses=rows.filter(function(t){ return kind(t.pnl)==='loss'; });
+    var net=rows.reduce(function(s,t){ return s+Number(t.pnl); },0);
+    var lossUsed=Math.abs(rows.reduce(function(s,t){ return Number(t.pnl)<0?s+Number(t.pnl):s; },0));
+    var grossWin=rows.reduce(function(s,t){ return Number(t.pnl)>0?s+Number(t.pnl):s; },0);
+    var avgWin=wins.length?wins.reduce(function(s,t){ return s+Number(t.pnl); },0)/wins.length:0;
+    var avgLoss=losses.length?Math.abs(losses.reduce(function(s,t){ return s+Number(t.pnl); },0))/losses.length:0;
+    var pf=lossUsed?(grossWin/lossUsed).toFixed(2):'—';
+    var exp=net/rows.length;
+    var pct=hasTg?Math.min(100,Math.max(0,Math.round(net/target*100))):0;
+    var lr=hasL?lossUsed/lossLimit:0;
+    $('rcSub').textContent='Day recap · '+plural(tradeCount,'trade')+' · net '+money(net);
+
+    var broken=[];
+    if(hasL&&lossUsed>=lossLimit) broken.push('loss limit reached');
+    if(hasT&&tradeCount>tradeLimit) broken.push('over the trade limit');
+    var best=rows.reduce(function(a,b){ return Number(b.pnl)>Number(a.pnl)?b:a; }), worst=rows.reduce(function(a,b){ return Number(b.pnl)<Number(a.pnl)?b:a; });
+    var journals=window.__getJournals?window.__getJournals():[];
+    var jkey=function(t){ return t.d+' '+t.t+' '+t.side+' '+t.en+' '+t.pnl; };
+    var jRows=rows.map(function(t){ return journals.find(function(e){ return e.key===jkey(t); }); });
+    var emotions=jRows.map(function(j){ return j&&j.emotion; }).filter(Boolean);
+    var mood='Not tracked';
+    if(emotions.length){ var c={}; emotions.forEach(function(e){ c[e]=(c[e]||0)+1; }); mood=Object.keys(c).sort(function(a,b){ return c[b]-c[a]; })[0]; }
+    var run=0,last=null;
+    for(var i=rows.length-1;i>=0;i--){ var k=kind(rows[i].pnl); if(last===null) last=k; if(k!==last) break; run++; }
+    var streak=last==='be'||last===null?'—':run+' '+(last==='win'?(run!==1?'wins':'win'):(run!==1?'losses':'loss'));
+
+    var notes=[];
+    var revenge=rows.filter(function(t){ return t.rev; }), noSl=rows.filter(function(t){ return t.sl==null; });
+    if(revenge.length) notes.push(['var(--red)','Revenge trade flagged','Re-entered inside the cooldown window after a loss: '+plural(revenge.length,'trade')+'.']);
+    if(noSl.length) notes.push(['var(--amber)','No stop-loss on '+plural(noSl.length,'trade'),'Set a stop before entry next time.']);
+    var bySes={}; rows.forEach(function(t){ bySes[t.ses]=(bySes[t.ses]||0)+Number(t.pnl); });
+    var sesKeys=Object.keys(bySes);
+    if(sesKeys.length>1){ var ws=sesKeys.reduce(function(a,b){ return bySes[b]<bySes[a]?b:a; }); if(bySes[ws]<0) notes.push(['var(--amber)',esc(ws)+' was the weakest session',money(bySes[ws])+' across that session.']); }
+    notes.push(['var(--accent-2)','Pace check',tradeCount+' of '+(hasT?tradeLimit:'not set')+' trades taken'+(hasTg?', '+pct+'% of the daily target.':'.')]);
+    if(broken.length) notes.push(['var(--red)','Daily rule broken',broken.join(' and ').replace(/^./,function(m){ return m.toUpperCase(); })+'.']);
+
+    var jn=jRows.filter(Boolean).length;
+    var rowsHtml=rows.map(function(t){
+      var p=Number(t.pnl), idx=(window.__trades||[]).indexOf(t);
+      return '<tr'+(idx>=0?' data-i="'+idx+'" title="Open this trade in the Journal"':'')+'><td>'+(window.iconFor?window.iconFor(t.sym):'')+'</td><td class="mono">'+esc(String(t.t).slice(0,5))+'</td><td style="font-weight:600">'+esc(t.sym)+'</td>'+
+        '<td><span class="side-tag '+(t.side==='BUY'?'long':'short')+'">'+(t.side==='BUY'?'Long':'Short')+'</span></td><td style="color:var(--faint)">'+esc(t.ses)+'</td>'+
+        '<td class="mono">'+fixed(t.en)+'</td><td class="mono">'+fixed(t.ex)+'</td><td style="color:var(--faint)">Not tracked</td>'+
+        '<td class="mono" style="color:'+(p>=0?'var(--green)':'var(--red)')+';font-weight:650">'+(p>=0?'+':'')+'$'+p.toFixed(2)+'</td><td style="color:var(--sub)">'+esc(WHY[t.why]||'—')+'</td></tr>';
+    }).join('');
+
+    $('rcBody').innerHTML=
+      '<div class="rings">'+
+        ringCard('DAY P&amp;L',dollars(net),net<0?'var(--red)':'',hasTg?pct+'% of '+'$'+target.toFixed(0)+' daily target':'Profit target not set','<span class="tag win">'+wins.length+'W</span><span class="tag loss">'+losses.length+'L</span>',pct/100,net<0?'var(--red)':'var(--green)')+
+        ringCard('DAY LOSS USED','$'+lossUsed.toFixed(2)+' / '+(hasL?'$'+lossLimit.toFixed(0):'not set'),'',hasL?'$'+Math.max(0,lossLimit-lossUsed).toFixed(2)+' room left':'No loss limit set',esc(plural(losses.length,'losing trade')),lr,lr>.9?'var(--red)':lr>=.6?'var(--warn)':'var(--green)')+
+        ringCard('DAY TRADES',tradeCount+' / '+(hasT?tradeLimit:'not set'),'',broken.length?broken.join(' and ').replace(/^./,function(m){ return m.toUpperCase(); }):'Within the daily rules',hasT?(tradeCount<=tradeLimit?Math.max(0,tradeLimit-tradeCount)+' slots were left':(tradeCount-tradeLimit)+' over the limit'):'No trade limit set',hasT?tradeCount/tradeLimit:0,'var(--accent-2)')+
+      '</div>'+
+      '<div class="row4">'+
+        card('RULES',broken.length?'Rule broken':(hasL||hasT?'Rules kept':'No limits set'),broken.length?broken.join(' and '):(hasL||hasT?'Stayed inside the daily limits':'Set limits in Account Settings'),broken.length?'var(--red)':'')+
+        card('BEST TRADE',esc(best.sym)+' '+money(Number(best.pnl)),String(best.t).slice(0,5)+' · '+(best.side==='BUY'?'Long':'Short'),Number(best.pnl)>0?'var(--green)':'')+
+        card('WORST TRADE',esc(worst.sym)+' '+money(Number(worst.pnl)),String(worst.t).slice(0,5)+' · '+(worst.side==='BUY'?'Long':'Short'),Number(worst.pnl)<0?'var(--red)':'')+
+        card('FEELING',mood,jn+' of '+plural(rows.length,'trade')+' journaled')+
+      '</div>'+
+      '<div class="split"><div class="panel glass"><div class="panel-head"><h2>Day notes</h2><span class="hint">'+plural(notes.length,'insight')+'</span></div>'+
+        notes.map(function(n){ return '<div class="note-item"><div class="note-dot" style="background:'+n[0]+'"></div><div><div class="t">'+n[1]+'</div><div class="s">'+esc(n[2])+'</div></div></div>'; }).join('')+'</div>'+
+      '<div class="panel glass"><div class="panel-head"><h2>Day equity curve</h2><span class="hint">Hover a point for detail</span></div>'+curveHtml(rows)+'</div></div>'+
+      '<div class="panel glass" style="margin-bottom:14px"><div class="panel-head"><h2>Risk / reward — this day</h2><span class="hint">Session view</span></div><div class="rr-grid">'+
+        '<div class="rr-tile"><div class="l">AVG WIN / AVG LOSS</div><div class="v">$'+avgWin.toFixed(2)+' / $'+avgLoss.toFixed(2)+'</div></div>'+
+        '<div class="rr-tile"><div class="l">OF DAILY TARGET</div><div class="v">'+(hasTg?pct+'%':'—')+'</div></div>'+
+        '<div class="rr-tile"><div class="l">PROFIT FACTOR</div><div class="v">'+pf+'</div></div>'+
+        '<div class="rr-tile"><div class="l">EXPECTANCY / TRADE</div><div class="v">'+(exp>=0?'+$':'-$')+Math.abs(exp).toFixed(2)+'</div></div>'+
+        '<div class="rr-tile"><div class="l">MOOD</div><div class="v">'+esc(mood)+'</div></div>'+
+        '<div class="rr-tile"><div class="l">ENDING STREAK</div><div class="v">'+streak+'</div></div>'+
+      '</div></div>'+
+      '<div class="panel glass"><div class="tbl-head"><h2 style="margin:0">Trades this day</h2><span class="pill">'+plural(rows.length,'trade')+'</span></div><div style="overflow-x:auto"><table><thead><tr><th style="width:32px"></th><th>TIME</th><th>SYMBOL</th><th>SIDE</th><th>SESSION</th><th>ENTRY</th><th>EXIT</th><th>DURATION</th><th>P&amp;L</th><th>REASON</th></tr></thead><tbody>'+rowsHtml+'</tbody></table></div></div>';
+  }
+  function show(){
+    document.querySelectorAll('.view').forEach(function(s){ s.hidden=s.id!=='view-recap'; });
+    document.querySelectorAll('.nav[data-view]').forEach(function(x){ var on=x.dataset.view==='calendar'; x.classList.toggle('active',on); if(on) x.setAttribute('aria-current','page'); else x.removeAttribute('aria-current'); });
+    window.scrollTo(0,0);
+  }
+  function back(){ if(window.__route) window.__route('calendar'); }
+  window.__openDayRecap=function(key){ if(!/^\d{4}-\d{2}-\d{2}$/.test(String(key))) return; render(key); show(); };
+  $('rcBack').addEventListener('click',back);
+  document.addEventListener('keydown',function(e){ if(e.key==='Escape'&&!view.hidden) back(); });
+  $('rcBody').addEventListener('click',function(e){
+    var tr=e.target.closest('tr[data-i]'); if(!tr) return;
+    var idx=+tr.dataset.i;
+    if(window.__route) window.__route('journal');
+    try{ history.replaceState(null,'','#journal'); }catch(_){}
+    if(window.__jPick) window.__jPick(idx);
+  });
+})();
+</script>
+
 </div>
 <script>
 (function(){
