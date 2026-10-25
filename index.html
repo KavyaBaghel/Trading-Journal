@@ -3833,7 +3833,6 @@ function calc(){const risk=+$('tlRisk').value||0,pips=+$('tlSl').value||0,rr=+$(
  const bad=f.some(x=>x[1]==='f'),v=$('tlVerdict');v.className='tl-verdict '+(bad?'no':'ok');v.textContent=bad?'Reject this size':'Size passes';
  const sl=isNaN(en)?'-':(side==='SELL'?en+pips*.1:en-pips*.1).toFixed(2),tp=isNaN(en)?'-':(side==='SELL'?en-tpP*.1:en+tpP*.1).toFixed(2),ok=lot>=.01;
  $('tlOut').innerHTML=[['Lot size',ok?lot.toFixed(2):'-'],['Actual risk',ok?m(real):'-'],['Target reward',ok?m(rew):'-'],['Stop loss price',sl],['Take profit price',tp],['Target (pips)',ok?tpP:'-']].map(x=>'<div><span>'+x[0]+'</span><b>'+x[1]+'</b></div>').join('');
- f.push(['var(--faint)','n','No tap or no 3-minute close means no trade, whatever the size says.']);
  $('tlChecks').innerHTML=f.map(x=>'<li style="--c:'+x[0]+'">'+x[2]+'</li>').join('')}
 ['tlRisk','tlSl','tlRr','tlSide','tlEntry'].forEach(i=>$(i).addEventListener('input',calc));calc();window.__tlCalc=calc})();</script>
 <script>(function(){const $=id=>document.getElementById(id),V=$('view-tools'),H=$('tlHome');let tm=null;
