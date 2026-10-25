@@ -8375,6 +8375,17 @@ window.__renderAnSetups=renderBoth;window.__renderAnEmotions=renderEmo;setTimeou
 #view-summary.wr-weekend>.wrap~*{display:none!important}
 #view-summary:has(#weeklyReview:not([hidden])) #weeklyReview~*{display:none!important}
 @media(prefers-reduced-motion:no-preference){#weeklyReview .wr-tile,#wrStats>.wr-cols>div,#weeklyReview .wr-block{animation:jl-card-in .5s var(--ease-out) both}#weeklyReview .wr-block:nth-child(2){animation-delay:.05s}#weeklyReview .wr-block:nth-child(3){animation-delay:.1s}#weeklyReview .wr-block:nth-child(4){animation-delay:.15s}}
+/* Weekly review: chart and heatmap cards share the Analytics plot style and each sit in their own card */
+#weeklyReview .wr-an>.wr-cols{margin:0}
+#weeklyReview .wr-an>.wr-tiles{margin:0;grid-template-columns:repeat(3,minmax(0,1fr))}
+#weeklyReview .wr-an>.wr-tiles>.wr-tile:last-child:nth-child(6){grid-column:auto}
+#weeklyReview .wr-hm-wrap{overflow-x:auto;padding-bottom:2px}
+#weeklyReview .wr-heat{display:grid;gap:3px;align-items:center;min-width:440px}
+#weeklyReview .wr-hh{font:600 8.5px "IBM Plex Mono",monospace;color:var(--faint);text-align:center}
+#weeklyReview .wr-hd{font:600 8.5px "IBM Plex Mono",monospace;color:var(--faint);text-align:left}
+#weeklyReview .wr-hc{height:34px;border-radius:6px;background:rgba(255,255,255,.025);display:grid;place-items:center;font-size:10px;font-weight:700;color:#fff;overflow:visible;position:relative;cursor:default;transition:transform .28s cubic-bezier(.22,.61,.36,1)}
+#weeklyReview .wr-hc[data-t]:hover{transform:scale(1.18);z-index:2}
+@media(max-width:820px){#weeklyReview .wr-an>.wr-tiles{grid-template-columns:repeat(2,minmax(0,1fr))}}
 </style>
 <script id="jl-weekly-review">
 /* Weekend weekly review (Saturday and Sunday trading days), shown on Today's Summary and at the top of the Calendar tab (one panel, moved to whichever of the two is open). Trading day and week use the same 06:00 IST / Monday-Sunday rules as the rest of the app.
@@ -8440,27 +8451,48 @@ window.__renderAnSetups=renderBoth;window.__renderAnEmotions=renderEmo;setTimeou
     return m;
   }
   function tileHtml(l,v,s,col){ return '<div class="wr-tile"><div class="l">'+l+'</div><div class="v"'+(col?' style="color:'+col+'"':'')+'>'+v+'</div>'+(s?'<div class="s">'+s+'</div>':'')+'</div>'; }
-  function equityHtml(rows,m){
-    var eq=[0], dd=[0], c=0, pk=0, mdd=0;
-    rows.forEach(function(t){ c+=Number(t.pnl); eq.push(c); pk=Math.max(pk,c); var d=pk-c; dd.push(d); mdd=Math.max(mdd,d); });
-    var W=600, H=150, P=8, lo=Math.min.apply(null,eq), hi=Math.max.apply(null,eq);
-    if(hi===lo){ hi+=1; lo-=1; }
-    function X(i){ return P+(W-2*P)*(eq.length>1?i/(eq.length-1):0); }
-    function Y(v){ return P+(H-2*P)*(hi-v)/(hi-lo); }
-    var pts=eq.map(function(v,i){ return X(i).toFixed(1)+','+Y(v).toFixed(1); }), y0=Y(0).toFixed(1), end=eq[eq.length-1];
-    var col=end<0?'var(--red)':'var(--green)';
-    var svg='<svg class="wr-svg" viewBox="0 0 '+W+' '+H+'" preserveAspectRatio="none" role="img" aria-label="Equity curve for the week">'
-      +'<line x1="'+P+'" x2="'+(W-P)+'" y1="'+y0+'" y2="'+y0+'" stroke="var(--border)" stroke-dasharray="4 4"/>'
-      +'<polygon points="'+X(0).toFixed(1)+','+y0+' '+pts.join(' ')+' '+X(eq.length-1).toFixed(1)+','+y0+'" fill="'+col+'" opacity=".14"/>'
-      +'<polyline points="'+pts.join(' ')+'" fill="none" stroke="'+col+'" stroke-width="2" stroke-linejoin="round" vector-effect="non-scaling-stroke"/></svg>';
-    var H2=56, dm=mdd||1;
-    var dp=dd.map(function(v,i){ return X(i).toFixed(1)+','+(P+(H2-2*P)*(v/dm)).toFixed(1); });
-    var ddSvg='<svg class="wr-svg dd" viewBox="0 0 '+W+' '+H2+'" preserveAspectRatio="none" role="img" aria-label="Drawdown for the week">'
-      +'<polygon points="'+X(0).toFixed(1)+','+P+' '+dp.join(' ')+' '+X(eq.length-1).toFixed(1)+','+P+'" fill="var(--red)" opacity=".28"/>'
-      +'<polyline points="'+dp.join(' ')+'" fill="none" stroke="var(--red)" stroke-width="1.5" stroke-linejoin="round" vector-effect="non-scaling-stroke"/></svg>';
-    var cap='Week ends at '+money(end)+'. Peak '+money(pk)+'. '+(mdd>0?'Max drawdown -$'+mdd.toFixed(2)+' from the running peak.':'No drawdown this week.');
+  /* ---------- chart + heatmap cards: same plot language as the Analytics tab, each one in its own card ---------- */
+  var CG='#43d787', CR='#f0685c', charts={};
+  var IC_EQ='<path d="M3 17l5-6 4 3 8-9"/>', IC_DD='<path d="M3 6h18M3 12c3 4 6-4 9 0s6 4 9 0"/>', IC_HM='<rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/>';
+  function cardHead(ic,title,sub){ return '<div class="a-s-head"><div class="a-s-ttl"><span class="a-s-ic"><svg viewBox="0 0 24 24">'+ic+'</svg></span><h3>'+title+'</h3></div></div>'+(sub?'<div class="sub">'+sub+'</div>':''); }
+  function axMoney(v,span){ var a=Math.abs(v); if(a<0.005) return '$0'; return (v<0?'-':'+')+'$'+a.toFixed(span>=40?0:1); }
+  function sortedRows(rows){
+    return rows.map(function(t,i){ return {t:t,i:i}; }).sort(function(a,c){ var x=a.t.d+' '+a.t.t, y=c.t.d+' '+c.t.t; return x<y?-1:x>y?1:a.i-c.i; }).map(function(o){ return o.t; });
+  }
+  /* Area chart with axis ticks, trade-number labels and a hover crosshair (hover is wired once, below, by event delegation). */
+  function areaChart(id,arr,color,label,aria){
+    var n=arr.length; if(!n) return '';
+    var Wd=520, H=210, pl=48, pr=8, pt=10, pb=22;
+    var hi=Math.max.apply(null,[0].concat(arr)), lo=Math.min.apply(null,[0].concat(arr)), span=hi-lo, up=hi>=-lo;
+    function y(v){ return pt+(hi-v)/(span||1)*(H-pt-pb); }
+    function X(i){ return pl+i*(Wd-pl-pr)/Math.max(1,n-1); }
+    var pts=arr.map(function(v,i){ return X(i).toFixed(1)+','+y(v).toFixed(1); }).join(' ');
+    var gid='wrg-'+id, ticks=span>0?[hi,(hi+lo)/2,lo]:[0], s='';
+    s+='<svg class="a-cs wr-sc" data-c="'+id+'" viewBox="0 0 '+Wd+' '+H+'" role="img" aria-label="'+esc(aria)+'"><defs><linearGradient id="'+gid+'" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="'+color+'" stop-opacity="'+(up?'.42':'.05')+'"/><stop offset="1" stop-color="'+color+'" stop-opacity="'+(up?'.05':'.42')+'"/></linearGradient></defs>';
+    ticks.forEach(function(v){ s+='<line x1="'+pl+'" x2="'+(Wd-pr)+'" y1="'+y(v).toFixed(1)+'" y2="'+y(v).toFixed(1)+'" stroke="rgba(255,255,255,.06)"/><text class="ax" x="'+(pl-6)+'" y="'+(y(v)+3).toFixed(1)+'" text-anchor="end">'+axMoney(v,span)+'</text>'; });
+    s+='<line x1="'+pl+'" x2="'+(Wd-pr)+'" y1="'+y(0).toFixed(1)+'" y2="'+y(0).toFixed(1)+'" stroke="rgba(255,255,255,.2)"/>'
+      +'<polygon points="'+X(0).toFixed(1)+','+y(0).toFixed(1)+' '+pts+' '+X(n-1).toFixed(1)+','+y(0).toFixed(1)+'" fill="url(#'+gid+')"/>'
+      +'<polyline points="'+pts+'" fill="none" stroke="'+color+'" stroke-width="1.8" stroke-linejoin="round"/>';
+    for(var i=0;i<n;i+=Math.max(1,Math.round(n/7))) s+='<text class="ax" x="'+X(i).toFixed(1)+'" y="'+(H-6)+'" text-anchor="middle">#'+(i+1)+'</text>';
+    s+='<line class="sc-x" y1="'+pt+'" y2="'+(H-pb)+'" stroke="rgba(255,255,255,.25)" style="opacity:0"/><circle class="sc-d" r="4" fill="'+color+'" stroke="#fff" stroke-width="1.5" style="opacity:0"/></svg>';
+    charts[id]={arr:arr,Wd:Wd,pl:pl,pr:pr,X:X,y:y,label:label};
+    return s;
+  }
+  function equityHtml(rows){
+    var cum=[], dd=[], c=0, pk=0, mdd=0;
+    rows.forEach(function(t){ c+=Number(t.pnl); cum.push(c); pk=Math.max(pk,c); dd.push(c-pk); mdd=Math.max(mdd,pk-c); });
+    var end=cum.length?cum[cum.length-1]:0;
+    var eq='<section class="a-s">'+cardHead(IC_EQ,'Equity curve','Cumulative P&amp;L, trade by trade')
+      +'<div class="a-plot">'+areaChart('eq',cum,end<0?CR:CG,'Equity','Equity curve for the week')+'</div>'
+      +'<div class="a-read">Week ends at <b style="color:'+(end<0?'var(--red)':end>0?'var(--green)':'var(--text)')+'">'+money(end)+'</b>. Peak <b>'+money(pk)+'</b>.</div></section>';
+    var dn='<section class="a-s">'+cardHead(IC_DD,'Drawdown','Distance below the weekly equity peak')
+      +'<div class="a-plot">'+areaChart('dd',dd,CR,'Below peak','Drawdown for the week')+'</div>'
+      +'<div class="a-read">'+(mdd>0?'Deepest point: <b style="color:var(--red)">-$'+mdd.toFixed(2)+'</b> below the running peak.':'No drawdown this week. The account never fell below its running peak.')+'</div></section>';
+    return '<div class="wr-cols">'+eq+dn+'</div>';
+  }
+  function kpiHtml(m){
     var st=m.cur>0?m.cur+' win'+(m.cur===1?'':'s'):m.cur<0?(-m.cur)+' loss'+(m.cur===-1?'':'es'):'none';
-    var tiles='<div class="wr-tiles">'
+    return '<div class="wr-tiles">'
       +tileHtml('AVG WIN',m.avgW==null?'-':money(m.avgW),m.W+' winning trade'+(m.W===1?'':'s'),m.avgW==null?'':'var(--green)')
       +tileHtml('AVG LOSS',m.avgL==null?'-':'-$'+m.avgL.toFixed(2),m.L+' losing trade'+(m.L===1?'':'s'),m.avgL==null?'':'var(--red)')
       +tileHtml('EXPECTANCY',m.exp==null?'-':money(m.exp),'Average P&amp;L per trade',m.exp==null?'':m.exp<0?'var(--red)':'var(--green)')
@@ -8468,7 +8500,6 @@ window.__renderAnSetups=renderBoth;window.__renderAnEmotions=renderEmo;setTimeou
       +tileHtml('WORST LOSS STREAK',String(m.maxL),'Breakeven trades skipped',m.maxL>=3?'var(--red)':'')
       +tileHtml('CURRENT STREAK',st,'As of the last trade',m.cur<0?'var(--red)':m.cur>0?'var(--green)':'')
       +'</div>';
-    return '<div class="wr-block a-s">'+hd('EQUITY CURVE AND DRAWDOWN')+''+svg+ddSvg+'<div class="wr-cap">'+cap+'</div>'+tiles+'</div>';
   }
   function cmpHtml(a,p){
     var has=p.rows>0;
@@ -8509,23 +8540,25 @@ window.__renderAnSetups=renderBoth;window.__renderAnEmotions=renderEmo;setTimeou
       hMin=Math.min(hMin,h); hMax=Math.max(hMax,h);
     });
     Object.keys(cell).forEach(function(k){ maxAbs=Math.max(maxAbs,Math.abs(cell[k].net)); });
-    var head=hd('TIME-OF-DAY HEATMAP (HOUR OF ENTRY, IST)');
-    if(hMax<0) return '<div class="wr-block a-s">'+head+'<div class="wr-empty">No trades with a recorded time.</div></div>';
+    var head=cardHead(IC_HM,'Trade heatmap','Weekday by hour (IST)');
+    if(hMax<0) return '<section class="a-s wr-block">'+head+'<div class="wr-empty">No trades with a recorded time.</div></section>';
     var span=[0,1,2,3,4].concat(dayHas[addDays(b.ws,5)]?[5]:[],dayHas[addDays(b.ws,6)]?[6]:[]), hours=[], h;
     for(h=hMin;h<=hMax;h++) hours.push(h);
-    var grid='<div class="wr-heat" style="grid-template-columns:40px repeat('+hours.length+',minmax(24px,1fr))"><span></span>'
-      +hours.map(function(x){ return '<span class="wr-hh">'+pad(x)+'</span>'; }).join('');
+    var grid='<div class="wr-heat" style="grid-template-columns:36px repeat('+hours.length+',minmax(26px,1fr))"><span class="wr-hh"></span>'
+      +hours.map(function(x){ return '<span class="wr-hh">'+x+'</span>'; }).join('');
     span.forEach(function(i){
       var d=addDays(b.ws,i);
       grid+='<span class="wr-hd">'+dayName(d)+'</span>';
       hours.forEach(function(x){
         var c=cell[d+'|'+x];
         if(!c){ grid+='<span class="wr-hc"></span>'; return; }
-        var a=maxAbs?Math.max(.18,Math.min(1,Math.abs(c.net)/maxAbs)):.18;
-        grid+='<span class="wr-hc" title="'+esc(dayName(d)+' '+pad(x)+':00 - '+c.n+' trade'+(c.n===1?'':'s')+', '+money(c.net))+'"><i style="background:'+(c.net<0?'var(--red)':c.net>0?'var(--green)':'var(--faint)')+';opacity:'+a.toFixed(2)+'"></i><b>'+c.n+'</b></span>';
+        var f=maxAbs?Math.min(1,Math.abs(c.net)/maxAbs):0, a=(.16+f*.5).toFixed(2), rgb=c.net<0?'240,104,92':c.net>0?'67,215,135':'139,144,163';
+        var tip='<div class="th">'+dayName(d)+' '+pad(x)+':00</div><div class="tr"><span>Trades</span><b>'+c.n+'</b></div><div class="tr"><span>Net P&amp;L</span><b>'+money(c.net)+'</b></div>';
+        grid+='<span class="wr-hc" data-t="'+esc(tip)+'" style="background:rgba('+rgb+','+a+');box-shadow:inset 0 0 0 1px rgba('+rgb+',.4)">'+c.n+'</span>';
       });
     });
-    return '<div class="wr-block a-s">'+head+'<div class="wr-scroll">'+grid+'</div><div class="wr-cap">Number in a cell is trades opened that hour. Colour strength is P&amp;L relative to the biggest cell. Green is profit, red is loss.</div></div>';
+    return '<section class="a-s wr-block">'+head+'<div class="a-plot wr-hm-wrap">'+grid+'</div></div>'
+      +'<div class="a-read">Number is trades opened that hour. <span style="color:var(--green)">Green</span> is net profit, <span style="color:var(--red)">red</span> is net loss. Brighter means a bigger P&amp;L swing.</div></section>';
   }
   function impactHtml(rows){
     var J=(window.__getJournals?window.__getJournals():[])||[], em={}, mt={}, eo={}, none=0;
@@ -8548,14 +8581,16 @@ window.__renderAnSetups=renderBoth;window.__renderAnEmotions=renderEmo;setTimeou
       +list('EMOTION IMPACT ON P&amp;L',eo,'No emotion logged on this week\'s journal entries.')
       +'</div><div class="wr-cap">'+none+' of '+rows.length+' trade'+(rows.length===1?'':'s')+' have no mistake tag or emotion logged, so they are left out above. A trade with two tags counts under both, so totals can add up to more than net P&amp;L.</div></div>';
   }
-  function hd(t){ var s=String(t||''), ttl=s.charAt(0)+s.slice(1).toLowerCase().replace(/\bist\b/g,'IST'); var ic=/EQUITY/.test(s)?'<path d="M3 17l5-6 4 3 8-9"/>':/HEATMAP/.test(s)?'<path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h6v6h-6z"/>':'<path d="M4 19V9M11 19V4M18 19v-7"/>'; return '<div class="a-s-head"><div class="a-s-ttl"><span class="a-s-ic"><svg viewBox="0 0 24 24">'+ic+'</svg></span><h3>'+ttl+'</h3></div></div>'; }
+  function hd(t){ var s=String(t||''), ttl=s.charAt(0)+s.slice(1).toLowerCase().replace(/\bist\b/g,'IST').replace(/p&amp;l/g,'P&amp;L'); var ic=/EQUITY/.test(s)?'<path d="M3 17l5-6 4 3 8-9"/>':/HEATMAP/.test(s)?'<path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h6v6h-6z"/>':'<path d="M4 19V9M11 19V4M18 19v-7"/>'; return '<div class="a-s-head"><div class="a-s-ttl"><span class="a-s-ic"><svg viewBox="0 0 24 24">'+ic+'</svg></span><h3>'+ttl+'</h3></div></div>'; }
   function safeBlock(label,fn){
     try{ return fn(); }catch(err){ return '<div class="wr-block a-s">'+hd(label)+'<div class="wr-empty">This section could not load ('+esc(err&&err.message||'error')+').</div></div>'; }
   }
   function analyticsHtml(rows,b){
+    rows=sortedRows(rows);
     var cur=metrics(rows), prev=metrics(wkRows(addDays(b.ws,-7)));
     return '<div class="wr-an">'
-      +safeBlock('EQUITY CURVE AND DRAWDOWN',function(){ return equityHtml(rows,cur); })
+      +safeBlock('EQUITY CURVE AND DRAWDOWN',function(){ return equityHtml(rows); })
+      +safeBlock('AVERAGES AND STREAKS',function(){ return kpiHtml(cur); })
       +safeBlock('THIS WEEK VS LAST WEEK',function(){ return cmpHtml(cur,prev); })
       +safeBlock('SESSION AND PAIR BREAKDOWN',function(){ return '<div class="wr-block a-s"><div class="wr-cols">'+groupHtml('SESSION BREAKDOWN',rows,function(t){ return t.ses; })+groupHtml('PAIR BREAKDOWN',rows,function(t){ return t.sym; })+'</div></div>'; })
       +safeBlock('TIME-OF-DAY HEATMAP',function(){ return heatHtml(rows,b); })
@@ -8686,6 +8721,41 @@ window.__renderAnSetups=renderBoth;window.__renderAnEmotions=renderEmo;setTimeou
     }).catch(function(err){ ev.list=[]; ev.fails++; ev.msg=(err&&err.message)||'Could not load the calendar.'; })
     .then(function(){ ev.loading=false; ev.loaded=true; ev.t=Date.now(); renderEvents(); });
   }
+
+  /* hover tooltips for the chart and heatmap cards (same #ttip element and look as the Analytics tab) */
+  var ttipEl=document.getElementById('ttip');
+  function tipShow(e,html){
+    if(!ttipEl) return;
+    ttipEl.innerHTML=html; ttipEl.classList.add('show');
+    var w=220, h=ttipEl.offsetHeight||70, left=e.clientX+14, top=e.clientY-h/2;
+    if(left+w>window.innerWidth) left=e.clientX-w-14;
+    if(top<8) top=8;
+    if(top+h>window.innerHeight-8) top=window.innerHeight-h-8;
+    ttipEl.style.left=left+'px'; ttipEl.style.top=top+'px';
+  }
+  function tipHide(){ if(ttipEl) ttipEl.classList.remove('show'); }
+  function scrubClear(except){
+    var all=root.querySelectorAll('svg.wr-sc'), i, l, d;
+    for(i=0;i<all.length;i++){ if(all[i]===except) continue; l=all[i].querySelector('.sc-x'); d=all[i].querySelector('.sc-d'); if(l) l.style.opacity=0; if(d) d.style.opacity=0; }
+  }
+  root.addEventListener('mousemove',function(e){
+    var t=e.target, svg=t&&t.closest?t.closest('svg.wr-sc'):null;
+    if(svg){
+      var c=charts[svg.getAttribute('data-c')]; scrubClear(svg);
+      if(!c||!c.arr.length){ tipHide(); return; }
+      var bx=svg.getBoundingClientRect(), n=c.arr.length;
+      var i=Math.max(0,Math.min(n-1,Math.round(((e.clientX-bx.left)/bx.width*c.Wd-c.pl)/(c.Wd-c.pl-c.pr)*(n-1))));
+      var l=svg.querySelector('.sc-x'), d=svg.querySelector('.sc-d');
+      l.setAttribute('x1',c.X(i)); l.setAttribute('x2',c.X(i)); d.setAttribute('cx',c.X(i)); d.setAttribute('cy',c.y(c.arr[i]));
+      l.style.opacity=1; d.style.opacity=1;
+      tipShow(e,'<div class="th">Trade #'+(i+1)+'</div><div class="tr"><span>'+esc(c.label)+'</span><b>'+money(c.arr[i])+'</b></div>');
+      return;
+    }
+    scrubClear(null);
+    var cell=t&&t.closest?t.closest('[data-t]'):null;
+    if(cell&&root.contains(cell)) tipShow(e,cell.getAttribute('data-t')); else tipHide();
+  });
+  root.addEventListener('mouseleave',function(){ scrubClear(null); tipHide(); });
 
   /* ---------- wiring ---------- */
   var lastStats='';
