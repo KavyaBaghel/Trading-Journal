@@ -7823,6 +7823,13 @@ function fillHero(){const s=(id,h)=>{const e=$(id);if(e)e.innerHTML=h};
         else done();
       }
     });
+    /* Pinned widgets show as soon as the tab opens; the rest appear after Generate widgets. */
+    (function(){
+      if(!WIDGETS.length || !window.jlAiState) return;
+      let html = '';
+      WIDGETS.forEach((w, i)=>{ if(window.jlAiState.isPinned(w.sub)) html += widgetHtml(w, i); });
+      if(html) wBox.innerHTML = '<div class="aic-wgrid">' + html + '</div>';
+    })();
   }
 
   window.__mountAiCoach = mount;
