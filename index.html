@@ -1412,6 +1412,16 @@
   .ldg-wk-days span:nth-child(n+6){opacity:.5}
   .ldg-wk .ldg-pnl{font-variant-numeric:tabular-nums}
   .ldg-wk .ldg-meta{font-size:10px;color:var(--sub)}
+  /* cosmetic pass: dotted texture, gradient date badge, soft-fade bars, NET micro-label, bigger result */
+  .ldg-row.ldg-wk{background:radial-gradient(rgba(255,255,255,.07) 1px,transparent 1.2px) 0 0/14px 14px,radial-gradient(120% 90% at 100% 0%,rgba(124,108,240,.26),rgba(124,108,240,0) 58%),linear-gradient(160deg,rgba(255,255,255,.05),rgba(255,255,255,0) 55%),var(--panel);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.08),inset 0 0 0 1px rgba(179,159,251,.08),0 14px 30px -20px rgba(124,108,240,.75)}
+  .ldg-row.ldg-wk .ldg-d b{background:linear-gradient(135deg,var(--accent),var(--accent-2));color:#141225;box-shadow:0 4px 12px -4px rgba(124,108,240,.8)}
+  .ldg-wk-pill{box-shadow:0 0 12px -3px rgba(124,108,240,.7);background:linear-gradient(135deg,rgba(124,108,240,.22),rgba(124,108,240,.08))}
+  .ldg-wk-spark i:not(.e){background:linear-gradient(180deg,currentColor,color-mix(in srgb,currentColor 30%,transparent))}
+  .ldg-wk-spark{height:32px}
+  .ldg-wk:not(.upcoming) .ldg-pnl{font-size:21px;font-weight:800;line-height:1.1;display:flex;flex-direction:column;gap:2px}
+  .ldg-wk:not(.upcoming) .ldg-pnl::before{content:"WEEK NET";font-family:"IBM Plex Mono",monospace;font-size:8px;font-weight:700;letter-spacing:.12em;color:var(--faint);text-shadow:none}
+  .ldg-wk .ldg-meta{padding-top:6px;border-top:1px solid rgba(255,255,255,.06)}
 
   /* week subtotal — spans the full 7-column grid */
   .ldg-sub{grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;gap:14px;
