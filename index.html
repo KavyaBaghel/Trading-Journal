@@ -3267,14 +3267,12 @@ window.__mountOpenPos=function(){const o=(window.__openTrades||[]).concat((windo
   <div id="psyHost"></div>
   <aside class="psy-side">
     <div class="psy-side-card glass up-reveal" style="animation-delay:80ms">
-      <div class="psy-side-head"><span class="psy-side-ic"><svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></span><h3>The 6-stage ritual</h3></div>
+      <div class="psy-side-head"><span class="psy-side-ic"><svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></span><h3>The 4-stage ritual</h3></div>
       <div class="psy-list">
-        <div class="psy-list-item"><b>1 · Mind Check</b><span>Six honest questions before you're allowed near a chart.</span></div>
-        <div class="psy-list-item"><b>2 · Setup Scan</b><span>Confirm a valid setup is actually forming — no forcing it.</span></div>
-        <div class="psy-list-item"><b>3 · Checklist</b><span>News, risk, entry and exit plan all signed off before the trigger.</span></div>
-        <div class="psy-list-item"><b>4 · Live Trade</b><span>Three hard rules while the position is open — no SL/TP tinkering.</span></div>
-        <div class="psy-list-item"><b>5 · Debrief</b><span>Screenshot it, feel it, write it down while it's fresh.</span></div>
-        <div class="psy-list-item"><b>6 · Cooldown</b><span>Mandatory pause. No re-entry on impulse, ever.</span></div>
+        <div class="psy-list-item"><b>1 · Setup Scan</b><span>Confirm a valid setup is actually forming — no forcing it.</span></div>
+        <div class="psy-list-item"><b>2 · Live Trade</b><span>Three hard rules while the position is open — no SL/TP tinkering.</span></div>
+        <div class="psy-list-item"><b>3 · Debrief</b><span>Screenshot it, feel it, write it down while it's fresh.</span></div>
+        <div class="psy-list-item"><b>4 · Cooldown</b><span>Mandatory pause. No re-entry on impulse, ever.</span></div>
       </div>
     </div>
     <div class="psy-side-card glass up-reveal" style="animation-delay:120ms">
@@ -4520,8 +4518,8 @@ document.addEventListener('input',e=>{if(cur&&RUN[cur.dataset.tool]&&cur.contain
   window.iconFor = iconFor;
 
   // ---------- psychology checklist (Today's Summary) ----------
-  // Shows the same checklist you edit in the Psychology tab (Checklist step). The items are read from the
-  // Psychology tab's saved list (localStorage 'jlPsy:checklist:items'), falling back to its default list.
+  // Shows the same Setup Scan list you edit in the Psychology tab. The items are read from the
+  // Psychology tab's saved list (localStorage 'jlPsy:setup:requirements'), falling back to its default list.
   // Ticks are remembered per trading day (06:00 IST reset) so each new day starts clean.
   const PSY_CHECKLIST_DEFAULTS = [{k:'news',t:'News Checked',d:'No high-impact USD news within 30 minutes'},{k:'emotion2',t:'Emotion Calm',d:'Still calm right before pulling the trigger.'},{k:'rulesmet',t:'Plan Rules Met',d:'Entering only because my plan and risk rules are fully met — not because I want action.'},{k:'risklimit',t:'Risk Under Limit',d:'Lot is 0.02 and risk is about $10 or less'},{k:'entry',t:'Entry Confirmed',d:"Price action confirms the entry on the setup's confirmed candle or timeframe close."},{k:'signal',t:'Confirmation Signal',d:'Daily stop not hit: under 4 trades, under 2 losses, week above -$80'},{k:'exit',t:'Exit Plan Set',d:'SL behind structure, TP at least 2R, and the 1.5R partial planned, all written before entry'}];
   const ovEsc = v => String(v==null?'':v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
@@ -4529,11 +4527,12 @@ document.addEventListener('input',e=>{if(cur&&RUN[cur.dataset.tool]&&cur.contain
   function ovLoadList(lsKey, defaults, prefix){
     let list = defaults;
     try{ const raw = localStorage.getItem(lsKey); if(raw){ const p = JSON.parse(raw); if(Array.isArray(p) && p.length) list = p.filter(r=>r && r.k && r.t); } }catch(e){}
-    return list.map(r=>({k:prefix+r.k, t:r.t, d:r.d, g:prefix==='m:'?'MIND':'CHECKLIST'}));
+    return list.map(r=>({k:prefix+r.k, t:r.t, d:r.d, g:'SETUP'}));
   }
-  /* Mind Stability Check first, then the pre-trade Checklist step, both exactly as saved in the Psychology tab */
+  /* Setup Scan is the only checklist now, exactly as saved in the Psychology tab */
+  const PSY_SETUP_DEFAULTS = [{k:'req_1',t:'Both side confirmation'}, {k:'req_2',t:'No blockage'}, {k:'req_3',t:'No losses back to back; if lost 1, stop for this session'}, {k:'req_4',t:'SL above candle and under 40 pips'}, {k:'req_5',t:'No c2c before 70 pips'}, {k:'req_6',t:'If 1 confirmed and another doesn\'t, and no blockage on both, you can still take the trade'}];
   function ovChkItems(){
-    return ovLoadList('jlPsy:mind:items', PSY_MIND_DEFAULTS, 'm:').concat(ovLoadList('jlPsy:checklist:items', PSY_CHECKLIST_DEFAULTS, 'c:'));
+    return ovLoadList('jlPsy:setup:requirements', PSY_SETUP_DEFAULTS, 's:');
   }
   function ovChkKey(){ return 'jlOvChk:' + (typeof getTradingDayIST==='function' ? getTradingDayIST() : ''); }
   function ovChkLoad(){ try{ const o = JSON.parse(localStorage.getItem(ovChkKey())||'{}'); return (o && typeof o==='object') ? o : {}; }catch(e){ return {}; } }
@@ -4546,7 +4545,7 @@ document.addEventListener('input',e=>{if(cur&&RUN[cur.dataset.tool]&&cur.contain
     let lastG = '';
     list.innerHTML = items.map(r=>{
       const on = !!saved[r.k];
-      const head = r.g!==lastG ? ((lastG=r.g), '<div class="grp-label" style="cursor:default;margin:'+(r.g==='MIND'?'0':'8px')+' 0 2px">'+(r.g==='MIND'?'MIND CHECK':'PRE-TRADE CHECKLIST')+'</div>') : '';
+      const head = r.g!==lastG ? ((lastG=r.g), '<div class="grp-label" style="cursor:default;margin:0 0 2px">SETUP SCAN</div>') : '';
       return head+'<li data-k="'+ovEsc(r.k)+'" class="'+(on?'done':'')+'"><input type="checkbox" '+(on?'checked':'')+' tabindex="-1"><span class="chk-t"><b style="font-weight:600">'+ovEsc(r.t)+'</b>'+(r.d?'<span class="chk-d">'+ovEsc(r.d)+'</span>':'')+'</span></li>';
     }).join('');
     updateProgress();
@@ -6353,7 +6352,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'){if(mpOpen)closeMont
   let LIVE_RULES = LIVE_DEFAULTS.map(r=>({...r}));
 
   let state = {
-    step: 1,
+    step: 2,
     mind: Object.fromEntries(MIND_ITEMS.map(i=>[i.k,false])),
     mindEditing: false,
     setup: Object.fromEntries(SETUP_REQS.map(i=>[i.k,false])),
@@ -6441,6 +6440,8 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'){if(mpOpen)closeMont
     syncSetupState();
     syncMindState();
     syncChecklistState();
+    /* Mind Check and Checklist stages were removed: a saved session on either one moves to the Setup Scan (or Live Trade if the scan was already complete) */
+    if(state.step===1) state.step = 2; else if(state.step===3) state.step = setupDone() ? 4 : 2;
     try{
       const r = await STORAGE.get('reminder:last', false);
       if(r && r.value) state.reminder = JSON.parse(r.value);
@@ -6452,7 +6453,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'){if(mpOpen)closeMont
     render();
     if(!cooldownTimer){
       cooldownTimer = setInterval(()=>{
-        if(state.step===1 && cooldownActive()) render();
+        if(state.step===2 && cooldownActive()) render();
         else if(state.step===6 && cooldown15Active()) render();
       }, 30000);
     }
@@ -6503,11 +6504,11 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'){if(mpOpen)closeMont
     return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">'+(ROW_ICONS[key]||ROW_ICONS.entry)+'</svg>';
   }
 
-  function mindDone(){ return MIND_ITEMS.every(i=>state.mind[i.k]); }
+  function mindDone(){ return true; } /* Mind Check stage removed */
   function setupCount(){ return SETUP_REQS.filter(i=>state.setup[i.k]).length; }
   function setupDone(){ return SETUP_REQS.length > 0 && setupCount() === SETUP_REQS.length; }
   function checklistCount(){ return CHECKLIST_ITEMS.filter(i=>state.checklist[i.k]).length; }
-  function checklistDone(){ return checklistCount() === CHECKLIST_ITEMS.length; }
+  function checklistDone(){ return true; } /* Checklist stage removed */
 
   function cooldownRemainingMs(){
     if(!state.lastTradeCompletedAt) return 0;
@@ -6531,30 +6532,25 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'){if(mpOpen)closeMont
   }
 
   function tabsHtml(){
+    const VIS = [2,4,5,6]; /* Setup Scan, Live Trade, Debrief, Cooldown */
     return `<div class="psy-rail" role="tablist">
-      ${STEPS.map((s,idx)=>{
-        const n = idx+1;
+      ${VIS.map((n,pos)=>{
+        const s = STEPS[n-1];
         let cls = "";
         if(n === state.step) cls += " on";
         else if(n < state.step) cls += " done";
-        let locked = false;
-        if(n === 2 && (!mindDone() || cooldownActive())) locked = true;
-        if(n === 3 && !setupDone()) locked = true;
-        if(n === 4 && !checklistDone()) locked = true;
-        if(n === 5 && !checklistDone()) locked = true;
-        if(n === 6 && !checklistDone()) locked = true;
+        const locked = (n===4 || n===5 || n===6) && !setupDone();
         const disabled = locked && n > state.step;
         return `<button class="${cls.trim()}" data-act="goto" data-n="${n}" ${disabled ? "disabled" : ""}>
-          <span class="n">${n < state.step ? "✓" : n}</span><span>${s}</span>
+          <span class="n">${n < state.step ? "✓" : pos+1}</span><span>${s}</span>
         </button>`;
       }).join("")}
     </div>`;
   }
 
   function goStep(n){
-    if(n===2 && (!mindDone() || cooldownActive())) return;
-    if(n===3 && !setupDone()) return;
-    if((n===4||n===5||n===6) && !checklistDone()) return;
+    if(n===1 || n===3) return; /* Mind Check and Checklist stages were removed */
+    if((n===4||n===5||n===6) && !setupDone()) return;
     state.step = n;
     saveState();
     render();
@@ -6591,6 +6587,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'){if(mpOpen)closeMont
     state.setupEditing = false;
     saveState();
     render();
+    try{ if(typeof window.__renderOvChecklist === 'function') window.__renderOvChecklist(); }catch(e){} // keep Today's Summary checklist in sync
   }
   async function cancelEditRequirements(){
     try{
@@ -6810,7 +6807,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'){if(mpOpen)closeMont
   function startNextTrade(){
     if(cooldown15Active()) return;
     state = {
-      step: 1,
+      step: 2,
       mind: Object.fromEntries(MIND_ITEMS.map(i=>[i.k,false])),
       mindEditing: false,
       setup: Object.fromEntries(SETUP_REQS.map(i=>[i.k,false])),
@@ -6839,10 +6836,8 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'){if(mpOpen)closeMont
   }
 
   function renderStatusNote(){
-    if(state.step===1) return `<div class="psy-note${cooldownActive()?' warn':''}">${cooldownActive() ? "In cooldown — no need to trade right now." : "Complete every mind check to unlock the setup scan."}</div>`;
-    if(state.step===2) return `<div class="psy-note">Setup scan unlocked. Confirm the setup is real before checklist.</div>`;
-    if(state.step===3) return `<div class="psy-note">Setup scan complete. Pre-trade checklist unlocked.</div>`;
-    if(state.step===4 || state.step===5) return `<div class="psy-note">Checklist complete. Live trade rules unlocked.</div>`;
+    if(state.step===2) return `<div class="psy-note${cooldownActive()?' warn':''}">${cooldownActive() ? "You closed a trade recently. Take a breath before the next entry." : "Confirm the setup is real before you plan an entry."}</div>`;
+    if(state.step===4 || state.step===5) return `<div class="psy-note">Setup scan complete. Live trade rules unlocked.</div>`;
     return "";
   }
 
@@ -6932,8 +6927,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'){if(mpOpen)closeMont
         </div>`).join("")}
       <div class="psy-actions">
         <button class="btn-ghost" data-act="reset-setup">Reset</button>
-        <button class="btn-ghost" data-act="goto" data-n="1">Back</button>
-        <button class="btn-primary" data-act="goto" data-n="3" ${done?"":"disabled"}>Continue${arrowIcon()}</button>
+        <button class="btn-primary" data-act="goto" data-n="4" ${done?"":"disabled"}>Continue${arrowIcon()}</button>
       </div>`;
   }
 
@@ -7022,7 +7016,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'){if(mpOpen)closeMont
       <div class="sub" style="margin:4px 0 6px">Log your entry, stop loss, and target as the trade is active.</div>
       ${LIVE_RULES.map(r=>`<div class="psy-info"><span class="ic">${rowIcon(r.k)}</span><div><b>${r.t}</b><span>${r.d}</span></div></div>`).join("")}
       <div class="psy-actions">
-        <button class="btn-ghost" data-act="goto" data-n="3">Back</button>
+        <button class="btn-ghost" data-act="goto" data-n="2">Back</button>
         <button class="btn-primary" data-act="goto" data-n="5">Continue to After Trade${arrowIcon()}</button>
       </div>`;
   }
@@ -7100,7 +7094,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'){if(mpOpen)closeMont
           ${COOLDOWN_OPTIONS_MIN.map(m=>`<button class="btn-ghost" data-act="pick-cooldown" data-min="${m}">${m} min</button>`).join("")}
         </div>
         <div class="psy-info"><span class="ic">${rowIcon('d2')}</span><div><b>Step away from the screen.</b><span>Close the chart. Don't watch price during the pause.</span></div></div>
-        <div class="psy-info"><span class="ic">${rowIcon('d3')}</span><div><b>No re-entry on impulse.</b><span>The next trade only starts after a fresh Mind Check.</span></div></div>
+        <div class="psy-info"><span class="ic">${rowIcon('d3')}</span><div><b>No re-entry on impulse.</b><span>The next trade only starts after a fresh Setup Scan.</span></div></div>
         <div class="psy-actions">
           <button class="btn-ghost" data-act="goto" data-n="5">Back</button>
         </div>`;
@@ -7119,7 +7113,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'){if(mpOpen)closeMont
         ? `<div class="psy-note alert">⏸ Cooldown active — ${formatRemaining(remaining)} left. No back-to-back trades.</div>`
         : `<div class="psy-note ok">Cooldown complete. You're clear to start the next trade whenever you're ready.</div>`}
       <div class="psy-info"><span class="ic">${rowIcon('d2')}</span><div><b>Step away from the screen.</b><span>Close the chart. Don't watch price during the pause.</span></div></div>
-      <div class="psy-info"><span class="ic">${rowIcon('d3')}</span><div><b>No re-entry on impulse.</b><span>The next trade only starts after a fresh Mind Check.</span></div></div>
+      <div class="psy-info"><span class="ic">${rowIcon('d3')}</span><div><b>No re-entry on impulse.</b><span>The next trade only starts after a fresh Setup Scan.</span></div></div>
       <div class="psy-actions">
         <button class="btn-ghost" data-act="goto" data-n="5">Back</button>
         <button class="btn-primary psy-full" data-act="start-next-trade" ${done?"":"disabled"}>${done ? "Start next trade" : `⏸ Pause ${mins}m cooldown`}${arrowIcon()}</button>
@@ -7127,8 +7121,9 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'){if(mpOpen)closeMont
   }
 
   function overallProgressBar(){
-    const idx = state.step - 1;
-    const pct = Math.round((idx/(STEPS.length-1))*100);
+    const VIS = [2,4,5,6];
+    const idx = Math.max(0, VIS.indexOf(state.step));
+    const pct = Math.round((idx/(VIS.length-1))*100);
     const full = state.step === STEPS.length;
     return `<div class="progress-wrap top-progress${full?' full':''}" style="margin:10px 0 14px">
       <div class="progress-lg"><div class="fill" data-pid="overall" style="width:${pct}%"></div></div>
@@ -7145,7 +7140,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'){if(mpOpen)closeMont
     else if(state.step===5) body = renderDebriefStep();
     else body = renderCooldownStep();
 
-    const reminderHtml = (state.step===1 && state.reminder) ?
+    const reminderHtml = (state.step===2 && state.reminder) ?
       `<div class="psy-note warn">Yesterday's reminder — don't repeat: ${state.reminder.text}</div>` : "";
 
     stageEl.innerHTML = `
@@ -7163,7 +7158,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'){if(mpOpen)closeMont
       ${renderStatusNote()}
       ${reminderHtml}
       <section class="a-s">${body}</section>
-      <div class="psy-foot">6-stage pre-trade ritual · local only</div>
+      <div class="psy-foot">4-stage pre-trade ritual · local only</div>
     `;
     animateProgressFills();
   }
