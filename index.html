@@ -8241,6 +8241,21 @@ window.__renderAnSetups=renderBoth;window.__renderAnEmotions=renderEmo;setTimeou
 #weeklyReview .wr-note{margin-top:10px}
 #weeklyReview .wr-preview{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;background:rgba(124,108,240,.12);border:1px solid rgba(124,108,240,.35);border-radius:12px;padding:10px 14px;margin-bottom:14px;font-size:12.5px;color:var(--sub)}
 @media(max-width:820px){#weeklyReview .wr-cols{grid-template-columns:1fr}}
+#weeklyReview .wr-an{margin-top:24px;display:grid;gap:22px}
+#weeklyReview .wr-block{border-top:1px solid var(--border);padding-top:16px;min-width:0}
+#weeklyReview .wr-svg{display:block;width:100%;height:150px}
+#weeklyReview .wr-svg.dd{height:56px;margin-top:6px}
+#weeklyReview .wr-cap{font-size:11.5px;color:var(--faint);margin:8px 0 14px;line-height:1.45}
+#weeklyReview .wr-mini{width:100%;border-collapse:collapse;font-size:12.5px}
+#weeklyReview .wr-mini th{text-align:left;font-size:10.5px;letter-spacing:.08em;font-weight:600;color:var(--faint);padding:6px 10px 8px 0}
+#weeklyReview .wr-mini td{padding:8px 10px 8px 0;border-top:1px solid var(--border);color:var(--sub);font-variant-numeric:tabular-nums}
+#weeklyReview .wr-mini td.ev{color:var(--text)}
+#weeklyReview .wr-heat{display:grid;gap:3px;align-items:center;min-width:360px}
+#weeklyReview .wr-hh,#weeklyReview .wr-hd{font-size:10px;color:var(--faint);text-align:center}
+#weeklyReview .wr-hd{text-align:left;font-weight:600}
+#weeklyReview .wr-hc{position:relative;display:flex;align-items:center;justify-content:center;height:26px;border-radius:5px;background:var(--panel-2);overflow:hidden;font-size:10px;color:var(--text)}
+#weeklyReview .wr-hc i{position:absolute;inset:0}
+#weeklyReview .wr-hc b{position:relative;font-weight:600}
 </style>
 <script id="jl-weekly-review">
 /* Saturday-only weekly review, shown on Today's Summary and at the top of the Calendar tab (one panel, moved to whichever of the two is open). Trading day and week use the same 06:00 IST / Monday-Sunday rules as the rest of the app.
@@ -8280,6 +8295,146 @@ window.__renderAnSetups=renderBoth;window.__renderAnEmotions=renderEmo;setTimeou
   function bounds(k){ var dow=(parseKey(k).getUTCDay()+6)%7, ws=addDays(k,-dow); return {ws:ws,we:addDays(ws,6),nm:addDays(ws,7)}; }
   function kind(p){ return typeof window.jlKind==='function' ? window.jlKind(p) : (p>0?'win':p<0?'loss':'be'); }
   function dayName(k){ return fmtDay(k,{weekday:'short'}); }
+
+  /* ---------- deeper analytics (same win/loss/rule-break definitions as the tiles above) ---------- */
+  function wkRows(ws){
+    var we=addDays(ws,6);
+    return (window.__trades||[]).filter(function(t){ return t&&t.d&&t.d>=ws&&t.d<=we&&isFinite(Number(t.pnl)); })
+      .sort(function(a,c){ var x=a.d+' '+a.t, y=c.d+' '+c.t; return x<y?-1:x>y?1:0; });
+  }
+  function posKey(t){ return t.d+'|'+t.t+'|'+t.sym+'|'+t.side; }
+  function metrics(rows){
+    var lossLim=Number(window.jlDailyLossLimit)||0, tradeLim=Number(window.jlMaxTradesPerDay)||0;
+    var m={net:0,gw:0,gl:0,W:0,L:0,BE:0,sw:0,sl:0,n:0,broken:0,maxW:0,maxL:0,cur:0}, seen={}, days={}, rw=0, rl=0;
+    rows.forEach(function(t){
+      var p=Number(t.pnl), c=kind(p), d=days[t.d]||(days[t.d]={loss:0,keys:{}});
+      m.net+=p; if(p>0) m.gw+=p; else if(p<0){ m.gl-=p; d.loss-=p; }
+      seen[posKey(t)]=1; d.keys[posKey(t)]=1;
+      if(c==='win'){ m.W++; m.sw+=p; rw++; rl=0; m.maxW=Math.max(m.maxW,rw); m.cur=rw; }
+      else if(c==='loss'){ m.L++; m.sl-=p; rl++; rw=0; m.maxL=Math.max(m.maxL,rl); m.cur=-rl; }
+      else m.BE++;
+    });
+    m.rows=rows.length; m.n=Object.keys(seen).length;
+    Object.keys(days).forEach(function(k){ var x=days[k]; if((lossLim>0&&x.loss>=lossLim)||(tradeLim>0&&Object.keys(x.keys).length>=tradeLim)) m.broken++; });
+    m.dec=m.W+m.L; m.wr=m.dec?m.W/m.dec*100:null; m.pf=m.gl>0?m.gw/m.gl:null;
+    m.avgW=m.W?m.sw/m.W:null; m.avgL=m.L?m.sl/m.L:null; m.exp=rows.length?m.net/rows.length:null;
+    return m;
+  }
+  function tileHtml(l,v,s,col){ return '<div class="wr-tile"><div class="l">'+l+'</div><div class="v"'+(col?' style="color:'+col+'"':'')+'>'+v+'</div>'+(s?'<div class="s">'+s+'</div>':'')+'</div>'; }
+  function equityHtml(rows,m){
+    var eq=[0], dd=[0], c=0, pk=0, mdd=0;
+    rows.forEach(function(t){ c+=Number(t.pnl); eq.push(c); pk=Math.max(pk,c); var d=pk-c; dd.push(d); mdd=Math.max(mdd,d); });
+    var W=600, H=150, P=8, lo=Math.min.apply(null,eq), hi=Math.max.apply(null,eq);
+    if(hi===lo){ hi+=1; lo-=1; }
+    function X(i){ return P+(W-2*P)*(eq.length>1?i/(eq.length-1):0); }
+    function Y(v){ return P+(H-2*P)*(hi-v)/(hi-lo); }
+    var pts=eq.map(function(v,i){ return X(i).toFixed(1)+','+Y(v).toFixed(1); }), y0=Y(0).toFixed(1), end=eq[eq.length-1];
+    var col=end<0?'var(--red)':'var(--green)';
+    var svg='<svg class="wr-svg" viewBox="0 0 '+W+' '+H+'" preserveAspectRatio="none" role="img" aria-label="Equity curve for the week">'
+      +'<line x1="'+P+'" x2="'+(W-P)+'" y1="'+y0+'" y2="'+y0+'" stroke="var(--border)" stroke-dasharray="4 4"/>'
+      +'<polygon points="'+X(0).toFixed(1)+','+y0+' '+pts.join(' ')+' '+X(eq.length-1).toFixed(1)+','+y0+'" fill="'+col+'" opacity=".14"/>'
+      +'<polyline points="'+pts.join(' ')+'" fill="none" stroke="'+col+'" stroke-width="2" stroke-linejoin="round" vector-effect="non-scaling-stroke"/></svg>';
+    var H2=56, dm=mdd||1;
+    var dp=dd.map(function(v,i){ return X(i).toFixed(1)+','+(P+(H2-2*P)*(v/dm)).toFixed(1); });
+    var ddSvg='<svg class="wr-svg dd" viewBox="0 0 '+W+' '+H2+'" preserveAspectRatio="none" role="img" aria-label="Drawdown for the week">'
+      +'<polygon points="'+X(0).toFixed(1)+','+P+' '+dp.join(' ')+' '+X(eq.length-1).toFixed(1)+','+P+'" fill="var(--red)" opacity=".28"/>'
+      +'<polyline points="'+dp.join(' ')+'" fill="none" stroke="var(--red)" stroke-width="1.5" stroke-linejoin="round" vector-effect="non-scaling-stroke"/></svg>';
+    var cap='Week ends at '+money(end)+'. Peak '+money(pk)+'. '+(mdd>0?'Max drawdown -$'+mdd.toFixed(2)+' from the running peak.':'No drawdown this week.');
+    var st=m.cur>0?m.cur+' win'+(m.cur===1?'':'s'):m.cur<0?(-m.cur)+' loss'+(m.cur===-1?'':'es'):'none';
+    var tiles='<div class="wr-tiles">'
+      +tileHtml('AVG WIN',m.avgW==null?'-':money(m.avgW),m.W+' winning trade'+(m.W===1?'':'s'),m.avgW==null?'':'var(--green)')
+      +tileHtml('AVG LOSS',m.avgL==null?'-':'-$'+m.avgL.toFixed(2),m.L+' losing trade'+(m.L===1?'':'s'),m.avgL==null?'':'var(--red)')
+      +tileHtml('EXPECTANCY',m.exp==null?'-':money(m.exp),'Average P&amp;L per trade',m.exp==null?'':m.exp<0?'var(--red)':'var(--green)')
+      +tileHtml('BEST WIN STREAK',String(m.maxW),'Breakeven trades skipped')
+      +tileHtml('WORST LOSS STREAK',String(m.maxL),'Breakeven trades skipped',m.maxL>=3?'var(--red)':'')
+      +tileHtml('CURRENT STREAK',st,'As of the last trade',m.cur<0?'var(--red)':m.cur>0?'var(--green)':'')
+      +'</div>';
+    return '<div class="wr-block"><div class="wr-sub">EQUITY CURVE AND DRAWDOWN</div>'+svg+ddSvg+'<div class="wr-cap">'+cap+'</div>'+tiles+'</div>';
+  }
+  function cmpHtml(a,p){
+    var has=p.rows>0;
+    function sg(v,fmt){ return v==null?'-':fmt(v); }
+    function dlt(x,y,fmt,goodUp){ if(!has||x==null||y==null) return ['-','']; var d=x-y; if(Math.abs(d)<1e-9) return ['0','']; return [(d>0?'+':'')+fmt(d), goodUp==null?'':((d>0)===goodUp?'var(--green)':'var(--red)')]; }
+    function row(label,va,vb,d){ return '<tr><td class="ev">'+label+'</td><td>'+va+'</td><td>'+(has?vb:'-')+'</td><td'+(d[1]?' style="color:'+d[1]+'"':'')+'>'+d[0]+'</td></tr>'; }
+    var f2=function(v){ return v.toFixed(2); }, f0=function(v){ return String(Math.round(v)); };
+    var html='<div class="wr-block"><div class="wr-sub">THIS WEEK VS LAST WEEK</div><div class="wr-scroll"><table class="wr-mini"><thead><tr><th>Metric</th><th>This week</th><th>Last week</th><th>Change</th></tr></thead><tbody>'
+      +row('Net P&amp;L',money(a.net),money(p.net),dlt(a.net,p.net,function(v){ return (v<0?'-$':'$')+Math.abs(v).toFixed(2); },true))
+      +row('Win rate',sg(a.wr,function(v){ return Math.round(v)+'%'; }),sg(p.wr,function(v){ return Math.round(v)+'%'; }),dlt(a.wr,p.wr,function(v){ return f0(v)+' pts'; },true))
+      +row('Profit factor',sg(a.pf,f2),sg(p.pf,f2),dlt(a.pf,p.pf,f2,true))
+      +row('Trades',String(a.n),String(p.n),dlt(a.n,p.n,f0,null))
+      +row('Rule-break days',String(a.broken),String(p.broken),dlt(a.broken,p.broken,f0,false))
+      +'</tbody></table></div>'+(has?'':'<div class="wr-cap">No trades were logged last week, so there is nothing to compare against.</div>')+'</div>';
+    return html;
+  }
+  function groupHtml(title,rows,fn){
+    var g={}, order=[];
+    rows.forEach(function(t){
+      var k=fn(t); if(!k) return;
+      var x=g[k]; if(!x){ x=g[k]={net:0,W:0,L:0,seen:{}}; order.push(k); }
+      var p=Number(t.pnl), c=kind(p); x.net+=p; if(c==='win') x.W++; else if(c==='loss') x.L++; x.seen[posKey(t)]=1;
+    });
+    var head='<div class="wr-sub">'+title+'</div>';
+    if(!order.length) return '<div>'+head+'<div class="wr-empty">Nothing recorded.</div></div>';
+    order.sort(function(a,c){ return g[c].net-g[a].net; });
+    var body=order.map(function(k){
+      var x=g[k], d=x.W+x.L, col=x.net<0?'var(--red)':x.net>0?'var(--green)':'var(--sub)';
+      return '<tr><td class="ev">'+esc(k)+'</td><td style="color:'+col+'">'+money(x.net)+'</td><td>'+(d?Math.round(x.W/d*100)+'%':'-')+'</td><td>'+Object.keys(x.seen).length+'</td></tr>';
+    }).join('');
+    return '<div>'+head+'<table class="wr-mini"><thead><tr><th>Name</th><th>P&amp;L</th><th>Win rate</th><th>Trades</th></tr></thead><tbody>'+body+'</tbody></table></div>';
+  }
+  function heatHtml(rows,b){
+    var cell={}, hMin=24, hMax=-1, maxAbs=0, dayHas={};
+    rows.forEach(function(t){
+      var h=parseInt(String(t.t||'').slice(0,2),10); if(!isFinite(h)||h<0||h>23) return;
+      var k=t.d+'|'+h, x=cell[k]||(cell[k]={net:0,n:0}); x.net+=Number(t.pnl); x.n++; dayHas[t.d]=1;
+      hMin=Math.min(hMin,h); hMax=Math.max(hMax,h);
+    });
+    Object.keys(cell).forEach(function(k){ maxAbs=Math.max(maxAbs,Math.abs(cell[k].net)); });
+    var head='<div class="wr-sub">TIME-OF-DAY HEATMAP (HOUR OF ENTRY, IST)</div>';
+    if(hMax<0) return '<div class="wr-block">'+head+'<div class="wr-empty">No trades with a recorded time.</div></div>';
+    var span=[0,1,2,3,4].concat(dayHas[addDays(b.ws,5)]?[5]:[],dayHas[addDays(b.ws,6)]?[6]:[]), hours=[], h;
+    for(h=hMin;h<=hMax;h++) hours.push(h);
+    var grid='<div class="wr-heat" style="grid-template-columns:40px repeat('+hours.length+',minmax(24px,1fr))"><span></span>'
+      +hours.map(function(x){ return '<span class="wr-hh">'+pad(x)+'</span>'; }).join('');
+    span.forEach(function(i){
+      var d=addDays(b.ws,i);
+      grid+='<span class="wr-hd">'+dayName(d)+'</span>';
+      hours.forEach(function(x){
+        var c=cell[d+'|'+x];
+        if(!c){ grid+='<span class="wr-hc"></span>'; return; }
+        var a=maxAbs?Math.max(.18,Math.min(1,Math.abs(c.net)/maxAbs)):.18;
+        grid+='<span class="wr-hc" title="'+esc(dayName(d)+' '+pad(x)+':00 - '+c.n+' trade'+(c.n===1?'':'s')+', '+money(c.net))+'"><i style="background:'+(c.net<0?'var(--red)':c.net>0?'var(--green)':'var(--faint)')+';opacity:'+a.toFixed(2)+'"></i><b>'+c.n+'</b></span>';
+      });
+    });
+    return '<div class="wr-block">'+head+'<div class="wr-scroll">'+grid+'</div><div class="wr-cap">Number in a cell is trades opened that hour. Colour strength is P&amp;L relative to the biggest cell. Green is profit, red is loss.</div></div>';
+  }
+  function impactHtml(rows){
+    var J=(window.__getJournals?window.__getJournals():[])||[], em={}, mt={}, eo={}, none=0;
+    J.forEach(function(e){ if(e&&e.key&&e.emotion) em[e.key]=e.emotion; });
+    rows.forEach(function(t){
+      var p=Number(t.pnl), k=t.d+' '+t.t+' '+t.side+' '+t.en+' '+t.pnl, e=em[k];
+      var tg=(t.tags||[]).filter(function(g){ return typeof g==='string'&&g; });
+      if(!tg.length&&!e) none++;
+      tg.forEach(function(g){ var x=mt[g]||(mt[g]={n:0,net:0}); x.n++; x.net+=p; });
+      if(e){ var y=eo[e]||(eo[e]={n:0,net:0}); y.n++; y.net+=p; }
+    });
+    function list(title,o,empty){
+      var ks=Object.keys(o).sort(function(a,c){ return o[a].net-o[c].net; });
+      if(!ks.length) return '<div><div class="wr-sub">'+title+'</div><div class="wr-empty">'+empty+'</div></div>';
+      return '<div><div class="wr-sub">'+title+'</div><table class="wr-mini"><thead><tr><th>Name</th><th>Trades</th><th>P&amp;L</th></tr></thead><tbody>'
+        +ks.map(function(k){ var x=o[k]; return '<tr><td class="ev">'+esc(k)+'</td><td>'+x.n+'</td><td style="color:'+(x.net<0?'var(--red)':x.net>0?'var(--green)':'var(--sub)')+'">'+money(x.net)+'</td></tr>'; }).join('')+'</tbody></table></div>';
+    }
+    return '<div class="wr-block"><div class="wr-cols">'
+      +list('MISTAKE IMPACT ON P&amp;L',mt,'No mistake tags saved on this week\'s trades.')
+      +list('EMOTION IMPACT ON P&amp;L',eo,'No emotion logged on this week\'s journal entries.')
+      +'</div><div class="wr-cap">'+none+' of '+rows.length+' trade'+(rows.length===1?'':'s')+' have no mistake tag or emotion logged, so they are left out above. A trade with two tags counts under both, so totals can add up to more than net P&amp;L.</div></div>';
+  }
+  function analyticsHtml(rows,b){
+    var cur=metrics(rows), prev=metrics(wkRows(addDays(b.ws,-7)));
+    return '<div class="wr-an">'+equityHtml(rows,cur)+cmpHtml(cur,prev)
+      +'<div class="wr-block"><div class="wr-cols">'+groupHtml('SESSION BREAKDOWN',rows,function(t){ return t.ses; })+groupHtml('PAIR BREAKDOWN',rows,function(t){ return t.sym; })+'</div></div>'
+      +heatHtml(rows,b)+impactHtml(rows)+'</div>';
+  }
 
   /* ---------- week stats (real trades only) ---------- */
   function statsHtml(){
@@ -8342,7 +8497,8 @@ window.__renderAnSetups=renderBoth;window.__renderAnEmotions=renderEmo;setTimeou
 
     return '<div class="wr-tiles">'+tiles+'</div>'
       +'<div class="wr-cols"><div><div class="wr-sub">DAILY P&amp;L</div>'+bars+'</div>'
-      +'<div><div class="wr-sub">WHAT TO REVIEW</div><ul class="wr-list">'+li.join('')+'</ul></div></div>';
+      +'<div><div class="wr-sub">WHAT TO REVIEW</div><ul class="wr-list">'+li.join('')+'</ul></div></div>'
+      +(function(){ try{ return analyticsHtml(rows,b); }catch(err){ return ''; } })();
   }
 
   /* ---------- rule saved for Monday ---------- */
