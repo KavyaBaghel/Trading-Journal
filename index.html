@@ -4146,7 +4146,7 @@ document.addEventListener('input',e=>{if(cur&&RUN[cur.dataset.tool]&&cur.contain
     const lim = Number(window.jlDailyLossLimit) || 0;
     if(!(lim>0)){ v.textContent='Not set'; m.textContent='No daily loss limit set'; window.ggRingTone(ring, 0); return; }
     const key = typeof window.getTradingDayIST === 'function' ? window.getTradingDayIST() : '';
-    const used = Math.abs((window.__trades || []).reduce((sum, t) => (t && t.d === key && t.pnl < 0) ? sum + t.pnl : sum, 0));
+    const used = Math.max(0, -((window.__trades || []).reduce((sum, t) => (t && t.d === key && isFinite(Number(t.pnl))) ? sum + Number(t.pnl) : sum, 0)));
     const left = Math.max(0, lim - used), usd = n => '$' + n.toFixed(2);
     v.textContent = usd(left);
     m.textContent = used >= lim ? 'Limit reached \u00b7 ' + usd(used) + ' used of ' + usd(lim) : usd(used) + ' used of ' + usd(lim);
@@ -4393,8 +4393,8 @@ document.addEventListener('input',e=>{if(cur&&RUN[cur.dataset.tool]&&cur.contain
     const byDay = {};
     (window.__trades || []).forEach(t=>{
       if(!t || !t.d) return;
-      const b = byDay[t.d] || (byDay[t.d] = {loss:0, n:0});
-      b.n++; if(t.pnl < 0) b.loss += -t.pnl;
+      const b = byDay[t.d] || (byDay[t.d] = {net:0, loss:0, n:0});
+      b.n++; b.net += Number(t.pnl) || 0; b.loss = Math.max(0, -b.net);
     });
     const days = Object.keys(byDay).sort().reverse();
     let streak = 0;
@@ -4908,11 +4908,11 @@ document.addEventListener('input',e=>{if(cur&&RUN[cur.dataset.tool]&&cur.contain
     const wkLoss = Number(window.jlWeeklyLossLimit) || dayLoss*ACTIVE_DAYS;
     const wkTrades = dayTrades*ACTIVE_DAYS;
     const byDay = {}, seen = {};
-    rows.forEach(t=>{ const d = byDay[t.d]||(byDay[t.d]={loss:0,keys:{}}); const v=Number(t.pnl); if(v<0) d.loss-=v; d.keys[t.d+'|'+t.t+'|'+t.sym+'|'+t.side]=1; seen[t.d+'|'+t.t+'|'+t.sym+'|'+t.side]=1; });
+    rows.forEach(t=>{ const d = byDay[t.d]||(byDay[t.d]={net:0,loss:0,keys:{}}); const v=Number(t.pnl); d.net+=v; d.loss=Math.max(0,-d.net); d.keys[t.d+'|'+t.t+'|'+t.sym+'|'+t.side]=1; seen[t.d+'|'+t.t+'|'+t.sym+'|'+t.side]=1; });
     const activeDays = Object.keys(byDay).length;
     const net = rows.reduce((s,t)=>s+Number(t.pnl),0);
     const W = rows.filter(t=>kind(t.pnl)==='win').length, L = rows.filter(t=>kind(t.pnl)==='loss').length;
-    const lossUsed = rows.reduce((s,t)=>Number(t.pnl)<0?s-Number(t.pnl):s,0);
+    const lossUsed = Math.max(0,-net);
     const tradeCount = Object.keys(seen).length;
     const broken = Object.keys(byDay).filter(d=>(dayLoss>0&&byDay[d].loss>=dayLoss)||(dayTrades>0&&Object.keys(byDay[d].keys).length>dayTrades)).length;
     const ring = (id,frac,color) => { const el=document.getElementById(id); if(!el) return; el.style.setProperty('--off',239-239*Math.max(0,Math.min(1,frac))); if(color) el.style.stroke=color; };
@@ -4958,10 +4958,11 @@ document.addEventListener('input',e=>{if(cur&&RUN[cur.dataset.tool]&&cur.contain
     }));
     const wins = trades.filter(t=>window.jlKind(t.pnl)==='win'), losses = trades.filter(t=>window.jlKind(t.pnl)==='loss');
     const pnlTotal = trades.reduce((s,t)=>s+t.pnl,0);
-    const lossUsed = Math.abs(trades.reduce((s,t)=>t.pnl<0?s+t.pnl:s,0)); /* real money lost, small losses included */
+    const grossLossAmt = Math.abs(trades.reduce((s,t)=>t.pnl<0?s+t.pnl:s,0));
+    const lossUsed = Math.max(0,-pnlTotal); /* net loss of the day on closed trades */
     const avgWin = wins.length? wins.reduce((s,t)=>s+t.pnl,0)/wins.length : 0;
     const avgLoss = losses.length? Math.abs(losses.reduce((s,t)=>s+t.pnl,0))/losses.length : 0;
-    const grossWin = trades.reduce((s,t)=>t.pnl>0?s+t.pnl:s,0), grossLoss = lossUsed;
+    const grossWin = trades.reduce((s,t)=>t.pnl>0?s+t.pnl:s,0), grossLoss = grossLossAmt;
     const pf = grossLoss? (grossWin/grossLoss).toFixed(2) : '—';
     const expVal = trades.length ? (pnlTotal/trades.length).toFixed(2) : 0;
     const pnlPct = targetUSD>0 ? Math.min(100, Math.max(0, Math.round(pnlTotal/targetUSD*100))) : 0;
@@ -5473,8 +5474,8 @@ let lastRules=[0,0,0,0];
     const key = getTradingDayIST(), lim = ruleLimits(), by = {};
     (window.__trades || []).forEach(t=>{
       if(!t || !t.d || t.d >= key) return;
-      const b = by[t.d] || (by[t.d] = {loss:0, n:0});
-      b.n++; if(t.pnl < 0) b.loss += -t.pnl;
+      const b = by[t.d] || (by[t.d] = {net:0, loss:0, n:0});
+      b.n++; b.net += Number(t.pnl) || 0; b.loss = Math.max(0, -b.net);
     });
     const days = Object.keys(by).sort(); if(!days.length) return null;
     const d = days[days.length-1], b = by[d], lossHit = lim.loss>0 && b.loss >= lim.loss, tradeHit = lim.trades>0 && b.n >= lim.trades;
@@ -8297,14 +8298,15 @@ w.querySelector('.top').after(c)}})();</script>
 <script id="jl-circuit">(function(){
 /*CB-PURE-START*/
 function circuitEval(rows,o,kindFn){
-  var g={},order=[],lossUsed=0;
+  var g={},order=[],netSum=0,lossUsed=0;
   (rows||[]).forEach(function(t){
     if(!t)return;var p=Number(t.pnl);if(!isFinite(p))return;
-    if(p<0)lossUsed+=-p;
+    netSum+=p;
     var k=t.d+'|'+t.t+'|'+t.sym+'|'+t.side;
     if(!g[k]){g[k]={t:String(t.t),pnl:0,rev:false};order.push(k)}
     g[k].pnl+=p;if(t.rev)g[k].rev=true;
   });
+  lossUsed=Math.max(0,-netSum);
   var list=order.map(function(k){return g[k]}).sort(function(a,b){return a.t<b.t?-1:a.t>b.t?1:0});
   var count=list.length,run=0,revN=list.filter(function(x){return x.rev}).length;
   for(var i=list.length-1;i>=0;i--){if(kindFn(list[i].pnl)==='loss')run++;else break}
@@ -8846,14 +8848,14 @@ window.__renderJourney=function(){const Z=window.__A||A,start=Z.start,tgt=Math.r
 window.__renderDDRing=function(){if(window.__renderJourney)window.__renderJourney();if(window.__renderAnScale)window.__renderAnScale();if(window.__renderAnRadar)window.__renderAnRadar();const md=getMdd();set('ggDDv',md>0?m(Math.max(0,md-A.dd)):'Not set');set('ggDDm',md>0?m(A.dd)+' of '+m(md)+' used':'No max drawdown set');window.ggRingTone(document.getElementById('ggGaugeDD'),md>0?A.dd/md:0)};window.__renderDDRing();
 const h=A.negHold&&A.negHold[0];set('aicRuleNote',h?'Sub-1-minute holds cost $'+h[1].toFixed(2)+' in this data.':'Hold time is not tracked yet, so timing leaks are not measured.');})();</script>
 <script>(function(){
-/* Analytics > Daily drawdown card: limit from the saved setup, used = real money lost on the
-   current trading day's losing trades (same 06:00 IST rule as Today's Summary and Account Settings). */
+/* Analytics > Daily drawdown card: limit from the saved setup, used = net loss of the current
+   trading day on closed trades (same 06:00 IST rule as Today's Summary and Account Settings). */
 function render(){
   const $=id=>document.getElementById(id); if(!$('ddBig')) return;
   const lim=Number(window.jlDailyLossLimit)||0;
   const key=typeof window.getTradingDayIST==='function'?window.getTradingDayIST():'';
   const today=(window.__trades||[]).filter(t=>t&&t.d===key);
-  const used=Math.abs(today.reduce((a,t)=>t.pnl<0?a+t.pnl:a,0));
+  const used=Math.max(0,-today.reduce((a,t)=>a+(Number(t.pnl)||0),0));
   const left=Math.max(0,lim-used),pct=lim>0?Math.min(100,used/lim*100):0,hit=lim>0&&used>=lim,usd=n=>'$'+n.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
   const m=/^(\d+)-(\d+)-(\d+)$/.exec(key),d=m?new Date(+m[1],+m[2]-1,+m[3]):new Date();
   $('ddDate').textContent=d.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
@@ -9254,8 +9256,8 @@ window.__renderAnSetups=renderBoth;window.__renderAnEmotions=renderEmo;setTimeou
     var lossLim=Number(window.jlDailyLossLimit)||0, tradeLim=Number(window.jlMaxTradesPerDay)||0;
     var m={net:0,gw:0,gl:0,W:0,L:0,BE:0,sw:0,sl:0,n:0,broken:0,maxW:0,maxL:0,cur:0}, seen={}, days={}, rw=0, rl=0;
     rows.forEach(function(t){
-      var p=Number(t.pnl), c=kind(p), d=days[t.d]||(days[t.d]={loss:0,keys:{}});
-      m.net+=p; if(p>0) m.gw+=p; else if(p<0){ m.gl-=p; d.loss-=p; }
+      var p=Number(t.pnl), c=kind(p), d=days[t.d]||(days[t.d]={net:0,loss:0,keys:{}});
+      m.net+=p; d.net+=p; d.loss=Math.max(0,-d.net); if(p>0) m.gw+=p; else if(p<0){ m.gl-=p; }
       seen[posKey(t)]=1; d.keys[posKey(t)]=1;
       if(c==='win'){ m.W++; m.sw+=p; rw++; rl=0; m.maxW=Math.max(m.maxW,rw); m.cur=rw; }
       else if(c==='loss'){ m.L++; m.sl-=p; rl++; rw=0; m.maxL=Math.max(m.maxL,rl); m.cur=-rl; }
@@ -9426,7 +9428,7 @@ window.__renderAnSetups=renderBoth;window.__renderAnEmotions=renderEmo;setTimeou
       var p=Number(t.pnl); net+=p; if(p>0) gw+=p; else if(p<0) gl-=p;
       var c=kind(p); if(c==='win') W++; else if(c==='loss') L++; else BE++;
       var tk=t.d+'|'+t.t+'|'+t.sym+'|'+t.side, d=days[t.d]||(days[t.d]={net:0,loss:0,keys:{}});
-      d.net+=p; if(p<0) d.loss-=p; d.keys[tk]=1; seen[tk]=1;
+      d.net+=p; d.loss=Math.max(0,-d.net); d.keys[tk]=1; seen[tk]=1;
       if(t.ses){ ses[t.ses]=(ses[t.ses]||0)+p; }
       (t.tags||[]).forEach(function(g){ if(typeof g==='string'&&g) tags[g]=(tags[g]||0)+1; });
       if(t.rev) rev++; if(t.sl==null) nosl++;
@@ -9687,13 +9689,13 @@ window.__renderAnSetups=renderBoth;window.__renderAnEmotions=renderEmo;setTimeou
     dayOrder.forEach(function(d){
       var D=days[d];
       var list=D.order.map(function(k,i){ var g=D.g[k]; g.i=i; return g; }).sort(function(a,b){ return a.t<b.t?-1:a.t>b.t?1:a.i-b.i; });
-      var lossUsed=0,count=0,run=0;
+      var lossUsed=0,netRun=0,count=0,run=0;
       list.forEach(function(G){
         r.total++; r.actualNet+=G.pnl;
         var tripped=(o.lossLimit>0&&lossUsed>=o.lossLimit)||(o.tradeLimit>0&&count>=o.tradeLimit)||(o.maxConsec>0&&run>=o.maxConsec);
         if(tripped){ r.after.n++; r.after.net+=G.pnl; return; }
         if(G.rev||G.nosl||G.lot){ r.rule.n++; r.rule.net+=G.pnl; if(G.rev) r.rule.rev++; if(G.nosl) r.rule.nosl++; if(G.lot) r.rule.lot++; return; }
-        r.kept++; r.simNet+=G.pnl; lossUsed+=G.neg; count++;
+        r.kept++; r.simNet+=G.pnl; netRun+=G.pnl; lossUsed=Math.max(0,-netRun); count++;
         run=kindFn(G.pnl)==='loss'?run+1:0;
       });
     });
@@ -9788,11 +9790,12 @@ window.__renderAnSetups=renderBoth;window.__renderAnEmotions=renderEmo;setTimeou
     var tradeCount=Object.keys(seen).length;
     var wins=rows.filter(function(t){ return kind(t.pnl)==='win'; }), losses=rows.filter(function(t){ return kind(t.pnl)==='loss'; });
     var net=rows.reduce(function(s,t){ return s+Number(t.pnl); },0);
-    var lossUsed=Math.abs(rows.reduce(function(s,t){ return Number(t.pnl)<0?s+Number(t.pnl):s; },0));
+    var grossLossAmt=Math.abs(rows.reduce(function(s,t){ return Number(t.pnl)<0?s+Number(t.pnl):s; },0));
+    var lossUsed=Math.max(0,-net);
     var grossWin=rows.reduce(function(s,t){ return Number(t.pnl)>0?s+Number(t.pnl):s; },0);
     var avgWin=wins.length?wins.reduce(function(s,t){ return s+Number(t.pnl); },0)/wins.length:0;
     var avgLoss=losses.length?Math.abs(losses.reduce(function(s,t){ return s+Number(t.pnl); },0))/losses.length:0;
-    var pf=lossUsed?(grossWin/lossUsed).toFixed(2):'—';
+    var pf=grossLossAmt?(grossWin/grossLossAmt).toFixed(2):'—';
     var exp=net/rows.length;
     var pct=hasTg?Math.min(100,Math.max(0,Math.round(net/target*100))):0;
     var lr=hasL?lossUsed/lossLimit:0;
