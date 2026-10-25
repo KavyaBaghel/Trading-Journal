@@ -1379,13 +1379,16 @@
   .ldg-badge.best{color:var(--silver);background:rgba(199,203,214,.13);border:1px solid rgba(199,203,214,.28)}
   .ldg-badge.worst{color:var(--red);background:rgba(240,104,92,.13);border:1px solid rgba(240,104,92,.25)}
 
-  /* Saturday cell — fixed "Weekly review" slot, shows that week's net result */
-  .ldg-row.ldg-wk{border-style:dashed;background:linear-gradient(160deg,rgba(124,108,240,.07),rgba(255,255,255,0) 60%),rgba(255,255,255,.012)}
+  /* Saturday / Sunday cells: weekly review slot, same card shape as the day cells with a soft accent tint */
+  .ldg-row.ldg-wk{border-color:rgba(124,108,240,.28);background:linear-gradient(160deg,rgba(124,108,240,.11),rgba(255,255,255,0) 62%),rgba(255,255,255,.015)}
+  .ldg-row.ldg-wk:hover{border-color:rgba(179,159,251,.55)}
   .ldg-row.ldg-wk.pos::before{background:var(--green);box-shadow:0 0 10px -1px rgba(67,215,135,.7)}
   .ldg-row.ldg-wk.neg::before{background:var(--red);box-shadow:0 0 10px -1px rgba(240,104,92,.7)}
   .ldg-row.ldg-wk:focus-visible{outline:2px solid var(--accent-2);outline-offset:2px}
-  .ldg-wk-lbl{order:1;font-family:"IBM Plex Mono",monospace;font-size:10px;font-weight:700;letter-spacing:.04em;color:var(--accent-2)}
-  .ldg-wk.upcoming .ldg-pnl{color:var(--faint);font-size:12px;font-weight:600}
+  .ldg-wk-lbl{order:1;margin-top:-1px;font-family:"IBM Plex Mono",monospace;font-size:9.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
+    color:var(--accent-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .ldg-wk.upcoming{opacity:.8}
+  .ldg-wk.upcoming .ldg-pnl{color:var(--sub);font-size:13px;font-weight:600}
 
   /* week subtotal — spans the full 7-column grid */
   .ldg-sub{grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;gap:14px;
@@ -6073,11 +6076,12 @@ function renderGrid(){
       const cls=over&&wt?(wp>0?' pos':wp<0?' neg':''):'';
       const col=wp>0?'var(--green)':wp<0?'var(--red)':'var(--faint)';
       const res=!over?'Upcoming':wt?money(wp):'No trades';
+      const meta=over?(wt?jlN(wt,'trade'):''):'Result after Fri';
       return '<div class="ldg-row ldg-wk'+(isToday?' today':'')+cls+(over?'':' upcoming')+'" data-wk="'+wi+'" role="button" tabindex="0" aria-label="Weekly review, week '+(wi+1)+'">'+
         '<div class="ldg-d"><b>'+d+'</b><small>'+(off===5?'SAT':'SUN')+'</small></div>'+
-        '<div class="ldg-wk-lbl">Weekly review</div>'+
+        '<div class="ldg-wk-lbl">Week '+(wi+1)+' review</div>'+
         '<div class="ldg-pnl"'+(over&&wt?' style="color:'+col+'"':'')+'>'+res+'</div>'+
-        '<div class="ldg-meta">'+(over?(wt?'Week '+(wi+1)+' &middot; '+jlN(wt,'trade'):'Week '+(wi+1)):'Week '+(wi+1)+' result after Fri')+'</div></div>';
+        (meta?'<div class="ldg-meta">'+meta+'</div>':'')+'</div>';
     };
     const dayRows=r.map((d,i)=>{
       if(d==null)return '<div class="ldg-pad"></div>';
