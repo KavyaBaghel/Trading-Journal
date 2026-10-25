@@ -11563,6 +11563,15 @@ initFirebaseAuth().catch(err=>{
   body .btn-primary,body .btn-ghost{min-height:44px}
 }
 </style>
+<style id="jl-calendar-type-css">
+/* Calendar text floor (11px). Cell internals that sit in narrow weekend cells only grow on phones, where cells are two columns wide. */
+#view-calendar .cal-dh,#view-calendar .cal-dow-cell .d,#view-calendar .cal-dow-cell .n,
+#view-calendar #cKP span,#view-calendar #cKP small,#view-calendar #cYKP span,#view-calendar #cYKP small,
+.ldg-sub,.ldg-mrow .m-name small,.ldg-mrow .m-meta,.ldg-meta,.ldg-wk .ldg-meta,.ldg-empty{font-size:var(--fs-1)}
+@media (max-width:680px){
+  .ldg-d small,.ldg-badge,.ldg-wk-pill,.ldg-wk-days,.ldg-wk:not(.upcoming) .ldg-pnl::before{font-size:var(--fs-1)}
+}
+</style>
 <style id="jl-ui-shared-css">
 /* Shared look for collapsible rows and small uppercase labels (used by Study notes and Daily journal history). */
 #pbRoot .pb-item,.djh-day{border:1px solid var(--border);border-radius:var(--r-3);margin-bottom:8px;background:rgba(255,255,255,.02)}
