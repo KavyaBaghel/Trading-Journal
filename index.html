@@ -1422,6 +1422,26 @@
   .ldg-wk:not(.upcoming) .ldg-pnl{font-size:21px;font-weight:800;line-height:1.1;display:flex;flex-direction:column;gap:2px}
   .ldg-wk:not(.upcoming) .ldg-pnl::before{content:"WEEK NET";font-family:"IBM Plex Mono",monospace;font-size:8px;font-weight:700;letter-spacing:.12em;color:var(--faint);text-shadow:none}
   .ldg-wk .ldg-meta{padding-top:6px;border-top:1px solid rgba(255,255,255,.06)}
+  /* Analytics-card look: flat dark panel, hairline border, boxed date badge, flat solid bars, quiet footer */
+  .ldg-row.ldg-wk{background:var(--panel);border:1px solid rgba(255,255,255,.08);border-radius:16px;
+    box-shadow:0 1px 0 rgba(255,255,255,.03) inset,0 10px 24px -18px rgba(0,0,0,.8)}
+  .ldg-row.ldg-wk::after{display:none}
+  .ldg-row.ldg-wk::before{background:var(--accent-2);opacity:.5;box-shadow:none}
+  .ldg-row.ldg-wk.pos::before{background:var(--green);opacity:.9;box-shadow:none}
+  .ldg-row.ldg-wk.neg::before{background:var(--red);opacity:.9;box-shadow:none}
+  .ldg-row.ldg-wk:hover{border-color:rgba(255,255,255,.18);box-shadow:0 1px 0 rgba(255,255,255,.04) inset,0 14px 30px -18px rgba(0,0,0,.85)}
+  .ldg-row.ldg-wk .ldg-d b{background:rgba(255,255,255,.04);color:var(--text,#f3f4f8);border:1px solid rgba(255,255,255,.1);border-radius:8px;box-shadow:none}
+  .ldg-row.ldg-wk.today .ldg-d b{background:var(--accent-2);color:#141225;border-color:transparent}
+  .ldg-wk-pill{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);color:var(--sub);box-shadow:none}
+  .ldg-wk-spark{gap:5px;border-bottom:1px solid rgba(255,255,255,.07)}
+  .ldg-wk-spark i:not(.e){background:currentColor;opacity:.88;border-radius:5px 5px 2px 2px}
+  .ldg-row.ldg-wk:hover .ldg-wk-spark i:not(.e){filter:none;opacity:1}
+  .ldg-wk-spark i.e{background:rgba(255,255,255,.07)}
+  .ldg-wk.pos .ldg-pnl,.ldg-wk.neg .ldg-pnl{text-shadow:none}
+  .ldg-wk:not(.upcoming) .ldg-pnl{font-weight:700;letter-spacing:-.015em}
+  .ldg-wk:not(.upcoming) .ldg-pnl::before{color:var(--faint);font-weight:600}
+  .ldg-wk .ldg-meta{color:var(--sub);border-top:1px solid rgba(255,255,255,.07)}
+  .ldg-wk.upcoming{opacity:.85}
 
   /* week subtotal — spans the full 7-column grid */
   .ldg-sub{grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;gap:14px;
