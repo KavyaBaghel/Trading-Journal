@@ -2700,11 +2700,11 @@ window.jlLiveBalance=function(Z){
   var r4=function(x){return Math.round(x*10000)/10000},n=function(x){x=Number(x);return isFinite(x)?x:null};
   function toDesign(c){c=c||{};var size=n(c.accountSize);size=size>0?size:null;
     var pt=n(c.profitTarget),pl=n(c.maxDailyLoss),wk=n(c.maxWeeklyLoss),dd=n(c.maxDrawdown);
-    return {balance:size,phase:c.phase||'Phase 1',type:c.type==='live'?'live':'funded',revWindowMin:n(c.revWindowMin),
+    return {balance:size,phase:c.phase||'',type:c.type==='live'?'live':c.type==='funded'?'funded':'',revWindowMin:n(c.revWindowMin),
       profitTargetPct:pt==null?null:(c.profitTargetType==='amount'?(size?r4(pt/size*100):null):pt),
       maxDailyLossUSD:pl==null?null:(c.maxDailyLossType==='percent'?(size?r4(pl*size/100):null):pl),maxDailyLossValue:pl,maxDailyLossUnit:c.maxDailyLossType==='percent'?'%':'$',
       maxWeeklyLossValue:wk,maxWeeklyLossUnit:c.maxWeeklyLossType==='percent'?'%':'$',maxWeeklyLossUSD:wk==null?null:(c.maxWeeklyLossType==='percent'?(size?r4(wk*size/100):null):wk),
-      maxTradesPerDay:n(c.maxTradesPerDay),dayProfitTarget:n(c.dayProfitTarget)||0,dayProfitTargetUnit:c.dayProfitTargetUnit==='$'?'$':'%',weeklyProfitTarget:n(c.weeklyProfitTarget)||0,weeklyProfitTargetUnit:c.weeklyProfitTargetUnit==='$'?'$':'%',riskPerTrade:n(c.riskPerTrade),minRr:n(c.minRr),lotSize:n(c.lotSize)||0,tradeDuringNews:c.tradeDuringNews==='no'?'no':'yes',maxDrawdown:dd,maxDrawdownUnit:c.maxDrawdownType==='amount'?'$':'%',deadline:c.phaseDeadline||''}}
+      maxTradesPerDay:n(c.maxTradesPerDay),dayProfitTarget:n(c.dayProfitTarget)||0,dayProfitTargetUnit:c.dayProfitTargetUnit==='$'?'$':'%',weeklyProfitTarget:n(c.weeklyProfitTarget)||0,weeklyProfitTargetUnit:c.weeklyProfitTargetUnit==='$'?'$':'%',riskPerTrade:n(c.riskPerTrade),minRr:n(c.minRr),lotSize:n(c.lotSize)||0,tradeDuringNews:c.tradeDuringNews==='no'?'no':c.tradeDuringNews==='yes'?'yes':'',maxDrawdown:dd,maxDrawdownUnit:c.maxDrawdownType==='amount'?'$':'%',deadline:c.phaseDeadline||''}}
   try{var c0=rdo();localStorage.setItem(DK,JSON.stringify(toDesign(c0)));window.__jlNeedsAccountSetup=!(c0&&n(c0.accountSize)>0)}
   catch(e){window.__jlNeedsAccountSetup=true;console.error('[Journall] account bootstrap failed',e)}
   function same(a,b,ks){return ks.every(function(k){return a[k]===b[k]||(typeof a[k]==='number'&&typeof b[k]==='number'&&Math.abs(a[k]-b[k])<1e-4)})}
@@ -2726,7 +2726,7 @@ window.jlLiveBalance=function(Z){
       if(!same(d,old,['riskPerTrade'])){var rp=n(d.riskPerTrade);if(rp!=null)c.riskPerTrade=rp}
       if(!same(d,old,['minRr'])){var mr=n(d.minRr);if(mr!=null)c.minRr=mr}
       if(!same(d,old,['lotSize'])){var ls=n(d.lotSize);if(ls!=null)c.lotSize=ls}
-      if(d.tradeDuringNews!==old.tradeDuringNews)c.tradeDuringNews=d.tradeDuringNews==='no'?'no':'yes';
+      if(d.tradeDuringNews!==old.tradeDuringNews)c.tradeDuringNews=d.tradeDuringNews==='no'?'no':d.tradeDuringNews==='yes'?'yes':'';
       if(!same(d,old,['deadline'])){c.phaseDeadline=d.deadline||''}
       if(d.type!==old.type)c.type=d.type;
       if(!same(d,old,['revWindowMin'])){var rw=n(d.revWindowMin);if(rw!=null)c.revWindowMin=rw}
@@ -3398,7 +3398,7 @@ window.__mountOpenPos=function(){const o=(window.__openTrades||[]).concat((windo
 
     <div class="gg-hero">
       <div class="gg-hero-top">
-        <div><div class="l">Account phase</div><div class="gg-hero-phase" id="ggHeroPhase">Phase 1</div>
+        <div><div class="l">Account phase</div><div class="gg-hero-phase" id="ggHeroPhase">Not set</div>
           <div class="meta" id="psyMeta"></div></div>
         <button class="gg-edit-btn" onclick="ggToggleSetup()"><span id="ggEditLbl">Edit setup</span> <svg id="ggEditChev" viewBox="0 0 24 24" width="14" height="14"><path d="m6 9 6 6 6-6" stroke="currentColor" fill="none" stroke-width="2"/></svg></button>
       </div>
@@ -3429,10 +3429,10 @@ window.__mountOpenPos=function(){const o=(window.__openTrades||[]).concat((windo
           <div class="gg-field"><span class="l">Initial account balance ($)</span>
             <div class="gg-stepper"><button onclick="ggStep('bal',-100)">−</button><input id="ggBal" value="" readonly><button onclick="ggStep('bal',100)">+</button></div></div>
           <div class="gg-field" id="ggPhaseField"><span class="l">Account phase</span>
-            <div class="gg-select" id="ggPhaseDisplay" style="cursor:default;user-select:none">Phase 1</div>
+            <div class="gg-select" id="ggPhaseDisplay" style="cursor:default;user-select:none">Not set</div>
             <small class="gg-field-note">Auto-detected from your MT5 account sync — not set manually.</small></div>
           <div class="gg-field"><span class="l">Account type</span>
-            <select class="gg-select" id="ggAcctType"><option value="funded">Funded account (prop firm)</option><option value="live">Live account</option></select>
+            <select class="gg-select" id="ggAcctType"><option value="">Not set</option><option value="funded">Funded account (prop firm)</option><option value="live">Live account</option></select>
             <small class="gg-field-note">Prop-firm rules like daily loss and drawdown limits only apply to a funded account. Journall can't tell this from the sync automatically — set it here.</small></div>
         </div>
       </div>
@@ -3452,9 +3452,9 @@ window.__mountOpenPos=function(){const o=(window.__openTrades||[]).concat((windo
       <div class="gg-tab-panel" data-p="risk" hidden>
         <div class="gg-mgrid">
           <div class="gg-field"><span class="l">Risk per trade (%)</span>
-            <div class="gg-stepper"><button onclick="ggStep('rpt',-.1)">−</button><input id="ggRpt" value="0.5" readonly><button onclick="ggStep('rpt',.1)">+</button></div></div>
+            <div class="gg-stepper"><button onclick="ggStep('rpt',-.1)">−</button><input id="ggRpt" value="" placeholder="Not set" readonly><button onclick="ggStep('rpt',.1)">+</button></div></div>
           <div class="gg-field"><span class="l">Minimum RR</span>
-            <div class="gg-stepper"><button onclick="ggStep('rr',-1)">−</button><input id="ggRr" value="2" readonly><button onclick="ggStep('rr',1)">+</button></div></div>
+            <div class="gg-stepper"><button onclick="ggStep('rr',-1)">−</button><input id="ggRr" value="" placeholder="Not set" readonly><button onclick="ggStep('rr',1)">+</button></div></div>
           <div class="gg-field"><span class="l">Max daily loss</span>
             <div class="gg-combo"><div class="gg-stepper" style="flex:1"><button onclick="ggStep('mdl',-5)">−</button><input id="ggMdl" value="20" readonly><button onclick="ggStep('mdl',5)">+</button></div><select id="ggMdlUnit"><option>$</option><option>%</option></select></div></div>
           <div class="gg-field"><span class="l">Max weekly loss</span>
@@ -3465,13 +3465,13 @@ window.__mountOpenPos=function(){const o=(window.__openTrades||[]).concat((windo
           <div class="gg-field"><span class="l">Max overall drawdown</span>
             <div class="gg-combo"><div class="gg-stepper" style="flex:1"><button onclick="ggStep('mdd',-1)">−</button><input id="ggMdd" value="10" readonly><button onclick="ggStep('mdd',1)">+</button></div><select id="ggMddUnit"><option>%</option><option>$</option></select></div></div>
           <div class="gg-field"><span class="l">Revenge trade window (minutes)</span>
-            <div class="gg-stepper"><button onclick="ggStep('revWin',-1)">−</button><input id="ggRevWin" value="15" readonly><button onclick="ggStep('revWin',1)">+</button></div>
+            <div class="gg-stepper"><button onclick="ggStep('revWin',-1)">−</button><input id="ggRevWin" value="" placeholder="Not set" readonly><button onclick="ggStep('revWin',1)">+</button></div>
             <small class="gg-field-note">A trade opened within this many minutes of a same-day loss closing is flagged as a revenge trade.</small></div>
           <div class="gg-field"><span class="l">Lot size</span>
             <div class="gg-stepper"><button onclick="ggStep('lot',-.01)">&minus;</button><input id="ggLot" value="0" readonly><button onclick="ggStep('lot',.01)">+</button></div>
             <small class="gg-field-note">The lot size you trade. Any position with a different lot is flagged as a rule break in Today's Summary. 0 = off.</small></div>
           <div class="gg-field"><span class="l">Trade during news?</span>
-            <select class="gg-select" id="ggNews"><option value="yes">Yes</option><option value="no">No (warn 30 min before news)</option></select></div>
+            <select class="gg-select" id="ggNews"><option value="">Not set</option><option value="yes">Yes</option><option value="no">No (warn 30 min before news)</option></select></div>
           <div class="gg-field"><span class="l">Broker UTC offset</span>
             <select class="gg-select" id="ggBro"><option value="">Not set</option><option value="-12">UTC-12</option><option value="-11.5">UTC-11:30</option><option value="-11">UTC-11</option><option value="-10.5">UTC-10:30</option><option value="-10">UTC-10</option><option value="-9.5">UTC-9:30</option><option value="-9">UTC-9</option><option value="-8.5">UTC-8:30</option><option value="-8">UTC-8</option><option value="-7.5">UTC-7:30</option><option value="-7">UTC-7</option><option value="-6.5">UTC-6:30</option><option value="-6">UTC-6</option><option value="-5.5">UTC-5:30</option><option value="-5">UTC-5</option><option value="-4.5">UTC-4:30</option><option value="-4">UTC-4</option><option value="-3.5">UTC-3:30</option><option value="-3">UTC-3</option><option value="-2.5">UTC-2:30</option><option value="-2">UTC-2</option><option value="-1.5">UTC-1:30</option><option value="-1">UTC-1</option><option value="-0.5">UTC-0:30</option><option value="0">UTC+0</option><option value="0.5">UTC+0:30</option><option value="1">UTC+1</option><option value="1.5">UTC+1:30</option><option value="2">UTC+2</option><option value="2.5">UTC+2:30</option><option value="3">UTC+3</option><option value="3.5">UTC+3:30</option><option value="4">UTC+4</option><option value="4.5">UTC+4:30</option><option value="5">UTC+5</option><option value="5.5">UTC+5:30</option><option value="6">UTC+6</option><option value="6.5">UTC+6:30</option><option value="7">UTC+7</option><option value="7.5">UTC+7:30</option><option value="8">UTC+8</option><option value="8.5">UTC+8:30</option><option value="9">UTC+9</option><option value="9.5">UTC+9:30</option><option value="10">UTC+10</option><option value="10.5">UTC+10:30</option><option value="11">UTC+11</option><option value="11.5">UTC+11:30</option><option value="12">UTC+12</option><option value="12.5">UTC+12:30</option><option value="13">UTC+13</option><option value="13.5">UTC+13:30</option><option value="14">UTC+14</option></select>
             <small class="gg-field-note">The UTC offset of your broker server clock, which is the clock in your MT5 report and sync. Used to turn those trade times into IST for the Weak times card. Not set = hour flags are paused.</small></div>
@@ -3669,7 +3669,7 @@ window.__mountOpenPos=function(){const o=(window.__openTrades||[]).concat((windo
       <div class="up-hero-left">
         <div class="up-avatar-wrap"><div class="up-avatar" id="upAvatar">?</div><span class="up-avatar-badge" title="MT5 sync active">✓</span></div>
         <div>
-          <div class="up-name-row"><span class="up-name" id="upName" data-user-name contenteditable="true" spellcheck="false" title="Click to edit your name"></span><span class="up-phase-chip" id="upPhaseChip">Phase 1</span></div>
+          <div class="up-name-row"><span class="up-name" id="upName" data-user-name contenteditable="true" spellcheck="false" title="Click to edit your name"></span><span class="up-phase-chip" id="upPhaseChip">Not set</span></div>
           <div class="up-bio" id="upBio" contenteditable="true" spellcheck="false"></div>
           <div class="up-meta"><span class="up-meta-chip" id="upMemberChip" hidden></span><span class="up-meta-chip" id="upJournalStreakChip">🔥 Loading…</span></div>
         </div>
@@ -4097,16 +4097,16 @@ document.addEventListener('input',e=>{if(cur&&RUN[cur.dataset.tool]&&cur.contain
   function ggLoadAccount(){
     let s = null;
     try{ s = JSON.parse(localStorage.getItem(ACC_KEY)); }catch(e){}
-    const a = Object.assign({balance:0, phase:'Phase 1', type:'funded', revWindowMin:15, profitTargetPct:0, maxDailyLossUSD:0, maxDailyLossUnit:'$', maxWeeklyLossUSD:0, maxWeeklyLossUnit:'$', maxTradesPerDay:0, dayProfitTarget:0, dayProfitTargetUnit:'%', weeklyProfitTarget:0, weeklyProfitTargetUnit:'%', riskPerTrade:0.5, minRr:2, lotSize:0, maxConsecLosses:0, brokerUtcOffset:'', tradeDuringNews:'yes', maxDrawdown:0, maxDrawdownUnit:'%', deadline:''}, s||{});
+    const a = Object.assign({balance:0, phase:'', type:'', revWindowMin:0, profitTargetPct:0, maxDailyLossUSD:0, maxDailyLossUnit:'$', maxWeeklyLossUSD:0, maxWeeklyLossUnit:'$', maxTradesPerDay:0, dayProfitTarget:0, dayProfitTargetUnit:'%', weeklyProfitTarget:0, weeklyProfitTargetUnit:'%', riskPerTrade:0, minRr:0, lotSize:0, maxConsecLosses:0, brokerUtcOffset:'', tradeDuringNews:'', maxDrawdown:0, maxDrawdownUnit:'%', deadline:''}, s||{});
     if(a.maxDailyLossValue == null) a.maxDailyLossValue = Number(a.maxDailyLossUSD) || 0;
     if(a.maxWeeklyLossValue == null) a.maxWeeklyLossValue = Number(a.maxWeeklyLossUSD) || 0;
     return a;
   }
   function ggApplyAccountDisplay(s){
-    const heroPhase = document.getElementById('ggHeroPhase'); if(heroPhase) heroPhase.textContent = s.phase;
+    const heroPhase = document.getElementById('ggHeroPhase'); if(heroPhase) heroPhase.textContent = s.phase || 'Not set';
     const startedAt = document.getElementById('ggStartedAtVal');
     if(startedAt) startedAt.textContent = Number(s.balance)>0 ? '$'+Number(s.balance).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}) : 'Not set';
-    const chip = document.getElementById('upPhaseChip'); if(chip) chip.textContent = s.phase;
+    const chip = document.getElementById('upPhaseChip'); if(chip) chip.textContent = s.phase || 'Not set';
     ggApplyDeadline(s.deadline);
     ggApplyLossTile();
   }
@@ -4156,25 +4156,25 @@ document.addEventListener('input',e=>{if(cur&&RUN[cur.dataset.tool]&&cur.contain
   // Exposed globally so tabs in later, separate <script> blocks (Today's Summary, the
   // revenge-trade detector) read the same configured numbers instead of each keeping its
   // own hardcoded copy of the profit target / daily loss limit / trade cap.
-  window.jlRevWindowMin = Number(ggAccount.revWindowMin) || 15;
+  window.jlRevWindowMin = Number(ggAccount.revWindowMin) || 0;
   window.jlProfitTargetUSD = Number(ggAccount.balance) * (Number(ggAccount.profitTargetPct)||0) / 100;
   window.jlDailyLossLimit = Number(ggAccount.maxDailyLossUSD) || 0; window.jlWeeklyLossLimit = Number(ggAccount.maxWeeklyLossUSD) || 0;
   window.jlMaxTradesPerDay = Number(ggAccount.maxTradesPerDay) || 0; window.jlStartBalance = Number(ggAccount.balance) || 0; window.jlDayProfitTargetUSD = (ggAccount.dayProfitTargetUnit === '$') ? (Number(ggAccount.dayProfitTarget)||0) : Number(ggAccount.balance) * (Number(ggAccount.dayProfitTarget)||0) / 100; window.jlWeeklyProfitTargetUSD = (ggAccount.weeklyProfitTargetUnit === '$') ? (Number(ggAccount.weeklyProfitTarget)||0) : Number(ggAccount.balance) * (Number(ggAccount.weeklyProfitTarget)||0) / 100;
 
-  const ggState = {sl:5, pv:.05, bal:ggAccount.balance, pt:ggAccount.profitTargetPct, mt:ggAccount.maxTradesPerDay, dpt:Number(ggAccount.dayProfitTarget)||0, wpt:Number(ggAccount.weeklyProfitTarget)||0, rpt:(Number(ggAccount.riskPerTrade)>0?Number(ggAccount.riskPerTrade):.5), rr:(Number(ggAccount.minRr)>0?Number(ggAccount.minRr):2), mdl:Number(ggAccount.maxDailyLossValue)||0, mwl:Number(ggAccount.maxWeeklyLossValue)||0, mdd:Number(ggAccount.maxDrawdown)||0, revWin:ggAccount.revWindowMin, lot:Number(ggAccount.lotSize)||0, mcl:Number(ggAccount.maxConsecLosses)||0};
+  const ggState = {sl:5, pv:.05, bal:ggAccount.balance, pt:ggAccount.profitTargetPct, mt:ggAccount.maxTradesPerDay, dpt:Number(ggAccount.dayProfitTarget)||0, wpt:Number(ggAccount.weeklyProfitTarget)||0, rpt:(Number(ggAccount.riskPerTrade)>0?Number(ggAccount.riskPerTrade):0), rr:(Number(ggAccount.minRr)>0?Number(ggAccount.minRr):0), mdl:Number(ggAccount.maxDailyLossValue)||0, mwl:Number(ggAccount.maxWeeklyLossValue)||0, mdd:Number(ggAccount.maxDrawdown)||0, revWin:ggAccount.revWindowMin, lot:Number(ggAccount.lotSize)||0, mcl:Number(ggAccount.maxConsecLosses)||0};
   const ggIds = {bal:'ggBal',pt:'ggPt',mt:'ggMt',dpt:'ggDpt',wpt:'ggWpt',rpt:'ggRpt',rr:'ggRr',mdl:'ggMdl',mwl:'ggMwl',mdd:'ggMdd',revWin:'ggRevWin',lot:'ggLot',mcl:'ggMcl'};
   // Loss limits can be $ or % of the starting balance; percent steps are a tenth of the dollar step.
   window.ggStep = function(id, d){
     if(id === 'mdl' || id === 'mwl'){ const u = document.getElementById(id === 'mdl' ? 'ggMdlUnit' : 'ggMwlUnit'); if(u && u.value === '%') d = d/10; }
     ggState[id] = +(ggState[id] + d).toFixed(2);
     if(ggState[id] < 0) ggState[id] = 0;
-    document.getElementById(ggIds[id]).value = ggState[id];
+    document.getElementById(ggIds[id]).value = ((id==='rpt'||id==='rr'||id==='revWin')&&!(ggState[id]>0)) ? '' : ggState[id];
     if(id === 'mdd' && window.__renderDDRing) window.__renderDDRing();
   };
 
   // hydrate the Account panel + read-only displays from whatever was last saved
   document.getElementById('ggBal').value = ggAccount.balance;
-  const ggRevWinEl = document.getElementById('ggRevWin'); if(ggRevWinEl) ggRevWinEl.value = ggAccount.revWindowMin;
+  const ggRevWinEl = document.getElementById('ggRevWin'); if(ggRevWinEl) ggRevWinEl.value = Number(ggAccount.revWindowMin)>0 ? ggAccount.revWindowMin : '';
   const ggPtEl = document.getElementById('ggPt'); if(ggPtEl) ggPtEl.value = ggAccount.profitTargetPct;
   const ggMdlEl = document.getElementById('ggMdl'); if(ggMdlEl) ggMdlEl.value = ggState.mdl;
   const ggMwlEl = document.getElementById('ggMwl'); if(ggMwlEl) ggMwlEl.value = ggState.mwl;
@@ -4186,17 +4186,17 @@ document.addEventListener('input',e=>{if(cur&&RUN[cur.dataset.tool]&&cur.contain
   const ggDptUnitEl = document.getElementById('ggDptUnit'); if(ggDptUnitEl) ggDptUnitEl.value = ggAccount.dayProfitTargetUnit === '$' ? '$' : '%';
   const ggWptEl = document.getElementById('ggWpt'); if(ggWptEl) ggWptEl.value = ggState.wpt;
   const ggWptUnitEl = document.getElementById('ggWptUnit'); if(ggWptUnitEl) ggWptUnitEl.value = ggAccount.weeklyProfitTargetUnit === '$' ? '$' : '%';
-  const ggRptEl = document.getElementById('ggRpt'); if(ggRptEl) ggRptEl.value = ggState.rpt;
-  const ggRrEl = document.getElementById('ggRr'); if(ggRrEl) ggRrEl.value = ggState.rr;
+  const ggRptEl = document.getElementById('ggRpt'); if(ggRptEl) ggRptEl.value = ggState.rpt>0 ? ggState.rpt : '';
+  const ggRrEl = document.getElementById('ggRr'); if(ggRrEl) ggRrEl.value = ggState.rr>0 ? ggState.rr : '';
   const ggLotEl = document.getElementById('ggLot'); if(ggLotEl) ggLotEl.value = ggState.lot;
   const ggMclEl = document.getElementById('ggMcl'); if(ggMclEl) ggMclEl.value = ggState.mcl;
-  const ggNewsEl = document.getElementById('ggNews'); if(ggNewsEl) ggNewsEl.value = ggAccount.tradeDuringNews === 'no' ? 'no' : 'yes';
+  const ggNewsEl = document.getElementById('ggNews'); if(ggNewsEl) ggNewsEl.value = ggAccount.tradeDuringNews === 'no' ? 'no' : ggAccount.tradeDuringNews === 'yes' ? 'yes' : '';
   const ggBroEl = document.getElementById('ggBro'); if(ggBroEl) ggBroEl.value = (ggAccount.brokerUtcOffset === '' || ggAccount.brokerUtcOffset == null) ? '' : String(ggAccount.brokerUtcOffset);
-  window.jlLotSize = Number(ggAccount.lotSize) || 0; window.jlMaxConsecLosses = Number(ggAccount.maxConsecLosses) || 0; window.jlTradeDuringNews = ggAccount.tradeDuringNews === 'no' ? 'no' : 'yes'; window.jlBrokerUtcOffset = (ggAccount.brokerUtcOffset === '' || ggAccount.brokerUtcOffset == null || !isFinite(Number(ggAccount.brokerUtcOffset))) ? null : Number(ggAccount.brokerUtcOffset); if(typeof window.jlRenderWeak === 'function') window.jlRenderWeak();
+  window.jlLotSize = Number(ggAccount.lotSize) || 0; window.jlMaxConsecLosses = Number(ggAccount.maxConsecLosses) || 0; window.jlTradeDuringNews = ggAccount.tradeDuringNews === 'no' ? 'no' : ggAccount.tradeDuringNews === 'yes' ? 'yes' : ''; window.jlBrokerUtcOffset = (ggAccount.brokerUtcOffset === '' || ggAccount.brokerUtcOffset == null || !isFinite(Number(ggAccount.brokerUtcOffset))) ? null : Number(ggAccount.brokerUtcOffset); if(typeof window.jlRenderWeak === 'function') window.jlRenderWeak();
   const ggMddEl = document.getElementById('ggMdd'); if(ggMddEl) ggMddEl.value = ggState.mdd;
   const ggMddUnitEl = document.getElementById('ggMddUnit'); if(ggMddUnitEl) ggMddUnitEl.value = ggAccount.maxDrawdownUnit === '$' ? '$' : '%';
   if(ggMddUnitEl) ggMddUnitEl.addEventListener('change', ()=>{ if(window.__renderDDRing) window.__renderDDRing(); });
-  const ggPhaseDisplay = document.getElementById('ggPhaseDisplay'); if(ggPhaseDisplay) ggPhaseDisplay.textContent = ggAccount.phase;
+  const ggPhaseDisplay = document.getElementById('ggPhaseDisplay'); if(ggPhaseDisplay) ggPhaseDisplay.textContent = ggAccount.phase || 'Not set';
   const ggAcctTypeSel = document.getElementById('ggAcctType'); if(ggAcctTypeSel) ggAcctTypeSel.value = ggAccount.type;
   const ggDeadlineEl = document.getElementById('ggDeadline'); if(ggDeadlineEl) ggDeadlineEl.value = ggAccount.deadline || '';
   ggApplyAccountDisplay(ggAccount);
@@ -4238,18 +4238,18 @@ document.addEventListener('input',e=>{if(cur&&RUN[cur.dataset.tool]&&cur.contain
       minRr: ggState.rr,
       lotSize: ggState.lot,
       maxConsecLosses: ggState.mcl,
-      tradeDuringNews: (ggNewsEl && ggNewsEl.value === 'no') ? 'no' : 'yes',
+      tradeDuringNews: (ggNewsEl && ggNewsEl.value === 'no') ? 'no' : (ggNewsEl && ggNewsEl.value === 'yes') ? 'yes' : '',
       brokerUtcOffset: (function(){ const e = document.getElementById('ggBro'); if(!e) return (ggAccount.brokerUtcOffset == null ? '' : ggAccount.brokerUtcOffset); return e.value === '' ? '' : Number(e.value); })(),
       maxDrawdown: ggState.mdd,
       maxDrawdownUnit: ggMddUnitEl ? ggMddUnitEl.value : (ggAccount.maxDrawdownUnit || '%'),
       deadline: ggDeadlineEl ? ggDeadlineEl.value : (ggAccount.deadline || '')
     };
     try{ localStorage.setItem(ACC_KEY, JSON.stringify(ggAccount)); }catch(e){}
-    window.jlRevWindowMin = Number(ggAccount.revWindowMin) || 15;
+    window.jlRevWindowMin = Number(ggAccount.revWindowMin) || 0;
     window.jlProfitTargetUSD = Number(ggAccount.balance) * (Number(ggAccount.profitTargetPct)||0) / 100;
     window.jlDailyLossLimit = Number(ggAccount.maxDailyLossUSD) || 0; window.jlWeeklyLossLimit = Number(ggAccount.maxWeeklyLossUSD) || 0;
     window.jlMaxTradesPerDay = Number(ggAccount.maxTradesPerDay) || 0; window.jlStartBalance = Number(ggAccount.balance) || 0; window.jlDayProfitTargetUSD = (ggAccount.dayProfitTargetUnit === '$') ? (Number(ggAccount.dayProfitTarget)||0) : Number(ggAccount.balance) * (Number(ggAccount.dayProfitTarget)||0) / 100; window.jlWeeklyProfitTargetUSD = (ggAccount.weeklyProfitTargetUnit === '$') ? (Number(ggAccount.weeklyProfitTarget)||0) : Number(ggAccount.balance) * (Number(ggAccount.weeklyProfitTarget)||0) / 100;
-    window.jlLotSize = Number(ggAccount.lotSize) || 0; window.jlMaxConsecLosses = Number(ggAccount.maxConsecLosses) || 0; window.jlTradeDuringNews = ggAccount.tradeDuringNews === 'no' ? 'no' : 'yes'; window.jlBrokerUtcOffset = (ggAccount.brokerUtcOffset === '' || ggAccount.brokerUtcOffset == null || !isFinite(Number(ggAccount.brokerUtcOffset))) ? null : Number(ggAccount.brokerUtcOffset); if(typeof window.jlRenderWeak === 'function') window.jlRenderWeak();
+    window.jlLotSize = Number(ggAccount.lotSize) || 0; window.jlMaxConsecLosses = Number(ggAccount.maxConsecLosses) || 0; window.jlTradeDuringNews = ggAccount.tradeDuringNews === 'no' ? 'no' : ggAccount.tradeDuringNews === 'yes' ? 'yes' : ''; window.jlBrokerUtcOffset = (ggAccount.brokerUtcOffset === '' || ggAccount.brokerUtcOffset == null || !isFinite(Number(ggAccount.brokerUtcOffset))) ? null : Number(ggAccount.brokerUtcOffset); if(typeof window.jlRenderWeak === 'function') window.jlRenderWeak();
     if(typeof window.jlRecomputeRevenge === 'function') window.jlRecomputeRevenge({rerender:true});
     if(typeof window.__renderToday === 'function') window.__renderToday();
     if(typeof window.jlPaintRules === 'function') window.jlPaintRules();
@@ -5126,8 +5126,8 @@ const $ = id => document.getElementById(id);
   /*RV-PURE-END*/
   (function(){
     const kp=$('aRev');if(!kp)return;
-    const st=revStats(window.__trades||[]),win=Number(window.jlRevWindowMin)||15;
-    const sub=$('aRevSub');if(sub)sub.textContent='Trades opened within '+win+' minutes of a loss, compared with the rest.';
+    const st=revStats(window.__trades||[]),win=Number(window.jlRevWindowMin)||0;
+    const sub=$('aRevSub');if(sub)sub.textContent=win>0?'Trades opened within '+win+' minutes of a loss, compared with the rest.':'Set the revenge window in Account Settings to measure this.';
     const lotTxt=v=>v==null?'-':v.toFixed(2);
     kp.innerHTML=[
       ['Revenge trades',String(st.n),'var(--text)',st.total?(st.total?(st.n/st.total*100).toFixed(1):'0.0')+'% of '+jlN(st.total,'trade'):'No trades yet'],
@@ -5684,13 +5684,13 @@ const sec=t=>{const p=t.split(':');return +p[0]*3600+ +p[1]*60+ +p[2]};
 // Exposed on window + reusable so Account Settings ▸ Save can re-run it live when the
 // window setting changes, instead of only taking effect on the next page reload.
 window.jlRecomputeRevenge=function(opts){
-  const REV_WINDOW=(Number(window.jlRevWindowMin)||15)*60;
+  const REV_WINDOW=(Number(window.jlRevWindowMin)||0)*60;
   for(let i=0;i<T.length;i++){
     const c=T[i],p=T[i+1];
     if(!p||p.d!==c.d){c.rev=false;c.revSize=null;continue}
     const sameFill=p.side===c.side&&Math.abs(p.en-c.en)<.5&&Math.abs(sec(p.t)-sec(c.t))<=120;
     const gap=sec(c.t)-sec(p.t);
-    c.rev=!sameFill&&p.pnl<0&&gap>=0&&gap<=REV_WINDOW;
+    c.rev=REV_WINDOW>0&&!sameFill&&p.pnl<0&&gap>=0&&gap<=REV_WINDOW;
     c.revSize=c.rev?(c.lot>p.lot?'higher':c.lot<p.lot?'lower':'equal'):null;
   }
   // Only re-render when explicitly asked (Save calling this later, once the page has
@@ -5738,9 +5738,9 @@ function row(x,mx,journals){const k=kind(x.pnl),mv=x.side==='BUY'?x.ex-x.en:x.en
   '<tr class="t-expand-row" data-key="'+esc(rk)+'"><td colspan="10"><div class="t-expand-cell">'+detailHtml+'<button type="button" class="btn-ghost t-expand-open" data-openkey="'+esc(rk)+'">Open full journal →</button></div></td></tr>'}
 
 function kpis(a){const w=a.filter(x=>kind(x.pnl)==='win'),l=a.filter(x=>kind(x.pnl)==='loss'),n=a.length,sum=z=>z.reduce((s,x)=>s+x.pnl,0),net=sum(a)+a.reduce((q,x)=>q+(x.cost||0),0),ns=a.filter(x=>x.sl==null).length,jd=a.filter(x=>x.j).length,rvTrades=a.filter(x=>x.rev),rv=rvTrades.length;
-  const revWin=Number(window.jlRevWindowMin)||15;
+  const revWin=Number(window.jlRevWindowMin)||0;
   const sizeCounts={higher:0,lower:0,equal:0};rvTrades.forEach(x=>{if(x.revSize)sizeCounts[x.revSize]++});
-  const revSub=rv?'Re-entry inside '+revWin+' min of a loss · lot '+sizeCounts.higher+' higher, '+sizeCounts.lower+' lower, '+sizeCounts.equal+' equal':'No cooldown breaks in view';
+  const revSub=rv?'Re-entry inside '+revWin+' min of a loss · lot '+sizeCounts.higher+' higher, '+sizeCounts.lower+' lower, '+sizeCounts.equal+' equal':(revWin>0?'No cooldown breaks in view':'Revenge window not set');
   $('tKP').innerHTML=[['Net P&amp;L',money(net),net<0?'var(--red)':'var(--green)',jlN(n,'trade')+' in view'],
   ['Win rate',n?Math.round(w.length/n*100)+'%':'—','',jlN(w.length,'win')+', '+jlN(l.length,'loss','losses')+', '+(n-w.length-l.length)+' break-even'],
   ['Avg win / avg loss',(w.length?'$'+(sum(w)/w.length).toFixed(2):'—')+' / '+(l.length?'$'+Math.abs(sum(l)/l.length).toFixed(2):'—'),'','Per trade'],
