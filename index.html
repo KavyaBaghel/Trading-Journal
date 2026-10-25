@@ -8265,6 +8265,7 @@ window.__renderAnSetups=renderBoth;window.__renderAnEmotions=renderEmo;setTimeou
 #weeklyReview .wr-hc i{position:absolute;inset:0}
 #weeklyReview .wr-hc b{position:relative;font-weight:600}
 #view-summary.wr-weekend #weeklyReview~*{display:none!important}
+#view-summary:has(#weeklyReview:not([hidden])) #weeklyReview~*{display:none!important}
 @media(prefers-reduced-motion:no-preference){#weeklyReview .wr-tile,#wrStats>.wr-cols>div,#weeklyReview .wr-block{animation:jl-card-in .5s var(--ease-out) both}#weeklyReview .wr-block:nth-child(2){animation-delay:.05s}#weeklyReview .wr-block:nth-child(3){animation-delay:.1s}#weeklyReview .wr-block:nth-child(4){animation-delay:.15s}}
 </style>
 <script id="jl-weekly-review">
@@ -8588,11 +8589,25 @@ window.__renderAnSetups=renderBoth;window.__renderAnEmotions=renderEmo;setTimeou
       homeParent.insertBefore(root,homeNext&&homeNext.parentNode===homeParent?homeNext:null);
     }
   }
+  /* Weekend: Today's Summary shows only this review. Everything after the panel is hidden with an inline !important style, so no other rule can bring it back; weekdays restore each element's own inline display. */
+  function hideBelow(on){
+    var sv=$('view-summary'); if(!sv) return;
+    sv.classList.toggle('wr-weekend',on);
+    var par=root.parentNode, ok=!!par&&sv.contains(par)&&on, marked=sv.querySelectorAll('[data-wr-hid]'), i, el;
+    for(i=0;i<marked.length;i++){ el=marked[i];
+      if(!ok||el.parentNode!==par){ var d=el.getAttribute('data-wr-d'); if(d) el.style.setProperty('display',d); else el.style.removeProperty('display'); el.removeAttribute('data-wr-hid'); el.removeAttribute('data-wr-d'); } }
+    if(!ok) return;
+    for(el=root.nextElementSibling;el;el=el.nextElementSibling){
+      if(el.tagName==='SCRIPT'||el.tagName==='STYLE') continue;
+      if(!el.hasAttribute('data-wr-hid')){ el.setAttribute('data-wr-d',el.style.getPropertyValue('display')||''); el.setAttribute('data-wr-hid','1'); }
+      el.style.setProperty('display','none','important');
+    }
+  }
   function tick(){
     var wk=isWeekend();
     place();
     root.hidden=!wk;
-    var sv=$('view-summary'); if(sv) sv.classList.toggle('wr-weekend',wk);
+    hideBelow(wk);
     syncPreview();
     if(!wk) return;
     try{
