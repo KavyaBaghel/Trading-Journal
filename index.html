@@ -2879,6 +2879,16 @@ window.jlLiveBalance=function(Z){
   function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
   window.jlCoachHtml=function(t){return esc(t).replace(/\*\*([^*\n]+)\*\*/g,'<b>$1</b>').replace(/\n/g,'<br>')};
   function m$(v){return (v<0?'-$':'+$')+Math.abs(v).toFixed(2)}
+  function jstats(){var J=[],kind=window.jlKind||function(p){return Math.abs(p)<1?'be':p>0?'win':'loss'},bykey={};
+    try{J=window.__getJournals?window.__getJournals():[]}catch(e){}if(!Array.isArray(J))J=[];
+    function use(j){return !!j&&j.pnl!=null&&j.pnl!==''&&isFinite(j.pnl)}
+    function add(g,k,p){var o=g[k]=g[k]||{n:0,w:0,l:0,net:0};o.n++;o.net+=p;var c=kind(p);if(c==='win')o.w++;else if(c==='loss')o.l++}
+    function top(g){return Object.keys(g).map(function(k){return[k,g[k]]}).sort(function(a,b){return b[1].n-a[1].n||(a[0]<b[0]?-1:1)}).slice(0,8)}
+    var su={},em={},tg={};
+    J.forEach(function(j){if(!use(j))return;var p=+j.pnl,s=String(j.setup||'').trim().slice(0,40),e=String(j.emotion||'').trim().slice(0,40);
+      if(s){add(su,s,p);if(j.key)bykey[j.key]=s}if(e)add(em,e,p);(Array.isArray(j.tags)?j.tags:[]).forEach(function(x){x=String(x||'').trim().slice(0,40);if(x)add(tg,x,p)})});
+    var pb=[];try{var raw=JSON.parse(localStorage.getItem('journall_playbook_v1')||'[]');if(Array.isArray(raw))raw.slice(0,8).forEach(function(p){if(p&&p.name)pb.push({name:String(p.name).slice(0,40),take:String(p.take||'').replace(/\s+/g,' ').trim().slice(0,300),skip:String(p.skip||'').replace(/\s+/g,' ').trim().slice(0,300)})})}catch(e){}
+    return{setups:top(su),emotions:top(em),tags:top(tg),playbook:pb,bykey:bykey}}
   function ctx(){
     var A=window.__A||{},T=window.__trades||[],L=['Journall trade-review context (real logged trades only)'];
     if(!T.length)return L.concat('No trades logged yet.').join('\n');
@@ -2886,8 +2896,14 @@ window.jlLiveBalance=function(Z){
     (A.ses||[]).forEach(function(x){L.push('Session '+x[0]+': '+m$(x[1])+' over '+x[2]+' trades')});
     try{var c=JSON.parse(localStorage.getItem('journall_account_config_v1')||'null');
       if(c&&c.accountSize)L.push('Account: size $'+c.accountSize+', phase '+(c.phase||'n/a')+', max trades/day '+(c.maxTradesPerDay||'n/a')+'.')}catch(e){}
+    var JS=jstats();
+    JS.setups.forEach(function(x){L.push('Setup '+x[0]+': '+x[1].n+' trades, '+x[1].w+'W '+x[1].l+'L, net '+m$(x[1].net))});
+    JS.emotions.forEach(function(x){L.push('Feeling '+x[0]+': '+x[1].n+' trades, net '+m$(x[1].net))});
+    JS.tags.forEach(function(x){L.push('Mistake tag '+x[0]+': '+x[1].n+' trades, net '+m$(x[1].net))});
+    JS.playbook.forEach(function(p){L.push('Playbook setup '+p.name+'. Take: '+(p.take||'not written')+'. Skip: '+(p.skip||'not written'))});
+    try{var rl=window.jlTodayRule?window.jlTodayRule():null;if(rl&&rl.text)L.push("Trader's rule for today: "+rl.text)}catch(e){}
     L.push('Recent trades (newest last):');
-    T.slice(-30).forEach(function(t){L.push('- '+t.d+' '+t.t+' '+t.sym+' '+t.side+' '+t.ses+' pnl '+m$(t.pnl)+' lot '+t.lot+' exit '+(t.why||'-')+(t.hold!=null?' hold '+Math.round(t.hold)+'s':'')+(t.rev?' [revenge-flagged]':'')+(t.tag?' tag '+t.tag:''))});
+    T.slice(-30).forEach(function(t){var su=JS.bykey[t.d+' '+t.t+' '+t.side+' '+t.en+' '+t.pnl];L.push('- '+t.d+' '+t.t+' '+t.sym+' '+t.side+' '+t.ses+' pnl '+m$(t.pnl)+' lot '+t.lot+' exit '+(t.why||'-')+(t.hold!=null?' hold '+Math.round(t.hold)+'s':'')+(t.rev?' [revenge-flagged]':'')+(t.tag?' tag '+t.tag:'')+(su?' setup '+su:''))});
     return L.join('\n');
   }
   window.jlCoachAsk=async function(prompt,mode){
@@ -2913,6 +2929,7 @@ window.jlLiveBalance=function(Z){
       months:Object.keys(mo).sort().map(function(k){return {month:k,net:+mo[k][0].toFixed(2),trades:mo[k][1]}}),
       weekdays:(A.wd||[]).map(function(x){return {day:x[0],net:+x[1].toFixed(2)}}),
       revengeFlaggedTrades:T.filter(function(t){return t.rev}).length,
+      setups:jstats().setups.map(function(x){return {setup:x[0],trades:x[1].n,net:+x[1].net.toFixed(2)}}),
       sub1MinuteHoldsNet:A.negHold&&A.negHold[0]?+A.negHold[0][1].toFixed(2):null,
       topMistakeTag:A.negMis&&A.negMis[0]?A.negMis[0][0]:null};
     var prompt=['You are a trading discipline coach. Write an end-of-day review from the stats below. Use trader language only. No profit promises or financial advice. Only use numbers that appear in the stats.',
@@ -3529,7 +3546,7 @@ window.__mountOpenPos=function(){const o=(window.__openTrades||[]).concat((windo
 
   <div class="top aic-reveal" style="animation-delay:0ms">
     <div>
-      <div class="eyebrow"><span class="streak aic-live"><span class="aic-live-dot"></span>AI Coach · reading your 2026 log</span><span class="date mono" id="dateStrAI"></span></div>
+      <div class="eyebrow"><span class="streak aic-live"><span class="aic-live-dot"></span>AI Coach · reading your trade log</span><span class="date mono" id="dateStrAI"></span></div>
       <h1>AI Coach</h1>
       <p>Grounded in what you actually logged. No hype, no signals — just what the numbers say.</p>
     </div>
@@ -3537,7 +3554,7 @@ window.__mountOpenPos=function(){const o=(window.__openTrades||[]).concat((windo
   </div>
 
   <div class="aic-snap">
-    <div class="aic-snap-card glass aic-reveal" style="animation-delay:60ms"><div class="l"><svg viewBox="0 0 24 24"><path d="M5 20V11M12 20V4M19 20v-6"/></svg>TRADES LOGGED</div><div class="v mono" id="aicN1">0</div><div class="s">2026 · all sessions</div></div>
+    <div class="aic-snap-card glass aic-reveal" style="animation-delay:60ms"><div class="l"><svg viewBox="0 0 24 24"><path d="M5 20V11M12 20V4M19 20v-6"/></svg>TRADES LOGGED</div><div class="v mono" id="aicN1">0</div><div class="s">All sessions</div></div>
     <div class="aic-snap-card glass aic-reveal" style="animation-delay:120ms"><div class="l"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/></svg>WIN RATE</div><div class="v mono" id="aicN2">0%</div><div class="s">0W · 0L · 0BE</div></div>
     <div class="aic-snap-card glass neg aic-reveal" style="animation-delay:180ms"><div class="l"><svg viewBox="0 0 24 24"><path d="M4 6l6 6 4-4 6 8M14 16h6v-6"/></svg>NET P&amp;L</div><div class="v mono" id="aicN3">$0.00</div><div class="s">PF 0.00 · exp $0.00/trade</div></div>
     <div class="aic-snap-card glass neg aic-reveal" style="animation-delay:240ms"><div class="l"><svg viewBox="0 0 24 24"><path d="M12 3 2 20h20z"/><path d="M12 10v4M12 17h.01"/></svg>MAIN LEAK</div><div class="v">None flagged</div><div class="s" id="aicN4">−$0.00 logged</div></div>
@@ -3563,6 +3580,7 @@ window.__mountOpenPos=function(){const o=(window.__openTrades||[]).concat((windo
         <input id="aicInput" type="text" placeholder="Ask: why am I losing? what's my best session?" autocomplete="off" maxlength="180">
         <button id="aicSend" class="aic-send">Ask</button>
       </div>
+      <div class="aic-priv">Asking sends your stats, last 30 trades, setup stats and playbook rules to your AI backend.</div>
     </div>
 
     <div class="aic-rail">
@@ -3579,8 +3597,10 @@ window.__mountOpenPos=function(){const o=(window.__openTrades||[]).concat((windo
       </div>
       <div class="aic-card glass aic-action aic-reveal" style="animation-delay:460ms">
         <div class="aic-card-head"><span class="l"><svg viewBox="0 0 24 24"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="9"/></svg>TODAY'S ONE RULE</span></div>
-        <div class="aic-focus-title" style="font-size:14.5px">No trade without a 3-minute close.</div>
+        <div class="aic-focus-title" style="font-size:14.5px" id="aicRuleTxt">No rule set yet</div>
+        <div class="aic-focus-note" id="aicRuleSrc" style="margin-top:4px"></div>
         <div class="aic-focus-note" style="margin-top:6px"><span id="aicRuleNote"></span></div>
+        <div class="aic-rule-edit"><input type="text" id="aicRuleIn" maxlength="140" placeholder="Type your own rule" autocomplete="off" aria-label="Your own rule"><button type="button" class="gg-btn-outline" id="aicRuleSave">Save</button><button type="button" class="gg-btn-outline" id="aicRuleClear" hidden>Clear</button></div>
         <button class="aic-mark" id="aicMark">Mark as today's focus</button>
       </div>
     </div>
@@ -7578,7 +7598,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'){if(mpOpen)closeMont
 <script>
 (function(){
   const $ = id => document.getElementById(id);
-  let mounted = false, marked = false;
+  let mounted = false, busy = false;
 
   function countUp(el, to, opts){
     opts = opts || {};
@@ -7603,7 +7623,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'){if(mpOpen)closeMont
     document.querySelectorAll('.aicSw').forEach(el=>requestAnimationFrame(()=>el.style.setProperty('--w',el.dataset.w+'%')));
   }
 
-  // ---------- coach answers, grounded in the logged 2026 numbers ----------
+  // ---------- coach answers, grounded in your logged numbers ----------
   const A=window.__A,T=window.__trades||[],m$=v=>(v<0?'-$':'+$')+Math.abs(v).toFixed(2),ab$=v=>'$'+Math.abs(v).toFixed(2);
   const rvT=T.filter(t=>t.rev),rvNet=rvT.reduce((a,t)=>a+t.pnl,0),sesS=A.ses.slice().sort((a,b)=>a[1]-b[1]),worstS=sesS[0],bestS=sesS[sesS.length-1];
   const MN=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],mo={};T.forEach(t=>{const k=t.d.slice(0,7);(mo[k]=mo[k]||[0,0]);mo[k][0]+=t.pnl;mo[k][1]++});
@@ -7613,28 +7633,36 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'){if(mpOpen)closeMont
   const NONE='No trades in this dataset yet. Log trades and the coach answers from them.';
   const grade=!A.n?'-':A.pf>=1.5?'A':A.pf>=1.2?'B':A.pf>=1?'C':A.pf>=.7?'D':'F';
   const todayKey=(typeof window.getTradingDayIST==='function'?window.getTradingDayIST():new Date().toISOString().slice(0,10)),todayNet=T.filter(t=>t.d===todayKey).reduce((a,t)=>a+t.pnl,0);
+  const escH=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  const ruleNow=()=>{try{return window.jlTodayRule?window.jlTodayRule():null}catch(e){return null}};
+  const ruleLine=()=>{const r=ruleNow();return r&&r.text?r.text:'No rule set yet. Add one in the Today\'s one rule card.'};
+  const setupRows=()=>{let J=[];try{J=window.__getJournals?window.__getJournals():[]}catch(e){}const g={};
+    J.forEach(j=>{if(!j||j.pnl==null||j.pnl===''||!isFinite(j.pnl))return;const k=String(j.setup||'').trim();if(!k)return;const o=g[k]=g[k]||{n:0,net:0};o.n++;o.net+=Number(j.pnl)});
+    return Object.entries(g).sort((x,y)=>y[1].n-x[1].n||x[0].localeCompare(y[0])).slice(0,8)};
   const ANSWERS = {
     performance: !A.n?NONE:`${A.n} trades, <b>${A.wr.toFixed(1)}% win rate</b>, net <b>${m$(A.net)}</b>. Profit factor ${A.pf.toFixed(2)}.${pfTxt}
-      <ul>${moL.map(x=>`<li>${x[0]}: ${m$(x[1])} (${x[2]} trades)</li>`).join('')}</ul>${A.n>150?'Cut trade count before you touch win rate.':'Sample is small. Judge process, not P&amp;L.'}`,
+      <ul>${moL.map(x=>`<li>${x[0]}: ${m$(x[1])} (${x[2]} trades)</li>`).join('')}</ul>`,
     weakness: !A.n?NONE:`<b>Revenge trading:</b> ${revTxt}.
-      <ul>${A.negMis.length?`<li>Top tagged mistake: ${A.negMis[0][0]} (-$${A.negMis[0][1].toFixed(2)})</li>`:'<li>No mistake tags logged yet. Tag trades in the Journal.</li>'}${worstS?`<li>Weakest session: ${worstS[0]} at ${m$(worstS[1])} over ${worstS[2]} trades</li>`:''}${sub1?`<li>Sub-1-minute holds: ${m$(-sub1[1])}, the signature of skipping your 3-minute close</li>`:'<li>Hold time is not tracked in this dataset</li>'}</ul>
-      "Stop trading after one loss" is your rule. It exists for this exact leak.`,
-    today: `One change, not five: <b>no entry without a 3-minute candle close.</b>
-      <ul><li>Wait for the close, no exceptions</li><li>Confirm sweep + structure shift before anything else</li><li>No valid setup = no trade, full stop</li></ul>${sub1?`That habit alone is costing you ${ab$(sub1[1])} in sub-1-minute holds.`:''}`,
+      <ul>${A.negMis.length?`<li>Top tagged mistake: ${A.negMis[0][0]} (-$${A.negMis[0][1].toFixed(2)})</li>`:'<li>No mistake tags logged yet. Tag trades in the Journal.</li>'}${worstS?`<li>Weakest session: ${worstS[0]} at ${m$(worstS[1])} over ${worstS[2]} trades</li>`:''}${sub1?`<li>Sub-1-minute holds: ${m$(-sub1[1])}</li>`:'<li>Hold time is not tracked in this dataset</li>'}</ul>`,
+    get today(){const r=ruleNow(),leaks=[];
+      if(rvT.length)leaks.push(`Revenge-flagged trades: ${m$(rvNet)}`);
+      if(worstS&&worstS[1]<0)leaks.push(`Weakest session: ${worstS[0]} at ${m$(worstS[1])}`);
+      if(sub1)leaks.push(`Sub-1-minute holds: ${m$(-sub1[1])}`);
+      return (r&&r.text?`Your rule for today: <b>${escH(r.text)}</b>`:`You have not set a rule for today. Type one in the Today's one rule card, or fill in "What to fix tomorrow" in your Daily journal.`)
+        +(leaks.length?`<ul>${leaks.map(x=>`<li>${x}</li>`).join('')}</ul>`:'<br>')+`Today so far: ${m$(todayNet)}.`},
     psychology: `Before the next entry, answer straight:
-      <ul><li>Did price actually sweep a level, or are you bored?</li><li>Would you take this exact setup on a demo account?</li><li>Is this trade #1 today, or are you recovering a loss?</li></ul>
-      Any hesitation on those = no trade.`,
-    setup: !A.n?NONE:`Honest answer: ${A.n<30?`${A.n} trades is too small a sample to call an edge.`:'check the buckets below before calling anything an edge.'}
-      <ul>${wdBest[1]>0?`<li>Best weekday: ${wdBest[0]} (${m$(wdBest[1])})</li>`:'<li>No weekday is in the green</li>'}${bestS&&bestS[1]>0?`<li>Best session: ${bestS[0]} (${m$(bestS[1])})</li>`:'<li>No session is in the green</li>'}</ul>
-      Prove it over 20 clean trades before calling it an edge.`
+      <ul><li>Does this trade match a setup in your playbook?</li><li>Is this trade #1 today, or are you recovering a loss?</li><li>Would you take it if your last trade had been a winner?</li></ul>${todayNet<0?`You are ${m$(todayNet)} today.`:''}`,
+    get setup(){if(!A.n)return NONE;const sr=setupRows();
+      return (sr.length?`Setups from your journal, with the trade count behind each figure:<ul>${sr.map(x=>`<li>${escH(x[0])}: ${m$(x[1].net)} over ${x[1].n} ${x[1].n===1?'trade':'trades'}</li>`).join('')}</ul>`:'No setups are journaled yet. Pick a Setup when you journal a trade.<br>')
+        +`<ul>${wdBest[1]>0?`<li>Best weekday: ${wdBest[0]} (${m$(wdBest[1])})</li>`:'<li>No weekday is in the green</li>'}${bestS&&bestS[1]>0?`<li>Best session: ${bestS[0]} (${m$(bestS[1])})</li>`:'<li>No session is in the green</li>'}</ul>`}
   };
-  
+
   const KEYMAP = [
-    [/session|new york|london|asia/i,'performance'],
-    [/psycholog|emotion|feel|fomo|revenge|tilt/i,'psychology'],
-    [/weak|mistake|leak|wrong|losing|worst/i,'weakness'],
-    [/best|setup|edge|works|proven/i,'setup'],
-    [/today|now|next|fix/i,'today']
+    [/revenge|weak|mistake|leak|wrong|losing|lose|worst/i,'weakness'],
+    [/psycholog|emotion|feel|fomo|tilt|mindset/i,'psychology'],
+    [/setup|edge|playbook|proven|best/i,'setup'],
+    [/today|now|next|fix|rule/i,'today'],
+    [/session|new york|london|asia|month|week|perform|pnl|profit|win/i,'performance']
   ];
   const FALLBACK = A.n?`Straight numbers: ${A.n} trades, ${A.wr.toFixed(0)}% win rate, net ${m$(A.net)}, profit factor ${A.pf.toFixed(2)}. Ask about <b>performance</b>, <b>weakness</b>, <b>today's fix</b>, <b>psychology</b>, or your <b>best setup</b>.`:NONE;
 
@@ -7655,7 +7683,8 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'){if(mpOpen)closeMont
     thread.appendChild(typing);
     thread.scrollTop = thread.scrollHeight;
     const chips = document.querySelectorAll('.aic-chip'); chips.forEach(c=>c.disabled=true);
-    const done = ()=>{ chips.forEach(c=>c.disabled=false); if(headAvatar) headAvatar.classList.remove('thinking'); };
+    busy = true; const inEl = $('aicInput'), sendEl = $('aicSend'); if(inEl) inEl.disabled = true; if(sendEl) sendEl.disabled = true;
+    const done = ()=>{ busy = false; chips.forEach(c=>c.disabled=false); if(inEl) inEl.disabled = false; if(sendEl) sendEl.disabled = false; if(headAvatar) headAvatar.classList.remove('thinking'); };
     window.jlCoachAsk(prompt||'').then(
       t=>{ typing.remove(); addMsg(thread, 'ai', window.jlCoachHtml(t)); done(); },
       e=>{ typing.remove(); addMsg(thread, 'ai', (ANSWERS[key] || FALLBACK)+'<div style="margin-top:8px;opacity:.65;font-size:12px">Cloud AI unavailable ('+window.jlCoachHtml((e&&e.message)||'error')+'). Local answer from your logged trades.</div>'); done(); });
@@ -7663,20 +7692,20 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'){if(mpOpen)closeMont
 
   // ---------- AI widgets — one card per pattern, wired back into the coach + Trades/Journal ----------
   const WIDGETS = !A.n?[]:[
-  {stat:m$(A.net)+' net', cls:A.net<0?'neg':'', sub:'Account pressure', tags:['All trades',A.n+' trades'], desc:A.net<0?"Your curve is under pressure, so recovery must come from cleaner trades, not more of them. <b>Action:</b> take only A-setups until the next review.":"The curve is positive. <b>Action:</b> protect it: same size, same rules.", askKey:'performance', route:'trades'},
-  {stat:rvT.length?m$(rvNet)+' leak':'0 flagged', cls:rvT.length?'neg':'', sub:'Revenge trading', tags:['Revenge trade',rvT.length+' flagged'], desc:"Flagged by your revenge-window rule in Account Settings. <b>Action:</b> enforce \"stop after one loss\" before every session.", askKey:'weakness', route:'journal'},
-  worstS&&{stat:worstS[0]+' '+m$(worstS[1]), cls:worstS[1]<0?'neg':'', sub:'Weakest session', tags:[worstS[0],worstS[2]+' trades'], desc:"Lowest net of your sessions in this data. <b>Action:</b> reduce size or skip it until setup quality improves.", askKey:'performance', route:'trades'},
-  bestS&&bestS!==worstS&&{stat:bestS[0]+' '+m$(bestS[1]), cls:bestS[1]<0?'neg':'', sub:'Strongest session', tags:[bestS[0],bestS[2]+' trades'], desc:"Best net so far. <b>Action:</b> study your cleanest trades here for what is actually different.", askKey:'setup', route:'trades'},
-  sub1?{stat:m$(-sub1[1])+' holds', cls:'neg', sub:'Sub-1-minute exits', tags:['0-1m holds','execution leak'], desc:"The clearest signature of skipping your 3-minute close rule. <b>Action:</b> no entry without a full candle close.", askKey:'today', route:'trades'}:{stat:'Not tracked', cls:'', sub:'Hold time', tags:['not tracked yet'], desc:"Hold time is not in the trade data yet, so no hold-time leak can be shown.", askKey:'today', route:'trades'},
-  {stat:A.pf.toFixed(2)+' PF', cls:A.pf<1?'neg':'', sub:'Profit factor', tags:[A.n+' trades','efficiency'], desc:A.pf<1?"You lose "+ab$(1/(A.pf||1))+" for every $1 you make right now. <b>Action:</b> cut trade count before you touch win rate.":"Winners outweigh losers. <b>Action:</b> keep size flat.", askKey:'performance', route:'trades'},
-  {stat:A.L+' / '+A.n+' losses', cls:'neg', sub:'Losing trade load', tags:[(A.L/A.n*100).toFixed(1)+'% loss rate'], desc:"Tells you when to slow down before it compounds. <b>Action:</b> after one loss, stop and journal.", askKey:'weakness', route:'journal'},
-  {stat:m$(todayNet)+' today', cls:todayNet<0?'neg':'', sub:"Today's control", tags:['first checklist item'], desc:"Daily control keeps one bad session from damaging the month. <b>Action:</b> no trade without a 3-minute close.", askKey:'today', route:'journal'}
+  {stat:m$(A.net)+' net', cls:A.net<0?'neg':'', sub:'Account pressure', tags:['All trades',A.n+' trades'], desc:'Total net across all logged trades.', askKey:'performance', route:'trades'},
+  {stat:rvT.length?m$(rvNet)+' leak':'0 flagged', cls:rvT.length?'neg':'', sub:'Revenge trading', tags:['Revenge trade',rvT.length+' flagged'], desc:'Trades flagged by the revenge window in Account Settings.', askKey:'weakness', route:'journal'},
+  worstS&&{stat:worstS[0]+' '+m$(worstS[1]), cls:worstS[1]<0?'neg':'', sub:'Weakest session', tags:[worstS[0],worstS[2]+' trades'], desc:'Lowest net of your sessions in this data.', askKey:'performance', route:'trades'},
+  bestS&&bestS!==worstS&&{stat:bestS[0]+' '+m$(bestS[1]), cls:bestS[1]<0?'neg':'', sub:'Strongest session', tags:[bestS[0],bestS[2]+' trades'], desc:'Highest net of your sessions in this data.', askKey:'setup', route:'trades'},
+  sub1?{stat:m$(-sub1[1])+' holds', cls:'neg', sub:'Sub-1-minute exits', tags:['0-1m holds','execution leak'], desc:'Net result of trades held under one minute.', askKey:'today', route:'trades'}:{stat:'Not tracked', cls:'', sub:'Hold time', tags:['not tracked yet'], desc:'Hold time is not in the trade data yet, so no hold-time leak can be shown.', askKey:'today', route:'trades'},
+  {stat:A.pf.toFixed(2)+' PF', cls:A.pf<1?'neg':'', sub:'Profit factor', tags:[A.n+' trades','efficiency'], desc:A.pf<1?'You lose '+ab$(1/(A.pf||1))+' for every $1 you make right now.':'Winners outweigh losers across your logged trades.', askKey:'performance', route:'trades'},
+  {stat:A.L+' / '+A.n+' losses', cls:'neg', sub:'Losing trade load', tags:[(A.L/A.n*100).toFixed(1)+'% loss rate'], desc:'Share of your trades that closed as losses.', askKey:'weakness', route:'journal'},
+  {stat:m$(todayNet)+' today', cls:todayNet<0?'neg':'', sub:"Today's control", tags:['current trading day'], desc:'Net result so far on the current trading day.', askKey:'today', route:'journal'}
 ].filter(Boolean);
 function reportHtml(){return '<div class="review-grade"><div class="aic-grade-ring" style="--off:96"><svg viewBox="0 0 52 52"><circle class="trk" cx="26" cy="26" r="22.4"/><circle class="val" cx="26" cy="26" r="22.4"/></svg><b>'+grade+'</b></div>'+
  '<div><div class="t">'+(A.pf>=1?'Profitable, protect it':'Losing account, fixable leaks')+'</div><div class="s">'+A.n+' trades \u00b7 '+A.wr.toFixed(1)+'% win rate \u00b7 profit factor '+A.pf.toFixed(2)+' \u00b7 net '+m$(A.net)+'</div></div></div>'+
  '<div class="review-sec"><h3>WHAT\'S WORKING</h3><ul>'+(bestM&&bestM[1]>0?'<li>'+bestM[0]+' was green: '+m$(bestM[1])+' over '+bestM[2]+' trades.</li>':'<li>No green month yet. Small samples prove nothing either way.</li>')+(wdBest[1]>0?'<li>'+wdBest[0]+' is your best weekday ('+m$(wdBest[1])+').</li>':'')+'</ul></div>'+
  '<div class="review-sec"><h3>WHAT\'S BROKEN</h3><ul><li>'+revTxt+'.</li>'+(sub1?'<li>Sub-1-minute holds: '+m$(-sub1[1])+'.</li>':'<li>Hold time is not tracked, so timing leaks are invisible.</li>')+(worstS&&worstS[1]<0?'<li>Weakest session: '+worstS[0]+' at '+m$(worstS[1])+'.</li>':'')+'</ul></div>'+
- '<div class="review-sec"><h3>RULE FOR TOMORROW</h3><ul><li>One trade. 3-minute close confirmation only. Stop completely after one loss.</li></ul></div>'}
+ '<div class="review-sec"><h3>RULE FOR TOMORROW</h3><ul><li>'+escH(ruleLine())+'</li></ul></div>'}
 function fillHero(){const s=(id,h)=>{const e=$(id);if(e)e.innerHTML=h};
  s('aicHello',A.n?jlN(A.n,'trade')+' logged. Net <b>'+m$(A.net)+'</b>, profit factor <b>'+A.pf.toFixed(2)+'</b>.':'No trades logged in this dataset yet.');
  s('aicFocAmt',rvT.length?ab$(rvNet):'None flagged');
@@ -7686,7 +7715,7 @@ function fillHero(){const s=(id,h)=>{const e=$(id);if(e)e.innerHTML=h};
 
 
   function widgetHtml(w, i){
-    return '<div class="aic-widget glass aic-reveal" style="animation-delay:'+(i*55)+'ms" data-idx="'+i+'">'+
+    return '<div class="aic-widget glass aic-reveal'+((window.jlAiState&&window.jlAiState.isPinned(w.sub))?' pinned':'')+'" style="animation-delay:'+(i*55)+'ms" data-idx="'+i+'">'+
       '<div class="aic-w-eyebrow"><span>AI WIDGET</span><button class="aic-w-pin" title="Pin">+</button></div>'+
       '<div class="aic-w-stat '+w.cls+'">'+w.stat+'</div>'+
       '<div class="aic-w-sub">'+w.sub+'</div>'+
@@ -7724,6 +7753,7 @@ function fillHero(){const s=(id,h)=>{const e=$(id);if(e)e.innerHTML=h};
 
     document.querySelectorAll('.aic-chip').forEach(chip=>{
       chip.addEventListener('click', ()=>{
+        if(busy) return;
         addMsg(thread, 'user', chip.textContent);
         respond(thread, chip.dataset.q, chip.textContent);
       });
@@ -7731,7 +7761,7 @@ function fillHero(){const s=(id,h)=>{const e=$(id);if(e)e.innerHTML=h};
 
     function ask(){
       const v = input.value.trim();
-      if(!v) return;
+      if(!v || busy) return;
       addMsg(thread, 'user', v.replace(/</g,'&lt;'));
       input.value = '';
       let key = 'performance';
@@ -7741,11 +7771,7 @@ function fillHero(){const s=(id,h)=>{const e=$(id);if(e)e.innerHTML=h};
     send.addEventListener('click', ask);
     input.addEventListener('keydown', e=>{ if(e.key==='Enter') ask(); });
 
-    $('aicMark').addEventListener('click', function(){
-      marked = !marked;
-      this.classList.toggle('on', marked);
-      this.textContent = marked ? "Today's focus set" : 'Mark as today\'s focus';
-    });
+    /* focus button and the rule card are handled by script jl-ai-coach-fixes */
 
     $('aicGen').addEventListener('click', ()=>{
       const box = $('aicReportBox'), btn = $('aicGen');
@@ -7777,7 +7803,7 @@ function fillHero(){const s=(id,h)=>{const e=$(id);if(e)e.innerHTML=h};
     });
     wBox.addEventListener('click', e=>{
       const pin = e.target.closest('.aic-w-pin');
-      if(pin){ pin.closest('.aic-widget').classList.toggle('pinned'); return; }
+      if(pin){ const card = pin.closest('.aic-widget'); card.classList.toggle('pinned'); if(window.jlAiState && WIDGETS[+card.dataset.idx]) window.jlAiState.setPin(WIDGETS[+card.dataset.idx].sub, card.classList.contains('pinned')); return; }
       const btn = e.target.closest('.aic-w-btn');
       if(!btn) return;
       const card = btn.closest('.aic-widget');
@@ -8742,6 +8768,53 @@ window.addEventListener('storage',function(ev){if(!ev.key||ev.key===PBK||ev.key=
 document.addEventListener('visibilitychange',function(){if(!document.hidden)render()});
 setTimeout(function(){render(true)},1500);render(true);
 })();</script>
+<style id="jl-ai-coach-fixes-css">
+.aic-rule-edit{display:flex;gap:6px;margin-top:10px}
+.aic-rule-edit input{flex:1;min-width:0;background:var(--panel-2);border:1px solid var(--border);border-radius:9px;color:var(--text);font-family:inherit;font-size:12.5px;padding:8px 10px}
+.aic-rule-edit input:focus{outline:none;border-color:var(--accent-2)}
+.aic-rule-edit .gg-btn-outline{padding:8px 12px}
+.aic-priv{color:var(--faint);font-size:11px;margin-top:8px}
+</style>
+<script id="jl-ai-coach-fixes">(function(){
+/* AI Coach: today's rule (typed, else latest Daily journal fix), today's focus and widget pins, all saved. */
+var RK='journall_ai_rule_v1',FK='journall_ai_focus_v1',PK='journall_ai_pins_v1',DJ='krishna_daily_journal';
+/*AF-PURE-START*/
+function clean(v){return String(v==null?'':v).replace(/\s+/g,' ').trim()}
+function pickRule(typed,map,today){var t=clean(typed&&typeof typed==='object'?typed.text:'').slice(0,140);if(t)return{text:t,src:'typed',day:''};
+  var best='';if(map&&typeof map==='object'&&!Array.isArray(map))Object.keys(map).forEach(function(k){
+    if(!/^\d{4}-\d{2}-\d{2}$/.test(k)||(today&&k>=today))return;var e=map[k],f=e&&e.post&&typeof e.post.fix==='string'?clean(e.post.fix):'';if(f&&k>best)best=k});
+  if(!best)return{text:'',src:'',day:''};return{text:clean(map[best].post.fix).slice(0,300),src:'journal',day:best}}
+function cleanPins(raw){var out=[],seen={};if(!Array.isArray(raw))return out;raw.forEach(function(x){var s=clean(x).slice(0,60);if(s&&!seen[s]){seen[s]=1;out.push(s)}});return out.slice(0,40)}
+function focusOn(raw,today){return !!raw&&typeof raw==='object'&&raw.on===true&&!!today&&raw.day===today}
+var DN=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'],MN=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+function dayLabel(day){var m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(String(day||''));if(!m)return String(day||'');var d=new Date(Date.UTC(+m[1],+m[2]-1,+m[3]));return DN[d.getUTCDay()]+' '+(+m[3])+' '+MN[d.getUTCMonth()]}
+/*AF-PURE-END*/
+function $(id){return document.getElementById(id)}
+function rd(k){try{return JSON.parse(localStorage.getItem(k))}catch(_){return null}}
+function wr(k,v){try{localStorage.setItem(k,JSON.stringify(v));return true}catch(_){return false}}
+function today(){return typeof window.getTradingDayIST==='function'?window.getTradingDayIST():''}
+window.jlTodayRule=function(){return pickRule(rd(RK),rd(DJ),today())};
+window.jlAiState={
+  isPinned:function(label){return cleanPins(rd(PK)).indexOf(clean(label))>=0},
+  setPin:function(label,on){var l=clean(label),a=cleanPins(rd(PK)).filter(function(x){return x!==l});if(on)a.push(l);wr(PK,a)}
+};
+function paint(){var tx=$('aicRuleTxt');if(!tx)return;var r=window.jlTodayRule();
+  tx.textContent=r.text||'No rule set yet';
+  var s=$('aicRuleSrc');if(s)s.textContent=r.src==='typed'?'Your own rule':r.src==='journal'?'From your Daily journal, '+dayLabel(r.day):'Type one below, or fill in "What to fix tomorrow" in your Daily journal.';
+  var c=$('aicRuleClear');if(c)c.hidden=r.src!=='typed';
+  var b=$('aicMark');if(b){var on=focusOn(rd(FK),today());b.classList.toggle('on',on);b.textContent=on?"Today's focus set":"Mark as today's focus"}}
+function saveRule(){var i=$('aicRuleIn');if(!i)return;var v=clean(i.value).slice(0,140);if(!v)return;if(wr(RK,{text:v}))i.value='';paint()}
+var sv=$('aicRuleSave'),cl=$('aicRuleClear'),mk=$('aicMark'),inp=$('aicRuleIn');
+if(sv)sv.addEventListener('click',saveRule);
+if(inp)inp.addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();saveRule()}});
+if(cl)cl.addEventListener('click',function(){try{localStorage.removeItem(RK)}catch(_){}paint()});
+if(mk)mk.addEventListener('click',function(){var on=focusOn(rd(FK),today());wr(FK,{day:today(),on:!on});paint()});
+var view=$('view-ai');
+if(view&&typeof MutationObserver==='function')new MutationObserver(function(){if(!view.hidden)paint()}).observe(view,{attributes:true,attributeFilter:['hidden']});
+window.addEventListener('storage',function(ev){if(!ev.key||ev.key===RK||ev.key===FK||ev.key===DJ)paint()});
+setTimeout(paint,1500);paint();
+})();</script>
+
 
 
 <script>(function(){const A=window.__A,m=v=>(v<0?'-$':'+$')+Math.abs(v).toFixed(2),set=(id,h)=>{const e=document.getElementById(id);if(e)e.textContent=h};
