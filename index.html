@@ -8146,17 +8146,18 @@ function circuitEval(rows,o,kindFn){
     if(!t)return;var p=Number(t.pnl);if(!isFinite(p))return;
     if(p<0)lossUsed+=-p;
     var k=t.d+'|'+t.t+'|'+t.sym+'|'+t.side;
-    if(!g[k]){g[k]={t:String(t.t),pnl:0};order.push(k)}
-    g[k].pnl+=p;
+    if(!g[k]){g[k]={t:String(t.t),pnl:0,rev:false};order.push(k)}
+    g[k].pnl+=p;if(t.rev)g[k].rev=true;
   });
   var list=order.map(function(k){return g[k]}).sort(function(a,b){return a.t<b.t?-1:a.t>b.t?1:0});
-  var count=list.length,run=0;
+  var count=list.length,run=0,revN=list.filter(function(x){return x.rev}).length;
   for(var i=list.length-1;i>=0;i--){if(kindFn(list[i].pnl)==='loss')run++;else break}
   var why=[];
   if(o.lossLimit>0&&lossUsed>=o.lossLimit)why.push('Daily loss limit reached ($'+lossUsed.toFixed(2)+' of $'+o.lossLimit.toFixed(2)+')');
   if(o.tradeLimit>0&&count>=o.tradeLimit)why.push('Daily trade limit reached ('+count+' of '+o.tradeLimit+')');
   if(o.maxConsec>0&&run>=o.maxConsec)why.push(run+' losing trades in a row (limit '+o.maxConsec+')');
-  return{tripped:why.length>0,why:why,count:count,lossUsed:lossUsed,run:run};
+  if(o.revLimit>0&&revN>=o.revLimit)why.push('Revenge trading: '+revN+' trades opened soon after a loss (limit '+o.revLimit+')');
+  return{tripped:why.length>0,why:why,count:count,lossUsed:lossUsed,run:run,revN:revN};
 }
 function msUntilReset(nowMs){
   var IST=5.5*3600000,s=new Date(nowMs+IST);
@@ -8170,7 +8171,7 @@ function paint(){
   var key=typeof window.getTradingDayIST==='function'?window.getTradingDayIST():'';
   var rows=(window.__trades||[]).filter(function(t){return t&&t.d===key});
   var kindFn=typeof window.jlKind==='function'?window.jlKind:function(p){return p<0?'loss':p>0?'win':'be'};
-  var r=circuitEval(rows,{lossLimit:Number(window.jlDailyLossLimit)||0,tradeLimit:Number(window.jlMaxTradesPerDay)||0,maxConsec:Number(window.jlMaxConsecLosses)||0},kindFn);
+  var r=circuitEval(rows,{lossLimit:Number(window.jlDailyLossLimit)||0,tradeLimit:Number(window.jlMaxTradesPerDay)||0,maxConsec:Number(window.jlMaxConsecLosses)||0,revLimit:2},kindFn);
   if(!r.tripped){el.hidden=true;return}
   document.getElementById('jlCircuitWhy').textContent=r.why.join('. ')+'.';
   document.getElementById('jlCircuitWait').textContent='Stay out of the market until the 06:00 IST reset, in '+fmtWait(msUntilReset(Date.now()))+'.';
