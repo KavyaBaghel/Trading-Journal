@@ -8258,7 +8258,7 @@ window.__renderAnSetups=renderBoth;window.__renderAnEmotions=renderEmo;setTimeou
 #weeklyReview .wr-hc b{position:relative;font-weight:600}
 </style>
 <script id="jl-weekly-review">
-/* Saturday-only weekly review, shown on Today's Summary and at the top of the Calendar tab (one panel, moved to whichever of the two is open). Trading day and week use the same 06:00 IST / Monday-Sunday rules as the rest of the app.
+/* Weekend weekly review (Saturday and Sunday trading days), shown on Today's Summary and at the top of the Calendar tab (one panel, moved to whichever of the two is open). Trading day and week use the same 06:00 IST / Monday-Sunday rules as the rest of the app.
    Stats come from window.__trades; upcoming events come from the Worker /market route through window.jlMarketFetch. */
 (function(){
   var root=document.getElementById('weeklyReview');
@@ -8279,9 +8279,9 @@ window.__renderAnSetups=renderBoth;window.__renderAnEmotions=renderEmo;setTimeou
   try{ var pm=/[?&]weekendPreview=([^&#]*)/.exec(location.search||''); if(pm){ if(pm[1]==='1'||pm[1]==='on') localStorage.setItem(PREV_KEY,'1'); else if(pm[1]==='0'||pm[1]==='off') localStorage.removeItem(PREV_KEY); } }catch(e){}
   function previewOn(){ try{ return localStorage.getItem(PREV_KEY)==='1'; }catch(e){ return false; } }
   function realToday(){ return typeof window.getTradingDayIST==='function' ? window.getTradingDayIST() : ''; }
-  function realWeekend(){ var k=realToday(); if(!k) return false; return parseKey(k).getUTCDay()===6; }
+  function realWeekend(){ var k=realToday(); if(!k) return false; var w=parseKey(k).getUTCDay(); return w===6||w===0; }
   function today(){ var k=realToday(); if(!k||!previewOn()||realWeekend()) return k; return addDays(k,-(parseKey(k).getUTCDay()+1)); }
-  function isWeekend(){ var k=today(); if(!k) return false; return parseKey(k).getUTCDay()===6; }
+  function isWeekend(){ var k=today(); if(!k) return false; var w=parseKey(k).getUTCDay(); return w===6||w===0; }
   function syncPreview(){
     var el=$('wrPreview'), on=previewOn()&&!!realToday()&&!realWeekend();
     if(!on){ if(el) el.parentNode.removeChild(el); return; }
@@ -8429,11 +8429,18 @@ window.__renderAnSetups=renderBoth;window.__renderAnEmotions=renderEmo;setTimeou
       +list('EMOTION IMPACT ON P&amp;L',eo,'No emotion logged on this week\'s journal entries.')
       +'</div><div class="wr-cap">'+none+' of '+rows.length+' trade'+(rows.length===1?'':'s')+' have no mistake tag or emotion logged, so they are left out above. A trade with two tags counts under both, so totals can add up to more than net P&amp;L.</div></div>';
   }
+  function safeBlock(label,fn){
+    try{ return fn(); }catch(err){ return '<div class="wr-block"><div class="wr-sub">'+label+'</div><div class="wr-empty">This section could not load ('+esc(err&&err.message||'error')+').</div></div>'; }
+  }
   function analyticsHtml(rows,b){
     var cur=metrics(rows), prev=metrics(wkRows(addDays(b.ws,-7)));
-    return '<div class="wr-an">'+equityHtml(rows,cur)+cmpHtml(cur,prev)
-      +'<div class="wr-block"><div class="wr-cols">'+groupHtml('SESSION BREAKDOWN',rows,function(t){ return t.ses; })+groupHtml('PAIR BREAKDOWN',rows,function(t){ return t.sym; })+'</div></div>'
-      +heatHtml(rows,b)+impactHtml(rows)+'</div>';
+    return '<div class="wr-an">'
+      +safeBlock('EQUITY CURVE AND DRAWDOWN',function(){ return equityHtml(rows,cur); })
+      +safeBlock('THIS WEEK VS LAST WEEK',function(){ return cmpHtml(cur,prev); })
+      +safeBlock('SESSION AND PAIR BREAKDOWN',function(){ return '<div class="wr-block"><div class="wr-cols">'+groupHtml('SESSION BREAKDOWN',rows,function(t){ return t.ses; })+groupHtml('PAIR BREAKDOWN',rows,function(t){ return t.sym; })+'</div></div>'; })
+      +safeBlock('TIME-OF-DAY HEATMAP',function(){ return heatHtml(rows,b); })
+      +safeBlock('MISTAKE AND EMOTION IMPACT',function(){ return impactHtml(rows); })
+      +'</div>';
   }
 
   /* ---------- week stats (real trades only) ---------- */
@@ -8498,7 +8505,7 @@ window.__renderAnSetups=renderBoth;window.__renderAnEmotions=renderEmo;setTimeou
     return '<div class="wr-tiles">'+tiles+'</div>'
       +'<div class="wr-cols"><div><div class="wr-sub">DAILY P&amp;L</div>'+bars+'</div>'
       +'<div><div class="wr-sub">WHAT TO REVIEW</div><ul class="wr-list">'+li.join('')+'</ul></div></div>'
-      +(function(){ try{ return analyticsHtml(rows,b); }catch(err){ return ''; } })();
+      +(function(){ try{ return analyticsHtml(rows,b); }catch(err){ return '<div class="wr-an"><div class="wr-block"><div class="wr-empty">Analytics could not load ('+esc(err&&err.message||'error')+').</div></div></div>'; } })();
   }
 
   /* ---------- rule saved for Monday ---------- */
