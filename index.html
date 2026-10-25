@@ -533,7 +533,14 @@
   .ring-card:hover svg{filter:drop-shadow(0 0 12px rgba(124,108,240,.4))}
   .card:hover svg{stroke:var(--accent-2)}
 
-  .rings{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:14px}
+  .rings{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:14px}
+  @media(max-width:1280px){.rings{grid-template-columns:repeat(2,1fr)}}
+  .chk-d{display:block;font-size:11.5px;color:var(--faint);margin-top:2px;line-height:1.35}
+  .checklist li.done .chk-d{text-decoration:none}
+  .checklist li>span.chk-t{min-width:0;overflow-wrap:anywhere}
+  .chk-foot{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:12px;font-size:11.5px}
+  .chk-foot a,.chk-foot button{color:var(--sub);background:none;border:0;padding:0;font:inherit;cursor:pointer;text-decoration:none}
+  .chk-foot a:hover,.chk-foot button:hover{color:var(--text)}
   .ring-card{padding:20px 22px;display:flex;align-items:center;gap:17px}
   .ring-card svg{flex:none;filter:drop-shadow(0 0 7px rgba(124,108,240,.18))}
   .ring-track{stroke:rgba(255,255,255,.055);fill:none;stroke-width:8}
@@ -2976,6 +2983,18 @@ window.jlLiveBalance=function(Z){
         <div class="ring-detail" id="tradesDetail"></div>
       </div>
     </div>
+    <div class="ring-card glass">
+      <svg width="76" height="76" viewBox="0 0 88 88">
+        <circle class="ring-track" cx="44" cy="44" r="38"/>
+        <circle class="ring-val" id="ringWeek" cx="44" cy="44" r="38" stroke="var(--green)" style="--off:239"/>
+      </svg>
+      <div>
+        <div class="ring-label">WEEK P&amp;L</div>
+        <div class="ring-num" id="weekNum">$0.00</div>
+        <div class="ring-sub" id="weekSub">Weekly target not set</div>
+        <div class="ring-detail" id="weekDetail"></div>
+      </div>
+    </div>
   </div>
 
   <div class="session glass">
@@ -3016,24 +3035,10 @@ window.jlLiveBalance=function(Z){
 
   <div class="split">
     <div class="panel glass">
-      <div class="panel-head"><h2>Pre-trade checklist</h2><span class="hint" id="chkHint">0 / 6 complete</span></div>
-      <div class="chk-strict-row">
-        <span>Strict mode — lock session items until pre-market is complete</span>
-        <button class="up-switch" id="chkStrictSwitch" type="button" aria-pressed="false"></button>
-      </div>
+      <div class="panel-head"><h2>Psychology checklist</h2><span class="hint" id="chkHint">0 / 0 complete</span></div>
       <div class="progress" id="chkBarWrap"><i id="chkBar" style="width:0%"></i></div>
-      <div class="grp-label">PRE-MARKET</div>
-      <ul class="checklist" id="checklist">
-        <li><input type="checkbox"> Bias confirmed on higher timeframe</li>
-        <li><input type="checkbox"> Session news / calendar checked</li>
-        <li><input type="checkbox"> Daily max loss and target reviewed</li>
-      </ul>
-      <div class="grp-label">DURING SESSION</div>
-      <ul class="checklist" id="checklist2">
-        <li><input type="checkbox"> Risk per trade set to plan</li>
-        <li><input type="checkbox"> No revenge-trade urge</li>
-        <li><input type="checkbox"> Stop-loss placed before entry</li>
-      </ul>
+      <ul class="checklist" id="checklist"></ul>
+      <div class="chk-foot"><a href="#psychology" id="chkEditLink">Edit in Psychology tab</a><button type="button" id="chkReset">Reset today</button></div>
       <div class="rule-box">
         <div class="l">TOMORROW'S RULE</div>
         <input type="text" id="ruleInput" maxlength="200" autocomplete="off" placeholder="e.g. Only trade the London open">
@@ -3762,6 +3767,11 @@ document.addEventListener('input',e=>{if(cur&&RUN[cur.dataset.tool]&&cur.contain
 #view-market .mk-news{display:flex;flex-direction:column;gap:10px;max-height:360px;overflow-y:auto;padding-right:6px;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.18) transparent}
 #view-market .mk-n{background:var(--panel-2);border:1px solid var(--border);border-radius:12px;padding:13px;display:flex;flex-direction:column;gap:9px;transition:.2s var(--ease)}
 #view-market .mk-n:hover{border-color:var(--border-hi)}
+#view-market .mk-n{min-width:0}
+#view-market .mk-nm{color:var(--faint);font-size:11px}
+#view-market .mk-nh{color:var(--text);text-decoration:none;font-weight:600;font-size:13px;line-height:1.4;overflow-wrap:anywhere}
+#view-market a.mk-nh:hover{text-decoration:underline}
+#view-market .mk-retry{align-self:flex-start;padding:5px 12px}
 #view-market .mk-note{margin:14px 0 0;font-size:12px;color:var(--faint)}
 @keyframes mkSh{to{background-position:-200% 0}}
 @media(max-width:900px){#view-market .mk-grid{grid-template-columns:minmax(0,1fr)}}
@@ -4509,58 +4519,62 @@ document.addEventListener('input',e=>{if(cur&&RUN[cur.dataset.tool]&&cur.contain
   // same real per-instrument logo instead of a hardcoded gold dot — one source of truth for the icon.
   window.iconFor = iconFor;
 
-  // ---------- checklist ----------
-  function wireChecklist(id){
-    document.querySelectorAll('#'+id+' li').forEach(li=>{
-      li.addEventListener('click',()=>{
-        if(li.classList.contains('locked')) return;
-        const cb = li.querySelector('input');
-        cb.checked = !cb.checked;
-        li.classList.toggle('done', cb.checked);
-        updateProgress();
-      });
+  // ---------- psychology checklist (Today's Summary) ----------
+  // Shows the same checklist you edit in the Psychology tab (Checklist step). The items are read from the
+  // Psychology tab's saved list (localStorage 'jlPsy:checklist:items'), falling back to its default list.
+  // Ticks are remembered per trading day (06:00 IST reset) so each new day starts clean.
+  const PSY_CHECKLIST_DEFAULTS = [{k:'news',t:'News Checked',d:'No high-impact USD news within 30 minutes'},{k:'emotion2',t:'Emotion Calm',d:'Still calm right before pulling the trigger.'},{k:'rulesmet',t:'Plan Rules Met',d:'Entering only because my plan and risk rules are fully met — not because I want action.'},{k:'risklimit',t:'Risk Under Limit',d:'Lot is 0.02 and risk is about $10 or less'},{k:'entry',t:'Entry Confirmed',d:"Price action confirms the entry on the setup's confirmed candle or timeframe close."},{k:'signal',t:'Confirmation Signal',d:'Daily stop not hit: under 4 trades, under 2 losses, week above -$80'},{k:'exit',t:'Exit Plan Set',d:'SL behind structure, TP at least 2R, and the 1.5R partial planned, all written before entry'}];
+  const ovEsc = v => String(v==null?'':v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+  function ovChkItems(){
+    try{
+      const raw = localStorage.getItem('jlPsy:checklist:items');
+      if(raw){ const p = JSON.parse(raw); if(Array.isArray(p) && p.length) return p.filter(r=>r && r.k && r.t); }
+    }catch(e){}
+    return PSY_CHECKLIST_DEFAULTS;
+  }
+  function ovChkKey(){ return 'jlOvChk:' + (typeof getTradingDayIST==='function' ? getTradingDayIST() : ''); }
+  function ovChkLoad(){ try{ const o = JSON.parse(localStorage.getItem(ovChkKey())||'{}'); return (o && typeof o==='object') ? o : {}; }catch(e){ return {}; } }
+  function ovChkSave(o){ try{ localStorage.setItem(ovChkKey(), JSON.stringify(o)); }catch(e){} }
+  let ovChkDay = '';
+  function renderOvChecklist(){
+    const list = document.getElementById('checklist'); if(!list) return;
+    const items = ovChkItems(), saved = ovChkLoad();
+    ovChkDay = ovChkKey();
+    list.innerHTML = items.map(r=>{
+      const on = !!saved[r.k];
+      return '<li data-k="'+ovEsc(r.k)+'" class="'+(on?'done':'')+'"><input type="checkbox" '+(on?'checked':'')+' tabindex="-1"><span class="chk-t"><b style="font-weight:600">'+ovEsc(r.t)+'</b>'+(r.d?'<span class="chk-d">'+ovEsc(r.d)+'</span>':'')+'</span></li>';
+    }).join('');
+    updateProgress();
+  }
+  window.__renderOvChecklist = renderOvChecklist;
+  const ovList = document.getElementById('checklist');
+  if(ovList){
+    ovList.addEventListener('click', e=>{
+      const li = e.target.closest('li[data-k]'); if(!li) return;
+      const cb = li.querySelector('input'); if(!cb) return;
+      if(e.target !== cb) cb.checked = !cb.checked; // a click on the box itself already toggled it natively
+      li.classList.toggle('done', cb.checked);
+      const o = ovChkLoad(); if(cb.checked) o[li.dataset.k] = 1; else delete o[li.dataset.k];
+      ovChkSave(o);
+      updateProgress();
     });
   }
-  wireChecklist('checklist'); wireChecklist('checklist2');
+  const ovResetBtn = document.getElementById('chkReset');
+  if(ovResetBtn) ovResetBtn.addEventListener('click', ()=>{ ovChkSave({}); renderOvChecklist(); });
   function updateProgress(){
-    const all = document.querySelectorAll('#checklist input, #checklist2 input');
-    const done = document.querySelectorAll('#checklist input:checked, #checklist2 input:checked').length;
+    const all = document.querySelectorAll('#checklist input');
+    const done = document.querySelectorAll('#checklist input:checked').length;
     const nowFull = all.length>0 && done===all.length;
     const wasFull = chkBarWrap.classList.contains('full');
-    chkBar.style.width = (done/all.length*100)+'%';
+    chkBar.style.width = (all.length ? done/all.length*100 : 0)+'%';
     chkHint.textContent = done+' / '+all.length+' complete';
     chkBarWrap.classList.toggle('full', nowFull);
     if(nowFull && !wasFull){ chkBarWrap.style.animation='none'; void chkBarWrap.offsetWidth; chkBarWrap.style.animation=''; }
-    applyStrictGate();
   }
-
-  // ---------- pre-market checklist gate (optional strict mode) ----------
-  // Locks the DURING SESSION items until every PRE-MARKET item is checked. Off by default, so
-  // existing behavior (freely checkable) is unchanged unless the user turns strict mode on; the
-  // choice is remembered per-device via localStorage, same pattern as the sidebar-collapse toggle.
-  const chkStrictSwitch = document.getElementById('chkStrictSwitch');
-  let strictMode = false;
-  try{ strictMode = localStorage.getItem('jlChecklistStrict') === '1'; }catch(e){}
-  function preMarketDone(){
-    const items = document.querySelectorAll('#checklist input');
-    return items.length>0 && document.querySelectorAll('#checklist input:checked').length === items.length;
-  }
-  function applyStrictGate(){
-    const gated = strictMode && !preMarketDone();
-    document.querySelectorAll('#checklist2 li').forEach(li=> li.classList.toggle('locked', gated));
-    if(chkStrictSwitch){
-      chkStrictSwitch.classList.toggle('on', strictMode);
-      chkStrictSwitch.setAttribute('aria-pressed', strictMode ? 'true' : 'false');
-    }
-  }
-  if(chkStrictSwitch){
-    chkStrictSwitch.addEventListener('click', ()=>{
-      strictMode = !strictMode;
-      try{ localStorage.setItem('jlChecklistStrict', strictMode?'1':'0'); }catch(e){}
-      applyStrictGate();
-    });
-  }
-  applyStrictGate();
+  renderOvChecklist();
+  // pick up Psychology-tab edits and the 06:00 IST day rollover
+  window.addEventListener('hashchange', renderOvChecklist);
+  setInterval(()=>{ if(ovChkDay !== ovChkKey()) renderOvChecklist(); }, 60000);
 
 
   // ---------- market session rows + real overlaps ----------
@@ -4737,8 +4751,32 @@ document.addEventListener('input',e=>{if(cur&&RUN[cur.dataset.tool]&&cur.contain
     return {net, wins, losses, worked, toFix, rule};
   }
 
+  // ---------- weekly P&L card (Mon-Sun, same 06:00 IST trading-day rule as the rest of the app) ----------
+  function updateWeekCard(todayKey){
+    const numEl = document.getElementById('weekNum'); if(!numEl) return;
+    const p = todayKey.split('-').map(Number), dt = new Date(Date.UTC(p[0],p[1]-1,p[2])), dow = (dt.getUTCDay()+6)%7;
+    const iso = ms => new Date(ms).toISOString().slice(0,10);
+    const ws = iso(dt.getTime()-dow*864e5), we = iso(dt.getTime()+(6-dow)*864e5);
+    const rows = (window.__trades||[]).filter(t=>t && t.d && t.d>=ws && t.d<=we && isFinite(Number(t.pnl)));
+    const net = rows.reduce((s,t)=>s+Number(t.pnl),0);
+    const W = rows.filter(t=>window.jlKind(Number(t.pnl))==='win').length, L = rows.filter(t=>window.jlKind(Number(t.pnl))==='loss').length;
+    const days = new Set(rows.map(t=>t.d)).size;
+    const tgt = Number(window.jlWeeklyProfitTargetUSD)||0, lim = Number(window.jlWeeklyLossLimit)||0;
+    const pct = tgt>0 ? Math.min(100, Math.max(0, Math.round(net/tgt*100))) : 0;
+    numEl.textContent = (net<0?'-$':'$')+Math.abs(net).toFixed(2);
+    numEl.style.color = net<0 ? 'var(--red)' : '';
+    document.getElementById('weekSub').textContent = tgt>0 ? pct+'% of $'+tgt.toFixed(0)+' weekly target' : 'Weekly target not set';
+    const ring = document.getElementById('ringWeek');
+    ring.style.setProperty('--off', 239-239*(pct/100));
+    ring.style.stroke = net<0 ? 'var(--red)' : 'var(--green)';
+    document.getElementById('weekDetail').innerHTML = rows.length
+      ? '<span class="tag win">'+W+'W</span><span class="tag loss">'+L+'L</span> <span style="color:var(--faint)">'+days+' day'+(days===1?'':'s')+(lim>0&&net<0?' · $'+Math.abs(net).toFixed(0)+' / $'+lim.toFixed(0)+' loss limit':'')+'</span>'
+      : '<span style="color:var(--faint)">No trades this week</span>';
+  }
+
   function setState(){
     const todayKey = getTradingDayIST();
+    try{ updateWeekCard(todayKey); }catch(e){}
     const rawToday = (window.__trades||[]).filter(t=>t.d===todayKey).slice().sort((a,b)=> a.t.localeCompare(b.t));
     const journals = window.__getJournals ? window.__getJournals() : [];
     const targetUSD = Number(window.jlDayProfitTargetUSD) || Number(window.jlProfitTargetUSD) || 0;
@@ -6590,6 +6628,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'){if(mpOpen)closeMont
     state.checklistEditing = false;
     saveState();
     render();
+    try{ if(typeof window.__renderOvChecklist === 'function') window.__renderOvChecklist(); }catch(e){} // keep Today's Summary checklist in sync
   }
   async function cancelEditChecklistItems(){
     try{
@@ -8019,17 +8058,33 @@ window.__renderAnSetups=renderBoth;window.__renderAnEmotions=renderEmo;setTimeou
       return '<div class="mk-k"><b>'+esc(e.event||'Event')+'</b><span>Date: '+t.toLocaleDateString(undefined,{month:'short',day:'numeric'})+'</span><br><span>Time: '+t.toLocaleTimeString(undefined,{hour:'2-digit',minute:'2-digit'})+'</span></div>';
     }).join('');
   }
+  function ago(sec){
+    const m=Math.round((Date.now()/1000-sec)/60);
+    if(m<1) return 'just now'; if(m<60) return m+'m ago'; const h=Math.round(m/60); if(h<24) return h+'h ago';
+    return new Date(sec*1000).toLocaleDateString(undefined,{month:'short',day:'numeric'});
+  }
   function renderNews(){
     const host=$('mkNewsList'); if(!host) return;
-    if(!news.length){ host.innerHTML='<div class="mk-n"><span style="color:var(--faint)">'+(loaded?(newsMsg||'No news returned.'):'Loading news…')+'</span></div>'; return; }
-    host.innerHTML=news.slice(0,10).map(n=>{
-      const t=n.datetime?new Date(n.datetime*1000).toLocaleString(undefined,{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'}):'';
-      const url=safeUrl(n.url);
-      return '<div class="mk-n"><span style="color:var(--faint);font-size:11px">'+esc(n.source||'')+' · '+esc(t)+'</span><a href="'+esc(url)+'" target="_blank" rel="noopener" style="color:var(--text);text-decoration:none;font-weight:600;font-size:13px">'+esc(n.headline||'')+'</a></div>';
+    /* clean the feed: drop blank headlines, de-duplicate repeats, newest first */
+    const seen={}, list=(news||[]).filter(n=>{
+      const h=String((n&&n.headline)||'').trim(); if(!h) return false;
+      const k=h.toLowerCase().replace(/\s+/g,' '); if(seen[k]) return false; seen[k]=1; return true;
+    }).sort((a,b)=>(b.datetime||0)-(a.datetime||0)).slice(0,12);
+    if(!list.length){
+      const msg=loaded?(newsMsg||'No news returned right now.'):'Loading news…';
+      host.innerHTML='<div class="mk-n"><span style="color:var(--faint)">'+esc(msg)+'</span>'+(loaded?'<button type="button" class="mk-chip mk-retry" id="mkNewsRetry">Retry</button>':'')+'</div>';
+      return;
+    }
+    host.innerHTML=list.map(n=>{
+      const t=n.datetime?ago(n.datetime):'';
+      const url=safeUrl(n.url), head=esc(String(n.headline).trim());
+      const meta='<span class="mk-nm">'+esc(n.source||'News')+(t?' · '+esc(t):'')+'</span>';
+      return '<div class="mk-n">'+meta+(url==='#'?'<span class="mk-nh">'+head+'</span>':'<a class="mk-nh" href="'+esc(url)+'" target="_blank" rel="noopener noreferrer">'+head+'</a>')+'</div>';
     }).join('');
   }
+  let lastTry=0, failTries=0;
   async function fetchAll(){
-    if(loading) return; loading=true;
+    if(loading) return; loading=true; lastTry=Date.now();
     setStatus('Loading\u2026',true);
     try{
       const now=new Date(), to=new Date(now); to.setDate(to.getDate()+14);
@@ -8054,6 +8109,10 @@ window.__renderAnSetups=renderBoth;window.__renderAnEmotions=renderEmo;setTimeou
     }
     loaded=true; loading=false;
     renderCalendar(); renderNews();
+    /* On a direct page load this can run before sign-in has finished, so the first try fails and used to stay failed.
+       Retry a few times in the background until news arrives. */
+    if(news.length){ failTries=0; }
+    else if(failTries<3){ failTries++; setTimeout(function(){ if(!news.length&&!loading) fetchAll(); }, 6000*failTries); }
   }
   window.jlNewsWarning=function(){
     if(window.jlTradeDuringNews!=='no'||!loaded||!cal.length)return null;
@@ -8079,13 +8138,23 @@ window.__renderAnSetups=renderBoth;window.__renderAnEmotions=renderEmo;setTimeou
     const status=$('mkStatus');
     if(status && !status.dataset.wired){
       status.dataset.wired='1';
-      status.addEventListener('click', ()=>{ fetchAll(); });
+      status.addEventListener('click', ()=>{ failTries=0; fetchAll(); });
 
+    }
+    const nl=$('mkNewsList');
+    if(nl && !nl.dataset.wired){
+      nl.dataset.wired='1';
+      nl.addEventListener('click', e=>{ if(e.target.closest('#mkNewsRetry')){ failTries=0; nl.innerHTML='<div class="mk-n"><span class="mk-sk" style="width:35%"></span><span class="mk-sk" style="width:95%"></span></div>'; fetchAll(); } });
     }
   }
   function mount(){
     wireChips();
-    if(!loaded) fetchAll(); else { renderCalendar(); renderNews(); setStatus(lastStat[0], lastStat[1]); }
+    if(!loaded) fetchAll();
+    else {
+      renderCalendar(); renderNews(); setStatus(lastStat[0], lastStat[1]);
+      /* opened the tab with nothing to show (earlier try failed): refresh, at most once every 30 s */
+      if((!news.length||!cal.length) && !loading && Date.now()-lastTry>30000){ failTries=0; fetchAll(); }
+    }
   }
   window.__mountMarketTab = mount;
   /* News rule: when "Trade during news?" is No, load the calendar in the background (no need to open the Market tab). */
