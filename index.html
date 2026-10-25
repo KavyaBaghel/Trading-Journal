@@ -8948,6 +8948,16 @@ window.__renderAnSetups=renderBoth;window.__renderAnEmotions=renderEmo;setTimeou
 #view-recap tbody tr[data-i]{cursor:pointer}
 #view-recap tbody tr[data-i]:hover td{background:rgba(255,255,255,.03)}
 #view-recap .rc-empty{padding:28px 6px;color:var(--faint);font-size:14px}
+#view-recap .rc-sim{margin-bottom:14px}
+#view-recap .rc-sim-chips{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 12px}
+#view-recap .rc-sim-chip{appearance:none;border:1px solid var(--border);background:var(--panel-2);color:var(--sub);border-radius:999px;padding:6px 13px;font:inherit;font-size:12px;font-weight:600;cursor:pointer;transition:border-color .2s,color .2s,background .2s}
+#view-recap .rc-sim-chip:hover{color:var(--text)}
+#view-recap .rc-sim-chip[aria-pressed="true"]{color:var(--text);border-color:var(--accent-2)}
+#view-recap .rc-sim-chip:focus-visible{outline:2px solid var(--accent-2);outline-offset:2px}
+#view-recap .rc-sim-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:6px}
+@media(max-width:700px){#view-recap .rc-sim-grid{grid-template-columns:1fr 1fr}}
+#view-recap .rc-sim-verdict{font-size:13px;color:var(--sub);margin:10px 0 4px}
+#view-recap .rc-sim-off{font-size:12px;color:var(--faint);margin-top:10px}
 #view-recap .cal-top{display:flex;flex-direction:column;align-items:flex-start;gap:18px}
 #view-recap .rc-back{display:inline-flex;align-items:center;gap:9px;height:36px;padding:0 8px 0 12px;border-radius:11px;cursor:pointer;
   background:linear-gradient(160deg,rgba(255,255,255,.035),rgba(255,255,255,0) 42%),var(--panel);border:1px solid var(--border);color:var(--sub);
@@ -8976,6 +8986,77 @@ window.__renderAnSetups=renderBoth;window.__renderAnEmotions=renderEmo;setTimeou
   function plural(n,w){ return n+' '+w+(n===1?'':'s'); }
   function fixed(v){ v=Number(v); return isFinite(v)?v.toFixed(2):'—'; }
   function parseKey(k){ var p=k.split('-'); return new Date(Date.UTC(+p[0],+p[1]-1,+p[2])); }
+  var simP='day', curKey='';
+  /*SIM-PURE-START*/
+  /* "What if I had followed my rules?" Walks each trading day in time order. A trade is dropped when the circuit
+     breaker would already have tripped from the trades kept so far (after a limit), or when it carries a rule-break
+     flag (revenge, no stop loss, lot over the set lot size). Dropped trades do not count toward the limits.
+     A limit that is not set (0) is not applied. */
+  function simEval(rows,o,kindFn){
+    var days={},dayOrder=[];
+    (rows||[]).forEach(function(t){
+      if(!t) return; var p=Number(t.pnl); if(!isFinite(p)) return;
+      var d=String(t.d); if(!days[d]){ days[d]={g:{},order:[]}; dayOrder.push(d); }
+      var D=days[d], k=t.d+'|'+t.t+'|'+t.sym+'|'+t.side;
+      if(!D.g[k]){ D.g[k]={t:String(t.t),pnl:0,neg:0,rev:false,nosl:false,lot:false}; D.order.push(k); }
+      var G=D.g[k]; G.pnl+=p; if(p<0) G.neg+=-p;
+      if(t.rev) G.rev=true;
+      if(t.sl==null) G.nosl=true;
+      if(o.lotSize>0&&Number(t.lot)>o.lotSize+1e-9) G.lot=true;
+    });
+    var r={total:0,kept:0,actualNet:0,simNet:0,after:{n:0,net:0},rule:{n:0,net:0,rev:0,nosl:0,lot:0}};
+    dayOrder.forEach(function(d){
+      var D=days[d];
+      var list=D.order.map(function(k,i){ var g=D.g[k]; g.i=i; return g; }).sort(function(a,b){ return a.t<b.t?-1:a.t>b.t?1:a.i-b.i; });
+      var lossUsed=0,count=0,run=0;
+      list.forEach(function(G){
+        r.total++; r.actualNet+=G.pnl;
+        var tripped=(o.lossLimit>0&&lossUsed>=o.lossLimit)||(o.tradeLimit>0&&count>=o.tradeLimit)||(o.maxConsec>0&&run>=o.maxConsec);
+        if(tripped){ r.after.n++; r.after.net+=G.pnl; return; }
+        if(G.rev||G.nosl||G.lot){ r.rule.n++; r.rule.net+=G.pnl; if(G.rev) r.rule.rev++; if(G.nosl) r.rule.nosl++; if(G.lot) r.rule.lot++; return; }
+        r.kept++; r.simNet+=G.pnl; lossUsed+=G.neg; count++;
+        run=kindFn(G.pnl)==='loss'?run+1:0;
+      });
+    });
+    var c=function(v){ return Math.round(v*100)/100; };
+    r.actualNet=c(r.actualNet); r.simNet=c(r.simNet); r.after.net=c(r.after.net); r.rule.net=c(r.rule.net);
+    return r;
+  }
+  /*SIM-PURE-END*/
+  function simRange(key,p){
+    if(p==='week'){ var dt=parseKey(key), dow=(dt.getUTCDay()+6)%7; return {lo:new Date(dt.getTime()-dow*864e5).toISOString().slice(0,10),hi:new Date(dt.getTime()+(6-dow)*864e5).toISOString().slice(0,10)}; }
+    if(p==='month') return {lo:key.slice(0,7)+'-01',hi:key.slice(0,7)+'-31'};
+    if(p==='all') return {lo:'0000-00-00',hi:'9999-99-99'};
+    return {lo:key,hi:key};
+  }
+  function simHtml(key){
+    var P=[['day','This day'],['week','This week'],['month','This month'],['all','All time']];
+    var rg=simRange(key,simP);
+    var rows=(window.__trades||[]).filter(function(t){ return t&&isFinite(Number(t.pnl))&&String(t.d)>=rg.lo&&String(t.d)<=rg.hi; });
+    var o={lossLimit:Number(window.jlDailyLossLimit)||0,tradeLimit:Number(window.jlMaxTradesPerDay)||0,maxConsec:Number(window.jlMaxConsecLosses)||0,lotSize:Number(window.jlLotSize)||0};
+    var r=simEval(rows,o,kind);
+    var label=simP==='day'?key:simP==='week'?rg.lo+' to '+rg.hi:simP==='month'?key.slice(0,7):'Every logged trade';
+    var chips='<div class="rc-sim-chips" role="group" aria-label="Period">'+P.map(function(x){ return '<button type="button" class="rc-sim-chip" data-simp="'+x[0]+'" aria-pressed="'+(x[0]===simP)+'">'+x[1]+'</button>'; }).join('')+'</div>';
+    var head='<div class="panel-head"><h2>What if I had followed my rules?</h2><span class="hint">'+esc(label)+'</span></div>';
+    if(!r.total) return head+chips+'<div class="rc-empty">No trades in this period.</div>';
+    var diff=Math.round((r.simNet-r.actualNet)*100)/100;
+    var dcol=diff>0?'var(--green)':diff<0?'var(--red)':'';
+    var tile=function(l,v,col){ return '<div class="rr-tile"><div class="l">'+l+'</div><div class="v"'+(col?' style="color:'+col+'"':'')+'>'+esc(v)+'</div></div>'; };
+    var verdict=diff>0?'Following the rules would have added '+dollars(diff)+' over this period.':diff<0?'Following the rules would have cost '+dollars(Math.abs(diff))+' on this data. The trades you skip made money, but they broke a rule.':'Following the rules would have made no difference here.';
+    var notes=[];
+    if(r.after.n) notes.push(['var(--red)','Taken after a limit was hit',plural(r.after.n,'trade')+' · net '+money(r.after.net)+'. These would not have been taken.']);
+    else notes.push(['var(--green)','No trades after a limit was hit','Every trade came before a limit was reached.']);
+    if(r.rule.n){
+      var fl=[]; if(r.rule.rev) fl.push('revenge '+r.rule.rev); if(r.rule.nosl) fl.push('no stop loss '+r.rule.nosl); if(r.rule.lot) fl.push('lot over limit '+r.rule.lot);
+      notes.push(['var(--amber)','Rule-break trades',plural(r.rule.n,'trade')+' · net '+money(r.rule.net)+'. Flags: '+fl.join(', ')+'. A trade can carry more than one flag.']);
+    } else notes.push(['var(--green)','No rule-break trades','No revenge, no stop loss or oversized lot trades.']);
+    var off=[]; if(!o.lossLimit) off.push('daily loss limit'); if(!o.tradeLimit) off.push('daily trade limit'); if(!o.maxConsec) off.push('max losses in a row'); if(!o.lotSize) off.push('lot size');
+    return head+chips+
+      '<div class="rc-sim-grid">'+tile('ACTUAL NET',money(r.actualNet),r.actualNet<0?'var(--red)':r.actualNet>0?'var(--green)':'')+tile('IF YOU FOLLOWED RULES',money(r.simNet),r.simNet<0?'var(--red)':r.simNet>0?'var(--green)':'')+tile('DIFFERENCE',money(diff),dcol)+tile('TRADES KEPT',r.kept+' of '+r.total,'')+'</div>'+
+      '<div class="rc-sim-verdict">'+esc(verdict)+'</div>'+
+      notes.map(function(n){ return '<div class="note-item"><div class="note-dot" style="background:'+n[0]+'"></div><div><div class="t">'+n[1]+'</div><div class="s">'+esc(n[2])+'</div></div></div>'; }).join('')+
+      (off.length?'<div class="rc-sim-off">Not applied because they are not set: '+off.join(', ')+'.</div>':'');
+  }
   function ringCard(label,num,numColor,sub,detail,frac,color){
     var off=239-239*Math.max(0,Math.min(1,frac));
     return '<div class="ring-card glass"><svg width="76" height="76" viewBox="0 0 88 88"><circle class="ring-track" cx="44" cy="44" r="38"/><circle class="ring-val" cx="44" cy="44" r="38" stroke="'+color+'" style="--off:'+off+'"/></svg><div><div class="ring-label">'+label+'</div><div class="ring-num"'+(numColor?' style="color:'+numColor+'"':'')+'>'+esc(num)+'</div><div class="ring-sub">'+esc(sub)+'</div><div class="ring-detail">'+detail+'</div></div></div>';
@@ -9016,7 +9097,7 @@ window.__renderAnSetups=renderBoth;window.__renderAnEmotions=renderEmo;setTimeou
       '<div class="chart-stats"><span class="s">Day low <b style="color:'+(lo<0?'var(--red)':'var(--green)')+'">'+dollars(lo)+'</b></span><span class="s">Day high <b style="color:'+(hi<0?'var(--red)':'var(--green)')+'">'+dollars(hi)+'</b></span></div>';
   }
   function render(key){
-    var dt=parseKey(key);
+    var dt=parseKey(key); curKey=key;
     var long=dt.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric',timeZone:'UTC'});
     $('rcTitle').textContent=long; $('rcEyebrow').textContent='IST trading day · '+key;
     document.title=dt.toLocaleDateString('en-US',{month:'short',day:'numeric',timeZone:'UTC'})+' recap — Journall';
@@ -9094,6 +9175,7 @@ window.__renderAnSetups=renderBoth;window.__renderAnEmotions=renderEmo;setTimeou
         '<div class="rr-tile"><div class="l">MOOD</div><div class="v">'+esc(mood)+'</div></div>'+
         '<div class="rr-tile"><div class="l">ENDING STREAK</div><div class="v">'+streak+'</div></div>'+
       '</div></div>'+
+      '<div class="panel glass rc-sim" id="rcSim">'+simHtml(key)+'</div>'+
       '<div class="panel glass"><div class="tbl-head"><h2 style="margin:0">Trades this day</h2><span class="pill">'+plural(rows.length,'trade')+'</span></div><div style="overflow-x:auto"><table><thead><tr><th style="width:32px"></th><th>TIME</th><th>SYMBOL</th><th>SIDE</th><th>SESSION</th><th>ENTRY</th><th>EXIT</th><th>DURATION</th><th>P&amp;L</th><th>REASON</th></tr></thead><tbody>'+rowsHtml+'</tbody></table></div></div>';
   }
   function show(){
@@ -9106,6 +9188,8 @@ window.__renderAnSetups=renderBoth;window.__renderAnEmotions=renderEmo;setTimeou
   $('rcBack').addEventListener('click',back);
   document.addEventListener('keydown',function(e){ if(e.key==='Escape'&&!view.hidden) back(); });
   $('rcBody').addEventListener('click',function(e){
+    var chip=e.target.closest('[data-simp]');
+    if(chip){ simP=chip.getAttribute('data-simp'); var host=$('rcSim'); if(host&&curKey) host.innerHTML=simHtml(curKey); return; }
     var tr=e.target.closest('tr[data-i]'); if(!tr) return;
     var idx=+tr.dataset.i;
     if(window.__route) window.__route('journal');
