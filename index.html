@@ -8330,6 +8330,26 @@ window.__renderAnSetups=renderBoth;window.__renderAnEmotions=renderEmo;setTimeou
 #weeklyReview .wr-hc{position:relative;display:flex;align-items:center;justify-content:center;height:26px;border-radius:5px;background:var(--panel);overflow:hidden;font-size:10px;color:var(--text)}
 #weeklyReview .wr-hc i{position:absolute;inset:0}
 #weeklyReview .wr-hc b{position:relative;font-weight:600}
+/* Analytics-card look for the Weekly review panel: flat dark panels, hairline borders, boxed icon badges */
+#weeklyReview{background:var(--panel);border:1px solid rgba(255,255,255,.08);border-radius:22px;box-shadow:0 1px 0 rgba(255,255,255,.03) inset,0 18px 40px -26px rgba(0,0,0,.85)}
+#weeklyReview .panel-head h2{font-size:18px;font-weight:700;letter-spacing:-.01em;gap:12px}
+#weeklyReview .panel-head h2::before{width:34px;height:34px;flex:none;border-radius:10px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.03) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23b39ffb' stroke-width='2' stroke-linecap='round'%3E%3Cpath d='M8 20V10M12 20V5M16 20v-7'/%3E%3C/svg%3E") center/17px no-repeat}
+#weeklyReview .panel-head .hint{color:var(--faint)}
+#weeklyReview .wr-tile{background:var(--panel-2);border:1px solid rgba(255,255,255,.07);border-radius:16px;padding:15px 16px}
+#weeklyReview .wr-tile:hover{border-color:rgba(255,255,255,.16);transform:none}
+#weeklyReview .wr-tile .l{font-size:10.5px;color:var(--faint);font-weight:650}
+#weeklyReview .wr-tile .v{font-size:22px;font-weight:700}
+#wrStats>.wr-tiles>.wr-tile:first-child{background:var(--panel-2);border-color:rgba(124,108,240,.38);box-shadow:0 0 0 1px rgba(124,108,240,.08) inset}
+#wrStats>.wr-tiles>.wr-tile:first-child .v{font-size:27px}
+#wrStats>.wr-cols>div,#weeklyReview .wr-block{background:var(--panel-2);border:1px solid rgba(255,255,255,.07);border-radius:18px;padding:18px 20px}
+#weeklyReview .wr-sub{font-size:11px;color:var(--sub);gap:10px;margin-bottom:16px}
+#weeklyReview .wr-sub::before{width:24px;height:24px;flex:none;border-radius:8px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.03) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23b39ffb' stroke-width='2' stroke-linecap='round'%3E%3Cpath d='M8 20V10M12 20V5M16 20v-7'/%3E%3C/svg%3E") center/13px no-repeat;opacity:1}
+#weeklyReview .wr-day{font-size:13px;margin-bottom:12px}
+#weeklyReview .wr-track{height:11px;background:rgba(255,255,255,.04);border:0}
+#weeklyReview .wr-day span.val{font-weight:700}
+#weeklyReview .wr-list li{border-bottom:1px solid rgba(255,255,255,.06);padding:10px 0}
+#weeklyReview .wr-rule{background:var(--panel-2);border:1px solid rgba(255,255,255,.07);border-left:3px solid var(--accent);border-radius:16px}
+#weeklyReview .wr-mini td,#weeklyReview .wr-tbl td{border-top-color:rgba(255,255,255,.06)}
 #view-summary.wr-weekend #weeklyReview~*{display:none!important}
 #view-summary.wr-weekend>.wrap~*{display:none!important}
 #view-summary:has(#weeklyReview:not([hidden])) #weeklyReview~*{display:none!important}
