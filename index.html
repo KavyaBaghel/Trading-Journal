@@ -2591,11 +2591,11 @@ window.jlLiveBalance=function(Z){
   function dedupe(list){var by={},out=[];list.forEach(function(t){var p=posOf(t);if(!p){out.push(t);return}
     var c=by[p];if(!c||(!isImp(c)&&isImp(t)))by[p]=t});Object.keys(by).forEach(function(p){out.push(by[p])});return out}
   /* Decision: import records show OPEN time in IST (from openUtc); bridge-only records show stored date/time as-is. */
-  function toDesignTrade(t){var d=t.date,tm=t.time,hold=null;
-    if(isImp(t)&&/Z$/.test(t.openUtc||'')){var s=new Date(Date.parse(t.openUtc)+IST).toISOString();d=s.slice(0,10);tm=s.slice(11,19)}
+  function toDesignTrade(t){var d=t.date,tm=t.time,hold=null,bt=1;
+    if(isImp(t)&&/Z$/.test(t.openUtc||'')){bt=0;var s=new Date(Date.parse(t.openUtc)+IST).toISOString();d=s.slice(0,10);tm=s.slice(11,19)}
     if(t.duration!=null&&t.duration>0)hold=Math.round(t.duration*60); else if(!isImp(t))hold=0;
     var en=t.entry!=null?t.entry:t.openPrice,ex=t.exit!=null?t.exit:t.closePrice;
-    return {d:d,t:tm,side:t.side,ses:sesOf(+tm.slice(0,2)),en:en,ex:ex,why:why(t.reason),pnl:r2(t.pnl),lot:t.volume,
+    return {d:d,t:tm,_bt:bt,side:t.side,ses:sesOf(+tm.slice(0,2)),en:en,ex:ex,why:why(t.reason),pnl:r2(t.pnl),lot:t.volume,
       sl:t.sl>0?t.sl:null,tag:'',j:false,sym:t.symbol,hold:hold,cost:0,_pos:posOf(t),_lk:liveKey(t)}}
   function buildImport(live){var kept=dedupe(live||[]);var closed=kept.map(toDesignTrade);
     var lk={};(live||[]).forEach(function(t){var p=posOf(t),k=p?kept.filter(function(x){return posOf(x)===p})[0]:(kept.indexOf(t)>=0?t:null);if(k)lk[liveKey(t)]=closed[kept.indexOf(k)]});  /* records with no position (report imports) map to themselves, never to another position-less record */
@@ -3452,6 +3452,9 @@ window.__mountOpenPos=function(){const o=(window.__openTrades||[]).concat((windo
             <small class="gg-field-note">The lot size you trade. Any position with a different lot is flagged as a rule break in Today's Summary. 0 = off.</small></div>
           <div class="gg-field"><span class="l">Trade during news?</span>
             <select class="gg-select" id="ggNews"><option value="yes">Yes</option><option value="no">No (warn 30 min before news)</option></select></div>
+          <div class="gg-field"><span class="l">Broker UTC offset</span>
+            <select class="gg-select" id="ggBro"><option value="">Not set</option><option value="-12">UTC-12</option><option value="-11.5">UTC-11:30</option><option value="-11">UTC-11</option><option value="-10.5">UTC-10:30</option><option value="-10">UTC-10</option><option value="-9.5">UTC-9:30</option><option value="-9">UTC-9</option><option value="-8.5">UTC-8:30</option><option value="-8">UTC-8</option><option value="-7.5">UTC-7:30</option><option value="-7">UTC-7</option><option value="-6.5">UTC-6:30</option><option value="-6">UTC-6</option><option value="-5.5">UTC-5:30</option><option value="-5">UTC-5</option><option value="-4.5">UTC-4:30</option><option value="-4">UTC-4</option><option value="-3.5">UTC-3:30</option><option value="-3">UTC-3</option><option value="-2.5">UTC-2:30</option><option value="-2">UTC-2</option><option value="-1.5">UTC-1:30</option><option value="-1">UTC-1</option><option value="-0.5">UTC-0:30</option><option value="0">UTC+0</option><option value="0.5">UTC+0:30</option><option value="1">UTC+1</option><option value="1.5">UTC+1:30</option><option value="2">UTC+2</option><option value="2.5">UTC+2:30</option><option value="3">UTC+3</option><option value="3.5">UTC+3:30</option><option value="4">UTC+4</option><option value="4.5">UTC+4:30</option><option value="5">UTC+5</option><option value="5.5">UTC+5:30</option><option value="6">UTC+6</option><option value="6.5">UTC+6:30</option><option value="7">UTC+7</option><option value="7.5">UTC+7:30</option><option value="8">UTC+8</option><option value="8.5">UTC+8:30</option><option value="9">UTC+9</option><option value="9.5">UTC+9:30</option><option value="10">UTC+10</option><option value="10.5">UTC+10:30</option><option value="11">UTC+11</option><option value="11.5">UTC+11:30</option><option value="12">UTC+12</option><option value="12.5">UTC+12:30</option><option value="13">UTC+13</option><option value="13.5">UTC+13:30</option><option value="14">UTC+14</option></select>
+            <small class="gg-field-note">The UTC offset of your broker server clock, which is the clock in your MT5 report and sync. Used to turn those trade times into IST for the Weak times card. Not set = hour flags are paused.</small></div>
         </div>
       </div>
       <div class="gg-setup-foot">
@@ -4053,7 +4056,7 @@ document.addEventListener('input',e=>{if(cur&&RUN[cur.dataset.tool]&&cur.contain
   function ggLoadAccount(){
     let s = null;
     try{ s = JSON.parse(localStorage.getItem(ACC_KEY)); }catch(e){}
-    const a = Object.assign({balance:0, phase:'Phase 1', type:'funded', revWindowMin:15, profitTargetPct:0, maxDailyLossUSD:0, maxDailyLossUnit:'$', maxWeeklyLossUSD:0, maxWeeklyLossUnit:'$', maxTradesPerDay:0, dayProfitTarget:0, dayProfitTargetUnit:'%', weeklyProfitTarget:0, weeklyProfitTargetUnit:'%', riskPerTrade:0.5, minRr:2, lotSize:0, maxConsecLosses:0, tradeDuringNews:'yes', maxDrawdown:0, maxDrawdownUnit:'%', deadline:''}, s||{});
+    const a = Object.assign({balance:0, phase:'Phase 1', type:'funded', revWindowMin:15, profitTargetPct:0, maxDailyLossUSD:0, maxDailyLossUnit:'$', maxWeeklyLossUSD:0, maxWeeklyLossUnit:'$', maxTradesPerDay:0, dayProfitTarget:0, dayProfitTargetUnit:'%', weeklyProfitTarget:0, weeklyProfitTargetUnit:'%', riskPerTrade:0.5, minRr:2, lotSize:0, maxConsecLosses:0, brokerUtcOffset:'', tradeDuringNews:'yes', maxDrawdown:0, maxDrawdownUnit:'%', deadline:''}, s||{});
     if(a.maxDailyLossValue == null) a.maxDailyLossValue = Number(a.maxDailyLossUSD) || 0;
     if(a.maxWeeklyLossValue == null) a.maxWeeklyLossValue = Number(a.maxWeeklyLossUSD) || 0;
     return a;
@@ -4147,7 +4150,8 @@ document.addEventListener('input',e=>{if(cur&&RUN[cur.dataset.tool]&&cur.contain
   const ggLotEl = document.getElementById('ggLot'); if(ggLotEl) ggLotEl.value = ggState.lot;
   const ggMclEl = document.getElementById('ggMcl'); if(ggMclEl) ggMclEl.value = ggState.mcl;
   const ggNewsEl = document.getElementById('ggNews'); if(ggNewsEl) ggNewsEl.value = ggAccount.tradeDuringNews === 'no' ? 'no' : 'yes';
-  window.jlLotSize = Number(ggAccount.lotSize) || 0; window.jlMaxConsecLosses = Number(ggAccount.maxConsecLosses) || 0; window.jlTradeDuringNews = ggAccount.tradeDuringNews === 'no' ? 'no' : 'yes';
+  const ggBroEl = document.getElementById('ggBro'); if(ggBroEl) ggBroEl.value = (ggAccount.brokerUtcOffset === '' || ggAccount.brokerUtcOffset == null) ? '' : String(ggAccount.brokerUtcOffset);
+  window.jlLotSize = Number(ggAccount.lotSize) || 0; window.jlMaxConsecLosses = Number(ggAccount.maxConsecLosses) || 0; window.jlTradeDuringNews = ggAccount.tradeDuringNews === 'no' ? 'no' : 'yes'; window.jlBrokerUtcOffset = (ggAccount.brokerUtcOffset === '' || ggAccount.brokerUtcOffset == null || !isFinite(Number(ggAccount.brokerUtcOffset))) ? null : Number(ggAccount.brokerUtcOffset); if(typeof window.jlRenderWeak === 'function') window.jlRenderWeak();
   const ggMddEl = document.getElementById('ggMdd'); if(ggMddEl) ggMddEl.value = ggState.mdd;
   const ggMddUnitEl = document.getElementById('ggMddUnit'); if(ggMddUnitEl) ggMddUnitEl.value = ggAccount.maxDrawdownUnit === '$' ? '$' : '%';
   if(ggMddUnitEl) ggMddUnitEl.addEventListener('change', ()=>{ if(window.__renderDDRing) window.__renderDDRing(); });
@@ -4194,6 +4198,7 @@ document.addEventListener('input',e=>{if(cur&&RUN[cur.dataset.tool]&&cur.contain
       lotSize: ggState.lot,
       maxConsecLosses: ggState.mcl,
       tradeDuringNews: (ggNewsEl && ggNewsEl.value === 'no') ? 'no' : 'yes',
+      brokerUtcOffset: (function(){ const e = document.getElementById('ggBro'); if(!e) return (ggAccount.brokerUtcOffset == null ? '' : ggAccount.brokerUtcOffset); return e.value === '' ? '' : Number(e.value); })(),
       maxDrawdown: ggState.mdd,
       maxDrawdownUnit: ggMddUnitEl ? ggMddUnitEl.value : (ggAccount.maxDrawdownUnit || '%'),
       deadline: ggDeadlineEl ? ggDeadlineEl.value : (ggAccount.deadline || '')
@@ -4203,7 +4208,7 @@ document.addEventListener('input',e=>{if(cur&&RUN[cur.dataset.tool]&&cur.contain
     window.jlProfitTargetUSD = Number(ggAccount.balance) * (Number(ggAccount.profitTargetPct)||0) / 100;
     window.jlDailyLossLimit = Number(ggAccount.maxDailyLossUSD) || 0; window.jlWeeklyLossLimit = Number(ggAccount.maxWeeklyLossUSD) || 0;
     window.jlMaxTradesPerDay = Number(ggAccount.maxTradesPerDay) || 0; window.jlStartBalance = Number(ggAccount.balance) || 0; window.jlDayProfitTargetUSD = (ggAccount.dayProfitTargetUnit === '$') ? (Number(ggAccount.dayProfitTarget)||0) : Number(ggAccount.balance) * (Number(ggAccount.dayProfitTarget)||0) / 100; window.jlWeeklyProfitTargetUSD = (ggAccount.weeklyProfitTargetUnit === '$') ? (Number(ggAccount.weeklyProfitTarget)||0) : Number(ggAccount.balance) * (Number(ggAccount.weeklyProfitTarget)||0) / 100;
-    window.jlLotSize = Number(ggAccount.lotSize) || 0; window.jlMaxConsecLosses = Number(ggAccount.maxConsecLosses) || 0; window.jlTradeDuringNews = ggAccount.tradeDuringNews === 'no' ? 'no' : 'yes';
+    window.jlLotSize = Number(ggAccount.lotSize) || 0; window.jlMaxConsecLosses = Number(ggAccount.maxConsecLosses) || 0; window.jlTradeDuringNews = ggAccount.tradeDuringNews === 'no' ? 'no' : 'yes'; window.jlBrokerUtcOffset = (ggAccount.brokerUtcOffset === '' || ggAccount.brokerUtcOffset == null || !isFinite(Number(ggAccount.brokerUtcOffset))) ? null : Number(ggAccount.brokerUtcOffset); if(typeof window.jlRenderWeak === 'function') window.jlRenderWeak();
     if(typeof window.jlRecomputeRevenge === 'function') window.jlRecomputeRevenge({rerender:true});
     if(typeof window.__renderToday === 'function') window.__renderToday();
     if(typeof window.jlPaintRules === 'function') window.jlPaintRules();
@@ -5149,15 +5154,25 @@ const $ = id => document.getElementById(id);
 
   // weak times card: weekdays and hours with a net loss and at least 3 trades (a trade = one position)
   /*WT-PURE-START*/
-  function weakTimes(T,minTrades){
+  function weakTimes(T,minTrades,off){
     minTrades=Number(minTrades)||3;
-    var DN=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'],pos={},order=[];
+    var hasOff=off!=null&&off!==''&&isFinite(Number(off));off=hasOff?Number(off):null;
+    var DN=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'],pos={},order=[],raw=0;
     (T||[]).forEach(function(t){
       if(!t||!t.d||t.t==null)return;
-      var h=parseInt(String(t.t).slice(0,2),10),dt=new Date(t.d+'T00:00:00Z');
+      var d=String(t.d),tm=String(t.t),h=parseInt(tm.slice(0,2),10),dt=new Date(d+'T00:00:00Z');
       if(!isFinite(h)||isNaN(dt.getTime()))return;
+      var dow=DN[dt.getUTCDay()];
+      if(t._bt){
+        if(hasOff){
+          var ms=Date.parse(d+'T'+(tm.length===5?tm+':00':tm.slice(0,8))+'Z');
+          if(!isFinite(ms))return;
+          var s=new Date(ms-off*3600000+19800000);
+          h=s.getUTCHours();dow=DN[s.getUTCDay()];
+        } else raw++;
+      }
       var k=t.d+'|'+t.t+'|'+t.sym+'|'+t.side,p=pos[k];
-      if(!p){p=pos[k]={h:h,dow:DN[dt.getUTCDay()],net:0};order.push(k)}
+      if(!p){p=pos[k]={h:h,dow:dow,net:0};order.push(k)}
       p.net+=Number(t.pnl)||0;
     });
     var byD={},byH={};
@@ -5166,20 +5181,24 @@ const $ = id => document.getElementById(id);
       a.n++;a.net+=p.net;b.n++;b.net+=p.net;
     });
     var flag=function(o){return Object.keys(o).map(function(x){return o[x]}).filter(function(x){return x.n>=minTrades&&x.net<-0.005}).sort(function(a,b){return a.net-b.net})};
-    return {total:order.length,days:flag(byD),hours:flag(byH)};
+    var paused=raw>0;
+    return {total:order.length,days:flag(byD),hours:paused?[]:flag(byH),paused:paused};
   }
   /*WT-PURE-END*/
   window.jlWeakTimes=weakTimes;
+  function brokerOff(){try{var s=JSON.parse(localStorage.getItem('jlAccountSettings')||'null');if(s&&s.brokerUtcOffset!==''&&s.brokerUtcOffset!=null&&isFinite(Number(s.brokerUtcOffset)))return Number(s.brokerUtcOffset)}catch(e){}return null}
   function renderWeak(){
     const body=$('aWt');if(!body)return;
-    const st=weakTimes(window.__trades||[],3);
-    const rows=st.days.map(x=>[x.k,'Weekday',x]).concat(st.hours.map(x=>[String(x.k).padStart(2,'0')+':00','Hour',x]));
+    const st=weakTimes(window.__trades||[],3,brokerOff());
+    const rows=st.days.map(x=>[x.k,'Weekday',x]).concat(st.hours.map(x=>[String(x.k).padStart(2,'0')+':00','Hour (IST)',x]));
+    const note=st.paused?'<tr><td colspan="5" style="color:var(--faint);padding:12px">Hour flags are paused. Set the Broker UTC offset in Account Settings (Risk tab) so MT5 times can be converted to IST. Weekdays use the stored date until then.</td></tr>':'';
     if(!rows.length){
-      body.innerHTML='<tr><td colspan="5" style="color:var(--faint);padding:18px 12px">'+(st.total?'No weekday or hour has a net loss with at least 3 trades.':'No trades yet.')+'</td></tr>';
+      body.innerHTML=note+'<tr><td colspan="5" style="color:var(--faint);padding:18px 12px">'+(st.total?(st.paused?'No weekday has a net loss with at least 3 trades.':'No weekday or hour has a net loss with at least 3 trades.'):'No trades yet.')+'</td></tr>';
       return;
     }
-    body.innerHTML=rows.map(r=>{const x=r[2];return '<tr><td style="font-weight:600">'+r[0]+'</td><td>'+r[1]+'</td><td class="mono">'+x.n+'</td><td class="mono" style="color:var(--red)">'+money(x.net)+'</td><td class="mono" style="color:var(--red)">'+money(x.net/x.n)+'</td></tr>'}).join('');
+    body.innerHTML=note+rows.map(r=>{const x=r[2];return '<tr><td style="font-weight:600">'+r[0]+'</td><td>'+r[1]+'</td><td class="mono">'+x.n+'</td><td class="mono" style="color:var(--red)">'+money(x.net)+'</td><td class="mono" style="color:var(--red)">'+money(x.net/x.n)+'</td></tr>'}).join('');
   }
+  window.jlRenderWeak=renderWeak;
   renderWeak();setTimeout(renderWeak,2000);setTimeout(renderWeak,6000);
 
 
