@@ -8586,11 +8586,8 @@ window.__renderAnSetups=renderBoth;window.__renderAnEmotions=renderEmo;setTimeou
   /* one panel, two homes: Today's Summary (original spot) or the top of the Calendar tab, whichever view is open */
   var homeParent=root.parentNode, homeNext=root.nextElementSibling;
   function place(){
-    var cal=$('view-calendar'), onCal=!!cal&&!cal.hidden;
-    if(onCal){
-      var wrap=cal.querySelector('.wrap'), top=wrap&&wrap.querySelector('.cal-top');
-      if(wrap&&top&&root.nextElementSibling!==top) wrap.insertBefore(root,top);
-    }else if(homeParent&&(root.parentNode!==homeParent||root.nextElementSibling!==homeNext)){
+    /* The panel lives on Today's Summary only; it is no longer shown at the top of the Calendar tab. */
+    if(homeParent&&(root.parentNode!==homeParent||root.nextElementSibling!==homeNext)){
       homeParent.insertBefore(root,homeNext&&homeNext.parentNode===homeParent?homeNext:null);
     }
   }
