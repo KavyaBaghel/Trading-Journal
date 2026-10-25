@@ -1378,7 +1378,7 @@
   .ldg-badge.best{color:var(--silver);background:rgba(199,203,214,.13);border:1px solid rgba(199,203,214,.28)}
   .ldg-badge.worst{color:var(--red);background:rgba(240,104,92,.13);border:1px solid rgba(240,104,92,.25)}
 
-  /* weekend cells — fixed "Weekly review" slot on Sat/Sun, shows that week's net result */
+  /* Saturday cell — fixed "Weekly review" slot, shows that week's net result */
   .ldg-row.ldg-wk{border-style:dashed;background:linear-gradient(160deg,rgba(124,108,240,.07),rgba(255,255,255,0) 60%),rgba(255,255,255,.012)}
   .ldg-row.ldg-wk.pos::before{background:var(--green);box-shadow:0 0 10px -1px rgba(67,215,135,.7)}
   .ldg-row.ldg-wk.neg::before{background:var(--red);box-shadow:0 0 10px -1px rgba(240,104,92,.7)}
@@ -6081,7 +6081,7 @@ function renderGrid(){
       return '<div class="ldg-row'+(isToday?' today':'')+pnlCls+'" data-d="'+d+'"><div class="ldg-d"><b>'+d+'</b><small>'+DOWS[i]+'</small></div>'+bar+
         '<div class="ldg-meta">'+v.t+' tr &middot; '+v.w+'W/'+v.l+'L/'+v.be+'BE'+flags+'</div>'+
         '<div class="ldg-pnl" style="color:'+(v.pnl>0?'var(--green)':v.pnl<0?'var(--red)':'var(--faint)')+'">'+money(v.pnl)+'</div></div>';
-    }).join('')+wkCell(5)+wkCell(6);
+    }).join('')+wkCell(5)+'<div class="ldg-pad"></div>'; /* Weekly review sits on Saturday only; Sunday stays empty */
     const sub=ds.length?'<div class="ldg-sub" data-week="'+wi+'"><div>WEEK '+(wi+1)+'</div><i>subtotal</i><b>'+jlN(wt,'trade')+'</b><span class="m-pnl" style="color:'+(wp>0?'var(--green)':wp<0?'var(--red)':'var(--faint)')+'">'+(wt?money(wp):'—')+'</span></div>':'';
     return dayRows+sub;
   }).join('');
