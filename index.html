@@ -3237,6 +3237,9 @@ window.jlLiveBalance=function(Z){
 <div class="a-h"><div class="a-h-t"><span class="a-h-ic"><svg viewBox="0 0 24 24"><path d="M7 4 3 8l4 4M3 8h14M17 12l4 4-4 4M21 16H7"/></svg></span><h2>Revenge trades</h2></div><p id="aRevSub">Trades opened soon after a loss, compared with the rest.</p></div>
 <div class="a-kp" id="aRev"></div>
 <div class="a-read" id="aRevR"></div>
+<div class="a-h"><div class="a-h-t"><span class="a-h-ic"><svg viewBox="0 0 24 24"><path d="M3 12h4l3-8 4 16 3-8h4"/></svg></span><h2>Overtrading</h2></div><p id="aOvSub">Days that reached your daily trade limit, compared with the rest.</p></div>
+<div class="a-kp" id="aOv"></div>
+<div class="a-read" id="aOvR"></div>
 
 <div class="a-h"><div class="a-h-t"><span class="a-h-ic"><svg viewBox="0 0 24 24"><path d="M4 4h16v16H4z"/><path d="M8 9h8M8 13h5"/></svg></span><h2>Setups</h2></div><p>Performance by setup, from your saved journals.</p></div>
 <section class="a-s"><div style="overflow-x:auto"><table><thead><tr><th>SETUP</th><th>TRADES</th><th>WIN RATE</th><th>NET P&amp;L</th><th>AVG</th><th>BEST</th><th>WORST</th><th>RESULT MIX</th></tr></thead>
@@ -5091,6 +5094,55 @@ const $ = id => document.getElementById(id);
       } else r.textContent='';
     }
   })();
+
+  // overtrading card: days that reached the daily trade limit (same rule as the banner and discipline streak)
+  /*OV-PURE-START*/
+  function overStats(T,limit){
+    limit=Number(limit)||0;
+    if(!(limit>0))return {on:false,limit:0};
+    var days={},order=[];
+    (T||[]).forEach(function(t){
+      if(!t||!t.d)return;
+      var d=days[t.d];if(!d){d=days[t.d]={keys:{},net:0};order.push(t.d)}
+      d.keys[t.d+'|'+t.t+'|'+t.sym+'|'+t.side]=1;
+      d.net+=Number(t.pnl)||0;
+    });
+    var over=0,other=0,netOver=0,netOther=0;
+    order.forEach(function(k){
+      var d=days[k];
+      if(Object.keys(d.keys).length>=limit){over++;netOver+=d.net}else{other++;netOther+=d.net}
+    });
+    return {on:true,limit:limit,days:order.length,n:over,otherDays:other,netOver:netOver,netOther:netOther,
+      avgOver:over?netOver/over:null,avgOther:other?netOther/other:null};
+  }
+  /*OV-PURE-END*/
+  function renderOver(){
+    const kp=$('aOv');if(!kp)return;
+    const st=overStats(window.__trades||[],window.jlMaxTradesPerDay);
+    const sub=$('aOvSub'),r=$('aOvR');
+    const mv=v=>v==null?'-':money(v),col=v=>v==null||v===0?'var(--text)':v<0?'var(--red)':'var(--green)';
+    if(!st.on){
+      if(sub)sub.textContent='Days that reached your daily trade limit, compared with the rest.';
+      kp.innerHTML=[['Overtrading days','-','var(--text)','Daily trade limit not set'],['Net P&L, overtrading days','-','var(--text)','Needs a daily trade limit'],['Avg per day, overtrading','-','var(--text)','Needs a daily trade limit'],['Avg per day, other days','-','var(--text)','Needs a daily trade limit']].map(k=>'<div><span>'+k[0]+'</span><b style="color:'+k[2]+'">'+k[1]+'</b><small>'+k[3]+'</small></div>').join('');
+      if(r)r.textContent='Set a daily trade limit in Account Settings to track overtrading.';
+      return;
+    }
+    if(sub)sub.textContent='Days with '+st.limit+' or more trades, your daily trade limit, compared with the rest.';
+    kp.innerHTML=[
+      ['Overtrading days',String(st.n),'var(--text)',st.days?(st.n/st.days*100).toFixed(1)+'% of '+jlN(st.days,'trading day'):'No trades yet'],
+      ['Net P&L, overtrading days',st.n?money(st.netOver):'-',st.n?col(st.netOver):'var(--text)','Total across those days'],
+      ['Avg per day, overtrading',mv(st.avgOver),col(st.avgOver),'Net P&L per flagged day'],
+      ['Avg per day, other days',mv(st.avgOther),col(st.avgOther),'Net P&L per other day']
+    ].map(k=>'<div><span>'+k[0]+'</span><b style="color:'+k[2]+'">'+k[1]+'</b><small>'+k[3]+'</small></div>').join('');
+    if(r){
+      if(!st.n)r.textContent='No day has reached your limit of '+st.limit+' trades.';
+      else if(st.avgOver!=null&&st.avgOther!=null){
+        const d=st.avgOver-st.avgOther;
+        r.textContent=Math.abs(d)<.005?'Overtrading days averaged about the same per day as your other days.':d<0?'Overtrading days averaged less per day than your other days.':'Overtrading days averaged more per day than your other days.';
+      } else r.textContent='';
+    }
+  }
+  renderOver();setTimeout(renderOver,2000);setTimeout(renderOver,6000);
 
 
   // heatmap: + = net-profit hour, - = net-loss hour, value = trade count (hours 0-17)
