@@ -533,8 +533,7 @@
   .ring-card:hover svg{filter:drop-shadow(0 0 12px rgba(124,108,240,.4))}
   .card:hover svg{stroke:var(--accent-2)}
 
-  .rings{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:14px}
-  @media(max-width:1280px){.rings{grid-template-columns:repeat(2,1fr)}}
+  .rings{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:14px}
   .chk-d{display:block;font-size:11.5px;color:var(--faint);margin-top:2px;line-height:1.35}
   .checklist li.done .chk-d{text-decoration:none}
   .checklist li>span.chk-t{min-width:0;overflow-wrap:anywhere}
@@ -2953,9 +2952,9 @@ window.jlLiveBalance=function(Z){
         <circle class="ring-val" id="ringPnl" cx="44" cy="44" r="38" stroke="var(--green)" style="--off:239"/>
       </svg>
       <div>
-        <div class="ring-label">TODAY P&amp;L</div>
+        <div class="ring-label">WEEK P&amp;L</div>
         <div class="ring-num" id="pnlNum">$0.00</div>
-        <div class="ring-sub" id="pnlSub">Profit target not set</div>
+        <div class="ring-sub" id="pnlSub">Weekly target not set</div>
         <div class="ring-detail" id="pnlDetail"></div>
       </div>
     </div>
@@ -2983,17 +2982,6 @@ window.jlLiveBalance=function(Z){
         <div class="ring-detail" id="tradesDetail"></div>
       </div>
     </div>
-    <div class="ring-card glass">
-      <svg width="76" height="76" viewBox="0 0 88 88">
-        <circle class="ring-track" cx="44" cy="44" r="38"/>
-        <circle class="ring-val" id="ringWeek" cx="44" cy="44" r="38" stroke="var(--green)" style="--off:239"/>
-      </svg>
-      <div>
-        <div class="ring-label">WEEK P&amp;L</div>
-        <div class="ring-num" id="weekNum">$0.00</div>
-        <div class="ring-sub" id="weekSub">Weekly target not set</div>
-        <div class="ring-detail" id="weekDetail"></div>
-      </div>
     </div>
   </div>
 
@@ -4525,12 +4513,15 @@ document.addEventListener('input',e=>{if(cur&&RUN[cur.dataset.tool]&&cur.contain
   // Ticks are remembered per trading day (06:00 IST reset) so each new day starts clean.
   const PSY_CHECKLIST_DEFAULTS = [{k:'news',t:'News Checked',d:'No high-impact USD news within 30 minutes'},{k:'emotion2',t:'Emotion Calm',d:'Still calm right before pulling the trigger.'},{k:'rulesmet',t:'Plan Rules Met',d:'Entering only because my plan and risk rules are fully met — not because I want action.'},{k:'risklimit',t:'Risk Under Limit',d:'Lot is 0.02 and risk is about $10 or less'},{k:'entry',t:'Entry Confirmed',d:"Price action confirms the entry on the setup's confirmed candle or timeframe close."},{k:'signal',t:'Confirmation Signal',d:'Daily stop not hit: under 4 trades, under 2 losses, week above -$80'},{k:'exit',t:'Exit Plan Set',d:'SL behind structure, TP at least 2R, and the 1.5R partial planned, all written before entry'}];
   const ovEsc = v => String(v==null?'':v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+  const PSY_MIND_DEFAULTS = [{k:'sleep',t:'Sleep clear',d:'I am not tired, foggy, or forcing trades.'},{k:'emotion',t:'Emotion calm',d:'No anger, fear, revenge, FOMO, or excitement spike.'},{k:'patience',t:'Patience ready',d:'I can wait for activation without chasing.'},{k:'loss',t:'Loss accepted',d:'If SL hits, I will pause, feel it, journal it, and not revenge trade.'},{k:'noneed',t:'No need to trade',d:'I am okay with no valid setup today.'},{k:'journal',t:'Journal commitment',d:'After the trade I will screenshot, pause, and journal honestly.'}];
+  function ovLoadList(lsKey, defaults, prefix){
+    let list = defaults;
+    try{ const raw = localStorage.getItem(lsKey); if(raw){ const p = JSON.parse(raw); if(Array.isArray(p) && p.length) list = p.filter(r=>r && r.k && r.t); } }catch(e){}
+    return list.map(r=>({k:prefix+r.k, t:r.t, d:r.d, g:prefix==='m:'?'MIND':'CHECKLIST'}));
+  }
+  /* Mind Stability Check first, then the pre-trade Checklist step, both exactly as saved in the Psychology tab */
   function ovChkItems(){
-    try{
-      const raw = localStorage.getItem('jlPsy:checklist:items');
-      if(raw){ const p = JSON.parse(raw); if(Array.isArray(p) && p.length) return p.filter(r=>r && r.k && r.t); }
-    }catch(e){}
-    return PSY_CHECKLIST_DEFAULTS;
+    return ovLoadList('jlPsy:mind:items', PSY_MIND_DEFAULTS, 'm:').concat(ovLoadList('jlPsy:checklist:items', PSY_CHECKLIST_DEFAULTS, 'c:'));
   }
   function ovChkKey(){ return 'jlOvChk:' + (typeof getTradingDayIST==='function' ? getTradingDayIST() : ''); }
   function ovChkLoad(){ try{ const o = JSON.parse(localStorage.getItem(ovChkKey())||'{}'); return (o && typeof o==='object') ? o : {}; }catch(e){ return {}; } }
@@ -4540,9 +4531,11 @@ document.addEventListener('input',e=>{if(cur&&RUN[cur.dataset.tool]&&cur.contain
     const list = document.getElementById('checklist'); if(!list) return;
     const items = ovChkItems(), saved = ovChkLoad();
     ovChkDay = ovChkKey();
+    let lastG = '';
     list.innerHTML = items.map(r=>{
       const on = !!saved[r.k];
-      return '<li data-k="'+ovEsc(r.k)+'" class="'+(on?'done':'')+'"><input type="checkbox" '+(on?'checked':'')+' tabindex="-1"><span class="chk-t"><b style="font-weight:600">'+ovEsc(r.t)+'</b>'+(r.d?'<span class="chk-d">'+ovEsc(r.d)+'</span>':'')+'</span></li>';
+      const head = r.g!==lastG ? ((lastG=r.g), '<div class="grp-label" style="cursor:default;margin:'+(r.g==='MIND'?'0':'8px')+' 0 2px">'+(r.g==='MIND'?'MIND CHECK':'PRE-TRADE CHECKLIST')+'</div>') : '';
+      return head+'<li data-k="'+ovEsc(r.k)+'" class="'+(on?'done':'')+'"><input type="checkbox" '+(on?'checked':'')+' tabindex="-1"><span class="chk-t"><b style="font-weight:600">'+ovEsc(r.t)+'</b>'+(r.d?'<span class="chk-d">'+ovEsc(r.d)+'</span>':'')+'</span></li>';
     }).join('');
     updateProgress();
   }
@@ -4753,7 +4746,7 @@ document.addEventListener('input',e=>{if(cur&&RUN[cur.dataset.tool]&&cur.contain
 
   // ---------- weekly P&L card (Mon-Sun, same 06:00 IST trading-day rule as the rest of the app) ----------
   function updateWeekCard(todayKey){
-    const numEl = document.getElementById('weekNum'); if(!numEl) return;
+    const numEl = document.getElementById('pnlNum'); if(!numEl) return;
     const p = todayKey.split('-').map(Number), dt = new Date(Date.UTC(p[0],p[1]-1,p[2])), dow = (dt.getUTCDay()+6)%7;
     const iso = ms => new Date(ms).toISOString().slice(0,10);
     const ws = iso(dt.getTime()-dow*864e5), we = iso(dt.getTime()+(6-dow)*864e5);
@@ -4765,18 +4758,17 @@ document.addEventListener('input',e=>{if(cur&&RUN[cur.dataset.tool]&&cur.contain
     const pct = tgt>0 ? Math.min(100, Math.max(0, Math.round(net/tgt*100))) : 0;
     numEl.textContent = (net<0?'-$':'$')+Math.abs(net).toFixed(2);
     numEl.style.color = net<0 ? 'var(--red)' : '';
-    document.getElementById('weekSub').textContent = tgt>0 ? pct+'% of $'+tgt.toFixed(0)+' weekly target' : 'Weekly target not set';
-    const ring = document.getElementById('ringWeek');
+    document.getElementById('pnlSub').textContent = tgt>0 ? pct+'% of $'+tgt.toFixed(0)+' weekly target' : 'Weekly target not set';
+    const ring = document.getElementById('ringPnl');
     ring.style.setProperty('--off', 239-239*(pct/100));
     ring.style.stroke = net<0 ? 'var(--red)' : 'var(--green)';
-    document.getElementById('weekDetail').innerHTML = rows.length
+    document.getElementById('pnlDetail').innerHTML = rows.length
       ? '<span class="tag win">'+W+'W</span><span class="tag loss">'+L+'L</span> <span style="color:var(--faint)">'+days+' day'+(days===1?'':'s')+(lim>0&&net<0?' · $'+Math.abs(net).toFixed(0)+' / $'+lim.toFixed(0)+' loss limit':'')+'</span>'
       : '<span style="color:var(--faint)">No trades this week</span>';
   }
 
   function setState(){
     const todayKey = getTradingDayIST();
-    try{ updateWeekCard(todayKey); }catch(e){}
     const rawToday = (window.__trades||[]).filter(t=>t.d===todayKey).slice().sort((a,b)=> a.t.localeCompare(b.t));
     const journals = window.__getJournals ? window.__getJournals() : [];
     const targetUSD = Number(window.jlDayProfitTargetUSD) || Number(window.jlProfitTargetUSD) || 0;
@@ -4859,6 +4851,7 @@ document.addEventListener('input',e=>{if(cur&&RUN[cur.dataset.tool]&&cur.contain
         <td style="color:var(--sub)">${t.reason}</td></tr>`).join('');
       reviewStatus.textContent=trades.length+' trade'+(trades.length!==1?'s':'')+' logged today.';
     }
+    try{ updateWeekCard(todayKey); }catch(e){} /* top-left card shows the week, overriding the daily values above */
     resetReview();
     updateRules(pnlTotal, lossUsed, trades.length, wins.length);
     return {rawToday, trades, pnlTotal};
@@ -6597,7 +6590,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'){if(mpOpen)closeMont
     syncMindState();
     state.mindEditing = false;
     saveState();
-    render();
+    render();    try{ if(typeof window.__renderOvChecklist === 'function') window.__renderOvChecklist(); }catch(e){}
   }
   async function cancelEditMindItems(){
     try{
@@ -7998,6 +7991,8 @@ window.__renderAnSetups=renderBoth;window.__renderAnEmotions=renderEmo;setTimeou
   const impColor=l=>l===3?'var(--red)':l===2?'var(--accent-2)':l===1?'var(--green)':'rgba(255,255,255,.12)';
   const esc=v=>String(v==null?'':v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
   const safeUrl=u=>/^https?:\/\//i.test(u||'')?u:'#';
+  /* parse an event time whatever shape the feed uses ("2026-10-27 12:30:00" = UTC, or ISO with Z / offset); bad rows give an invalid Date and are skipped */
+  const tm=e=>{let s=String((e&&e.time)||'').trim(); if(!s) return new Date(NaN); s=s.replace(' ','T'); if(!/(Z|[+-]\d{2}:?\d{2})$/.test(s)) s+='Z'; return new Date(s)};
 
   function state(){
     const g=id=>{const el=$(id);const on=el&&el.querySelector('.mk-chip.on');return on?on.dataset.val:'all'};
@@ -8020,13 +8015,13 @@ window.__renderAnSetups=renderBoth;window.__renderAnEmotions=renderEmo;setTimeou
     const {range,impact,ccy}=state();
     const [from,to]=rangeBounds(range);
     let rows=cal.filter(e=>{
-      const t=new Date(e.time.replace(' ','T')+'Z');
-      if(t<from||t>=to) return false;
+      const t=tm(e);
+      if(!isFinite(t)||t<from||t>=to) return false;
       if(impact!=='all' && impLvl(e.impact)!==({high:3,medium:2,low:1}[impact])) return false;
       const c=CCY_MAP[e.country]||e.country;
       if(ccy!=='all' && c!==ccy) return false;
       return true;
-    }).sort((a,b)=>new Date(a.time)-new Date(b.time));
+    }).sort((a,b)=>tm(a)-tm(b));
     const body=$('mkCalBody'), note=$('mkCalNote');
     if(!body) return;
     if(!rows.length){
@@ -8034,7 +8029,7 @@ window.__renderAnSetups=renderBoth;window.__renderAnEmotions=renderEmo;setTimeou
     } else {
       let lastDay='', html='';
       rows.forEach(e=>{
-        const t=new Date(e.time.replace(' ','T')+'Z');
+        const t=tm(e);
         const dayKey=t.toDateString();
         if(dayKey!==lastDay){ lastDay=dayKey; html+='<tr class="mk-day"><td colspan="7">'+t.toLocaleDateString(undefined,{weekday:'long',month:'short',day:'numeric'})+'</td></tr>'; }
         const lvl=impLvl(e.impact);
@@ -8050,11 +8045,11 @@ window.__renderAnSetups=renderBoth;window.__renderAnEmotions=renderEmo;setTimeou
   function renderKeyEvents(){
     const host=$('mkKeyEvents'); if(!host) return;
     const now=new Date(), ccy=state().ccy;
-    const upcoming=cal.filter(e=>new Date(e.time.replace(' ','T')+'Z')>=now && impLvl(e.impact)>=2 && (ccy==='all' || (CCY_MAP[e.country]||e.country)===ccy))
-      .sort((a,b)=>new Date(a.time)-new Date(b.time)).slice(0,4);
+    const upcoming=cal.filter(e=>tm(e)>=now && impLvl(e.impact)>=2 && (ccy==='all' || (CCY_MAP[e.country]||e.country)===ccy))
+      .sort((a,b)=>tm(a)-tm(b)).slice(0,4);
     if(!upcoming.length){ host.innerHTML='<div class="mk-k"><span>No high/medium-impact '+(ccy==='all'?'':esc(ccy)+' ')+'events found in range.</span></div>'; return; }
     host.innerHTML=upcoming.map(e=>{
-      const t=new Date(e.time.replace(' ','T')+'Z');
+      const t=tm(e);
       return '<div class="mk-k"><b>'+esc(e.event||'Event')+'</b><span>Date: '+t.toLocaleDateString(undefined,{month:'short',day:'numeric'})+'</span><br><span>Time: '+t.toLocaleTimeString(undefined,{hour:'2-digit',minute:'2-digit'})+'</span></div>';
     }).join('');
   }
@@ -8120,7 +8115,7 @@ window.__renderAnSetups=renderBoth;window.__renderAnEmotions=renderEmo;setTimeou
     cal.forEach(e=>{
       if(impLvl(e.impact)<2)return;
       if(ccy!=='all'&&(CCY_MAP[e.country]||e.country)!==ccy)return;
-      const t=new Date(String(e.time).replace(' ','T')+'Z').getTime();
+      const t=tm(e).getTime();
       if(!isFinite(t)||t<now||t-now>30*60000)return;
       if(!best||t<best.t)best={t:t,e:e};
     });
@@ -8327,7 +8322,7 @@ window.__renderAnSetups=renderBoth;window.__renderAnEmotions=renderEmo;setTimeou
   }
 
   /* ---------- upcoming events ---------- */
-  var ev={loaded:false,loading:false,list:[],msg:'',src:'',t:0,key:''};
+  var ev={loaded:false,loading:false,list:[],msg:'',src:'',t:0,key:'',fails:0};
   function impLvl(s){ s=(s||'').toLowerCase(); return s.indexOf('high')>-1?3:s.indexOf('med')>-1?2:s.indexOf('low')>-1?1:0; }
   function impColor(l){ return l===3?'var(--red)':l===2?'var(--accent-2)':'var(--green)'; }
   function impact(){ var on=root.querySelector('#wrImpactChips .wr-chip.on'); return on?on.dataset.val:'high'; }
@@ -8364,13 +8359,13 @@ window.__renderAnSetups=renderBoth;window.__renderAnEmotions=renderEmo;setTimeou
   function fetchEvents(force){
     var k=today(); if(!k||ev.loading) return;
     var b=bounds(k), age=Date.now()-ev.t;
-    if(!force&&ev.key===b.nm&&ev.loaded&&age<(ev.list.length?30:5)*60000) return;
+    if(!force&&ev.key===b.nm&&ev.loaded&&age<(ev.list.length?30:(ev.msg&&ev.fails<4?0.3:5))*60000) return;
     if(typeof window.jlMarketFetch!=='function'){ ev.loaded=true; ev.list=[]; ev.msg='The market backend is not available.'; renderEvents(); return; }
     ev.loading=true; ev.key=b.nm; renderEvents();
     window.jlMarketFetch({from:addDays(b.nm,-1),to:addDays(b.nm,6)}).then(function(R){
       var cs=R.calendar.status;
-      ev.list=cs===200?(R.calendar.events||[]):[]; ev.src=(R.calendar&&R.calendar.source)||''; ev.msg=why('The economic calendar',cs);
-    }).catch(function(err){ ev.list=[]; ev.msg=(err&&err.message)||'Could not load the calendar.'; })
+      ev.list=cs===200?(R.calendar.events||[]):[]; ev.src=(R.calendar&&R.calendar.source)||''; ev.msg=why('The economic calendar',cs); ev.fails=ev.list.length?0:ev.fails+1;
+    }).catch(function(err){ ev.list=[]; ev.fails++; ev.msg=(err&&err.message)||'Could not load the calendar.'; })
     .then(function(){ ev.loading=false; ev.loaded=true; ev.t=Date.now(); renderEvents(); });
   }
 
@@ -8392,7 +8387,7 @@ window.__renderAnSetups=renderBoth;window.__renderAnEmotions=renderEmo;setTimeou
     this.querySelectorAll('.wr-chip').forEach(function(x){ var on=x===btn; x.classList.toggle('on',on); x.setAttribute('aria-pressed',on?'true':'false'); });
     renderEvents();
   });
-  $('wrRefresh').addEventListener('click',function(){ fetchEvents(true); });
+  $('wrRefresh').addEventListener('click',function(){ ev.fails=0; fetchEvents(true); });
   document.addEventListener('visibilitychange',function(){ if(!document.hidden) tick(); });
   window.addEventListener('hashchange',tick);
   window.addEventListener('storage',function(e){ if(e.key===RULE_KEY) tick(); });
