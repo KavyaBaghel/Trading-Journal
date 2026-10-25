@@ -1048,6 +1048,9 @@
   .j-grid{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:14px;align-items:start}
   .j-grid>.a-s{margin:0}
   .j-main{display:grid;gap:14px;min-width:0;align-content:start}.j-main>.a-s{margin:0}
+  .jl-circuit{position:sticky;top:8px;z-index:60;display:flex;gap:12px;align-items:flex-start;margin:10px 16px 0;padding:12px 16px;border-radius:var(--radius-card,18px);border:1px solid color-mix(in srgb,var(--red) 55%,transparent);background:linear-gradient(135deg,color-mix(in srgb,var(--red) 24%,#0b0b10),color-mix(in srgb,var(--red) 10%,#0b0b10));box-shadow:0 10px 30px -14px color-mix(in srgb,var(--red) 70%,transparent)}
+  .jl-circuit[hidden]{display:none}.jl-circuit svg{flex:none;width:20px;height:20px;margin-top:1px;fill:none;stroke:var(--red);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+  .jl-circuit b{display:block;font-size:13.5px;font-weight:650;color:var(--red)}.jl-circuit span{display:block;margin-top:2px;font-size:12.5px;line-height:1.45;color:var(--text)}.jl-circuit small{display:block;margin-top:4px;font-size:12px;color:var(--sub)}
   .j-side{position:sticky;top:16px;max-height:calc(100vh - 32px);display:flex;flex-direction:column}
   #jList{overflow:auto;display:grid;gap:10px;margin-top:14px;align-content:start}
   .j-in,.j-ta{width:100%;background:var(--panel-2);border:1px solid var(--border);border-radius:10px;padding:10px 12px;color:var(--text);font:13.5px Inter,sans-serif;transition:border-color .3s cubic-bezier(.22,.61,.36,1),background .3s cubic-bezier(.22,.61,.36,1)}
@@ -2968,6 +2971,7 @@ window.jlLiveBalance=function(Z){
 <div class="scrim" id="scrim"></div>
 <button class="menu-btn" id="menuBtn" aria-label="Open menu"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
 <main class="main">
+<div class="jl-circuit" id="jlCircuit" role="alert" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 9v4M12 17h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg><div><b>Circuit breaker tripped</b><span id="jlCircuitWhy"></span><small id="jlCircuitWait"></small></div></div>
 <div class="view" id="view-summary">
 <div class="wrap">
 
@@ -3421,6 +3425,9 @@ window.__mountOpenPos=function(){const o=(window.__openTrades||[]).concat((windo
             <div class="gg-combo"><div class="gg-stepper" style="flex:1"><button onclick="ggStep('mdl',-5)">−</button><input id="ggMdl" value="20" readonly><button onclick="ggStep('mdl',5)">+</button></div><select id="ggMdlUnit"><option>$</option><option>%</option></select></div></div>
           <div class="gg-field"><span class="l">Max weekly loss</span>
             <div class="gg-combo"><div class="gg-stepper" style="flex:1"><button onclick="ggStep('mwl',-10)">−</button><input id="ggMwl" value="0" readonly><button onclick="ggStep('mwl',10)">+</button></div><select id="ggMwlUnit"><option>$</option><option>%</option></select></div></div>
+          <div class="gg-field"><span class="l">Max losses in a row</span>
+            <div class="gg-stepper"><button onclick="ggStep('mcl',-1)">&minus;</button><input id="ggMcl" value="0" readonly><button onclick="ggStep('mcl',1)">+</button></div>
+            <small class="gg-field-note">After this many losing trades in a row, the circuit breaker banner shows on every tab until the 06:00 IST reset. 0 = off.</small></div>
           <div class="gg-field"><span class="l">Max overall drawdown</span>
             <div class="gg-combo"><div class="gg-stepper" style="flex:1"><button onclick="ggStep('mdd',-1)">−</button><input id="ggMdd" value="10" readonly><button onclick="ggStep('mdd',1)">+</button></div><select id="ggMddUnit"><option>%</option><option>$</option></select></div></div>
           <div class="gg-field"><span class="l">Revenge trade window (minutes)</span>
@@ -4032,7 +4039,7 @@ document.addEventListener('input',e=>{if(cur&&RUN[cur.dataset.tool]&&cur.contain
   function ggLoadAccount(){
     let s = null;
     try{ s = JSON.parse(localStorage.getItem(ACC_KEY)); }catch(e){}
-    const a = Object.assign({balance:0, phase:'Phase 1', type:'funded', revWindowMin:15, profitTargetPct:0, maxDailyLossUSD:0, maxDailyLossUnit:'$', maxWeeklyLossUSD:0, maxWeeklyLossUnit:'$', maxTradesPerDay:0, dayProfitTarget:0, dayProfitTargetUnit:'%', weeklyProfitTarget:0, weeklyProfitTargetUnit:'%', riskPerTrade:0.5, minRr:2, lotSize:0, tradeDuringNews:'yes', maxDrawdown:0, maxDrawdownUnit:'%', deadline:''}, s||{});
+    const a = Object.assign({balance:0, phase:'Phase 1', type:'funded', revWindowMin:15, profitTargetPct:0, maxDailyLossUSD:0, maxDailyLossUnit:'$', maxWeeklyLossUSD:0, maxWeeklyLossUnit:'$', maxTradesPerDay:0, dayProfitTarget:0, dayProfitTargetUnit:'%', weeklyProfitTarget:0, weeklyProfitTargetUnit:'%', riskPerTrade:0.5, minRr:2, lotSize:0, maxConsecLosses:0, tradeDuringNews:'yes', maxDrawdown:0, maxDrawdownUnit:'%', deadline:''}, s||{});
     if(a.maxDailyLossValue == null) a.maxDailyLossValue = Number(a.maxDailyLossUSD) || 0;
     if(a.maxWeeklyLossValue == null) a.maxWeeklyLossValue = Number(a.maxWeeklyLossUSD) || 0;
     return a;
@@ -4096,8 +4103,8 @@ document.addEventListener('input',e=>{if(cur&&RUN[cur.dataset.tool]&&cur.contain
   window.jlDailyLossLimit = Number(ggAccount.maxDailyLossUSD) || 0; window.jlWeeklyLossLimit = Number(ggAccount.maxWeeklyLossUSD) || 0;
   window.jlMaxTradesPerDay = Number(ggAccount.maxTradesPerDay) || 0; window.jlStartBalance = Number(ggAccount.balance) || 0; window.jlDayProfitTargetUSD = (ggAccount.dayProfitTargetUnit === '$') ? (Number(ggAccount.dayProfitTarget)||0) : Number(ggAccount.balance) * (Number(ggAccount.dayProfitTarget)||0) / 100; window.jlWeeklyProfitTargetUSD = (ggAccount.weeklyProfitTargetUnit === '$') ? (Number(ggAccount.weeklyProfitTarget)||0) : Number(ggAccount.balance) * (Number(ggAccount.weeklyProfitTarget)||0) / 100;
 
-  const ggState = {sl:5, pv:.05, bal:ggAccount.balance, pt:ggAccount.profitTargetPct, mt:ggAccount.maxTradesPerDay, dpt:Number(ggAccount.dayProfitTarget)||0, wpt:Number(ggAccount.weeklyProfitTarget)||0, rpt:(Number(ggAccount.riskPerTrade)>0?Number(ggAccount.riskPerTrade):.5), rr:(Number(ggAccount.minRr)>0?Number(ggAccount.minRr):2), mdl:Number(ggAccount.maxDailyLossValue)||0, mwl:Number(ggAccount.maxWeeklyLossValue)||0, mdd:Number(ggAccount.maxDrawdown)||0, revWin:ggAccount.revWindowMin, lot:Number(ggAccount.lotSize)||0};
-  const ggIds = {bal:'ggBal',pt:'ggPt',mt:'ggMt',dpt:'ggDpt',wpt:'ggWpt',rpt:'ggRpt',rr:'ggRr',mdl:'ggMdl',mwl:'ggMwl',mdd:'ggMdd',revWin:'ggRevWin',lot:'ggLot'};
+  const ggState = {sl:5, pv:.05, bal:ggAccount.balance, pt:ggAccount.profitTargetPct, mt:ggAccount.maxTradesPerDay, dpt:Number(ggAccount.dayProfitTarget)||0, wpt:Number(ggAccount.weeklyProfitTarget)||0, rpt:(Number(ggAccount.riskPerTrade)>0?Number(ggAccount.riskPerTrade):.5), rr:(Number(ggAccount.minRr)>0?Number(ggAccount.minRr):2), mdl:Number(ggAccount.maxDailyLossValue)||0, mwl:Number(ggAccount.maxWeeklyLossValue)||0, mdd:Number(ggAccount.maxDrawdown)||0, revWin:ggAccount.revWindowMin, lot:Number(ggAccount.lotSize)||0, mcl:Number(ggAccount.maxConsecLosses)||0};
+  const ggIds = {bal:'ggBal',pt:'ggPt',mt:'ggMt',dpt:'ggDpt',wpt:'ggWpt',rpt:'ggRpt',rr:'ggRr',mdl:'ggMdl',mwl:'ggMwl',mdd:'ggMdd',revWin:'ggRevWin',lot:'ggLot',mcl:'ggMcl'};
   // Loss limits can be $ or % of the starting balance; percent steps are a tenth of the dollar step.
   window.ggStep = function(id, d){
     if(id === 'mdl' || id === 'mwl'){ const u = document.getElementById(id === 'mdl' ? 'ggMdlUnit' : 'ggMwlUnit'); if(u && u.value === '%') d = d/10; }
@@ -4124,8 +4131,9 @@ document.addEventListener('input',e=>{if(cur&&RUN[cur.dataset.tool]&&cur.contain
   const ggRptEl = document.getElementById('ggRpt'); if(ggRptEl) ggRptEl.value = ggState.rpt;
   const ggRrEl = document.getElementById('ggRr'); if(ggRrEl) ggRrEl.value = ggState.rr;
   const ggLotEl = document.getElementById('ggLot'); if(ggLotEl) ggLotEl.value = ggState.lot;
+  const ggMclEl = document.getElementById('ggMcl'); if(ggMclEl) ggMclEl.value = ggState.mcl;
   const ggNewsEl = document.getElementById('ggNews'); if(ggNewsEl) ggNewsEl.value = ggAccount.tradeDuringNews === 'no' ? 'no' : 'yes';
-  window.jlLotSize = Number(ggAccount.lotSize) || 0; window.jlTradeDuringNews = ggAccount.tradeDuringNews === 'no' ? 'no' : 'yes';
+  window.jlLotSize = Number(ggAccount.lotSize) || 0; window.jlMaxConsecLosses = Number(ggAccount.maxConsecLosses) || 0; window.jlTradeDuringNews = ggAccount.tradeDuringNews === 'no' ? 'no' : 'yes';
   const ggMddEl = document.getElementById('ggMdd'); if(ggMddEl) ggMddEl.value = ggState.mdd;
   const ggMddUnitEl = document.getElementById('ggMddUnit'); if(ggMddUnitEl) ggMddUnitEl.value = ggAccount.maxDrawdownUnit === '$' ? '$' : '%';
   if(ggMddUnitEl) ggMddUnitEl.addEventListener('change', ()=>{ if(window.__renderDDRing) window.__renderDDRing(); });
@@ -4170,6 +4178,7 @@ document.addEventListener('input',e=>{if(cur&&RUN[cur.dataset.tool]&&cur.contain
       riskPerTrade: ggState.rpt,
       minRr: ggState.rr,
       lotSize: ggState.lot,
+      maxConsecLosses: ggState.mcl,
       tradeDuringNews: (ggNewsEl && ggNewsEl.value === 'no') ? 'no' : 'yes',
       maxDrawdown: ggState.mdd,
       maxDrawdownUnit: ggMddUnitEl ? ggMddUnitEl.value : (ggAccount.maxDrawdownUnit || '%'),
@@ -4180,10 +4189,11 @@ document.addEventListener('input',e=>{if(cur&&RUN[cur.dataset.tool]&&cur.contain
     window.jlProfitTargetUSD = Number(ggAccount.balance) * (Number(ggAccount.profitTargetPct)||0) / 100;
     window.jlDailyLossLimit = Number(ggAccount.maxDailyLossUSD) || 0; window.jlWeeklyLossLimit = Number(ggAccount.maxWeeklyLossUSD) || 0;
     window.jlMaxTradesPerDay = Number(ggAccount.maxTradesPerDay) || 0; window.jlStartBalance = Number(ggAccount.balance) || 0; window.jlDayProfitTargetUSD = (ggAccount.dayProfitTargetUnit === '$') ? (Number(ggAccount.dayProfitTarget)||0) : Number(ggAccount.balance) * (Number(ggAccount.dayProfitTarget)||0) / 100; window.jlWeeklyProfitTargetUSD = (ggAccount.weeklyProfitTargetUnit === '$') ? (Number(ggAccount.weeklyProfitTarget)||0) : Number(ggAccount.balance) * (Number(ggAccount.weeklyProfitTarget)||0) / 100;
-    window.jlLotSize = Number(ggAccount.lotSize) || 0; window.jlTradeDuringNews = ggAccount.tradeDuringNews === 'no' ? 'no' : 'yes';
+    window.jlLotSize = Number(ggAccount.lotSize) || 0; window.jlMaxConsecLosses = Number(ggAccount.maxConsecLosses) || 0; window.jlTradeDuringNews = ggAccount.tradeDuringNews === 'no' ? 'no' : 'yes';
     if(typeof window.jlRecomputeRevenge === 'function') window.jlRecomputeRevenge({rerender:true});
     if(typeof window.__renderToday === 'function') window.__renderToday();
     if(typeof window.jlPaintRules === 'function') window.jlPaintRules();
+    if(typeof window.jlCircuitRefresh === 'function') window.jlCircuitRefresh();
     ggApplyAccountDisplay(ggAccount);
     ggApplyAcctType(ggAccount.type);
     ggRenderGoals(); // streak depends on the limits just saved
@@ -8086,6 +8096,47 @@ w.querySelector('.top').after(c)}})();</script>
   }
   window.__jlExtraRules=function(rows){ if(rows) lastToday=rows; paint(); };
   setInterval(paint,30000); setTimeout(paint,2000);
+})();</script>
+<script id="jl-circuit">(function(){
+/*CB-PURE-START*/
+function circuitEval(rows,o,kindFn){
+  var g={},order=[],lossUsed=0;
+  (rows||[]).forEach(function(t){
+    if(!t)return;var p=Number(t.pnl);if(!isFinite(p))return;
+    if(p<0)lossUsed+=-p;
+    var k=t.d+'|'+t.t+'|'+t.sym+'|'+t.side;
+    if(!g[k]){g[k]={t:String(t.t),pnl:0};order.push(k)}
+    g[k].pnl+=p;
+  });
+  var list=order.map(function(k){return g[k]}).sort(function(a,b){return a.t<b.t?-1:a.t>b.t?1:0});
+  var count=list.length,run=0;
+  for(var i=list.length-1;i>=0;i--){if(kindFn(list[i].pnl)==='loss')run++;else break}
+  var why=[];
+  if(o.lossLimit>0&&lossUsed>=o.lossLimit)why.push('Daily loss limit reached ($'+lossUsed.toFixed(2)+' of $'+o.lossLimit.toFixed(2)+')');
+  if(o.tradeLimit>0&&count>=o.tradeLimit)why.push('Daily trade limit reached ('+count+' of '+o.tradeLimit+')');
+  if(o.maxConsec>0&&run>=o.maxConsec)why.push(run+' losing trades in a row (limit '+o.maxConsec+')');
+  return{tripped:why.length>0,why:why,count:count,lossUsed:lossUsed,run:run};
+}
+function msUntilReset(nowMs){
+  var IST=5.5*3600000,s=new Date(nowMs+IST);
+  var r=Date.UTC(s.getUTCFullYear(),s.getUTCMonth(),s.getUTCDate(),6,0,0)-IST;
+  if(r<=nowMs)r+=86400000;return r-nowMs;
+}
+function fmtWait(ms){var m=Math.max(1,Math.ceil(ms/60000)),h=Math.floor(m/60);return h?h+'h '+(m%60)+'m':m+'m'}
+/*CB-PURE-END*/
+function paint(){
+  var el=document.getElementById('jlCircuit');if(!el)return;
+  var key=typeof window.getTradingDayIST==='function'?window.getTradingDayIST():'';
+  var rows=(window.__trades||[]).filter(function(t){return t&&t.d===key});
+  var kindFn=typeof window.jlKind==='function'?window.jlKind:function(p){return p<0?'loss':p>0?'win':'be'};
+  var r=circuitEval(rows,{lossLimit:Number(window.jlDailyLossLimit)||0,tradeLimit:Number(window.jlMaxTradesPerDay)||0,maxConsec:Number(window.jlMaxConsecLosses)||0},kindFn);
+  if(!r.tripped){el.hidden=true;return}
+  document.getElementById('jlCircuitWhy').textContent=r.why.join('. ')+'.';
+  document.getElementById('jlCircuitWait').textContent='Stay out of the market until the 06:00 IST reset, in '+fmtWait(msUntilReset(Date.now()))+'.';
+  el.hidden=false;
+}
+window.jlCircuitRefresh=paint;window.jlCircuitEval=circuitEval;
+setInterval(paint,15000);setTimeout(paint,1500);setTimeout(paint,5000);
 })();</script>
 <script>(function(){const A=window.__A,m=v=>(v<0?'-$':'+$')+Math.abs(v).toFixed(2),set=(id,h)=>{const e=document.getElementById(id);if(e)e.textContent=h};
 const rv=(window.__trades||[]).filter(t=>t.rev).length;
