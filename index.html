@@ -3752,9 +3752,11 @@ window.__mountOpenPos=function(){const o=(window.__openTrades||[]).concat((windo
 <div class="tl-pane" data-tool="size" hidden><button type="button" class="tl-back">Close &times;</button>
 <div class="tl-grid">
  <section class="glass tl-card"><h3>Trade inputs</h3>
-  <label>Risk per trade ($)<input id="tlRisk" type="number" min="0" step="0.5" value="6"></label>
-  <label>Stop loss (pips)<input id="tlSl" type="number" min="1" step="1" value="60"><small>10 pips = $1.00 of gold price. Your usual range is 40-80.</small></label>
-  <label>Reward : risk<input id="tlRr" type="number" min="0.5" step="0.5" value="3"><small>Minimum 3.</small></label>
+  <label>Risk per trade ($)<input id="tlRisk" type="number" min="0" step="0.5" value=""></label>
+  <label>Stop loss (pips)<input id="tlSl" type="number" min="1" step="1" value=""></label>
+  <label>Pip value per 1.00 lot ($)<input id="tlPv" type="number" min="0" step="any" placeholder="Not set"><small>Depends on your symbol and broker. Saved on this device.</small></label>
+  <label>Price move per pip (optional)<input id="tlPs" type="number" min="0" step="any" placeholder="Not set"><small>Only used for the stop loss and take profit prices.</small></label>
+  <label>Reward : risk<input id="tlRr" type="number" min="0.5" step="0.5" value=""></label>
   <div class="tl-row"><label>Direction<select id="tlSide"><option>SELL</option><option>BUY</option></select></label>
   <label>Entry price (optional)<input id="tlEntry" type="number" step="0.01" placeholder="e.g. 4331.71"></label></div>
  </section>
@@ -3769,7 +3771,7 @@ window.__mountOpenPos=function(){const o=(window.__openTrades||[]).concat((windo
 <div class="tl-pane" data-tool="ex" hidden><button type="button" class="tl-back">Close &times;</button>
 <section class="glass tl-card"><h3>Expectancy &amp; breakeven</h3><div class="tl-row"><label>Win rate (%)<input id="exWr" type="number" step="any" value="40"></label><label>Reward : risk<input id="exRr" type="number" step="any" value="3"></label></div><div id="exV" class="tl-verdict"></div><div id="exOut" class="tl-out"></div><small>A win rate only means something over 100+ trades.</small></section></div>
 <div class="tl-pane" data-tool="pp" hidden><button type="button" class="tl-back">Close &times;</button>
-<section class="glass tl-card"><h3>Pip &amp; profit converter</h3><div class="tl-row"><label>Lot size<input id="ppLot" type="number" step="any" value="0.01"></label><label>Pips<input id="ppPips" type="number" step="any" value="60"></label></div><div class="tl-row"><label>Entry price (optional)<input id="ppEn" type="number" step="any" value=""></label><label>Exit price (optional)<input id="ppEx" type="number" step="any" value=""></label></div><div id="ppOut" class="tl-out"></div><small>Gold: 10 pips = $1.00 of price. $10 per pip per 1.00 lot. Check your broker contract size.</small></section></div>
+<section class="glass tl-card"><h3>Pip &amp; profit converter</h3><div class="tl-row"><label>Lot size<input id="ppLot" type="number" step="any" value=""></label><label>Pips<input id="ppPips" type="number" step="any" value=""></label></div><div class="tl-row"><label>Entry price (optional)<input id="ppEn" type="number" step="any" value=""></label><label>Exit price (optional)<input id="ppEx" type="number" step="any" value=""></label></div><div class="tl-row"><label>Pip value per 1.00 lot ($)<input id="ppPv" type="number" step="any" min="0" placeholder="Not set"></label><label>Price move per pip<input id="ppPs" type="number" step="any" min="0" placeholder="Not set"></label></div><div id="ppOut" class="tl-out"></div><small>Both numbers depend on your symbol and broker. Check your contract size. Saved on this device.</small></section></div>
 <div class="tl-pane" data-tool="lim" hidden><button type="button" class="tl-back">Close &times;</button>
 <section class="glass tl-card"><h3>Daily limit planner</h3><div class="tl-row"><label>Daily loss limit ($)<input id="lmLim" type="number" step="any" value=""></label><label>Profit target ($)<input id="lmTgt" type="number" step="any" value=""></label></div><div class="tl-row"><label>Risk per trade ($)<input id="lmRisk" type="number" step="any" value="6"></label><label>Reward : risk<input id="lmRr" type="number" step="any" value="3"></label><label>Win rate (%)<input id="lmWr" type="number" step="any" value="40"></label></div><div id="lmOut" class="tl-out"></div><div id="lmNote" class="tl-note"></div></section></div>
 <div class="tl-pane" data-tool="st" hidden><button type="button" class="tl-back">Close &times;</button>
@@ -3823,22 +3825,28 @@ window.__mountOpenPos=function(){const o=(window.__openTrades||[]).concat((windo
 @media(prefers-reduced-motion:reduce){.tl-pane,.tl-pane .tl-modal{animation:none!important}}
 </style>
 <script>(function(){const $=id=>document.getElementById(id);
-function calc(){const risk=+$('tlRisk').value||0,pips=+$('tlSl').value||0,rr=+$('tlRr').value||0,side=$('tlSide').value,en=parseFloat($('tlEntry').value),PV=10,
+/* Pip value and price per pip are the person's own numbers, saved on this device (journall_ prefix, so they sync). Nothing is assumed. */
+const PK='journall_tools_pip_v1';
+function pipGet(){try{const o=JSON.parse(localStorage.getItem(PK));return{pv:Number(o&&o.pv)>0?Number(o.pv):0,ps:Number(o&&o.ps)>0?Number(o.ps):0}}catch(e){return{pv:0,ps:0}}}
+function pipSet(pv,ps){try{localStorage.setItem(PK,JSON.stringify({pv:pv>0?pv:0,ps:ps>0?ps:0}))}catch(e){}}
+function pipFill(){const p=pipGet();[['tlPv','pv'],['tlPs','ps'],['ppPv','pv'],['ppPs','ps']].forEach(a=>{const e=$(a[0]);if(e&&document.activeElement!==e)e.value=p[a[1]]>0?p[a[1]]:''})}
+window.jlPip={get:pipGet,set:pipSet,fill:pipFill};
+document.addEventListener('input',e=>{const id=e.target&&e.target.id;if(id==='tlPv'||id==='tlPs'||id==='ppPv'||id==='ppPs'){const a=id.slice(0,2)==='tl'?'tl':'pp';pipSet(+($(a+'Pv')||{}).value||0,+($(a+'Ps')||{}).value||0);pipFill()}});
+function calc(){const risk=+$('tlRisk').value||0,pips=+$('tlSl').value||0,rr=+$('tlRr').value||0,side=$('tlSide').value,en=parseFloat($('tlEntry').value),PV=Math.max(0,+$('tlPv').value||0),PS=Math.max(0,+$('tlPs').value||0),minRr=Number(window.jlMinRr)||0,
  lim=Number(window.jlDailyLossLimit)||0,last=(window.__trades||[])[0],lastLot=last&&last.lot,
- raw=pips>0?risk/(pips*PV):0,lot=Math.floor(raw*100+1e-9)/100,real=lot*pips*PV,rew=real*rr,tpP=pips*rr,f=[];
+ raw=pips>0&&PV>0?risk/(pips*PV):0,lot=Math.floor(raw*100+1e-9)/100,real=lot*pips*PV,rew=real*rr,tpP=pips*rr,f=[];
  const m=v=>'$'+v.toFixed(2),add=(s,t)=>f.push([s==='f'?'var(--red)':s==='w'?'var(--amber)':'var(--green)',s,t]);
- if(pips<=0||risk<=0)add('f','Enter a risk and a stop loss.');
+ if(!(PV>0))add('f','Enter the pip value per 1.00 lot.');else if(pips<=0||risk<=0)add('f','Enter a risk and a stop loss.');
  else if(lot<0.01)add('f','Risk is too small for 0.01 lot at this stop. Minimum risk is '+m(pips*PV*.01)+'.');
- if(pips>150)add('f','Stop is '+pips+' pips. Over 150 is rejected.');else if(pips>80)add('w','Stop is '+pips+' pips. Above 80 needs a written justification.');else if(pips>0&&pips<40)add('w','Stop under 40 pips is tighter than your usual 40-80.');else if(pips>0)add('p','Stop is inside your 40-80 range.');
- if(rr<3)add('f','Reward:risk is '+rr+'. Minimum is 3.');else add('p','Reward:risk is '+rr+'.');
+  if(minRr>0&&rr<minRr)add('f','Reward:risk is '+rr+'. Your minimum is '+minRr+'.');else if(rr>0)add('p','Reward:risk is '+rr+'.');
  if(lot>=.01){if(!(lim>0))add('w','No daily loss limit is set in Account Settings.');else if(real>lim)add('f','Risk '+m(real)+' exceeds your daily loss limit of '+m(lim)+'.');else add('p','Risk '+m(real)+' is '+Math.round(real/lim*100)+'% of your daily loss limit. One loss ends the day.');
   if(lastLot!=null&&lot>lastLot)add('f','Lot '+lot.toFixed(2)+' is above your last lot ('+lastLot+'). Never increase size.');else if(lastLot!=null)add('p','Lot does not exceed your last lot ('+lastLot+').')}
  const bad=f.some(x=>x[1]==='f'),v=$('tlVerdict');v.className='tl-verdict '+(bad?'no':'ok');v.textContent=bad?'Reject this size':'Size passes';
- const sl=isNaN(en)?'-':(side==='SELL'?en+pips*.1:en-pips*.1).toFixed(2),tp=isNaN(en)?'-':(side==='SELL'?en-tpP*.1:en+tpP*.1).toFixed(2),ok=lot>=.01;
+ const sl=isNaN(en)||!(PS>0)?'-':(side==='SELL'?en+pips*PS:en-pips*PS).toFixed(2),tp=isNaN(en)||!(PS>0)?'-':(side==='SELL'?en-tpP*PS:en+tpP*PS).toFixed(2),ok=lot>=.01;
  $('tlOut').innerHTML=[['Lot size',ok?lot.toFixed(2):'-'],['Actual risk',ok?m(real):'-'],['Target reward',ok?m(rew):'-'],['Stop loss price',sl],['Take profit price',tp],['Target (pips)',ok?tpP:'-']].map(x=>'<div><span>'+x[0]+'</span><b>'+x[1]+'</b></div>').join('');
  $('tlChecks').innerHTML=f.map(x=>'<li style="--c:'+x[0]+'">'+x[2]+'</li>').join('')}
-['tlRisk','tlSl','tlRr','tlSide','tlEntry'].forEach(i=>$(i).addEventListener('input',calc));calc();window.__tlCalc=calc})();</script>
-<script>(function(){const $=id=>document.getElementById(id),V=$('view-tools'),H=$('tlHome');let tm=null;
+['tlRisk','tlSl','tlRr','tlSide','tlEntry','tlPv','tlPs'].forEach(i=>$(i).addEventListener('input',calc));pipFill();calc();window.__tlCalc=calc})();</script>
+<script>(function(){const $=id=>document.getElementById(id),V=$('view-tools'),H=$('tlHome');let tm=null;if(window.jlPip)window.jlPip.fill();
 const out=(id,a)=>{$(id).innerHTML=a.map(x=>'<div><span>'+x[0]+'</span><b>'+x[1]+'</b></div>').join('')},n=id=>parseFloat($(id).value),m=v=>'$'+v.toFixed(2),
 C=[['Sydney','Australia/Sydney',8,17],['Tokyo','Asia/Tokyo',9,18],['London','Europe/London',8,17],['New York','America/New_York',8,17]];
 function hours(){const now=new Date(),R=C.map(([nm,z,o,c])=>{const p={};new Intl.DateTimeFormat('en-GB',{timeZone:z,hour:'2-digit',minute:'2-digit',weekday:'short',hourCycle:'h23'}).formatToParts(now).forEach(x=>p[x.type]=x.value);
@@ -3848,8 +3856,10 @@ function hours(){const now=new Date(),R=C.map(([nm,z,o,c])=>{const p={};new Intl
 function ex(){const w=n('exWr')/100,r=n('exRr'),v=$('exV');if(!(r>0)||!(w>=0&&w<=1)){v.className='tl-verdict wait';v.textContent='Enter a win rate (0-100) and R:R.';$('exOut').innerHTML='';return}
  const E=w*r-(1-w),be=100/(1+r);v.className='tl-verdict '+(E>0?'ok':'no');v.textContent=E>0?'Positive edge: '+E.toFixed(2)+'R per trade':'No edge: '+E.toFixed(2)+'R per trade';
  out('exOut',[['Breakeven win rate',be.toFixed(1)+'%'],['Your margin',(w*100-be).toFixed(1)+' pts'],['Per 100 trades',(E*100).toFixed(0)+'R']])}
-function pp(){const l=n('ppLot'),p=n('ppPips'),a=n('ppEn'),b=n('ppEx'),o=[];if(l>0&&p>=0)o.push(['$ for '+p+' pips',m(l*p*10)],['Price move',(p*.1).toFixed(2)]);
- if(!isNaN(a)&&!isNaN(b)){const q=Math.abs(b-a)/.1;o.push(['Entry to exit',q.toFixed(0)+' pips']);if(l>0)o.push(['$ for that move',m(l*q*10)])}out('ppOut',o)}
+function pp(){const l=n('ppLot'),p=n('ppPips'),a=n('ppEn'),b=n('ppEx'),PV=n('ppPv')>0?n('ppPv'):0,PS=n('ppPs')>0?n('ppPs'):0,o=[];
+ if(l>0&&p>=0&&PV>0)o.push(['$ for '+p+' pips',m(l*p*PV)]);if(p>=0&&PS>0)o.push(['Price move',(p*PS).toFixed(2)]);
+ if(!isNaN(a)&&!isNaN(b)&&PS>0){const q=Math.abs(b-a)/PS;o.push(['Entry to exit',q.toFixed(0)+' pips']);if(l>0&&PV>0)o.push(['$ for that move',m(l*q*PV)])}
+ if(!(PV>0)||!(PS>0))o.push(['Needs',!(PV>0)&&!(PS>0)?'pip value and price per pip':!(PV>0)?'pip value':'price per pip']);out('ppOut',o)}
 function lim(){const L=n('lmLim'),T=n('lmTgt'),k=n('lmRisk'),r=n('lmRr'),w=n('lmWr')/100;if(!(k>0)||!(r>0)||!(L>0)||!(T>0)){$('lmOut').innerHTML='';$('lmNote').textContent='Fill every field.';return}
  const wins=Math.ceil(T/(k*r)),tr=w>0?Math.ceil(wins/w):null;out('lmOut',[['Losses to hit limit',Math.floor(L/k)],['Wins for target',wins],['Trades for target',tr==null?'n/a':'~'+tr]]);
  $('lmNote').textContent='Your rule stops you after one loss: '+m(k)+' is '+Math.round(k/L*100)+'% of your daily limit. Trades needed assumes your win rate holds.'}
@@ -4195,7 +4205,7 @@ document.addEventListener('input',e=>{if(cur&&RUN[cur.dataset.tool]&&cur.contain
   const ggMrvEl = document.getElementById('ggMrv'); if(ggMrvEl) ggMrvEl.value = ggState.mrv;
   const ggNewsEl = document.getElementById('ggNews'); if(ggNewsEl) ggNewsEl.value = ggAccount.tradeDuringNews === 'no' ? 'no' : ggAccount.tradeDuringNews === 'yes' ? 'yes' : '';
   const ggBroEl = document.getElementById('ggBro'); if(ggBroEl) ggBroEl.value = (ggAccount.brokerUtcOffset === '' || ggAccount.brokerUtcOffset == null) ? '' : String(ggAccount.brokerUtcOffset);
-  window.jlLotSize = Number(ggAccount.lotSize) || 0; window.jlMaxConsecLosses = Number(ggAccount.maxConsecLosses) || 0; window.jlMaxRevengeTrades = Number(ggAccount.maxRevengeTrades) || 0; window.jlTradeDuringNews = ggAccount.tradeDuringNews === 'no' ? 'no' : ggAccount.tradeDuringNews === 'yes' ? 'yes' : ''; window.jlBrokerUtcOffset = (ggAccount.brokerUtcOffset === '' || ggAccount.brokerUtcOffset == null || !isFinite(Number(ggAccount.brokerUtcOffset))) ? null : Number(ggAccount.brokerUtcOffset); if(typeof window.jlRenderWeak === 'function') window.jlRenderWeak();
+  window.jlLotSize = Number(ggAccount.lotSize) || 0; window.jlMaxConsecLosses = Number(ggAccount.maxConsecLosses) || 0; window.jlMaxRevengeTrades = Number(ggAccount.maxRevengeTrades) || 0; window.jlMinRr = Number(ggAccount.minRr) || 0; window.jlTradeDuringNews = ggAccount.tradeDuringNews === 'no' ? 'no' : ggAccount.tradeDuringNews === 'yes' ? 'yes' : ''; window.jlBrokerUtcOffset = (ggAccount.brokerUtcOffset === '' || ggAccount.brokerUtcOffset == null || !isFinite(Number(ggAccount.brokerUtcOffset))) ? null : Number(ggAccount.brokerUtcOffset); if(typeof window.jlRenderWeak === 'function') window.jlRenderWeak();
   const ggMddEl = document.getElementById('ggMdd'); if(ggMddEl) ggMddEl.value = ggState.mdd;
   const ggMddUnitEl = document.getElementById('ggMddUnit'); if(ggMddUnitEl) ggMddUnitEl.value = ggAccount.maxDrawdownUnit === '$' ? '$' : '%';
   if(ggMddUnitEl) ggMddUnitEl.addEventListener('change', ()=>{ if(window.__renderDDRing) window.__renderDDRing(); });
@@ -4253,7 +4263,7 @@ document.addEventListener('input',e=>{if(cur&&RUN[cur.dataset.tool]&&cur.contain
     window.jlProfitTargetUSD = Number(ggAccount.balance) * (Number(ggAccount.profitTargetPct)||0) / 100;
     window.jlDailyLossLimit = Number(ggAccount.maxDailyLossUSD) || 0; window.jlWeeklyLossLimit = Number(ggAccount.maxWeeklyLossUSD) || 0;
     window.jlMaxTradesPerDay = Number(ggAccount.maxTradesPerDay) || 0; window.jlStartBalance = Number(ggAccount.balance) || 0; window.jlDayProfitTargetUSD = (ggAccount.dayProfitTargetUnit === '$') ? (Number(ggAccount.dayProfitTarget)||0) : Number(ggAccount.balance) * (Number(ggAccount.dayProfitTarget)||0) / 100; window.jlWeeklyProfitTargetUSD = (ggAccount.weeklyProfitTargetUnit === '$') ? (Number(ggAccount.weeklyProfitTarget)||0) : Number(ggAccount.balance) * (Number(ggAccount.weeklyProfitTarget)||0) / 100;
-    window.jlLotSize = Number(ggAccount.lotSize) || 0; window.jlMaxConsecLosses = Number(ggAccount.maxConsecLosses) || 0; window.jlMaxRevengeTrades = Number(ggAccount.maxRevengeTrades) || 0; window.jlTradeDuringNews = ggAccount.tradeDuringNews === 'no' ? 'no' : ggAccount.tradeDuringNews === 'yes' ? 'yes' : ''; window.jlBrokerUtcOffset = (ggAccount.brokerUtcOffset === '' || ggAccount.brokerUtcOffset == null || !isFinite(Number(ggAccount.brokerUtcOffset))) ? null : Number(ggAccount.brokerUtcOffset); if(typeof window.jlRenderWeak === 'function') window.jlRenderWeak();
+    window.jlLotSize = Number(ggAccount.lotSize) || 0; window.jlMaxConsecLosses = Number(ggAccount.maxConsecLosses) || 0; window.jlMaxRevengeTrades = Number(ggAccount.maxRevengeTrades) || 0; window.jlMinRr = Number(ggAccount.minRr) || 0; window.jlTradeDuringNews = ggAccount.tradeDuringNews === 'no' ? 'no' : ggAccount.tradeDuringNews === 'yes' ? 'yes' : ''; window.jlBrokerUtcOffset = (ggAccount.brokerUtcOffset === '' || ggAccount.brokerUtcOffset == null || !isFinite(Number(ggAccount.brokerUtcOffset))) ? null : Number(ggAccount.brokerUtcOffset); if(typeof window.jlRenderWeak === 'function') window.jlRenderWeak();
     if(typeof window.jlRecomputeRevenge === 'function') window.jlRecomputeRevenge({rerender:true});
     if(typeof window.__renderToday === 'function') window.__renderToday();
     if(typeof window.jlPaintRules === 'function') window.jlPaintRules();
