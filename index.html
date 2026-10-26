@@ -3465,6 +3465,15 @@ window.__mountOpenPos=function(){const o=(window.__openTrades||[]).concat((windo
           <div class="gg-field"><span class="l">Max revenge trades</span>
             <div class="gg-stepper"><button onclick="ggStep('mrv',-1)">&minus;</button><input id="ggMrv" value="0" readonly><button onclick="ggStep('mrv',1)">+</button></div>
             <small class="gg-field-note">After this many revenge trades in a day, the circuit breaker banner shows on every tab until the 06:00 IST reset. Needs the revenge window above. 0 = off.</small></div>
+          <div class="gg-field"><span class="l">Consistency rule (% of profit)</span>
+            <div class="gg-stepper"><button onclick="ggStep('cns',-5)">&minus;</button><input id="ggCns" value="0" readonly><button onclick="ggStep('cns',5)">+</button></div>
+            <small class="gg-field-note">Your best day must stay at or under this share of your total profit. 0 = off.</small></div>
+          <div class="gg-field"><span class="l">Minimum trading days</span>
+            <div class="gg-stepper"><button onclick="ggStep('mtd',-1)">&minus;</button><input id="ggMtd" value="0" readonly><button onclick="ggStep('mtd',1)">+</button></div>
+            <small class="gg-field-note">Days with at least one closed trade count. 0 = off.</small></div>
+          <div class="gg-field"><span class="l">Profit split (% to you)</span>
+            <div class="gg-stepper"><button onclick="ggStep('spl',-5)">&minus;</button><input id="ggSpl" value="0" readonly><button onclick="ggStep('spl',5)">+</button></div>
+            <small class="gg-field-note">Used to estimate your share of the profit. 0 = off.</small></div>
           <div class="gg-field"><span class="l">Max overall drawdown</span>
             <div class="gg-combo"><div class="gg-stepper" style="flex:1"><button onclick="ggStep('mdd',-1)">−</button><input id="ggMdd" value="10" readonly><button onclick="ggStep('mdd',1)">+</button></div><select id="ggMddUnit"><option>%</option><option>$</option></select></div></div>
           <div class="gg-field"><span class="l">Revenge trade window (minutes)</span>
@@ -3498,6 +3507,17 @@ window.__mountOpenPos=function(){const o=(window.__openTrades||[]).concat((windo
       <div class="gg-tile">
         <svg viewBox="0 0 80 80" class="gg-gauge"><circle cx="40" cy="40" r="34" class="gg-gauge-track"/><circle cx="40" cy="40" r="34" class="gg-gauge-val red" id="ggGaugeDD" style="--off:214"/></svg>
         <div><div class="l">Drawdown buffer</div><div class="v" id="ggDDv">$0.00</div><div class="meta" id="ggDDm"></div></div>
+      </div>
+    </div>
+
+    <div class="pr-card" id="ggPropCard">
+      <div class="pr-h"><h2>Prop firm progress</h2><span class="pr-sub">Uses all trades in your data, with no phase or account split.</span></div>
+      <div id="ggPropBody"></div>
+      <div class="pr-pay">
+        <span class="pr-l">Payout log</span>
+        <div class="pr-add"><input type="date" id="prDate" aria-label="Payout date"><input type="number" id="prAmt" min="0" step="any" placeholder="Amount ($)" aria-label="Payout amount"><button type="button" class="gg-btn-outline" id="prAdd">Add payout</button></div>
+        <div class="pr-msg" id="prMsg"></div>
+        <div id="prList"></div>
       </div>
     </div>
 
@@ -4109,7 +4129,7 @@ document.addEventListener('input',e=>{if(cur&&RUN[cur.dataset.tool]&&cur.contain
   function ggLoadAccount(){
     let s = null;
     try{ s = JSON.parse(localStorage.getItem(ACC_KEY)); }catch(e){}
-    const a = Object.assign({balance:0, phase:'', type:'', revWindowMin:0, profitTargetPct:0, maxDailyLossUSD:0, maxDailyLossUnit:'$', maxWeeklyLossUSD:0, maxWeeklyLossUnit:'$', maxTradesPerDay:0, dayProfitTarget:0, dayProfitTargetUnit:'%', weeklyProfitTarget:0, weeklyProfitTargetUnit:'%', riskPerTrade:0, minRr:0, lotSize:0, maxConsecLosses:0, maxRevengeTrades:0, brokerUtcOffset:'', tradeDuringNews:'', maxDrawdown:0, maxDrawdownUnit:'%', deadline:''}, s||{});
+    const a = Object.assign({balance:0, phase:'', type:'', revWindowMin:0, profitTargetPct:0, maxDailyLossUSD:0, maxDailyLossUnit:'$', maxWeeklyLossUSD:0, maxWeeklyLossUnit:'$', maxTradesPerDay:0, dayProfitTarget:0, dayProfitTargetUnit:'%', weeklyProfitTarget:0, weeklyProfitTargetUnit:'%', riskPerTrade:0, minRr:0, lotSize:0, maxConsecLosses:0, maxRevengeTrades:0, consistencyPct:0, minTradingDays:0, profitSplit:0, brokerUtcOffset:'', tradeDuringNews:'', maxDrawdown:0, maxDrawdownUnit:'%', deadline:''}, s||{});
     if(a.maxDailyLossValue == null) a.maxDailyLossValue = Number(a.maxDailyLossUSD) || 0;
     if(a.maxWeeklyLossValue == null) a.maxWeeklyLossValue = Number(a.maxWeeklyLossUSD) || 0;
     return a;
@@ -4173,13 +4193,14 @@ document.addEventListener('input',e=>{if(cur&&RUN[cur.dataset.tool]&&cur.contain
   window.jlDailyLossLimit = Number(ggAccount.maxDailyLossUSD) || 0; window.jlWeeklyLossLimit = Number(ggAccount.maxWeeklyLossUSD) || 0;
   window.jlMaxTradesPerDay = Number(ggAccount.maxTradesPerDay) || 0; window.jlStartBalance = Number(ggAccount.balance) || 0; window.jlDayProfitTargetUSD = (ggAccount.dayProfitTargetUnit === '$') ? (Number(ggAccount.dayProfitTarget)||0) : Number(ggAccount.balance) * (Number(ggAccount.dayProfitTarget)||0) / 100; window.jlWeeklyProfitTargetUSD = (ggAccount.weeklyProfitTargetUnit === '$') ? (Number(ggAccount.weeklyProfitTarget)||0) : Number(ggAccount.balance) * (Number(ggAccount.weeklyProfitTarget)||0) / 100;
 
-  const ggState = {sl:5, pv:.05, bal:ggAccount.balance, pt:ggAccount.profitTargetPct, mt:ggAccount.maxTradesPerDay, dpt:Number(ggAccount.dayProfitTarget)||0, wpt:Number(ggAccount.weeklyProfitTarget)||0, rpt:(Number(ggAccount.riskPerTrade)>0?Number(ggAccount.riskPerTrade):0), rr:(Number(ggAccount.minRr)>0?Number(ggAccount.minRr):0), mdl:Number(ggAccount.maxDailyLossValue)||0, mwl:Number(ggAccount.maxWeeklyLossValue)||0, mdd:Number(ggAccount.maxDrawdown)||0, revWin:ggAccount.revWindowMin, lot:Number(ggAccount.lotSize)||0, mcl:Number(ggAccount.maxConsecLosses)||0, mrv:Number(ggAccount.maxRevengeTrades)||0};
-  const ggIds = {bal:'ggBal',pt:'ggPt',mt:'ggMt',dpt:'ggDpt',wpt:'ggWpt',rpt:'ggRpt',rr:'ggRr',mdl:'ggMdl',mwl:'ggMwl',mdd:'ggMdd',revWin:'ggRevWin',lot:'ggLot',mcl:'ggMcl',mrv:'ggMrv'};
+  const ggState = {sl:5, pv:.05, bal:ggAccount.balance, pt:ggAccount.profitTargetPct, mt:ggAccount.maxTradesPerDay, dpt:Number(ggAccount.dayProfitTarget)||0, wpt:Number(ggAccount.weeklyProfitTarget)||0, rpt:(Number(ggAccount.riskPerTrade)>0?Number(ggAccount.riskPerTrade):0), rr:(Number(ggAccount.minRr)>0?Number(ggAccount.minRr):0), mdl:Number(ggAccount.maxDailyLossValue)||0, mwl:Number(ggAccount.maxWeeklyLossValue)||0, mdd:Number(ggAccount.maxDrawdown)||0, revWin:ggAccount.revWindowMin, lot:Number(ggAccount.lotSize)||0, mcl:Number(ggAccount.maxConsecLosses)||0, mrv:Number(ggAccount.maxRevengeTrades)||0, cns:Number(ggAccount.consistencyPct)||0, mtd:Number(ggAccount.minTradingDays)||0, spl:Number(ggAccount.profitSplit)||0};
+  const ggIds = {bal:'ggBal',pt:'ggPt',mt:'ggMt',dpt:'ggDpt',wpt:'ggWpt',rpt:'ggRpt',rr:'ggRr',mdl:'ggMdl',mwl:'ggMwl',mdd:'ggMdd',revWin:'ggRevWin',lot:'ggLot',mcl:'ggMcl',mrv:'ggMrv',cns:'ggCns',mtd:'ggMtd',spl:'ggSpl'};
   // Loss limits can be $ or % of the starting balance; percent steps are a tenth of the dollar step.
   window.ggStep = function(id, d){
     if(id === 'mdl' || id === 'mwl'){ const u = document.getElementById(id === 'mdl' ? 'ggMdlUnit' : 'ggMwlUnit'); if(u && u.value === '%') d = d/10; }
     ggState[id] = +(ggState[id] + d).toFixed(2);
     if(ggState[id] < 0) ggState[id] = 0;
+    if((id === 'cns' || id === 'spl') && ggState[id] > 100) ggState[id] = 100;
     document.getElementById(ggIds[id]).value = ((id==='rpt'||id==='rr'||id==='revWin')&&!(ggState[id]>0)) ? '' : ggState[id];
     if(id === 'mdd' && window.__renderDDRing) window.__renderDDRing();
   };
@@ -4203,9 +4224,10 @@ document.addEventListener('input',e=>{if(cur&&RUN[cur.dataset.tool]&&cur.contain
   const ggLotEl = document.getElementById('ggLot'); if(ggLotEl) ggLotEl.value = ggState.lot;
   const ggMclEl = document.getElementById('ggMcl'); if(ggMclEl) ggMclEl.value = ggState.mcl;
   const ggMrvEl = document.getElementById('ggMrv'); if(ggMrvEl) ggMrvEl.value = ggState.mrv;
+  [['ggCns','cns'],['ggMtd','mtd'],['ggSpl','spl']].forEach(function(a){ const el = document.getElementById(a[0]); if(el) el.value = ggState[a[1]]; });
   const ggNewsEl = document.getElementById('ggNews'); if(ggNewsEl) ggNewsEl.value = ggAccount.tradeDuringNews === 'no' ? 'no' : ggAccount.tradeDuringNews === 'yes' ? 'yes' : '';
   const ggBroEl = document.getElementById('ggBro'); if(ggBroEl) ggBroEl.value = (ggAccount.brokerUtcOffset === '' || ggAccount.brokerUtcOffset == null) ? '' : String(ggAccount.brokerUtcOffset);
-  window.jlLotSize = Number(ggAccount.lotSize) || 0; window.jlMaxConsecLosses = Number(ggAccount.maxConsecLosses) || 0; window.jlMaxRevengeTrades = Number(ggAccount.maxRevengeTrades) || 0; window.jlMinRr = Number(ggAccount.minRr) || 0; window.jlTradeDuringNews = ggAccount.tradeDuringNews === 'no' ? 'no' : ggAccount.tradeDuringNews === 'yes' ? 'yes' : ''; window.jlBrokerUtcOffset = (ggAccount.brokerUtcOffset === '' || ggAccount.brokerUtcOffset == null || !isFinite(Number(ggAccount.brokerUtcOffset))) ? null : Number(ggAccount.brokerUtcOffset); if(typeof window.jlRenderWeak === 'function') window.jlRenderWeak();
+  window.jlLotSize = Number(ggAccount.lotSize) || 0; window.jlMaxConsecLosses = Number(ggAccount.maxConsecLosses) || 0; window.jlMaxRevengeTrades = Number(ggAccount.maxRevengeTrades) || 0; window.jlMinRr = Number(ggAccount.minRr) || 0; window.jlConsistencyPct = Number(ggAccount.consistencyPct) || 0; window.jlMinTradingDays = Number(ggAccount.minTradingDays) || 0; window.jlProfitSplit = Number(ggAccount.profitSplit) || 0; window.jlTradeDuringNews = ggAccount.tradeDuringNews === 'no' ? 'no' : ggAccount.tradeDuringNews === 'yes' ? 'yes' : ''; window.jlBrokerUtcOffset = (ggAccount.brokerUtcOffset === '' || ggAccount.brokerUtcOffset == null || !isFinite(Number(ggAccount.brokerUtcOffset))) ? null : Number(ggAccount.brokerUtcOffset); if(typeof window.jlRenderWeak === 'function') window.jlRenderWeak();
   const ggMddEl = document.getElementById('ggMdd'); if(ggMddEl) ggMddEl.value = ggState.mdd;
   const ggMddUnitEl = document.getElementById('ggMddUnit'); if(ggMddUnitEl) ggMddUnitEl.value = ggAccount.maxDrawdownUnit === '$' ? '$' : '%';
   if(ggMddUnitEl) ggMddUnitEl.addEventListener('change', ()=>{ if(window.__renderDDRing) window.__renderDDRing(); });
@@ -4252,6 +4274,9 @@ document.addEventListener('input',e=>{if(cur&&RUN[cur.dataset.tool]&&cur.contain
       lotSize: ggState.lot,
       maxConsecLosses: ggState.mcl,
       maxRevengeTrades: ggState.mrv,
+      consistencyPct: ggState.cns,
+      minTradingDays: ggState.mtd,
+      profitSplit: ggState.spl,
       tradeDuringNews: (ggNewsEl && ggNewsEl.value === 'no') ? 'no' : (ggNewsEl && ggNewsEl.value === 'yes') ? 'yes' : '',
       brokerUtcOffset: (function(){ const e = document.getElementById('ggBro'); if(!e) return (ggAccount.brokerUtcOffset == null ? '' : ggAccount.brokerUtcOffset); return e.value === '' ? '' : Number(e.value); })(),
       maxDrawdown: ggState.mdd,
@@ -4263,7 +4288,7 @@ document.addEventListener('input',e=>{if(cur&&RUN[cur.dataset.tool]&&cur.contain
     window.jlProfitTargetUSD = Number(ggAccount.balance) * (Number(ggAccount.profitTargetPct)||0) / 100;
     window.jlDailyLossLimit = Number(ggAccount.maxDailyLossUSD) || 0; window.jlWeeklyLossLimit = Number(ggAccount.maxWeeklyLossUSD) || 0;
     window.jlMaxTradesPerDay = Number(ggAccount.maxTradesPerDay) || 0; window.jlStartBalance = Number(ggAccount.balance) || 0; window.jlDayProfitTargetUSD = (ggAccount.dayProfitTargetUnit === '$') ? (Number(ggAccount.dayProfitTarget)||0) : Number(ggAccount.balance) * (Number(ggAccount.dayProfitTarget)||0) / 100; window.jlWeeklyProfitTargetUSD = (ggAccount.weeklyProfitTargetUnit === '$') ? (Number(ggAccount.weeklyProfitTarget)||0) : Number(ggAccount.balance) * (Number(ggAccount.weeklyProfitTarget)||0) / 100;
-    window.jlLotSize = Number(ggAccount.lotSize) || 0; window.jlMaxConsecLosses = Number(ggAccount.maxConsecLosses) || 0; window.jlMaxRevengeTrades = Number(ggAccount.maxRevengeTrades) || 0; window.jlMinRr = Number(ggAccount.minRr) || 0; window.jlTradeDuringNews = ggAccount.tradeDuringNews === 'no' ? 'no' : ggAccount.tradeDuringNews === 'yes' ? 'yes' : ''; window.jlBrokerUtcOffset = (ggAccount.brokerUtcOffset === '' || ggAccount.brokerUtcOffset == null || !isFinite(Number(ggAccount.brokerUtcOffset))) ? null : Number(ggAccount.brokerUtcOffset); if(typeof window.jlRenderWeak === 'function') window.jlRenderWeak();
+    window.jlLotSize = Number(ggAccount.lotSize) || 0; window.jlMaxConsecLosses = Number(ggAccount.maxConsecLosses) || 0; window.jlMaxRevengeTrades = Number(ggAccount.maxRevengeTrades) || 0; window.jlMinRr = Number(ggAccount.minRr) || 0; window.jlConsistencyPct = Number(ggAccount.consistencyPct) || 0; window.jlMinTradingDays = Number(ggAccount.minTradingDays) || 0; window.jlProfitSplit = Number(ggAccount.profitSplit) || 0; window.jlTradeDuringNews = ggAccount.tradeDuringNews === 'no' ? 'no' : ggAccount.tradeDuringNews === 'yes' ? 'yes' : ''; window.jlBrokerUtcOffset = (ggAccount.brokerUtcOffset === '' || ggAccount.brokerUtcOffset == null || !isFinite(Number(ggAccount.brokerUtcOffset))) ? null : Number(ggAccount.brokerUtcOffset); if(typeof window.jlRenderWeak === 'function') window.jlRenderWeak();
     if(typeof window.jlRecomputeRevenge === 'function') window.jlRecomputeRevenge({rerender:true});
     if(typeof window.__renderToday === 'function') window.__renderToday();
     if(typeof window.jlPaintRules === 'function') window.jlPaintRules();
@@ -4272,6 +4297,7 @@ document.addEventListener('input',e=>{if(cur&&RUN[cur.dataset.tool]&&cur.contain
     ggApplyAcctType(ggAccount.type);
     ggRenderGoals(); // streak depends on the limits just saved
     if(window.__renderDDRing) window.__renderDDRing();
+    if(window.__renderProp) window.__renderProp();
     ggToggleSetup();
     const t = document.getElementById('gToast') || document.getElementById('ggToast');
     if(t){ t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),1800); }
@@ -11608,6 +11634,83 @@ initFirebaseAuth().catch(err=>{
   .ldg-d small,.ldg-badge,.ldg-wk-pill,.ldg-wk-days,.ldg-wk:not(.upcoming) .ldg-pnl::before{font-size:var(--fs-1)}
 }
 </style>
+<style id="jl-prop-css">
+.pr-card{margin-top:18px;padding:18px;border:1px solid var(--border);border-radius:var(--r-3);background:rgba(255,255,255,.02)}
+.pr-h{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 12px;margin-bottom:12px}
+.pr-h h2{margin:0;font-size:var(--fs-4);font-weight:700;color:var(--text)}
+.pr-sub{color:var(--faint);font-size:var(--fs-2)}
+.pr-row{display:flex;flex-wrap:wrap;justify-content:space-between;gap:4px 12px;padding:10px 0;border-top:1px solid var(--border)}
+.pr-row:first-child{border-top:0}
+.pr-l{display:block;font-size:var(--fs-1);font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--faint)}
+.pr-v{font-size:var(--fs-4);font-weight:700;color:var(--text)}
+.pr-v.ok{color:var(--green)}.pr-v.bad{color:var(--red)}.pr-v.mute{color:var(--faint);font-weight:600}
+.pr-m{flex-basis:100%;color:var(--sub);font-size:var(--fs-2);line-height:1.4}
+.pr-pay{margin-top:6px;padding-top:12px;border-top:1px solid var(--border)}
+.pr-add{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0}
+.pr-add input{flex:1;min-width:130px;background:var(--panel-2);border:1px solid var(--border);border-radius:var(--r-2);color:var(--text);font-family:inherit;font-size:var(--fs-3);padding:9px 11px}
+.pr-add input:focus{outline:none;border-color:var(--accent-2)}
+.pr-msg{color:var(--warn);font-size:var(--fs-2);min-height:16px}
+.pr-pr{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 0;border-top:1px solid var(--border);font-size:var(--fs-3);color:var(--sub)}
+.pr-pr b{color:var(--text)}
+.pr-none{color:var(--faint);font-size:var(--fs-3);padding:6px 0}
+@media (max-width:640px),(pointer:coarse){.pr-add input,.pr-add .gg-btn-outline,.pr-pr .gg-btn-outline{min-height:44px}}
+.pr-add .gg-btn-outline:focus-visible,.pr-pr .gg-btn-outline:focus-visible,.pr-add input:focus-visible{outline:2px solid var(--accent-2);outline-offset:2px}
+</style>
+<script id="jl-prop-rules">(function(){
+/* Prop firm progress: consistency rule, minimum trading days, profit split and a payout log.
+   Every number comes from Account Settings or from what you type. Nothing is assumed. */
+var PK='journall_payouts_v1';
+/*PR-PURE-START*/
+function dayNets(trades){var m={},order=[];(Array.isArray(trades)?trades:[]).forEach(function(t){if(!t||!t.d)return;var p=Number(t.pnl);if(!isFinite(p))return;if(!(t.d in m)){m[t.d]=0;order.push(t.d)}m[t.d]+=p});
+  return order.sort().map(function(d){return{d:d,net:Math.round(m[d]*100)/100}})}
+function propStats(trades,o){var days=dayNets(trades),net=0,best=null;
+  days.forEach(function(x){net+=x.net;if(!best||x.net>best.net)best=x});net=Math.round(net*100)/100;
+  var r={days:days.length,net:net,best:(best&&best.net>0)?best:null,cons:null,minDays:null};
+  if(o.consPct>0){if(net>0&&r.best){var sh=r.best.net/net*100;r.cons={share:sh,limit:o.consPct,ok:sh<=o.consPct+1e-9,maxBest:Math.round(net*o.consPct)/100}}
+    else r.cons={share:null,limit:o.consPct,ok:null,maxBest:0}}
+  if(o.minDays>0)r.minDays={have:days.length,need:o.minDays,left:Math.max(0,o.minDays-days.length),ok:days.length>=o.minDays};
+  return r}
+function splitShare(net,pct){return net>0&&pct>0?Math.round(net*pct)/100:0}
+function cleanPayouts(raw){var out=[],seen={};if(!Array.isArray(raw))return out;
+  raw.forEach(function(x){if(!x||typeof x!=='object')return;var a=Number(x.amount),d=typeof x.date==='string'?x.date:'';if(!isFinite(a)||a<=0||!/^\d{4}-\d{2}-\d{2}$/.test(d))return;
+    var id=(typeof x.id==='string'&&x.id)?x.id:'p'+d+'-'+a;if(seen[id])return;seen[id]=1;out.push({id:id,date:d,amount:Math.round(a*100)/100})});
+  return out.sort(function(a,b){return a.date<b.date?1:a.date>b.date?-1:0})}
+function payoutTotal(list){return Math.round((Array.isArray(list)?list:[]).reduce(function(s,p){return s+p.amount},0)*100)/100}
+function esc(v){return String(v==null?'':v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
+function money(v){return(v<0?'-$':'$')+Math.abs(v).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})}
+function dayLabel(d){var m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(d||'');if(!m)return d||'';var M=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];return M[+m[2]-1]+' '+(+m[3])+', '+m[1]}
+function row(label,val,cls,meta){return '<div class="pr-row"><span class="pr-l">'+esc(label)+'</span><span class="pr-v '+(cls||'')+'">'+esc(val)+'</span>'+(meta?'<span class="pr-m">'+esc(meta)+'</span>':'')+'</div>'}
+function summaryHtml(st,o,paid){var h='';
+  if(!(o.consPct>0))h+=row('Consistency rule','Not set','mute','Set it in Account Settings.');
+  else if(st.cons.ok===null)h+=row('Consistency rule','No profit yet','mute','The rule limits your best day to '+o.consPct+'% of total profit.');
+  else h+=row('Consistency rule',st.cons.share.toFixed(1)+'% of profit',st.cons.ok?'ok':'bad',(st.cons.ok?'Within the limit. ':'Over the limit. ')+'Best day '+money(st.best.net)+' on '+dayLabel(st.best.d)+'. At '+o.consPct+'% of '+money(st.net)+' the best day can be up to '+money(st.cons.maxBest)+'.');
+  if(!(o.minDays>0))h+=row('Trading days','Not set','mute','Set a minimum in Account Settings.');
+  else h+=row('Trading days',st.minDays.have+' of '+st.minDays.need,st.minDays.ok?'ok':'',st.minDays.ok?'Minimum reached.':st.minDays.left+(st.minDays.left===1?' more trading day needed.':' more trading days needed.'));
+  if(!(o.split>0))h+=row('Profit split','Not set','mute','Set the split in Account Settings to see your share.');
+  else{var sh=splitShare(st.net,o.split);h+=row('Your share ('+o.split+'%)',money(sh),sh>0?'ok':'mute','Estimated from net profit of '+money(st.net)+'.'+(sh>0?' Paid out so far: '+money(paid)+'. Not yet paid: '+money(Math.max(0,Math.round((sh-paid)*100)/100))+'.':''))}
+  h+=row('Paid out so far',money(paid),paid>0?'':'mute','');return h}
+function listHtml(list){return list.length?list.map(function(p){return '<div class="pr-pr"><span><b>'+esc(money(p.amount))+'</b> on '+esc(dayLabel(p.date))+'</span><button type="button" class="gg-btn-outline" data-prdel="'+esc(p.id)+'">Delete</button></div>'}).join(''):'<div class="pr-none">No payouts logged yet.</div>'}
+/*PR-PURE-END*/
+function $(id){return document.getElementById(id)}
+function rd(){try{return JSON.parse(localStorage.getItem(PK))}catch(_){return null}}
+function wr(v){try{localStorage.setItem(PK,JSON.stringify(v));return true}catch(_){msg('Could not save. Browser storage may be full.');return false}}
+function msg(t){var m=$('prMsg');if(m)m.textContent=t||''}
+function opts(){return{consPct:Number(window.jlConsistencyPct)||0,minDays:Number(window.jlMinTradingDays)||0,split:Number(window.jlProfitSplit)||0}}
+function render(){var b=$('ggPropBody');if(!b)return;var list=cleanPayouts(rd());
+  b.innerHTML=summaryHtml(propStats(window.__trades||[],opts()),opts(),payoutTotal(list));var l=$('prList');if(l)l.innerHTML=listHtml(list)}
+window.__renderProp=render;
+var card=$('ggPropCard'),armT=0;
+if(card)card.addEventListener('click',function(e){var t=e.target;if(!t.closest)return;
+  if(t.closest('#prAdd')){var d=$('prDate').value,a=Number($('prAmt').value);
+    if(!/^\d{4}-\d{2}-\d{2}$/.test(d)||!(a>0)){msg('Pick a date and enter an amount above zero.');return}
+    var list=cleanPayouts(rd());list.push({id:'p'+Date.now().toString(36)+Math.random().toString(36).slice(2,6),date:d,amount:Math.round(a*100)/100});
+    if(wr(cleanPayouts(list))){$('prAmt').value='';msg('');render()}return}
+  var del=t.closest('[data-prdel]');if(del){
+    if(del.getAttribute('data-arm')!=='1'){del.setAttribute('data-arm','1');del.textContent='Tap again to delete';clearTimeout(armT);armT=setTimeout(render,3000);return}
+    clearTimeout(armT);var id=del.getAttribute('data-prdel');wr(cleanPayouts(rd()).filter(function(p){return p.id!==id}));render()}});
+window.addEventListener('storage',function(ev){if(!ev.key||ev.key===PK)render()});
+setTimeout(render,1500);setInterval(render,30000);render();
+})();</script>
 <style id="jl-ui-shared-css">
 /* Shared look for collapsible rows and small uppercase labels (used by Study notes and Daily journal history). */
 #pbRoot .pb-item,.djh-day{border:1px solid var(--border);border-radius:var(--r-3);margin-bottom:8px;background:rgba(255,255,255,.02)}
