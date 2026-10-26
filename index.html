@@ -1127,6 +1127,14 @@
   .j-drop:hover .j-drop-ic{border-color:var(--accent-2)}.j-drop:hover .j-drop-ic svg{stroke:var(--accent-2)}
   .j-drop img,.j-drop video{width:100%;max-height:170px;border-radius:9px;object-fit:cover;background:#000;display:block;box-shadow:0 8px 20px -8px rgba(0,0,0,.6)}
   .j-pv{display:flex;flex-direction:column;gap:6px;width:100%;word-break:break-all} .j-pv:empty{display:none}
+  .j-shots{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:8px}
+  .j-shot{position:relative;margin:0}
+  .j-shot img{display:block;width:100%;height:auto;border-radius:8px;border:1px solid var(--border);cursor:zoom-in}
+  .j-shot.big{grid-column:1/-1}.j-shot.big img{cursor:zoom-out}
+  .j-shx{position:absolute;top:4px;right:4px;width:24px;height:24px;border-radius:50%;border:0;background:rgba(0,0,0,.65);color:#fff;font-size:15px;line-height:1;cursor:pointer}
+  .j-shx:focus-visible{outline:2px solid var(--accent-2);outline-offset:2px}
+  .j-shm{color:var(--faint);font-size:var(--fs-2)}
+  @media (max-width:640px),(pointer:coarse){.j-shx{width:36px;height:36px}}
   .j-act{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
   .j-sm{padding:7px 14px;font-size:12.5px}
 
@@ -3305,7 +3313,7 @@ window.__mountOpenPos=function(){const o=(window.__openTrades||[]).concat((windo
 <div class="j-r2" style="margin-top:12px"><div class="j-f"><label for="jBef">Emotion before entry</label><div class="j-fw"><span class="j-fw-ic j-fw-ic-ta"><svg viewBox="0 0 24 24"><path d="M12 3v3M12 18v3M3 12h3M18 12h3M6 6l2 2M16 16l2 2M18 6l-2 2M8 16l-2 2"/></svg></span><textarea class="j-ta j-fw-ta" id="jBef" placeholder="What did you feel before clicking?"></textarea><span class="j-cnt" id="jBefC">0</span></div></div><div class="j-f"><label for="jAft">Emotion after exit</label><div class="j-fw"><span class="j-fw-ic j-fw-ic-ta"><svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4M22 12v6a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h11"/></svg></span><textarea class="j-ta j-fw-ta" id="jAft" placeholder="What did you feel after the exit?"></textarea><span class="j-cnt" id="jAftC">0</span></div></div></div>
 <div class="j-f" style="margin-top:14px"><label for="jImp">Improvement</label><div class="j-fw"><span class="j-fw-ic j-fw-ic-ta"><svg viewBox="0 0 24 24"><path d="M9 18h6M10 22h4M12 2a6 6 0 0 0-4 10.5c.6.6 1 1.4 1 2.5h6c0-1.1.4-1.9 1-2.5A6 6 0 0 0 12 2z"/></svg></span><textarea class="j-ta j-fw-ta" id="jImp" placeholder="One concrete change for the next trade"></textarea><span class="j-cnt" id="jImpC">0</span></div></div>
 <div class="j-sh"><span class="j-sh-ic"><svg viewBox="0 0 24 24"><path d="M21.44 11.05 12.25 20.24a5 5 0 0 1-7.07-7.07l9.19-9.19a3.5 3.5 0 0 1 4.95 4.95L10.13 17.1a2 2 0 0 1-2.83-2.83l8.49-8.49"/></svg></span><h4>Attachments</h4><span>Optional, kept on this device</span></div>
-<div class="j-att"><div class="j-drop"><div class="j-drop-h"><span class="j-drop-ic"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="11" r="2"/><path d="m21 15-4.5-4.5L9 18"/></svg></span><b class="j-l">Screenshot</b></div><div class="j-pv" id="jShotBox"></div><button type="button" class="btn-ghost j-sm" data-pick="jShotF">Attach screenshot</button><input type="file" id="jShotF" accept="image/*" hidden></div>
+<div class="j-att"><div class="j-drop"><div class="j-drop-h"><span class="j-drop-ic"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="11" r="2"/><path d="m21 15-4.5-4.5L9 18"/></svg></span><b class="j-l">Screenshot</b></div><div class="j-pv" id="jShotBox"></div><button type="button" class="btn-ghost j-sm" data-pick="jShotF">Attach screenshots</button><input type="file" id="jShotF" accept="image/*" multiple hidden></div>
 <div class="j-drop"><div class="j-drop-h"><span class="j-drop-ic"><svg viewBox="0 0 24 24"><rect x="2" y="6" width="14" height="12" rx="2"/><path d="m22 8-6 4 6 4z"/></svg></span><b class="j-l">Screen recording</b></div><div class="j-pv" id="jRecBox"></div><button type="button" class="btn-ghost j-sm" data-pick="jRecF">Attach recording</button><input type="file" id="jRecF" accept="video/*" hidden></div></div>
 <div class="j-chk"><div class="a-s-head"><div><h3 style="margin:0;font-size:14px">Journal check</h3><div class="sub" style="margin:2px 0 0">Flags gaps and rule breaks before you save</div></div><button type="button" class="btn-primary j-sm" id="jCheck">Check journal</button></div><div id="jChk" aria-live="polite"></div></div>
 <div class="j-act" style="margin-top:20px"><button type="button" class="btn-primary" id="jSave">Save journal</button><button type="button" class="btn-ghost" id="jDraft">Save draft</button><button type="button" class="btn-ghost" id="jPrev">Previous trade</button><button type="button" class="btn-ghost" id="jNext">Next trade</button><button type="button" class="btn-ghost" id="jClear">Clear form</button><span id="jMsg" role="status"></span></div>
@@ -6006,7 +6014,7 @@ let J;try{J=JSON.parse(localStorage.getItem(DK))}catch(e){}
 if(!Array.isArray(J))J=SEED;
 const save=()=>{try{localStorage.setItem(DK,JSON.stringify(J))}catch(e){}window.__jlDirty=true};
 let cur,filt='All',jf='All',qs='',urls={};
-const blank=()=>{cur={idx:-1,free:false,q:[null,null,null],tags:[],conf:[],emotion:'',id:null,shot:'',rec:''}};blank();
+const blank=()=>{cur={idx:-1,free:false,q:[null,null,null],tags:[],conf:[],emotion:'',id:null,shot:'',shots:[],rec:''}};blank();
 const msg=t=>{$('jMsg').textContent=t};
 /* Setup combobox: hidden #jSetup keeps .value get/set working for the rest of this block */
 const SETUPS=['Breakout','Pullback','Reversal','Range','Trend Continuation','Other'];let setupOpen=false;
@@ -6066,7 +6074,45 @@ window.jGrade=function(q){if(!Array.isArray(q)||q.length<3||q.slice(0,3).some(fu
 window.jGradeChip=function(q){var r=window.jGrade(q);return r?'<span class="j-gr" style="--gc:'+r.c+'" title="Trade grade from your 3 Yes/No checks"><b>'+r.g+'</b>Grade</span>':'<span class="j-gr none" title="Answer all 3 Yes/No checks to grade this trade"><b>–</b>Not graded</span>'};
 function yn(){var gb=document.getElementById('jGradeBox');if(gb)gb.innerHTML=window.jGradeChip(cur.q)+'<span class="sub">Auto-graded from your 3 Yes/No checks.</span>';document.querySelectorAll('#view-journal .j-yn[data-q]').forEach(g=>g.querySelectorAll('.a-tab').forEach(b=>{const on=cur.q[+g.dataset.q]===b.dataset.v;b.classList.toggle('on',on);b.setAttribute('aria-pressed',on)}))}
 function tags(){$('jTags').innerHTML=TAGS.map(t=>{const on=cur.tags.includes(t);return '<button type="button" class="j-tg'+(on?' on':'')+'" data-t="'+t+'" aria-pressed="'+on+'">'+t+'</button>'}).join('')}
-function resetAtt(){for(const k of ['shot','rec']){if(urls[k]){URL.revokeObjectURL(urls[k]);urls[k]=null}$(k==='shot'?'jShotBox':'jRecBox').textContent=cur[k]?cur[k]+' (attach again to preview)':PH[k]}}
+/*SH-START*/
+/* Several screenshots per journal. Stored as tiny JPEGs in one synced key, journall_shots_v1, with a small total budget
+   and a check against the cloud document size limit, because every synced key lives in one Firestore document. */
+const SHK='journall_shots_v1',SH_PER=4,SH_IMG=28000,SH_TOTAL=300000,SH_DOC=800000;
+/*SH-PURE-START*/
+const shId=id=>{id=String(id==null?'':id);const c=id.charAt(0);return(c==='L'||c==='j')?id.slice(1):id};
+const shClean=raw=>{const out={};if(!raw||typeof raw!=='object'||Array.isArray(raw))return out;Object.keys(raw).forEach(k=>{const v=raw[k];if(!Array.isArray(v))return;out[k]=v.filter(x=>typeof x==='string'&&/^data:image\/jpeg;base64,/.test(x)).slice(0,4)});return out};
+const shChars=list=>(Array.isArray(list)?list:[]).reduce((n,x)=>n+x.length,0);
+const shTotal=map=>Object.keys(map).reduce((n,k)=>n+shChars(map[k]),0);
+const shCheck=o=>{if(o.count>o.per)return{ok:false,why:'A trade can hold up to '+o.per+' screenshots.'};if(o.img>o.maxImg)return{ok:false,why:'That screenshot is still too large after shrinking.'};if(o.total>o.maxTotal)return{ok:false,why:'Screenshot budget is full ('+Math.round(o.totalBefore/1000)+' of '+Math.round(o.maxTotal/1000)+' KB used). Remove one first.'};if(o.doc>o.maxDoc)return{ok:false,why:'Your synced data is close to the cloud size limit, so no more screenshots can be added.'};return{ok:true,why:''}};
+/*SH-PURE-END*/
+const shRead=()=>{try{return shClean(JSON.parse(localStorage.getItem(SHK)))}catch(_){return{}}};
+const shWrite=m=>{try{localStorage.setItem(SHK,JSON.stringify(m));return true}catch(_){return false}};
+const shFor=id=>(shRead()[shId(id)]||[]).slice();
+function shSave(id){const m=shRead(),k=shId(id),l=(cur.shots||[]).slice();if(!l.length&&!(k in m))return true;m[k]=l;return shWrite(m)}
+function shClear(id){const m=shRead(),k=shId(id);if(m[k]&&m[k].length){m[k]=[];shWrite(m)}}
+function shSynced(){let n=0;try{for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(!k||k==='krishna_journal_form_draft'||k==='krishna_psychology_form_draft')continue;if(k==='theme'||k==='selectedDate'||['viz','viztrade','krishna','journall'].some(p=>k.indexOf(p)===0))n+=k.length+(localStorage.getItem(k)||'').length}}catch(_){}return n}
+function shShrink(file){return new Promise((res,rej)=>{const url=URL.createObjectURL(file),im=new Image();
+  im.onload=()=>{URL.revokeObjectURL(url);try{
+    for(const side of [560,480,400,320,260]){const sc=Math.min(1,side/Math.max(im.naturalWidth,im.naturalHeight)),w=Math.max(1,Math.round(im.naturalWidth*sc)),h=Math.max(1,Math.round(im.naturalHeight*sc)),cv=document.createElement('canvas');cv.width=w;cv.height=h;const g=cv.getContext('2d');g.fillStyle='#fff';g.fillRect(0,0,w,h);g.drawImage(im,0,0,w,h);
+      for(const q of [.5,.4,.3]){const d=cv.toDataURL('image/jpeg',q);if(d.length<=SH_IMG){res(d);return}}}
+    res(null)}catch(e){rej(e)}};
+  im.onerror=()=>{URL.revokeObjectURL(url);rej(new Error('bad image'))};im.src=url})}
+function shPaint(){const box=$('jShotBox');if(!box)return;const m=shRead(),own=m[shId(cur.id)]||[],pend=cur.shots||[],used=shTotal(m)-shChars(own)+shChars(pend);let h='';
+  if(pend.length)h+='<div class="j-shots">'+pend.map((d,i)=>'<figure class="j-shot"><img alt="Screenshot '+(i+1)+'" src="'+d+'" data-shbig="'+i+'"><button type="button" class="j-shx" data-shx="'+i+'" aria-label="Remove screenshot '+(i+1)+'">&times;</button></figure>').join('')+'</div>';
+  h+='<span class="j-shm">'+(pend.length?pend.length+' of '+SH_PER+' screenshots. ':'No screenshots attached. ')+'Budget '+Math.round(used/1000)+' of '+Math.round(SH_TOTAL/1000)+' KB.</span>';box.innerHTML=h}
+$('jShotF').addEventListener('change',async e=>{const files=Array.from(e.target.files||[]);e.target.value='';if(!files.length)return;cur.shots=cur.shots||[];let note='';
+  for(const f of files){if(!/^image\//.test(f.type)){note='Only image files can be attached.';continue}
+    if(cur.shots.length>=SH_PER){note='A trade can hold up to '+SH_PER+' screenshots.';break}
+    let d=null;try{d=await shShrink(f)}catch(_){note='Could not read '+f.name+'.';continue}
+    if(!d){note=f.name+' is still too large after shrinking.';continue}
+    const m=shRead(),own=m[shId(cur.id)]||[],before=shTotal(m)-shChars(own)+shChars(cur.shots);
+    const r=shCheck({count:cur.shots.length+1,per:SH_PER,img:d.length,maxImg:SH_IMG,total:before+d.length,totalBefore:before,maxTotal:SH_TOTAL,doc:shSynced()-shChars(own)+shChars(cur.shots)+d.length,maxDoc:SH_DOC});
+    if(!r.ok){note=r.why;break}
+    cur.shots.push(d)}
+  shPaint();msg(note)});
+$('jShotBox').addEventListener('click',e=>{const x=e.target.closest('[data-shx]');if(x){cur.shots.splice(+x.dataset.shx,1);shPaint();msg('');return}const im=e.target.closest('[data-shbig]');if(im)im.closest('.j-shot').classList.toggle('big')});
+/*SH-END*/
+function resetAtt(){if(urls.rec){URL.revokeObjectURL(urls.rec);urls.rec=null}$('jRecBox').textContent=cur.rec?cur.rec+' (attach again to preview)':PH.rec;shPaint()}
 function fields(e){e=e||{};$('jMis').value=e.mistake||'';$('jBef').value=e.before||'';$('jAft').value=e.after||'';$('jImp').value=e.improve||'';$('jDate').value=e.date||(window.getTradingDayIST?window.getTradingDayIST():new Date().toISOString().slice(0,10));$('jSetup').value=e.setup||''}
 /*CF-START*/
 const CFK='journall_confluence_list_v1';let CF=[];try{const v=JSON.parse(localStorage.getItem(CFK));if(Array.isArray(v))CF=v.filter(x=>typeof x==='string'&&x.trim()).map(x=>x.trim())}catch(e){}
@@ -6083,7 +6129,7 @@ $('jConfWrap').addEventListener('click',e=>{const x=e.target.closest('[data-cfx]
 $('jConfNew').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();addConf()}});
 /*CF-END*/
 function paint(){fillSel();card();yn();tags();conf();resetAtt();if(typeof syncCounts==='function')syncCounts();$('jChk').innerHTML=''}
-function load(e){blank();cur.id=e.id;cur.idx=T.findIndex(t=>key(t)===e.key);cur.free=cur.idx<0;cur.q=(e.q||[null,null,null]).slice();cur.tags=(e.tags||[]).slice();cur.conf=(e.conf||[]).slice();cur.emotion=e.emotion||'';cur.shot=e.shot||'';cur.rec=e.rec||'';fields(e);paint();msg('Editing saved journal.')}
+function load(e){blank();cur.id=e.id;cur.idx=T.findIndex(t=>key(t)===e.key);cur.free=cur.idx<0;cur.q=(e.q||[null,null,null]).slice();cur.tags=(e.tags||[]).slice();cur.conf=(e.conf||[]).slice();cur.emotion=e.emotion||'';cur.shot=e.shot||'';cur.shots=shFor(e.id);cur.rec=e.rec||'';fields(e);paint();msg('Editing saved journal.')}
 function pick(i){const e0=i>=0?J.find(e=>e.key===key(T[i])):null;if(e0){load(e0);return}
   blank();cur.idx=i>=0?i:-1;cur.free=i===-2;fields(null);
   if(i>=0){const t=T[i];$('jDate').value=t.d;$('jSetup').value='';cur.tags=(t.tags||[]).slice().concat(t.sl==null&&!(t.tags||[]).includes('No SL')?['No SL']:[])}
@@ -6102,7 +6148,7 @@ function read(){const t=T[cur.idx],o=J.find(x=>x.id===cur.id)||{};
   return{id:cur.id||'j'+Date.now(),key:t?key(t):(o.key||''),date:$('jDate').value,time:t?t.t:(o.time||''),sym:t?t.sym:(o.sym||''),side:t?t.side:(o.side||''),pnl:t?t.pnl:(o.pnl==null?null:o.pnl),setup:$('jSetup').value,q:cur.q.slice(),tags:cur.tags.slice(),conf:cur.conf.slice(),emotion:cur.emotion||'',mistake:$('jMis').value.trim(),before:$('jBef').value.trim(),after:$('jAft').value.trim(),improve:$('jImp').value.trim(),shot:cur.shot,rec:cur.rec}}
 function saveJ(){if(cur.idx<0&&!cur.free){msg('Pick a trade or choose Free note first.');return}
   const e=read();if(!e.improve&&!e.mistake&&!e.before){msg('Write at least one note before saving.');return}
-  const i=J.findIndex(x=>x.id===e.id);if(i>=0)J[i]=e;else J.unshift(e);cur.id=e.id;save();sync();drDelFor(e);msg('Journal saved.')}
+  const i=J.findIndex(x=>x.id===e.id);if(i>=0)J[i]=e;else J.unshift(e);cur.id=e.id;save();sync();drDelFor(e);msg(shSave(e.id)?'Journal saved.':'Journal saved, but the screenshots could not be stored. Browser storage may be full.')}
 function step(d){const l=list(),p=l.indexOf(cur.idx),n=l[p<0?(d>0?0:l.length-1):p+d];if(n==null){msg('No more trades in this view.');return}pick(n)}
 function check(){const e=read(),t=T[cur.idx],r=[],bad=s=>r.push(['var(--red)',s]),warn=s=>r.push(['var(--amber)',s]);
   if(cur.idx<0&&!cur.free)bad('No trade selected. Pick the trade this journal belongs to.');
@@ -6173,7 +6219,7 @@ $('view-journal').addEventListener('click',e=>{const b=e.target.closest('button'
       preview:{title:ttl,sub:[x.date,x.sym,x.side].filter(Boolean).join(' · '),value:x.pnl==null?'':money(x.pnl),color:k==='note'?'var(--accent-2)':col(k)},
       confirmText:'Delete',cancelText:'Keep it',danger:true,opener:b}).then(ok=>{
       if(!ok)return;const i=J.findIndex(y=>y.id===x.id);if(i<0)return;
-      J.splice(i,1);save();sync();
+      J.splice(i,1);save();sync();setTimeout(()=>{if(!J.some(y=>y.id===x.id))shClear(x.id)},6000);
       window.jlToast({icon:'trash',text:'Journal deleted',sub:[ttl,x.sym].filter(Boolean).join(' · '),actionText:'Undo',duration:5000,
         onAction:()=>{if(J.some(y=>y.id===x.id))return;J.splice(Math.min(i,J.length),0,x);save();sync();window.jlToast({icon:'check',text:'Journal restored',duration:2200,progress:false})}})});
     return}
@@ -6183,7 +6229,7 @@ $('view-journal').addEventListener('click',e=>{const b=e.target.closest('button'
    jExp:()=>{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(J,null,2)],{type:'application/json'}));a.download='journall-journals.json';a.click();URL.revokeObjectURL(a.href)}})[b.id]?.()});
 $('jSrch').addEventListener('input',e=>{qs=e.target.value;renderList()});
 $('jMisTabs').addEventListener('click',e=>{const b=e.target.closest('button');if(!b||!b.dataset.p)return;misP=b.dataset.p;misCard()});
-[['jShotF','shot','jShotBox'],['jRecF','rec','jRecBox']].forEach(([id,k,box])=>$(id).addEventListener('change',e=>{const f=e.target.files[0];if(!f)return;
+[['jRecF','rec','jRecBox']].forEach(([id,k,box])=>$(id).addEventListener('change',e=>{const f=e.target.files[0];if(!f)return;
   if(urls[k])URL.revokeObjectURL(urls[k]);const u=urls[k]=URL.createObjectURL(f);cur[k]=f.name;
   $(box).innerHTML=(k==='shot'?'<img alt="Attached screenshot" src="'+u+'">':'<video controls src="'+u+'"></video>')+'<span>'+esc(f.name)+'</span>'}));
 $('jImpFile').addEventListener('change',e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();
@@ -6230,7 +6276,7 @@ function drRender(){const sec=$('jDraftSec');if(!sec)return;const d=drRead();
   sec.style.display=''}
 function drResume(){const d=drRead();if(!d)return;const e=d.e,o=d.id?J.find(x=>x.id===d.id):null;
   blank();const idx=d.free?-1:T.findIndex(t=>key(t)===e.key);
-  cur.idx=idx;cur.free=!!d.free||idx<0;cur.id=o?o.id:null;
+  cur.idx=idx;cur.free=!!d.free||idx<0;cur.id=o?o.id:null;cur.shots=cur.id?shFor(cur.id):[];
   cur.q=(e.q||[null,null,null]).slice();cur.tags=(e.tags||[]).slice();cur.conf=(e.conf||[]).slice();cur.emotion=e.emotion||'';cur.shot=e.shot||'';cur.rec=e.rec||'';
   fields(e);paint();
   msg(!d.free&&idx<0?'That trade is no longer in your list, so the draft opened as a free note.':'Draft restored.');
