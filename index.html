@@ -6445,8 +6445,8 @@ function renderGrid(){
   const ins=[];
   const overDays=active.filter(k=>TL()>0&&dm[k].t>TL());
   const brkDays=active.filter(k=>LL()>0&&dm[k].pnl<=-LL());
-  if(overDays.length)ins.push(['var(--amber)','<b>Overtrading:</b> '+overDays.length+' of '+active.length+' active days went over the '+TL()+'-trade limit.<span>'+MONTHS[vm]+' '+(worst||overDays[0])+' alone had '+(dm[worst]?dm[worst].t:dm[overDays[0]].t)+' trades and the month\'s '+(dm[worst]&&dm[worst].pnl<0?'worst result':'heaviest session')+'.</span>']);
-  if(brkDays.length)ins.push(['var(--red)','<b>Loss limit:</b> '+brkDays.length+' day'+(brkDays.length>1?'s':'')+' breached the $'+LL()+' daily loss limit ('+brkDays.map(d=>MONTHS[vm].slice(0,3)+' '+d).join(', ')+'), costing '+money(brkDays.reduce((s,d)=>s+dm[d].pnl,0))+' between them.<span>That alone is more than the month\'s net result.</span>']);
+  if(overDays.length)ins.push(['var(--amber)','<b>Overtrading:</b> '+overDays.length+' of '+active.length+' active days went over the '+TL()+'-trade limit.<span>'+MONTHS[vm]+' '+overDays.reduce((a,b)=>dm[b].t>dm[a].t?b:a)+' was the heaviest, with '+dm[overDays.reduce((a,b)=>dm[b].t>dm[a].t?b:a)].t+' trades.</span>']);
+  if(brkDays.length)ins.push(['var(--red)','<b>Loss limit:</b> '+brkDays.length+' day'+(brkDays.length>1?'s':'')+' breached the $'+LL()+' daily loss limit ('+brkDays.map(d=>MONTHS[vm].slice(0,3)+' '+d).join(', ')+'), costing '+money(brkDays.reduce((s,d)=>s+dm[d].pnl,0))+' between them.<span>The month\'s net result is '+money(net)+'.</span>']);
   if(best)ins.push(['var(--green)','<b>Best day:</b> '+MONTHS[vm]+' '+best+' ('+money(dm[best].pnl)+') on '+jlN(dm[best].t,'trade')+', '+jlN(dm[best].l,'loss','losses')+'.<span>Whatever changed that day is worth repeating.</span>']);
   let streak=0,maxStreak=0,streakEnd=null;
   active.slice().sort((a,b)=>a-b).forEach(d=>{ if(dm[d].pnl<0){streak++; if(streak>maxStreak){maxStreak=streak;streakEnd=d} } else streak=0 });
