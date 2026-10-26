@@ -3515,8 +3515,16 @@ window.__mountOpenPos=function(){const o=(window.__openTrades||[]).concat((windo
     </div>
 
     <div class="pr-card" id="ggPropCard">
-      <div class="pr-h"><h2>Prop firm progress</h2><span class="pr-sub">Uses all trades in your data, with no phase or account split.</span></div>
+      <div class="pr-h"><h2>Prop firm progress</h2><span class="pr-sub" id="prSub">Uses all trades in your data. Add a challenge below to scope it to a phase.</span></div>
+      <div class="pr-scope" id="prScope" role="group" aria-label="Challenge scope"></div>
       <div id="ggPropBody"></div>
+      <div class="pr-pay">
+        <span class="pr-l">Challenges</span>
+        <div class="pr-add"><input type="text" id="chName" maxlength="40" placeholder="Name, for example Phase 1" aria-label="Challenge name"><input type="date" id="chStart" aria-label="Challenge start date"><input type="date" id="chEnd" aria-label="Challenge end date, optional"><button type="button" class="gg-btn-outline" id="chAdd">Add challenge</button></div>
+        <small class="gg-field-note">Trades dated from the start through the end date count in that challenge. Leave the end date empty while it is still running.</small>
+        <div class="pr-msg" id="chMsg"></div>
+        <div id="chList"></div>
+      </div>
       <div class="pr-pay">
         <span class="pr-l">Payout log</span>
         <div class="pr-add"><input type="date" id="prDate" aria-label="Payout date"><input type="number" id="prAmt" min="0" step="any" placeholder="Amount ($)" aria-label="Payout amount"><button type="button" class="gg-btn-outline" id="prAdd">Add payout</button></div>
@@ -11666,6 +11674,11 @@ initFirebaseAuth().catch(err=>{
 .pr-pr{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 0;border-top:1px solid var(--border);font-size:var(--fs-3);color:var(--sub)}
 .pr-pr b{color:var(--text)}
 .pr-none{color:var(--faint);font-size:var(--fs-3);padding:6px 0}
+.pr-scope{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 10px}
+.pr-chip{background:var(--panel-2);border:1px solid var(--border);border-radius:999px;color:var(--sub);font-family:inherit;font-size:var(--fs-2);padding:6px 12px;cursor:pointer}
+.pr-chip.on{border-color:var(--accent-2);color:var(--text);font-weight:700}
+.pr-chip:focus-visible{outline:2px solid var(--accent-2);outline-offset:2px}
+@media (max-width:640px),(pointer:coarse){.pr-chip{min-height:44px}}
 @media (max-width:640px),(pointer:coarse){.pr-add input,.pr-add .gg-btn-outline,.pr-pr .gg-btn-outline{min-height:44px}}
 .pr-add .gg-btn-outline:focus-visible,.pr-pr .gg-btn-outline:focus-visible,.pr-add input:focus-visible{outline:2px solid var(--accent-2);outline-offset:2px}
 </style>
@@ -11703,17 +11716,40 @@ function summaryHtml(st,o,paid){var h='';
   else{var sh=splitShare(st.net,o.split);h+=row('Your share ('+o.split+'%)',money(sh),sh>0?'ok':'mute','Estimated from net profit of '+money(st.net)+'.'+(sh>0?' Paid out so far: '+money(paid)+'. Not yet paid: '+money(Math.max(0,Math.round((sh-paid)*100)/100))+'.':''))}
   h+=row('Paid out so far',money(paid),paid>0?'':'mute','');return h}
 function listHtml(list){return list.length?list.map(function(p){return '<div class="pr-pr"><span><b>'+esc(money(p.amount))+'</b> on '+esc(dayLabel(p.date))+'</span><button type="button" class="gg-btn-outline" data-prdel="'+esc(p.id)+'">Delete</button></div>'}).join(''):'<div class="pr-none">No payouts logged yet.</div>'}
+function cleanChallenges(raw){var out=[],seen={},re=/^\d{4}-\d{2}-\d{2}$/;if(!Array.isArray(raw))return out;
+  raw.forEach(function(x){if(!x||typeof x!=='object')return;var n=typeof x.name==='string'?x.name.trim().slice(0,40):'',s=typeof x.start==='string'?x.start:'',e=typeof x.end==='string'?x.end:'';
+    if(!n||!re.test(s)||(e&&(!re.test(e)||e<s)))return;var id=(typeof x.id==='string'&&x.id)?x.id:'c'+s+'-'+n;if(seen[id])return;seen[id]=1;out.push({id:id,name:n,start:s,end:e})});
+  return out.sort(function(a,b){return a.start<b.start?-1:a.start>b.start?1:0})}
+function scopeTrades(trades,ch){var l=Array.isArray(trades)?trades:[];if(!ch)return l;return l.filter(function(t){return t&&t.d&&t.d>=ch.start&&(!ch.end||t.d<=ch.end)})}
+function chipsHtml(list,sel){var h='<button type="button" class="pr-chip'+(sel?'':' on')+'" data-prsc="">All trades</button>';list.forEach(function(c){h+='<button type="button" class="pr-chip'+(sel===c.id?' on':'')+'" data-prsc="'+esc(c.id)+'">'+esc(c.name)+'</button>'});return h}
+function chListHtml(list){return list.length?list.map(function(c){return '<div class="pr-pr"><span><b>'+esc(c.name)+'</b> '+esc(dayLabel(c.start))+' to '+(c.end?esc(dayLabel(c.end)):'now')+'</span><button type="button" class="gg-btn-outline" data-chdel="'+esc(c.id)+'">Delete</button></div>'}).join(''):'<div class="pr-none">No challenges logged yet.</div>'}
+function subText(ch){return ch?('Uses trades from '+ch.name+', '+dayLabel(ch.start)+' to '+(ch.end?dayLabel(ch.end):'now')+'. Rules come from Account Settings.'):'Uses all trades in your data. Add a challenge below to scope it to a phase.'}
 /*PR-PURE-END*/
 function $(id){return document.getElementById(id)}
 function rd(){try{return JSON.parse(localStorage.getItem(PK))}catch(_){return null}}
 function wr(v){try{localStorage.setItem(PK,JSON.stringify(v));return true}catch(_){msg('Could not save. Browser storage may be full.');return false}}
 function msg(t){var m=$('prMsg');if(m)m.textContent=t||''}
 function opts(){return{consPct:Number(window.jlConsistencyPct)||0,minDays:Number(window.jlMinTradingDays)||0,split:Number(window.jlProfitSplit)||0}}
-function render(){var b=$('ggPropBody');if(!b)return;var list=cleanPayouts(rd());
-  b.innerHTML=summaryHtml(propStats(window.__trades||[],opts()),opts(),payoutTotal(list));var l=$('prList');if(l)l.innerHTML=listHtml(list)}
+var CK='journall_challenges_v1',SK='journall_prop_scope_v1';
+function rdC(){try{return JSON.parse(localStorage.getItem(CK))}catch(_){return null}}
+function wrC(v){try{localStorage.setItem(CK,JSON.stringify(v));return true}catch(_){cmsg('Could not save. Browser storage may be full.');return false}}
+function cmsg(t){var m=$('chMsg');if(m)m.textContent=t||''}
+function selId(){try{return localStorage.getItem(SK)||''}catch(_){return ''}}
+function render(){var b=$('ggPropBody');if(!b)return;var list=cleanPayouts(rd()),chs=cleanChallenges(rdC()),sid=selId(),ch=chs.filter(function(c){return c.id===sid})[0]||null;
+  b.innerHTML=summaryHtml(propStats(scopeTrades(window.__trades||[],ch),opts()),opts(),payoutTotal(list));var l=$('prList');if(l)l.innerHTML=listHtml(list);
+  var sb=$('prSub');if(sb)sb.textContent=subText(ch);var sc=$('prScope');if(sc)sc.innerHTML=chipsHtml(chs,ch?ch.id:'');var cl=$('chList');if(cl)cl.innerHTML=chListHtml(chs)}
 window.__renderProp=render;
 var card=$('ggPropCard'),armT=0;
 if(card)card.addEventListener('click',function(e){var t=e.target;if(!t.closest)return;
+  var scb=t.closest('[data-prsc]');if(scb){try{localStorage.setItem(SK,scb.getAttribute('data-prsc')||'')}catch(_){}render();return}
+  if(t.closest('#chAdd')){var cn=($('chName').value||'').trim(),cs=$('chStart').value,ce=$('chEnd').value,cre=/^\d{4}-\d{2}-\d{2}$/;
+    if(!cn||!cre.test(cs)){cmsg('Enter a name and a start date.');return}
+    if(ce&&(!cre.test(ce)||ce<cs)){cmsg('The end date cannot be before the start date.');return}
+    var cl=cleanChallenges(rdC());cl.push({id:'c'+Date.now().toString(36)+Math.random().toString(36).slice(2,6),name:cn.slice(0,40),start:cs,end:ce||''});
+    if(wrC(cleanChallenges(cl))){$('chName').value='';$('chStart').value='';$('chEnd').value='';cmsg('');render()}return}
+  var cdel=t.closest('[data-chdel]');if(cdel){
+    if(cdel.getAttribute('data-arm')!=='1'){cdel.setAttribute('data-arm','1');cdel.textContent='Tap again to delete';clearTimeout(armT);armT=setTimeout(render,3000);return}
+    clearTimeout(armT);var cid=cdel.getAttribute('data-chdel');if(wrC(cleanChallenges(rdC()).filter(function(c){return c.id!==cid}))){if(selId()===cid){try{localStorage.setItem(SK,'')}catch(_){}}render()}return}
   if(t.closest('#prAdd')){var d=$('prDate').value,a=Number($('prAmt').value);
     if(!/^\d{4}-\d{2}-\d{2}$/.test(d)||!(a>0)){msg('Pick a date and enter an amount above zero.');return}
     var list=cleanPayouts(rd());list.push({id:'p'+Date.now().toString(36)+Math.random().toString(36).slice(2,6),date:d,amount:Math.round(a*100)/100});
@@ -11721,7 +11757,7 @@ if(card)card.addEventListener('click',function(e){var t=e.target;if(!t.closest)r
   var del=t.closest('[data-prdel]');if(del){
     if(del.getAttribute('data-arm')!=='1'){del.setAttribute('data-arm','1');del.textContent='Tap again to delete';clearTimeout(armT);armT=setTimeout(render,3000);return}
     clearTimeout(armT);var id=del.getAttribute('data-prdel');wr(cleanPayouts(rd()).filter(function(p){return p.id!==id}));render()}});
-window.addEventListener('storage',function(ev){if(!ev.key||ev.key===PK)render()});
+window.addEventListener('storage',function(ev){if(!ev.key||ev.key===PK||ev.key===CK||ev.key===SK)render()});
 setTimeout(render,1500);setInterval(render,30000);render();
 })();</script>
 <style id="jl-ui-shared-css">
