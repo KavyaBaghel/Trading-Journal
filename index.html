@@ -3528,8 +3528,8 @@ window.__mountOpenPos=function(){const o=(window.__openTrades||[]).concat((windo
       <div id="ggPropBody"></div>
       <div class="pr-pay">
         <span class="pr-l">Challenges</span>
-        <div class="pr-add"><input type="text" id="chName" maxlength="40" placeholder="Name, for example Phase 1" aria-label="Challenge name"><input type="date" id="chStart" aria-label="Challenge start date"><input type="date" id="chEnd" aria-label="Challenge end date, optional"><button type="button" class="gg-btn-outline" id="chAdd">Add challenge</button></div>
-        <small class="gg-field-note">Trades dated from the start through the end date count in that challenge. Leave the end date empty while it is still running.</small>
+        <div class="pr-add"><input type="text" id="chName" maxlength="40" placeholder="Name, for example Phase 1" aria-label="Challenge name"><input type="date" id="chStart" aria-label="Challenge start date"><input type="date" id="chEnd" aria-label="Challenge end date, optional"><input type="number" id="chDl" min="0" max="100" step="any" placeholder="Daily loss %" aria-label="Daily loss percent, optional"><input type="number" id="chMd" min="0" max="100" step="any" placeholder="Max loss %" aria-label="Max loss percent, optional"><input type="number" id="chPt" min="0" max="100" step="any" placeholder="Target %" aria-label="Profit target percent, optional"><button type="button" class="gg-btn-outline" id="chAdd">Add challenge</button></div>
+        <small class="gg-field-note">Trades dated from the start through the end date count in that challenge. Leave the end date empty while it is still running. The three percent boxes are optional: while today falls inside a challenge, the app uses its daily loss, max loss and target instead of Account Settings, converted from your initial balance. A box left empty keeps the Account Settings value.</small>
         <div class="pr-msg" id="chMsg"></div>
         <div id="chList"></div>
       </div>
@@ -4128,6 +4128,33 @@ document.addEventListener('input',e=>{if(cur&&RUN[cur.dataset.tool]&&cur.contain
 })();
 </script>
 
+<script id="jl-ch-limits">(function(){
+/* Per-challenge limits: the challenge whose dates include today can carry its own daily loss, max loss and target (percent of the
+   Account Settings initial balance). A box left empty keeps the Account Settings value. Nothing here is assumed or defaulted. */
+/*CL-PURE-START*/
+function dateOk(s){return typeof s==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(s)}
+function pctOrNull(v){var x=Number(v);return(v!==''&&v!=null&&isFinite(x)&&x>0&&x<=100)?Math.round(x*100)/100:null}
+function activeCh(list,today){if(!Array.isArray(list)||!dateOk(today))return null;var best=null;
+  list.forEach(function(c){if(!c||typeof c!=='object'||typeof c.name!=='string'||!c.name.trim()||!dateOk(c.start)||(c.end&&(!dateOk(c.end)||c.end<c.start)))return;
+    if(c.start>today||(c.end&&c.end<today))return;if(!best||c.start>best.start)best=c});return best}
+function chLims(c){if(!c)return null;var o={dl:pctOrNull(c.dl),md:pctOrNull(c.md),pt:pctOrNull(c.pt)};return(o.dl||o.md||o.pt)?o:null}
+function usd(bal,pct){return Math.round(bal*pct)/100}
+function effective(acc,bal,lims){var bd=Number(acc&&acc.maxDailyLossUSD)||0,bp=bal*(Number(acc&&acc.profitTargetPct)||0)/100;
+  return{dlUSD:(lims&&lims.dl)?usd(bal,lims.dl):bd,ptUSD:(lims&&lims.pt)?usd(bal,lims.pt):bp,mddPct:(lims&&lims.md)||0}}
+/*CL-PURE-END*/
+function tday(){var d=new Date(Date.now()+5.5*3600000);if(d.getUTCHours()<6)d.setUTCDate(d.getUTCDate()-1);var q=function(n){return String(n).padStart(2,'0')};return d.getUTCFullYear()+'-'+q(d.getUTCMonth()+1)+'-'+q(d.getUTCDate())}
+function rd(k){try{return JSON.parse(localStorage.getItem(k))}catch(_){return null}}
+var lastSig='',had=false;
+window.jlApplyChLimits=function(o){
+  var today=(typeof window.getTradingDayIST==='function')?window.getTradingDayIST():tday(),acc=rd('jlAccountSettings');if(!acc||typeof acc!=='object')acc={};
+  var bal=Number(acc.balance)||Number(window.jlStartBalance)||0,ch=bal>0?activeCh(rd('journall_challenges_v1'),today):null,lims=chLims(ch),e=effective(acc,bal,lims);
+  if(lims||had){window.jlDailyLossLimit=e.dlUSD;window.jlProfitTargetUSD=e.ptUSD}
+  had=!!lims;window.jlChMddPct=e.mddPct;window.jlChInfo=lims?{name:ch.name.trim(),dl:lims.dl,md:lims.md,pt:lims.pt}:null;
+  var sig=JSON.stringify([e.dlUSD,e.ptUSD,e.mddPct,lims?1:0]),changed=sig!==lastSig;lastSig=sig;
+  if(changed&&!(o&&o.noRefresh)&&typeof window.jlRefreshLimitViews==='function')window.jlRefreshLimitViews();
+  return window.jlChInfo};
+})();</script>
+
 <script>
 (function(){
   document.getElementById('dateStrG').textContent = new Date().toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
@@ -4258,6 +4285,7 @@ document.addEventListener('input',e=>{if(cur&&RUN[cur.dataset.tool]&&cur.contain
   const ggNewsEl = document.getElementById('ggNews'); if(ggNewsEl) ggNewsEl.value = ggAccount.tradeDuringNews === 'no' ? 'no' : ggAccount.tradeDuringNews === 'yes' ? 'yes' : '';
   const ggBroEl = document.getElementById('ggBro'); if(ggBroEl) ggBroEl.value = (ggAccount.brokerUtcOffset === '' || ggAccount.brokerUtcOffset == null) ? '' : String(ggAccount.brokerUtcOffset);
   window.jlLotSize = Number(ggAccount.lotSize) || 0; window.jlMaxConsecLosses = Number(ggAccount.maxConsecLosses) || 0; window.jlMaxRevengeTrades = Number(ggAccount.maxRevengeTrades) || 0; window.jlMinRr = Number(ggAccount.minRr) || 0; window.jlConsistencyPct = Number(ggAccount.consistencyPct) || 0; window.jlMinTradingDays = Number(ggAccount.minTradingDays) || 0; window.jlProfitSplit = Number(ggAccount.profitSplit) || 0; window.jlTradeDuringNews = ggAccount.tradeDuringNews === 'no' ? 'no' : ggAccount.tradeDuringNews === 'yes' ? 'yes' : ''; window.jlBrokerUtcOffset = (ggAccount.brokerUtcOffset === '' || ggAccount.brokerUtcOffset == null || !isFinite(Number(ggAccount.brokerUtcOffset))) ? null : Number(ggAccount.brokerUtcOffset); if(typeof window.jlRenderWeak === 'function') window.jlRenderWeak();
+  if(window.jlApplyChLimits) window.jlApplyChLimits({noRefresh:true});
   const ggMddEl = document.getElementById('ggMdd'); if(ggMddEl) ggMddEl.value = ggState.mdd;
   const ggMddUnitEl = document.getElementById('ggMddUnit'); if(ggMddUnitEl) ggMddUnitEl.value = ggAccount.maxDrawdownUnit === '$' ? '$' : '%';
   if(ggMddUnitEl) ggMddUnitEl.addEventListener('change', ()=>{ if(window.__renderDDRing) window.__renderDDRing(); });
@@ -4281,6 +4309,17 @@ document.addEventListener('input',e=>{if(cur&&RUN[cur.dataset.tool]&&cur.contain
     btn.classList.toggle('on', open);
     document.getElementById('ggEditLbl').textContent = open ? 'Close' : 'Edit setup';
   };
+  // Repaints everything that reads the limits, used when the running challenge changes (new challenge, end date passed).
+  window.jlRefreshLimitViews = function(){
+    if(typeof window.jlRecomputeRevenge === 'function') window.jlRecomputeRevenge({rerender:true});
+    if(typeof window.__renderToday === 'function') window.__renderToday();
+    if(typeof window.jlPaintRules === 'function') window.jlPaintRules();
+    if(typeof window.jlCircuitRefresh === 'function') window.jlCircuitRefresh();
+    ggApplyAccountDisplay(ggAccount);
+    ggRenderGoals();
+    if(window.__renderDDRing) window.__renderDDRing();
+  };
+
   window.ggSaveSetup = function(){
     ggAccount = {
       balance: ggState.bal,
@@ -4319,6 +4358,7 @@ document.addEventListener('input',e=>{if(cur&&RUN[cur.dataset.tool]&&cur.contain
     window.jlDailyLossLimit = Number(ggAccount.maxDailyLossUSD) || 0; window.jlWeeklyLossLimit = Number(ggAccount.maxWeeklyLossUSD) || 0;
     window.jlMaxTradesPerDay = Number(ggAccount.maxTradesPerDay) || 0; window.jlStartBalance = Number(ggAccount.balance) || 0; window.jlDayProfitTargetUSD = (ggAccount.dayProfitTargetUnit === '$') ? (Number(ggAccount.dayProfitTarget)||0) : Number(ggAccount.balance) * (Number(ggAccount.dayProfitTarget)||0) / 100; window.jlWeeklyProfitTargetUSD = (ggAccount.weeklyProfitTargetUnit === '$') ? (Number(ggAccount.weeklyProfitTarget)||0) : Number(ggAccount.balance) * (Number(ggAccount.weeklyProfitTarget)||0) / 100;
     window.jlLotSize = Number(ggAccount.lotSize) || 0; window.jlMaxConsecLosses = Number(ggAccount.maxConsecLosses) || 0; window.jlMaxRevengeTrades = Number(ggAccount.maxRevengeTrades) || 0; window.jlMinRr = Number(ggAccount.minRr) || 0; window.jlConsistencyPct = Number(ggAccount.consistencyPct) || 0; window.jlMinTradingDays = Number(ggAccount.minTradingDays) || 0; window.jlProfitSplit = Number(ggAccount.profitSplit) || 0; window.jlTradeDuringNews = ggAccount.tradeDuringNews === 'no' ? 'no' : ggAccount.tradeDuringNews === 'yes' ? 'yes' : ''; window.jlBrokerUtcOffset = (ggAccount.brokerUtcOffset === '' || ggAccount.brokerUtcOffset == null || !isFinite(Number(ggAccount.brokerUtcOffset))) ? null : Number(ggAccount.brokerUtcOffset); if(typeof window.jlRenderWeak === 'function') window.jlRenderWeak();
+    if(window.jlApplyChLimits) window.jlApplyChLimits({noRefresh:true});
     if(typeof window.jlRecomputeRevenge === 'function') window.jlRecomputeRevenge({rerender:true});
     if(typeof window.__renderToday === 'function') window.__renderToday();
     if(typeof window.jlPaintRules === 'function') window.jlPaintRules();
@@ -5344,7 +5384,7 @@ const A=window.__A,N=A.n,W=A.W,L=A.L,BE=A.BE,GP=A.gp,GL=A.gl,NET=A.net,DD=A.dd,A
   const rd=F('.a-eq .a-read');if(rd)rd.innerHTML='A rising line means the account is growing; a falling line means losses or a discipline leak. Current result: <b style="color:'+col+'">'+money(NET)+'</b>.';
   F('.a-ins').innerHTML=A.ins.map(x=>'<li style="--c:'+x[0]+'"><b>'+x[1]+'</b> '+x[2]+'<span>'+x[3]+'</span></li>').join('');
 })();
-const getDDB=function(){var e=document.getElementById('ggMdd'),v=Number(e&&e.value)||0,u=e&&e.closest('.gg-combo')&&e.closest('.gg-combo').querySelector('select');return u&&u.value==='$'?v:Number(window.jlStartBalance||0)*v/100},TGT=Math.round(window.jlProfitTargetUSD||0),payoff=AW/AL,beWR=AL/(AW+AL)*100,decWR=W+L?W/(W+L)*100:0,expc=N?NET/N:0,rf=DD?NET/DD:0,pf=GL?GP/GL:0,costs=NET-(GP-GL);
+const getDDB=function(){var cm=Number(window.jlChMddPct)||0;if(cm>0)return Number(window.jlStartBalance||0)*cm/100;var e=document.getElementById('ggMdd'),v=Number(e&&e.value)||0,u=e&&e.closest('.gg-combo')&&e.closest('.gg-combo').querySelector('select');return u&&u.value==='$'?v:Number(window.jlStartBalance||0)*v/100},TGT=Math.round(window.jlProfitTargetUSD||0),payoff=AW/AL,beWR=AL/(AW+AL)*100,decWR=W+L?W/(W+L)*100:0,expc=N?NET/N:0,rf=DD?NET/DD:0,pf=GL?GP/GL:0,costs=NET-(GP-GL);
 
 $('aKP').innerHTML=[['Expectancy / trade',money(expc),expc>0?'var(--green)':expc<0?'var(--red)':'var(--text)','Net P&L \u00b7 '+jlN(N,'trade')],['Payoff ratio',payoff.toFixed(2),payoff>=1?'var(--green)':'var(--red)','Avg win ÷ avg loss'],['Break-even win rate',beWR.toFixed(1)+'%','var(--amber)','Needed at this payoff'],['Decisive win rate',decWR.toFixed(1)+'%',decWR>=beWR?'var(--green)':'var(--red)','Wins ÷ (wins + losses)'],['Recovery factor',rf.toFixed(2),rf>0?'var(--green)':rf<0?'var(--red)':'var(--text)','Net ÷ max drawdown'],['Scratched trades',(BE/N*100).toFixed(1)+'%','var(--text)',BE+' of '+N+' break-even'],['Commission + swap',Math.abs(costs)<.005?'$0.00':money(costs),'var(--text)','Gap between gross and net']].map(k=>'<div><span>'+k[0]+'</span><b style="color:'+k[2]+'">'+k[1]+'</b><small>'+k[3]+'</small></div>').join('');
 
@@ -8946,7 +8986,7 @@ setTimeout(paint,1500);paint();
 const rv=(window.__trades||[]).filter(t=>t.rev).length;
 set('psyYr',A.n?jlN(A.n,'trade')+' logged, '+A.wr.toFixed(0)+'% win rate, '+jlN(rv,'revenge trade')+' flagged, '+A.mt+' tagged with a mistake.':'No trades logged in this dataset yet.');
 set('psyMeta',A.n?jlN(A.n,'trade')+' tracked \u00b7 '+A.wr.toFixed(0)+'% win rate \u00b7 '+m(A.net)+' net':'No trades tracked');})();</script>
-<script>(function(){const A=window.__A,$=id=>document.getElementById(id),tg=Math.round(window.jlProfitTargetUSD||0),bal=A.start+A.net,m=v=>'$'+v.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}),getMdd=function(){var e=document.getElementById('ggMdd'),v=Number(e&&e.value)||0,u=e&&e.closest('.gg-combo')&&e.closest('.gg-combo').querySelector('select');return u&&u.value==='$'?v:Number(window.jlStartBalance||0)*v/100},mdd0=getMdd();
+<script>(function(){const A=window.__A,$=id=>document.getElementById(id),tg=Math.round(window.jlProfitTargetUSD||0),bal=A.start+A.net,m=v=>'$'+v.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}),getMdd=function(){var cm=Number(window.jlChMddPct)||0;if(cm>0)return Number(window.jlStartBalance||0)*cm/100;var e=document.getElementById('ggMdd'),v=Number(e&&e.value)||0,u=e&&e.closest('.gg-combo')&&e.closest('.gg-combo').querySelector('select');return u&&u.value==='$'?v:Number(window.jlStartBalance||0)*v/100},mdd0=getMdd();
 /* Balance scale: range = start - drawdown budget .. start + profit target; every marker, label and the red/green split come from those three numbers */
 window.__renderAnScale=function(b){const sc=document.querySelector('.a-scale');if(!sc)return;b=b==null?(window.jlLiveBalance?window.jlLiveBalance(A):bal):b;
   const lo=A.start-getMdd(),hi=A.start+tg,span=(hi-lo)||1,pc=v=>Math.max(0,Math.min(100,(v-lo)/span*100)),n0=v=>'$'+Math.round(v).toLocaleString('en-US'),mks=sc.querySelectorAll('.a-mk'),now=sc.querySelector('.a-now');
@@ -11765,11 +11805,16 @@ function summaryHtml(st,o,paid){var h='';
 function listHtml(list){return list.length?list.map(function(p){return '<div class="pr-pr"><span><b>'+esc(money(p.amount))+'</b> on '+esc(dayLabel(p.date))+'</span><button type="button" class="gg-btn-outline" data-prdel="'+esc(p.id)+'">Delete</button></div>'}).join(''):'<div class="pr-none">No payouts logged yet.</div>'}
 function cleanChallenges(raw){var out=[],seen={},re=/^\d{4}-\d{2}-\d{2}$/;if(!Array.isArray(raw))return out;
   raw.forEach(function(x){if(!x||typeof x!=='object')return;var n=typeof x.name==='string'?x.name.trim().slice(0,40):'',s=typeof x.start==='string'?x.start:'',e=typeof x.end==='string'?x.end:'';
-    if(!n||!re.test(s)||(e&&(!re.test(e)||e<s)))return;var id=(typeof x.id==='string'&&x.id)?x.id:'c'+s+'-'+n;if(seen[id])return;seen[id]=1;out.push({id:id,name:n,start:s,end:e})});
+    if(!n||!re.test(s)||(e&&(!re.test(e)||e<s)))return;var id=(typeof x.id==='string'&&x.id)?x.id:'c'+s+'-'+n;if(seen[id])return;seen[id]=1;var o={id:id,name:n,start:s,end:e};['dl','md','pt'].forEach(function(k){var v=Number(x[k]);if(x[k]!==''&&x[k]!=null&&isFinite(v)&&v>0&&v<=100)o[k]=Math.round(v*100)/100});out.push(o)});
   return out.sort(function(a,b){return a.start<b.start?-1:a.start>b.start?1:0})}
 function scopeTrades(trades,ch){var l=Array.isArray(trades)?trades:[];if(!ch)return l;return l.filter(function(t){return t&&t.d&&t.d>=ch.start&&(!ch.end||t.d<=ch.end)})}
 function chipsHtml(list,sel){var h='<button type="button" class="pr-chip'+(sel?'':' on')+'" data-prsc="">All trades</button>';list.forEach(function(c){h+='<button type="button" class="pr-chip'+(sel===c.id?' on':'')+'" data-prsc="'+esc(c.id)+'">'+esc(c.name)+'</button>'});return h}
-function chListHtml(list){return list.length?list.map(function(c){return '<div class="pr-pr"><span><b>'+esc(c.name)+'</b> '+esc(dayLabel(c.start))+' to '+(c.end?esc(dayLabel(c.end)):'now')+'</span><button type="button" class="gg-btn-outline" data-chdel="'+esc(c.id)+'">Delete</button></div>'}).join(''):'<div class="pr-none">No challenges logged yet.</div>'}
+function limTxt(c){var p=[];if(c.dl)p.push('daily loss '+c.dl+'%');if(c.md)p.push('max loss '+c.md+'%');if(c.pt)p.push('target '+c.pt+'%');return p.length?' ('+esc(p.join(', '))+')':''}
+function limitsHtml(info,anySet){if(!anySet)return '';
+  if(!info)return row('Limits in use','Account Settings','mute','No running challenge has its own limits today.');
+  var p=[];if(info.dl)p.push('daily loss '+info.dl+'%');if(info.md)p.push('max loss '+info.md+'%');if(info.pt)p.push('target '+info.pt+'%');
+  return row('Limits in use',info.name,'ok','From this challenge: '+p.join(', ')+'. Anything not listed uses Account Settings.')}
+function chListHtml(list){return list.length?list.map(function(c){return '<div class="pr-pr"><span><b>'+esc(c.name)+'</b> '+esc(dayLabel(c.start))+' to '+(c.end?esc(dayLabel(c.end)):'now')+limTxt(c)+'</span><button type="button" class="gg-btn-outline" data-chdel="'+esc(c.id)+'">Delete</button></div>'}).join(''):'<div class="pr-none">No challenges logged yet.</div>'}
 function subText(ch){return ch?('Uses trades from '+ch.name+', '+dayLabel(ch.start)+' to '+(ch.end?dayLabel(ch.end):'now')+'. Rules come from Account Settings.'):'Uses all trades in your data. Add a challenge below to scope it to a phase.'}
 function lastClosedDay(trades){var m='',re=/^\d{4}-\d{2}-\d{2}$/;(Array.isArray(trades)?trades:[]).forEach(function(t){if(t&&typeof t.d==='string'&&re.test(t.d)&&t.d>m)m=t.d});return m}
 function dayGap(a,b){var x=/^(\d{4})-(\d{2})-(\d{2})$/.exec(a||''),y=/^(\d{4})-(\d{2})-(\d{2})$/.exec(b||'');if(!x||!y)return null;return Math.max(0,Math.round((Date.UTC(+y[1],+y[2]-1,+y[3])-Date.UTC(+x[1],+x[2]-1,+x[3]))/864e5))}
@@ -11788,18 +11833,20 @@ function rdC(){try{return JSON.parse(localStorage.getItem(CK))}catch(_){return n
 function wrC(v){try{localStorage.setItem(CK,JSON.stringify(v));return true}catch(_){cmsg('Could not save. Browser storage may be full.');return false}}
 function cmsg(t){var m=$('chMsg');if(m)m.textContent=t||''}
 function selId(){try{return localStorage.getItem(SK)||''}catch(_){return ''}}
-function render(){var b=$('ggPropBody');if(!b)return;var list=cleanPayouts(rd()),chs=cleanChallenges(rdC()),sid=selId(),ch=chs.filter(function(c){return c.id===sid})[0]||null;
-  b.innerHTML=inactHtml(window.__trades||[],typeof window.getTradingDayIST==='function'?window.getTradingDayIST():'')+summaryHtml(propStats(scopeTrades(window.__trades||[],ch),opts()),opts(),payoutTotal(list));var l=$('prList');if(l)l.innerHTML=listHtml(list);
+function render(){var b=$('ggPropBody');if(!b)return;if(window.jlApplyChLimits)window.jlApplyChLimits();var list=cleanPayouts(rd()),chs=cleanChallenges(rdC()),sid=selId(),ch=chs.filter(function(c){return c.id===sid})[0]||null;
+  b.innerHTML=limitsHtml(window.jlChInfo||null,chs.some(function(c){return c.dl||c.md||c.pt}))+inactHtml(window.__trades||[],typeof window.getTradingDayIST==='function'?window.getTradingDayIST():'')+summaryHtml(propStats(scopeTrades(window.__trades||[],ch),opts()),opts(),payoutTotal(list));var l=$('prList');if(l)l.innerHTML=listHtml(list);
   var sb=$('prSub');if(sb)sb.textContent=subText(ch);var sc=$('prScope');if(sc)sc.innerHTML=chipsHtml(chs,ch?ch.id:'');var cl=$('chList');if(cl)cl.innerHTML=chListHtml(chs)}
 window.__renderProp=render;
 var card=$('ggPropCard'),armT=0;
 if(card)card.addEventListener('click',function(e){var t=e.target;if(!t.closest)return;
   var scb=t.closest('[data-prsc]');if(scb){try{localStorage.setItem(SK,scb.getAttribute('data-prsc')||'')}catch(_){}render();return}
-  if(t.closest('#chAdd')){var cn=($('chName').value||'').trim(),cs=$('chStart').value,ce=$('chEnd').value,cre=/^\d{4}-\d{2}-\d{2}$/;
+  if(t.closest('#chAdd')){var cn=($('chName').value||'').trim(),cs=$('chStart').value,ce=$('chEnd').value,cre=/^\d{4}-\d{2}-\d{2}$/,lm={},bad=false;
+    [['dl','chDl'],['md','chMd'],['pt','chPt']].forEach(function(k){var el=$(k[1]),v=el?String(el.value||'').trim():'';if(!v)return;var x=Number(v);if(!isFinite(x)||!(x>0)||x>100)bad=true;else lm[k[0]]=Math.round(x*100)/100});
     if(!cn||!cre.test(cs)){cmsg('Enter a name and a start date.');return}
     if(ce&&(!cre.test(ce)||ce<cs)){cmsg('The end date cannot be before the start date.');return}
-    var cl=cleanChallenges(rdC());cl.push({id:'c'+Date.now().toString(36)+Math.random().toString(36).slice(2,6),name:cn.slice(0,40),start:cs,end:ce||''});
-    if(wrC(cleanChallenges(cl))){$('chName').value='';$('chStart').value='';$('chEnd').value='';cmsg('');render()}return}
+    if(bad){cmsg('Limits must be a percent above 0 and up to 100, or left empty.');return}
+    var cl=cleanChallenges(rdC());cl.push({id:'c'+Date.now().toString(36)+Math.random().toString(36).slice(2,6),name:cn.slice(0,40),start:cs,end:ce||'',dl:lm.dl,md:lm.md,pt:lm.pt});
+    if(wrC(cleanChallenges(cl))){$('chName').value='';$('chStart').value='';$('chEnd').value='';['chDl','chMd','chPt'].forEach(function(k){var el=$(k);if(el)el.value=''});cmsg('');render()}return}
   var cdel=t.closest('[data-chdel]');if(cdel){
     if(cdel.getAttribute('data-arm')!=='1'){cdel.setAttribute('data-arm','1');cdel.textContent='Tap again to delete';clearTimeout(armT);armT=setTimeout(render,3000);return}
     clearTimeout(armT);var cid=cdel.getAttribute('data-chdel');if(wrC(cleanChallenges(rdC()).filter(function(c){return c.id!==cid}))){if(selId()===cid){try{localStorage.setItem(SK,'')}catch(_){}}render()}return}
