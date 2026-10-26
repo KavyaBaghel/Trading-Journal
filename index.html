@@ -11771,6 +11771,12 @@ function scopeTrades(trades,ch){var l=Array.isArray(trades)?trades:[];if(!ch)ret
 function chipsHtml(list,sel){var h='<button type="button" class="pr-chip'+(sel?'':' on')+'" data-prsc="">All trades</button>';list.forEach(function(c){h+='<button type="button" class="pr-chip'+(sel===c.id?' on':'')+'" data-prsc="'+esc(c.id)+'">'+esc(c.name)+'</button>'});return h}
 function chListHtml(list){return list.length?list.map(function(c){return '<div class="pr-pr"><span><b>'+esc(c.name)+'</b> '+esc(dayLabel(c.start))+' to '+(c.end?esc(dayLabel(c.end)):'now')+'</span><button type="button" class="gg-btn-outline" data-chdel="'+esc(c.id)+'">Delete</button></div>'}).join(''):'<div class="pr-none">No challenges logged yet.</div>'}
 function subText(ch){return ch?('Uses trades from '+ch.name+', '+dayLabel(ch.start)+' to '+(ch.end?dayLabel(ch.end):'now')+'. Rules come from Account Settings.'):'Uses all trades in your data. Add a challenge below to scope it to a phase.'}
+function lastClosedDay(trades){var m='',re=/^\d{4}-\d{2}-\d{2}$/;(Array.isArray(trades)?trades:[]).forEach(function(t){if(t&&typeof t.d==='string'&&re.test(t.d)&&t.d>m)m=t.d});return m}
+function dayGap(a,b){var x=/^(\d{4})-(\d{2})-(\d{2})$/.exec(a||''),y=/^(\d{4})-(\d{2})-(\d{2})$/.exec(b||'');if(!x||!y)return null;return Math.max(0,Math.round((Date.UTC(+y[1],+y[2]-1,+y[3])-Date.UTC(+x[1],+x[2]-1,+x[3]))/864e5))}
+function inactHtml(trades,today){var last=lastClosedDay(trades),n=last?dayGap(last,today):null;
+  if(last&&n===null)return '';
+  if(n===null)return row('Days without a closed trade','No closed trades yet','mute','The count starts from your first closed trade. FundingPips closes the account after 30 days in a row with no fully closed trade.');
+  return row('Days without a closed trade','Day '+n+' of 30',n>=30?'bad':'','Last closed trade on '+dayLabel(last)+'. FundingPips closes the account after 30 days in a row with no fully closed trade. An open trade does not reset it.')}
 /*PR-PURE-END*/
 function $(id){return document.getElementById(id)}
 function rd(){try{return JSON.parse(localStorage.getItem(PK))}catch(_){return null}}
@@ -11783,7 +11789,7 @@ function wrC(v){try{localStorage.setItem(CK,JSON.stringify(v));return true}catch
 function cmsg(t){var m=$('chMsg');if(m)m.textContent=t||''}
 function selId(){try{return localStorage.getItem(SK)||''}catch(_){return ''}}
 function render(){var b=$('ggPropBody');if(!b)return;var list=cleanPayouts(rd()),chs=cleanChallenges(rdC()),sid=selId(),ch=chs.filter(function(c){return c.id===sid})[0]||null;
-  b.innerHTML=summaryHtml(propStats(scopeTrades(window.__trades||[],ch),opts()),opts(),payoutTotal(list));var l=$('prList');if(l)l.innerHTML=listHtml(list);
+  b.innerHTML=inactHtml(window.__trades||[],typeof window.getTradingDayIST==='function'?window.getTradingDayIST():'')+summaryHtml(propStats(scopeTrades(window.__trades||[],ch),opts()),opts(),payoutTotal(list));var l=$('prList');if(l)l.innerHTML=listHtml(list);
   var sb=$('prSub');if(sb)sb.textContent=subText(ch);var sc=$('prScope');if(sc)sc.innerHTML=chipsHtml(chs,ch?ch.id:'');var cl=$('chList');if(cl)cl.innerHTML=chListHtml(chs)}
 window.__renderProp=render;
 var card=$('ggPropCard'),armT=0;
