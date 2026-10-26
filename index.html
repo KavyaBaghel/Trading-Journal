@@ -4894,7 +4894,6 @@ document.addEventListener('input',e=>{if(cur&&RUN[cur.dataset.tool]&&cur.contain
   // ---------- weekly cards (Mon-Sun, 06:00 IST trading day). Limits = daily limit x active days (Mon-Fri = 5). ----------
   function updateWeekCard(todayKey){
     if(!document.getElementById('pnlNum')) return;
-    const ACTIVE_DAYS = 5;
     const p = todayKey.split('-').map(Number), dt = new Date(Date.UTC(p[0],p[1]-1,p[2])), dow = (dt.getUTCDay()+6)%7;
     const iso = ms => new Date(ms).toISOString().slice(0,10);
     const ws = iso(dt.getTime()-dow*864e5), we = iso(dt.getTime()+(6-dow)*864e5);
@@ -4903,9 +4902,8 @@ document.addEventListener('input',e=>{if(cur&&RUN[cur.dataset.tool]&&cur.contain
     const money = v => (v<0?'-$':'$')+Math.abs(v).toFixed(2);
     const set = (id,v) => { const el=document.getElementById(id); if(el) el.textContent=v; };
     const dayTgt = Number(window.jlDayProfitTargetUSD)||0, dayLoss = Number(window.jlDailyLossLimit)||0, dayTrades = Number(window.jlMaxTradesPerDay)||0;
-    const wkTgt = Number(window.jlWeeklyProfitTargetUSD) || dayTgt*ACTIVE_DAYS;
-    const wkLoss = Number(window.jlWeeklyLossLimit) || dayLoss*ACTIVE_DAYS;
-    const wkTrades = dayTrades*ACTIVE_DAYS;
+    const wkTgt = Number(window.jlWeeklyProfitTargetUSD) || 0;
+    const wkLoss = Number(window.jlWeeklyLossLimit) || 0;
     const byDay = {}, seen = {};
     rows.forEach(t=>{ const d = byDay[t.d]||(byDay[t.d]={net:0,loss:0,keys:{}}); const v=Number(t.pnl); d.net+=v; d.loss=Math.max(0,-d.net); d.keys[t.d+'|'+t.t+'|'+t.sym+'|'+t.side]=1; seen[t.d+'|'+t.t+'|'+t.sym+'|'+t.side]=1; });
     const activeDays = Object.keys(byDay).length;
@@ -4919,24 +4917,24 @@ document.addEventListener('input',e=>{if(cur&&RUN[cur.dataset.tool]&&cur.contain
     /* 1 - weekly profit */
     const pct = wkTgt>0 ? Math.min(100,Math.max(0,Math.round(net/wkTgt*100))) : 0;
     const n1 = document.getElementById('pnlNum'); n1.textContent = money(net); n1.style.color = net<0?'var(--red)':'';
-    set('pnlSub', wkTgt>0 ? pct+'% of $'+wkTgt.toFixed(0)+' weekly target'+(Number(window.jlWeeklyProfitTargetUSD)?'':' ($'+dayTgt.toFixed(0)+' x '+ACTIVE_DAYS+' days)') : 'No weekly or daily target set');
+    set('pnlSub', wkTgt>0 ? pct+'% of $'+wkTgt.toFixed(0)+' weekly target' : 'No weekly target set');
     ring('ringPnl', pct/100, net<0?'var(--red)':'var(--green)');
     document.getElementById('pnlDetail').innerHTML = rows.length
-      ? '<span class="tag win">'+W+'W</span><span class="tag loss">'+L+'L</span> <span style="color:var(--faint)">'+activeDays+' of '+ACTIVE_DAYS+' days active</span>'
+      ? '<span class="tag win">'+W+'W</span><span class="tag loss">'+L+'L</span> <span style="color:var(--faint)">'+activeDays+(activeDays===1?' day':' days')+' active</span>'
       : '<span style="color:var(--faint)">No trades this week</span>';
 
     /* 2 - weekly loss used */
     set('lossNum', '$'+lossUsed.toFixed(2)+' / '+(wkLoss>0?'$'+wkLoss.toFixed(0):'not set'));
     const lr = wkLoss>0 ? lossUsed/wkLoss : 0;
-    set('lossSub', wkLoss>0 ? '$'+Math.max(0,wkLoss-lossUsed).toFixed(2)+' room left'+(Number(window.jlWeeklyLossLimit)?'':' ($'+dayLoss.toFixed(0)+' x '+ACTIVE_DAYS+' days)') : 'No loss limit set');
+    set('lossSub', wkLoss>0 ? '$'+Math.max(0,wkLoss-lossUsed).toFixed(2)+' room left' : 'No weekly loss limit set');
     ring('ringLoss', lr, lr>.9?'var(--red)':lr>=.6?'var(--warn)':'var(--green)');
     set('lossDetail', L+' losing trade'+(L===1?'':'s')+' this week');
 
     /* 3 - weekly trades */
-    set('tradesNum', tradeCount+' / '+(wkTrades>0?wkTrades:'not set'));
-    ring('ringTrades', wkTrades>0 ? tradeCount/wkTrades : 0);
+    set('tradesNum', String(tradeCount));
+    ring('ringTrades', 0);
     set('tradesSub', broken+' day'+(broken===1?'':'s')+' broke a daily rule');
-    set('tradesDetail', wkTrades>0 ? Math.max(0,wkTrades-tradeCount)+' slots left ('+dayTrades+' x '+ACTIVE_DAYS+' days)'+(activeDays?' · avg '+(tradeCount/activeDays).toFixed(1)+'/day':'') : 'No trade limit set');
+    set('tradesDetail', activeDays ? 'avg '+(tradeCount/activeDays).toFixed(1)+'/day over '+activeDays+(activeDays===1?' active day':' active days') : 'No trades this week');
   }
 
   function setState(){
