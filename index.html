@@ -1867,6 +1867,8 @@
   .gg-mgrid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
   .gg-field .l{font-size:11px;color:var(--sub);letter-spacing:.06em;text-transform:uppercase;font-weight:650;margin-bottom:7px;display:block}
   .gg-field-note{display:block;font-size:11px;color:var(--faint);margin-top:7px;line-height:1.5}
+  .gg-preset{margin:0 0 14px}
+  .gg-preset .gg-btn-outline{width:auto;padding:9px 16px}
   .gg-stepper{display:flex;align-items:center;background:var(--panel-2);border:1px solid var(--border-hi);border-radius:9px;overflow:hidden;transition:border-color .18s var(--ease)}
   .gg-stepper:hover{border-color:var(--accent-2)}
   .gg-stepper button{background:none;border:none;color:var(--sub);width:32px;height:34px;font-size:14px;cursor:pointer;transition:.2s var(--ease)}
@@ -3425,6 +3427,8 @@ window.__mountOpenPos=function(){const o=(window.__openTrades||[]).concat((windo
         <button class="gg-tab" data-t="risk">Risk limits</button>
       </div>
       <div class="gg-tab-panel" data-p="acc">
+        <div class="gg-preset"><button type="button" class="gg-btn-outline" id="ggFpFlexBtn" onclick="ggApplyFpFlex()">Apply FundingPips 2 Step Flex (Phase 1)</button>
+          <small class="gg-field-note">Fills daily loss 4%, max drawdown 12%, profit target 10%, consistency rule 0, minimum trading days 0 and profit split 0. Nothing is saved until you tap Save setup. Check the values against your FundingPips dashboard.</small></div>
         <div class="gg-mgrid">
           <div class="gg-field"><span class="l">Initial account balance ($)</span>
             <div class="gg-stepper"><button onclick="ggStep('bal',-100)">−</button><input id="ggBal" value="" readonly><button onclick="ggStep('bal',100)">+</button></div></div>
@@ -4203,6 +4207,15 @@ document.addEventListener('input',e=>{if(cur&&RUN[cur.dataset.tool]&&cur.contain
     if((id === 'cns' || id === 'spl') && ggState[id] > 100) ggState[id] = 100;
     document.getElementById(ggIds[id]).value = ((id==='rpt'||id==='rr'||id==='revWin')&&!(ggState[id]>0)) ? '' : ggState[id];
     if(id === 'mdd' && window.__renderDDRing) window.__renderDDRing();
+  };
+
+  // One-tap FundingPips 2 Step Flex (Phase 1) preset: fills the fields only, saving stays with Save setup.
+  window.ggApplyFpFlex = function(){
+    ggState.mdl = 4; ggState.mdd = 12; ggState.pt = 10; ggState.cns = 0; ggState.mtd = 0; ggState.spl = 0;
+    const put = function(id, v){ const e = document.getElementById(id); if(e) e.value = v; };
+    put('ggMdl', 4); put('ggMdlUnit', '%'); put('ggMdd', 12); put('ggMddUnit', '%'); put('ggPt', 10); put('ggCns', 0); put('ggMtd', 0); put('ggSpl', 0);
+    if(window.__renderDDRing) window.__renderDDRing();
+    if(typeof window.jlToast === 'function') window.jlToast({text:'FundingPips values filled', sub:'Tap Save setup to keep them', duration:4000});
   };
 
   // hydrate the Account panel + read-only displays from whatever was last saved
