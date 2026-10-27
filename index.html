@@ -4531,7 +4531,7 @@ window.jlApplyChLimits=function(o){
   }
   function ggRenderGoals(){
     ggGoals.forEach(g=>{ if(g.typeId==='streak'&&!g.manual) g.current = ggDisciplineStreak(); });
-    const A=window.__A;if(A)ggGoals.forEach(g=>{if(g.manual)return;if(g.typeId==='balance')g.current=A.start+A.net;else if(g.typeId==='winrate')g.current=Math.round(A.wr);else if(g.typeId==='volume')g.current=A.n});
+    const A=window.__A;if(A)ggGoals.forEach(g=>{if(g.manual)return;if(g.typeId==='balance')g.current=A.start+A.net;else if(g.typeId==='winrate')g.current=Math.round(A.wr);else if(g.typeId==='volume'){const TR=window.__trades||[];g.current=(/journal/i.test(g.title||'')&&TR.some(t=>t&&t.j!==undefined))?TR.filter(t=>t&&t.j).length:A.n}});
     const grid = document.getElementById('ggGoalsGrid');
     document.getElementById('ggGoalsMeta').textContent = ggGoals.length
       ? ggGoals.length+' active goal'+(ggGoals.length===1?'':'s')+' alongside your phase target'
