@@ -6282,6 +6282,14 @@ $('view-journal').addEventListener('click',e=>{const b=e.target.closest('button'
   ({jSave:saveJ,jDraft:drSaveBtn,jDrResume:drResume,jDrDiscard:drDiscard,jNext:()=>step(1),jPrev:()=>step(-1),jCheck:check,jClear:()=>{drDelFor(read());blank();fields(null);paint();msg('')},jImpB:()=>$('jImpFile').click(),
    jExp:()=>{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(J,null,2)],{type:'application/json'}));a.download='journall-journals.json';a.click();URL.revokeObjectURL(a.href)}})[b.id]?.()});
 $('jSrch').addEventListener('input',e=>{qs=e.target.value;renderList()});
+/* Quick Log trade delete: keep this page's in-memory journals in step, so a later save cannot write a deleted journal back (and flip its deletion record). Nothing is saved here. */
+const qlHold={},qlJid=v=>String(v).replace(/^[Lj]/,'');
+window.addEventListener('ql-journal-removed',ev=>{const w=qlJid(ev.detail&&ev.detail.id),i=J.findIndex(x=>x&&qlJid(x.id)===w);if(i<0)return;
+  qlHold[w]={e:J[i],i:i};const gone=String(J[i].id);J.splice(i,1);
+  if(cur.id!=null&&String(cur.id)===gone){blank();fields(null);paint();msg('This journal was deleted with its trade.')}
+  sync()});
+window.addEventListener('ql-journal-restored',ev=>{const w=qlJid(ev.detail&&ev.detail.id),h=qlHold[w];if(!h)return;delete qlHold[w];
+  if(!J.some(x=>x&&qlJid(x.id)===w))J.splice(Math.min(h.i,J.length),0,h.e);sync()});
 $('jMisTabs').addEventListener('click',e=>{const b=e.target.closest('button');if(!b||!b.dataset.p)return;misP=b.dataset.p;misCard()});
 [['jRecF','rec','jRecBox']].forEach(([id,k,box])=>$(id).addEventListener('change',e=>{const f=e.target.files[0];if(!f)return;
   if(urls[k])URL.revokeObjectURL(urls[k]);const u=urls[k]=URL.createObjectURL(f);cur[k]=f.name;
@@ -12213,6 +12221,7 @@ setTimeout(render,1500);setInterval(render,30000);render();
     setTimeout(function(){try{location.reload()}catch(e){}},2500);
   }
   function toast(o){if(typeof window.jlToast==='function')window.jlToast(o)}
+  function qlEv(n,id){try{window.dispatchEvent(new CustomEvent(n,{detail:{id:id}}))}catch(e){}}
   var KJT='journall_deleted_journals';
   function rdObj(k){try{var v=JSON.parse(localStorage.getItem(k)||'null');return v&&typeof v==='object'&&!Array.isArray(v)?v:{}}catch(e){return{}}}
   function findQl(id){
@@ -12301,6 +12310,7 @@ setTimeout(render,1500);setInterval(render,30000);render();
       toast({icon:'trash',text:'Could not delete. Nothing was changed.',duration:3600,progress:false});return;
     }
     delBusy=true;var undone=false;
+    if(oj)qlEv('ql-journal-removed',oj.id);
     toast({icon:'trash',text:'Trade deleted',sub:[t.symbol,t.side].filter(Boolean).join(' \u00b7 '),actionText:'Undo',duration:5000,onAction:function(){
       if(undone)return;undone=true;
       try{
@@ -12310,6 +12320,7 @@ setTimeout(render,1500);setInterval(render,30000);render();
           var J2=rd(KJ);if(!J2.some(function(e){return e&&String(e.id)===jk})){J2.splice(Math.min(Math.max(ji,0),J2.length),0,oj);localStorage.setItem(KJ,JSON.stringify(J2))}
           localStorage.setItem(KJT,JSON.stringify(qlTomb(rdObj(KJT),oj.id,0,Date.now())));
           if(saved.length){var m2=rdShots();m2[jk]=saved;localStorage.setItem(KS,JSON.stringify(m2))}
+          qlEv('ql-journal-restored',oj.id);
         }
       }catch(e){}
       delBusy=false;toast({icon:'check',text:'Trade restored',duration:2200,progress:false});
