@@ -3121,10 +3121,10 @@ window.jlLiveBalance=function(Z){
 
   <div class="split">
     <div class="panel glass">
-      <div class="panel-head"><h2>Psychology checklist</h2><span class="hint" id="chkHint">0 / 0 complete</span></div>
+      <div class="panel-head"><h2>Setup scan</h2><span class="hint" id="chkHint">0 / 0 complete</span></div>
       <div class="progress" id="chkBarWrap"><i id="chkBar" style="width:0%"></i></div>
       <ul class="checklist" id="checklist"></ul>
-      <div class="chk-foot"><a href="#psychology" id="chkEditLink">Edit in Psychology tab</a><button type="button" id="chkReset">Reset today</button></div>
+      <div class="chk-foot"><a href="#psychology" id="chkEditLink">Edit setup scan in Psychology tab</a><button type="button" id="chkReset">Reset today</button></div>
       <div class="rule-box">
         <div class="l">TOMORROW'S RULE</div>
         <input type="text" id="ruleInput" maxlength="200" autocomplete="off" placeholder="e.g. Only trade the London open">
@@ -4779,17 +4779,16 @@ window.jlApplyChLimits=function(o){
   // Shows the same checklist you edit in the Psychology tab (Checklist step). The items are read from the
   // Psychology tab's saved list (localStorage 'jlPsy:checklist:items'), falling back to its default list.
   // Ticks are remembered per trading day (06:00 IST reset) so each new day starts clean.
-  const PSY_CHECKLIST_DEFAULTS = [{k:'news',t:'News Checked',d:'No high-impact USD news within 30 minutes'},{k:'emotion2',t:'Emotion Calm',d:'Still calm right before pulling the trigger.'},{k:'rulesmet',t:'Plan Rules Met',d:'Entering only because my plan and risk rules are fully met — not because I want action.'},{k:'risklimit',t:'Risk Under Limit',d:'Lot is 0.02 and risk is about $10 or less'},{k:'entry',t:'Entry Confirmed',d:"Price action confirms the entry on the setup's confirmed candle or timeframe close."},{k:'signal',t:'Confirmation Signal',d:'Daily stop not hit: under 4 trades, under 2 losses, week above -$80'},{k:'exit',t:'Exit Plan Set',d:'SL behind structure, TP at least 2R, and the 1.5R partial planned, all written before entry'}];
+  const PSY_SETUP_DEFAULTS = [{k:'req_1',t:'Both side confirmation'},{k:'req_2',t:'No blockage'},{k:'req_3',t:'No losses back to back; if lost 1, stop for this session'},{k:'req_4',t:'SL above candle and under 40 pips'},{k:'req_5',t:'No c2c before 70 pips'},{k:'req_6',t:"If 1 confirmed and another doesn't, and no blockage on both, you can still take the trade"}];
   const ovEsc = v => String(v==null?'':v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
-  const PSY_MIND_DEFAULTS = [{k:'sleep',t:'Sleep clear',d:'I am not tired, foggy, or forcing trades.'},{k:'emotion',t:'Emotion calm',d:'No anger, fear, revenge, FOMO, or excitement spike.'},{k:'patience',t:'Patience ready',d:'I can wait for activation without chasing.'},{k:'loss',t:'Loss accepted',d:'If SL hits, I will pause, feel it, journal it, and not revenge trade.'},{k:'noneed',t:'No need to trade',d:'I am okay with no valid setup today.'},{k:'journal',t:'Journal commitment',d:'After the trade I will screenshot, pause, and journal honestly.'}];
   function ovLoadList(lsKey, defaults, prefix){
     let list = defaults;
     try{ const raw = localStorage.getItem(lsKey); if(raw){ const p = JSON.parse(raw); if(Array.isArray(p) && p.length) list = p.filter(r=>r && r.k && r.t); } }catch(e){}
-    return list.map(r=>({k:prefix+r.k, t:r.t, d:r.d, g:prefix==='m:'?'MIND':'CHECKLIST'}));
+    return list.map(r=>({k:prefix+r.k, t:r.t, d:r.d, g:'SETUP'}));
   }
-  /* Mind Stability Check first, then the pre-trade Checklist step, both exactly as saved in the Psychology tab */
+  /* Setup Scan requirements, exactly as saved in the Psychology tab (Setup Scan step) */
   function ovChkItems(){
-    return ovLoadList('jlPsy:mind:items', PSY_MIND_DEFAULTS, 'm:').concat(ovLoadList('jlPsy:checklist:items', PSY_CHECKLIST_DEFAULTS, 'c:'));
+    return ovLoadList('jlPsy:setup:requirements', PSY_SETUP_DEFAULTS, 's:');
   }
   function ovChkKey(){ return 'jlOvChk:' + (typeof getTradingDayIST==='function' ? getTradingDayIST() : ''); }
   function ovChkLoad(){ try{ const o = JSON.parse(localStorage.getItem(ovChkKey())||'{}'); return (o && typeof o==='object') ? o : {}; }catch(e){ return {}; } }
@@ -4802,7 +4801,7 @@ window.jlApplyChLimits=function(o){
     let lastG = '';
     list.innerHTML = items.map(r=>{
       const on = !!saved[r.k];
-      const head = r.g!==lastG ? ((lastG=r.g), '<div class="grp-label" style="cursor:default;margin:'+(r.g==='MIND'?'0':'8px')+' 0 2px">'+(r.g==='MIND'?'MIND CHECK':'PRE-TRADE CHECKLIST')+'</div>') : '';
+      const head = r.g!==lastG ? ((lastG=r.g), '<div class="grp-label" style="cursor:default;margin:0 0 2px">SETUP SCAN</div>') : '';
       return head+'<li data-k="'+ovEsc(r.k)+'" class="'+(on?'done':'')+'"><input type="checkbox" '+(on?'checked':'')+' tabindex="-1"><span class="chk-t"><b style="font-weight:600">'+ovEsc(r.t)+'</b>'+(r.d?'<span class="chk-d">'+ovEsc(r.d)+'</span>':'')+'</span></li>';
     }).join('');
     updateProgress();
@@ -7124,6 +7123,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'){if(mpOpen)closeMont
     state.setupEditing = false;
     saveState();
     render();
+    try{ if(typeof window.__renderOvChecklist === 'function') window.__renderOvChecklist(); }catch(e){} // keep Today's Summary setup scan in sync
   }
   async function cancelEditRequirements(){
     try{
