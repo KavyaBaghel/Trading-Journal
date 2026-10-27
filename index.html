@@ -3272,7 +3272,7 @@ window.jlLiveBalance=function(Z){
 <div class="a-h"><div class="a-h-t"><span class="a-h-ic"><svg viewBox="0 0 24 24"><path d="M3 12h4l3-8 4 16 3-8h4"/></svg></span><h2>Overtrading</h2></div><p id="aOvSub">Days that reached your daily trade limit, compared with the rest.</p></div>
 <div class="a-kp" id="aOv"></div>
 <div class="a-read" id="aOvR"></div>
-<div class="a-h"><div class="a-h-t"><span class="a-h-ic"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span><h2>Weak times</h2></div><p>Weekdays and hours with a net loss and at least 3 trades.</p></div>
+<div class="a-h"><div class="a-h-t"><span class="a-h-ic"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span><h2>Weak times</h2></div><p>Weekdays and hours with a net loss, at least 3 trades, and a per-trade average worse than your overall average.</p></div>
 <section class="a-s"><div style="overflow-x:auto"><table><thead><tr><th>WHEN</th><th>TYPE</th><th>TRADES</th><th>NET P&amp;L</th><th>AVG</th></tr></thead>
 <tbody id="aWt"></tbody></table></div></section>
 
@@ -5357,10 +5357,11 @@ const $ = id => document.getElementById(id);
   function renderWeak(){
     const body=$('aWt');if(!body)return;
     const st=weakTimes(window.__trades||[],3,brokerOff());
-    const rows=st.days.map(x=>[x.k,'Weekday',x]).concat(st.hours.map(x=>[String(x.k).padStart(2,'0')+':00','Hour (IST)',x]));
+    const wk=x=>typeof st.avg!=='number'||x.net/x.n<st.avg;
+    const rows=st.days.filter(wk).map(x=>[x.k,'Weekday',x]).concat(st.hours.filter(wk).map(x=>[String(x.k).padStart(2,'0')+':00','Hour (IST)',x]));
     const note=st.paused?'<tr><td colspan="5" style="color:var(--faint);padding:12px">Hour flags are paused. Set the Broker UTC offset in Account Settings (Risk tab) so MT5 times can be converted to IST. Weekdays use the stored date until then.</td></tr>':'';
     if(!rows.length){
-      body.innerHTML=note+'<tr><td colspan="5" style="color:var(--faint);padding:18px 12px">'+(st.total?(st.paused?'No weekday has a net loss with at least 3 trades.':'No weekday or hour has a net loss with at least 3 trades.'):'No trades yet.')+'</td></tr>';
+      body.innerHTML=note+'<tr><td colspan="5" style="color:var(--faint);padding:18px 12px">'+(st.total?(st.paused?'No weekday is net-losing and worse than your average per trade (at least 3 trades).':'No weekday or hour is net-losing and worse than your average per trade (at least 3 trades).'):'No trades yet.')+'</td></tr>';
       return;
     }
     body.innerHTML=note+rows.map(r=>{const x=r[2];return '<tr><td style="font-weight:600">'+r[0]+'</td><td>'+r[1]+'</td><td class="mono">'+x.n+'</td><td class="mono" style="color:var(--red)">'+money(x.net)+'</td><td class="mono" style="color:var(--red)">'+money(x.net/x.n)+'</td></tr>'}).join('');
@@ -8537,7 +8538,7 @@ function weakNowEval(st,nowMs){
   var m=function(x){return (x.net<0?'-':'')+'$'+Math.abs(x.net).toFixed(2)};
   var av=function(v){return (v<0?'-':'')+'$'+Math.abs(v).toFixed(2)};
   ((st&&st.days)||[]).forEach(function(x){if(x.k!==dw)return;var hasAvg=st&&typeof st.avg==='number';if(hasAvg&&!(x.net/x.n<st.avg))return;parts.push(dw+' is a weak weekday for you: net '+m(x)+' over '+x.n+' trades'+(hasAvg?' (avg '+av(x.net/x.n)+' per trade vs '+av(st.avg)+' for all days)':''))});
-  ((st&&st.hours)||[]).forEach(function(x){if(x.k===h)parts.push('The '+String(h).padStart(2,'0')+':00 IST hour is weak for you: net '+m(x)+' over '+x.n+' trades')});
+  ((st&&st.hours)||[]).forEach(function(x){if(x.k!==h)return;var hasAvg=st&&typeof st.avg==='number';if(hasAvg&&!(x.net/x.n<st.avg))return;parts.push('The '+String(h).padStart(2,'0')+':00 IST hour is weak for you: net '+m(x)+' over '+x.n+' trades'+(hasAvg?' (avg '+av(x.net/x.n)+' per trade vs '+av(st.avg)+' for all hours)':''))});
   return{warn:parts.length>0,parts:parts,hour:h,dow:dw};
 }
 /*CB-PURE-END*/
