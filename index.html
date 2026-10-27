@@ -1042,6 +1042,7 @@
   .t-expand-open{margin-top:4px;font-size:11.5px;padding:6px 12px}
   .t-ql-acts{display:inline-flex;gap:8px;margin-left:8px;flex-wrap:wrap}
   .t-ql-acts .btn-ghost{margin-top:4px;font-size:11.5px;padding:6px 12px}
+  .t-ql-acts .t-ql-del{color:var(--red)}
   .t-empty{display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center;padding:44px 20px}.t-empty span{color:var(--sub);font-size:12.5px;margin-bottom:6px}
   #tMore{display:flex;justify-content:center;margin-top:6px}
 
@@ -5847,7 +5848,7 @@ function row(x,mx,journals){const k=kind(x.pnl),mv=x.side==='BUY'?x.ex-x.en:x.en
   '<td><div class="mono t-pl" style="color:'+col(k)+'">'+money(x.pnl)+'</div><div class="t-mag"><i style="width:'+Math.max(4,Math.abs(x.pnl)/mx*100)+'%;background:'+col(k)+'"></i></div></td>'+
   '<td>'+((je&&(je.setup||je.emotion))?'<div class="t-stags">'+(je.setup?'<span class="t-stag">'+esc(je.setup)+'</span>':'')+(je.emotion?'<span class="t-stag t-stag-emo">'+esc(je.emotion)+'</span>':'')+'</div>':'<span class="t-dash" title="No setup or emotion tagged">-</span>')+(je?'<div style="margin-top:6px">'+window.jGradeChip(je.q)+'</div>':'')+'</td>'+
   '<td>'+(x.tags&&x.tags.length?x.tags.map(g=>'<span class="t-tag">'+g+'</span>').join(''):'')+(x.rev?'<span class="t-tag t-tag-rev">Revenge trade · lot '+x.revSize+'</span>':'')+'<div class="t-jn'+(x.j?' ok':'')+'">'+(x.j?'Journaled':'Needs journal')+'</div></td></tr>'+
-  '<tr class="t-expand-row" data-key="'+esc(rk)+'"><td colspan="10"><div class="t-expand-cell">'+detailHtml+'<button type="button" class="btn-ghost t-expand-open" data-openkey="'+esc(rk)+'">Open full journal →</button>'+((window.__qlM||{})[x._lk]?'<span class="t-ql-acts"><button type="button" class="btn-ghost t-ql-edit" data-qlid="'+esc((window.__qlM||{})[x._lk])+'">Edit trade</button></span>':'')+'</div></td></tr>'}
+  '<tr class="t-expand-row" data-key="'+esc(rk)+'"><td colspan="10"><div class="t-expand-cell">'+detailHtml+'<button type="button" class="btn-ghost t-expand-open" data-openkey="'+esc(rk)+'">Open full journal →</button>'+((window.__qlM||{})[x._lk]?'<span class="t-ql-acts"><button type="button" class="btn-ghost t-ql-edit" data-qlid="'+esc((window.__qlM||{})[x._lk])+'">Edit trade</button><button type="button" class="btn-ghost t-ql-del" data-qlid="'+esc((window.__qlM||{})[x._lk])+'">Delete trade</button></span>':'')+'</div></td></tr>'}
 
 function kpis(a){const w=a.filter(x=>kind(x.pnl)==='win'),l=a.filter(x=>kind(x.pnl)==='loss'),n=a.length,sum=z=>z.reduce((s,x)=>s+x.pnl,0),net=sum(a)+a.reduce((q,x)=>q+(x.cost||0),0),ns=a.filter(x=>x.sl==null).length,jd=a.filter(x=>x.j).length,rvTrades=a.filter(x=>x.rev),rv=rvTrades.length;
   const revWin=Number(window.jlRevWindowMin)||0;
@@ -12249,6 +12250,51 @@ setTimeout(render,1500);setInterval(render,30000);render();
     setTimeout(function(){try{location.reload()}catch(e){}},2500);
   }
   window.qlEditTrade=editTrade;
+  var KTT='journall_deleted_trades',delBusy=false;
+  function deleteTrade(id,btn){
+    if(delBusy)return;
+    var f=findQl(id);
+    if(!f){toast({icon:'trash',text:'Could not find that trade on this device',duration:3200,progress:false});return}
+    if(typeof window.jlConfirm!=='function')return;
+    var t=f.t,pnl=Number(t.pnl);
+    window.jlConfirm({title:'Delete this Quick Log trade?',body:'This removes the trade, its journal entry and its screenshot, here and in your synced data. You get 5 seconds to undo it.',
+      preview:{title:(pnl<0?'Loss':'Win')+' trade',sub:[t.date,t.symbol,t.side].filter(Boolean).join(' \u00b7 '),value:(pnl<0?'-':'+')+'$'+Math.abs(pnl).toFixed(2),color:pnl<0?'var(--red)':'var(--green)'},
+      confirmText:'Delete',cancelText:'Keep it',danger:true,opener:btn}).then(function(ok){if(ok)doDelete(id)});
+  }
+  function doDelete(id){
+    if(delBusy)return;
+    var f=findQl(id);if(!f)return;
+    var t=f.t,oj=f.oj,prev={},ts=Date.now(),ti=-1,ji=-1,jk=oj?String(oj.id):null,saved=[];
+    function snap(k){if(!(k in prev))prev[k]=localStorage.getItem(k)}
+    try{
+      snap(KT);var T=rd(KT);ti=T.findIndex(function(x){return x&&x.id===id});if(ti<0)throw new Error('gone');T.splice(ti,1);localStorage.setItem(KT,JSON.stringify(T));
+      snap(KTT);localStorage.setItem(KTT,JSON.stringify(qlTomb(rdObj(KTT),id,1,ts)));
+      if(oj){
+        snap(KJ);var J=rd(KJ);ji=J.findIndex(function(e){return e&&String(e.id)===jk});if(ji>=0){J.splice(ji,1);localStorage.setItem(KJ,JSON.stringify(J))}
+        snap(KJT);localStorage.setItem(KJT,JSON.stringify(qlTomb(rdObj(KJT),oj.id,1,ts)));
+        var m=rdShots();saved=(m[jk]||[]).slice();if(saved.length){snap(KS);m[jk]=[];localStorage.setItem(KS,JSON.stringify(m))}
+      }
+    }catch(e){
+      Object.keys(prev).forEach(function(k){try{if(prev[k]==null)localStorage.removeItem(k);else localStorage.setItem(k,prev[k])}catch(_){}});
+      toast({icon:'trash',text:'Could not delete. Nothing was changed.',duration:3600,progress:false});return;
+    }
+    delBusy=true;var undone=false;
+    toast({icon:'trash',text:'Trade deleted',sub:[t.symbol,t.side].filter(Boolean).join(' \u00b7 '),actionText:'Undo',duration:5000,onAction:function(){
+      if(undone)return;undone=true;
+      try{
+        var T2=rd(KT);if(!T2.some(function(x){return x&&x.id===id})){T2.splice(Math.min(ti,T2.length),0,t);localStorage.setItem(KT,JSON.stringify(T2))}
+        localStorage.setItem(KTT,JSON.stringify(qlTomb(rdObj(KTT),id,0,Date.now())));
+        if(oj){
+          var J2=rd(KJ);if(!J2.some(function(e){return e&&String(e.id)===jk})){J2.splice(Math.min(Math.max(ji,0),J2.length),0,oj);localStorage.setItem(KJ,JSON.stringify(J2))}
+          localStorage.setItem(KJT,JSON.stringify(qlTomb(rdObj(KJT),oj.id,0,Date.now())));
+          if(saved.length){var m2=rdShots();m2[jk]=saved;localStorage.setItem(KS,JSON.stringify(m2))}
+        }
+      }catch(e){}
+      delBusy=false;toast({icon:'check',text:'Trade restored',duration:2200,progress:false});
+    }});
+    setTimeout(function(){if(!undone){try{location.reload()}catch(e){}}},5400);
+  }
+  window.qlDeleteTrade=deleteTrade;
   fab.addEventListener('click',open);
 })();
 </script>
