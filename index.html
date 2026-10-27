@@ -6857,12 +6857,18 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'){if(mpOpen)closeMont
     {k:"journal", t:"Journal commitment", d:"After the trade I will screenshot, pause, and journal honestly."},
   ];
 
-  /* checklist text follows Account Settings: lot size and daily trade limit (display only; stored text is untouched) */
+  /* checklist text follows Account Settings: lot size, daily trade limit, risk per trade, losses and weekly loss limit (display only; stored text is untouched) */
   function liveDesc(d){
     d=String(d==null?'':d);
-    const lot=Number(window.jlLotSize)||0,tr=Number(window.jlMaxTradesPerDay)||0;
-    if(lot>0) d=d.replace(/Lot is \d*\.?\d+/,'Lot is '+String(lot));
+    const fm=v=>String(Math.round(v*100)/100);
+    let acc={};try{acc=JSON.parse(localStorage.getItem('jlAccountSettings')||'null')||{}}catch(e){}
+    const lot=Number(window.jlLotSize)||0,tr=Number(window.jlMaxTradesPerDay)||0,mcl=Number(window.jlMaxConsecLosses)||0,wl=Number(window.jlWeeklyLossLimit)||0;
+    const bal=Number(window.jlStartBalance)||Number(acc.balance)||0,rp=Number(acc.riskPerTrade)||0,risk=bal>0&&rp>0?bal*rp/100:0;
+    if(lot>0) d=d.replace(/Lot is \d*\.?\d+/,'Lot is '+fm(lot));
     if(tr>0) d=d.replace(/under \d+ trades/,'under '+tr+' trades');
+    if(mcl>0) d=d.replace(/under \d+ losses/,'under '+mcl+' losses');
+    if(wl>0) d=d.replace(/week above -\$\d*\.?\d+/,'week above -$'+fm(wl));
+    if(risk>0) d=d.replace(/risk is about \$\d*\.?\d+/,'risk is about $'+fm(risk));
     return d;
   }
   window.__psyRerender=function(){ try{ render(); }catch(e){} };
