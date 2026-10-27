@@ -1056,7 +1056,6 @@
   .jl-circuit{position:sticky;top:8px;z-index:60;display:flex;gap:12px;align-items:flex-start;margin:10px 16px 0;padding:12px 16px;border-radius:var(--radius-card,18px);border:1px solid color-mix(in srgb,var(--red) 55%,transparent);background:linear-gradient(135deg,color-mix(in srgb,var(--red) 24%,#0b0b10),color-mix(in srgb,var(--red) 10%,#0b0b10));box-shadow:0 10px 30px -14px color-mix(in srgb,var(--red) 70%,transparent)}
   .jl-circuit[hidden]{display:none}.jl-circuit svg{flex:none;width:20px;height:20px;margin-top:1px;fill:none;stroke:var(--red);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
   .jl-circuit b{display:block;font-size:13.5px;font-weight:650;color:var(--red)}.jl-circuit span{display:block;margin-top:2px;font-size:12.5px;line-height:1.45;color:var(--text)}.jl-circuit small{display:block;margin-top:4px;font-size:12px;color:var(--sub)}
-  .jl-circuit>div{flex:1;min-width:0}.jl-circuit .jl-circuit-x{flex:none;margin:-4px -6px 0 auto;width:26px;height:26px;padding:0;display:inline-flex;align-items:center;justify-content:center;border:0;border-radius:8px;background:transparent;color:var(--sub);cursor:pointer;transition:background .15s,color .15s}.jl-circuit .jl-circuit-x[hidden]{display:none}.jl-circuit .jl-circuit-x:hover,.jl-circuit .jl-circuit-x:focus-visible{background:color-mix(in srgb,var(--red) 22%,transparent);color:var(--text);outline:none}.jl-circuit .jl-circuit-x svg{width:14px;height:14px;margin:0;fill:none;stroke:currentColor;stroke-width:2.2}
   .j-side{position:sticky;top:16px;max-height:calc(100vh - 32px);display:flex;flex-direction:column}
   #jList{overflow:auto;display:grid;gap:10px;margin-top:14px;align-content:start}
   .j-in,.j-ta{width:100%;background:var(--panel-2);border:1px solid var(--border);border-radius:10px;padding:10px 12px;color:var(--text);font:13.5px Inter,sans-serif;transition:border-color .3s cubic-bezier(.22,.61,.36,1),background .3s cubic-bezier(.22,.61,.36,1)}
@@ -3004,7 +3003,7 @@ window.jlLiveBalance=function(Z){
 <div class="scrim" id="scrim"></div>
 <button class="menu-btn" id="menuBtn" aria-label="Open menu"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
 <main class="main">
-<div class="jl-circuit" id="jlCircuit" role="alert" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 9v4M12 17h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg><div><b id="jlCircuitTitle">Circuit breaker tripped</b><span id="jlCircuitWhy"></span><small id="jlCircuitWait"></small></div><button type="button" class="jl-circuit-x" id="jlCircuitX" aria-label="Snooze this warning for 6 hours" title="Snooze for 6 hours" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+<div class="jl-circuit" id="jlCircuit" role="alert" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 9v4M12 17h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg><div><b id="jlCircuitTitle">Circuit breaker tripped</b><span id="jlCircuitWhy"></span><small id="jlCircuitWait"></small></div></div>
 <div class="view" id="view-summary">
 <div class="wrap">
 
@@ -3052,7 +3051,7 @@ window.jlLiveBalance=function(Z){
         <circle class="ring-val" id="ringPnl" cx="44" cy="44" r="38" stroke="var(--green)" style="--off:239"/>
       </svg>
       <div>
-        <div class="ring-label">WEEK P&amp;L</div>
+        <div class="ring-label">TODAY P&amp;L</div>
         <div class="ring-num" id="pnlNum">$0.00</div>
         <div class="ring-sub" id="pnlSub">Weekly target not set</div>
         <div class="ring-detail" id="pnlDetail"></div>
@@ -3064,7 +3063,7 @@ window.jlLiveBalance=function(Z){
         <circle class="ring-val" id="ringLoss" cx="44" cy="44" r="38" stroke="var(--green)" style="--off:239"/>
       </svg>
       <div>
-        <div class="ring-label">WEEK LOSS USED</div>
+        <div class="ring-label">DAILY LOSS USED</div>
         <div class="ring-num" id="lossNum">$0 / $20</div>
         <div class="ring-sub" id="lossSub">Full room left</div>
         <div class="ring-detail" id="lossDetail"></div>
@@ -3076,7 +3075,7 @@ window.jlLiveBalance=function(Z){
         <circle class="ring-val" id="ringTrades" cx="44" cy="44" r="38" stroke="var(--accent-2)" style="--off:239"/>
       </svg>
       <div>
-        <div class="ring-label">WEEK TRADES</div>
+        <div class="ring-label">TODAY'S TRADES</div>
         <div class="ring-num" id="tradesNum">0 / 8</div>
         <div class="ring-sub" id="tradesSub">0 rule breaks</div>
         <div class="ring-detail" id="tradesDetail"></div>
@@ -5020,6 +5019,10 @@ window.jlApplyChLimits=function(o){
   function updateWeekCard(todayKey){
     if(!document.getElementById('pnlNum')) return;
     const p = todayKey.split('-').map(Number), dt = new Date(Date.UTC(p[0],p[1]-1,p[2])), dow = (dt.getUTCDay()+6)%7;
+    /* Mon-Fri: the three cards show today's P&L, daily loss used and today's trades (written by setState). Weekly totals only appear on the weekend, alongside the weekly review. */
+    const weekend = dow>=5, lbl = document.querySelectorAll('.rings .ring-label');
+    if(lbl.length===3){ const T = weekend ? ['WEEK P&L','WEEK LOSS USED','WEEK TRADES'] : ['TODAY P&L','DAILY LOSS USED',"TODAY'S TRADES"]; for(let i=0;i<3;i++) lbl[i].textContent = T[i]; }
+    if(!weekend) return;
     const iso = ms => new Date(ms).toISOString().slice(0,10);
     const ws = iso(dt.getTime()-dow*864e5), we = iso(dt.getTime()+(6-dow)*864e5);
     const rows = (window.__trades||[]).filter(t=>t && t.d && t.d>=ws && t.d<=we && isFinite(Number(t.pnl)));
@@ -5147,7 +5150,7 @@ window.jlApplyChLimits=function(o){
         <td style="color:var(--sub)">${t.reason}</td></tr>`).join('');
       reviewStatus.textContent=trades.length+' trade'+(trades.length!==1?'s':'')+' logged today.';
     }
-    try{ updateWeekCard(todayKey); }catch(e){} /* top-left card shows the week, overriding the daily values above */
+    try{ updateWeekCard(todayKey); }catch(e){} /* Mon-Fri keeps the daily values above; Sat/Sun swaps in the week totals */
     resetReview();
     updateRules(pnlTotal, lossUsed, trades.length, wins.length);
     return {rawToday, trades, pnlTotal};
@@ -8540,8 +8543,6 @@ function weakNow(){
     return weakNowEval(window.jlWeakTimes(window.__trades||[],3,off),Date.now());
   }catch(e){return{warn:false,parts:[]}}
 }
-var SNZ_KEY='jlWeakSnoozeUntil',SNZ_MS=6*3600000;
-function weakSnoozed(){try{return Number(localStorage.getItem(SNZ_KEY)||0)>Date.now()}catch(e){return false}}
 function paint(){
   var el=document.getElementById('jlCircuit');if(!el)return;
   var key=typeof window.getTradingDayIST==='function'?window.getTradingDayIST():'';
@@ -8549,7 +8550,6 @@ function paint(){
   var kindFn=typeof window.jlKind==='function'?window.jlKind:function(p){return p<0?'loss':p>0?'win':'be'};
   var r=circuitEval(rows,{lossLimit:Number(window.jlDailyLossLimit)||0,tradeLimit:Number(window.jlMaxTradesPerDay)||0,maxConsec:Number(window.jlMaxConsecLosses)||0,revLimit:Number(window.jlMaxRevengeTrades)||0,sameDirLimit:Number(window.jlSameDirLossLimit)||0},kindFn);
   var ttl=document.getElementById('jlCircuitTitle');
-  var xb=document.getElementById('jlCircuitX');if(xb)xb.hidden=true;
   if(!r.tripped){
     var fr=fridayEval(Date.now(),window.jlFridayCutoff,30);
     if(fr.show){
@@ -8559,12 +8559,10 @@ function paint(){
       el.hidden=false;return;
     }
     var wk=weakNow();
-    if(wk.warn&&weakSnoozed()){el.hidden=true;return;}
     if(wk.warn){
       if(ttl)ttl.textContent='Weak time to trade';
       document.getElementById('jlCircuitWhy').textContent=wk.parts.join('. ')+'.';
       document.getElementById('jlCircuitWait').textContent='Based on your past trades. Nothing is blocked.';
-      if(xb)xb.hidden=false;
       el.hidden=false;return;
     }
     el.hidden=true;return;
@@ -8574,11 +8572,6 @@ function paint(){
   document.getElementById('jlCircuitWait').textContent='Stay out of the market until the 06:00 IST reset, in '+fmtWait(msUntilReset(Date.now()))+'.';
   el.hidden=false;
 }
-(function(){var xb=document.getElementById('jlCircuitX');if(!xb)return;xb.addEventListener('click',function(){
-  if(!window.confirm('Snooze this "Weak time to trade" warning for 6 hours?'))return;
-  try{localStorage.setItem(SNZ_KEY,String(Date.now()+SNZ_MS))}catch(e){}
-  paint();
-})})();
 window.jlCircuitRefresh=paint;window.jlCircuitEval=circuitEval;window.jlFridayEval=fridayEval;
 setInterval(paint,15000);setTimeout(paint,1500);setTimeout(paint,5000);
 })();</script>
