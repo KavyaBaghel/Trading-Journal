@@ -12005,6 +12005,16 @@ setTimeout(render,1500);setInterval(render,30000);render();
     var lot=qlNum(o.lot);if(!(lot>0))return{ok:false,why:'Enter the lot size as a number above 0.'};
     var pips=null;
     if(String(o.pips==null?'':o.pips).trim()!==''){pips=qlNum(o.pips);if(!(pips>=0))return{ok:false,why:'Pips must be a number, 0 or more.'}}
+    var en=null,ex=null,enS=String(o.entry==null?'':o.entry).trim(),exS=String(o.exit==null?'':o.exit).trim();
+    if(enS!==''){en=qlNum(enS);if(!(en>0))return{ok:false,why:'Entry price must be a number above 0.'}}
+    if(exS!==''){ex=qlNum(exS);if(!(ex>0))return{ok:false,why:'Exit price must be a number above 0.'}}
+    if(en!=null&&ex!=null){
+      var mv=o.dir==='BUY'?ex-en:en-ex;
+      if((o.res==='win'&&!(mv>0))||(o.res==='loss'&&mv>0)){
+        var need={'BUY win':'the exit above the entry','SELL win':'the exit below the entry','BUY loss':'the exit at or below the entry','SELL loss':'the exit at or above the entry'}[o.dir+' '+o.res];
+        return{ok:false,why:'These prices do not fit a '+(o.dir==='BUY'?'Buy':'Sell')+' '+o.res+'. It needs '+need+'. Fix them or clear one of the two.'}
+      }
+    }
     var sym=String(o.sym==null?'':o.sym).trim().toUpperCase().replace(/[^A-Z0-9._-]/g,'').slice(0,12);
     var emo=String(o.emotion||'');if(emo&&QL_EMO.indexOf(emo)<0)return{ok:false,why:'Unknown emotion.'};
     var note=String(o.note==null?'':o.note).trim().slice(0,300);
@@ -12012,6 +12022,8 @@ setTimeout(render,1500);setInterval(render,30000);render();
     var sg=o.res==='win'?1:-1,st=qlStamp(now);
     var t={id:'ql-'+now.toString(36),date:st.date,time:st.time,symbol:sym,side:o.dir,volume:lot,sl:0,pnl:qlR2(sg*amt),reason:'Quick Log',mistakes:[],notes:note,source:'quicklog'};
     if(pips!=null)t.pips=qlR2(sg*pips);
+    if(en!=null)t.entry=en;
+    if(ex!=null)t.exit=ex;
     var j=null;
     if(emo||note||o.shot){
       j={id:now,tradeKey:qlLiveKey(t),trade:{date:t.date,time:t.time,symbol:sym,side:o.dir,pnl:t.pnl,mistakes:[]},date:t.date,
@@ -12044,11 +12056,13 @@ setTimeout(render,1500);setInterval(render,30000);render();
     if(!old||typeof old!=='object'||!/^ql-/.test(String(old.id)))return{ok:false,why:'This is not a Quick Log trade.'};
     var ms=qlOrigMs(old.id);if(!isFinite(ms))return{ok:false,why:'Could not read the original time of this trade.'};
     var keep=!!(o.keepBody&&oj);
-    var b=qlBuild({dir:o.dir,res:o.res,amount:o.amount,lot:o.lot,pips:o.pips,sym:o.sym,emotion:o.emotion,note:keep?String(oj.body||'').slice(0,300):o.note,shot:!!o.shot,now:ms});
+    var b=qlBuild({dir:o.dir,res:o.res,amount:o.amount,lot:o.lot,pips:o.pips,sym:o.sym,entry:o.entry,exit:o.exit,emotion:o.emotion,note:keep?String(oj.body||'').slice(0,300):o.note,shot:!!o.shot,now:ms});
     if(!b.ok)return b;
     var t=Object.assign({},old);
     t.side=b.trade.side;t.symbol=b.trade.symbol;t.volume=b.trade.volume;t.pnl=b.trade.pnl;t.notes=b.trade.notes;
     if(b.trade.pips!=null)t.pips=b.trade.pips;else if(old.pips!=null)t.pips=null;
+    if(b.trade.entry!=null)t.entry=b.trade.entry;else if(old.entry!=null)t.entry=null;
+    if(b.trade.exit!=null)t.exit=b.trade.exit;else if(old.exit!=null)t.exit=null;
     var key=qlLiveKey(t),emo=String(o.emotion||''),noteTxt=keep?String(oj.body||''):b.trade.notes;
     var has=!!(emo||noteTxt||o.shot);
     var out={ok:true,trade:t,journal:null,dropJournal:false};
@@ -12102,7 +12116,9 @@ setTimeout(render,1500);setInterval(render,30000);render();
     +'<div class="ql-grid"><label>Result amount (USD)<input type="text" id="qlAmt" inputmode="decimal" autocomplete="off"></label>'
     +'<label>Lot size<input type="text" id="qlLot" inputmode="decimal" autocomplete="off"></label>'
     +'<label>Pips (optional)<input type="text" id="qlPips" inputmode="decimal" autocomplete="off"></label>'
-    +'<label>Symbol (optional)<input type="text" id="qlSym" maxlength="12" autocomplete="off" autocapitalize="characters"></label></div>'
+    +'<label>Symbol (optional)<input type="text" id="qlSym" maxlength="12" autocomplete="off" autocapitalize="characters"></label>'
+    +'<label>Entry price (optional)<input type="text" id="qlEn" inputmode="decimal" autocomplete="off"></label>'
+    +'<label>Exit price (optional)<input type="text" id="qlEx" inputmode="decimal" autocomplete="off"></label></div>'
     +'<div class="ql-lab" id="qlEmoL">How did you feel (optional)</div>'
     +'<div class="ql-chips" id="qlEmo" role="group" aria-labelledby="qlEmoL">'+QL_EMO.map(function(x){return'<button type="button" class="ql-chip" data-v="'+x+'" aria-pressed="false">'+x+'</button>'}).join('')+'</div>'
     +'<label>Short note (optional)<textarea id="qlNote" maxlength="300" rows="2"></textarea></label>'
@@ -12115,7 +12131,7 @@ setTimeout(render,1500);setInterval(render,30000);render();
     function seg(id,set){$(id).addEventListener('click',function(e){var b=e.target.closest('button[data-v]');if(!b)return;set(b.getAttribute('data-v'));paintSeg();reset()})}
     seg('qlDir',function(v){dir=v});seg('qlRes',function(v){res=v});
     $('qlEmo').addEventListener('click',function(e){var b=e.target.closest('button[data-v]');if(!b)return;var v=b.getAttribute('data-v');emo=emo===v?'':v;paintSeg()});
-    ['qlAmt','qlLot','qlPips','qlSym','qlNote'].forEach(function(id){$(id).addEventListener('input',reset)});
+    ['qlAmt','qlLot','qlPips','qlSym','qlEn','qlEx','qlNote'].forEach(function(id){$(id).addEventListener('input',reset)});
     $('qlAddShot').addEventListener('click',function(){$('qlFile').click()});
     $('qlFile').addEventListener('change',onFile);
     $('qlSave').addEventListener('click',save);
@@ -12143,7 +12159,7 @@ setTimeout(render,1500);setInterval(render,30000);render();
     if(!scrim)build();
     dir='';res='';emo='';shot=null;warned=false;busy=false;editCtx=null;
     $('qlTitle').textContent='Quick log';$('qlSub').textContent='Saves as a normal trade, dated now in IST.';$('qlNote').disabled=false;$('qlAddShot').hidden=false;
-    ['qlAmt','qlLot','qlPips','qlSym','qlNote'].forEach(function(id){$(id).value=''});
+    ['qlAmt','qlLot','qlPips','qlSym','qlEn','qlEx','qlNote'].forEach(function(id){$(id).value=''});
     $('qlFile').value='';$('qlSave').textContent='Save trade';$('qlSave').disabled=false;msg('',false);paintSeg();paintShot();
     opener=document.activeElement;scrim.hidden=false;fab.style.visibility='hidden';
     var f=scrim.querySelector('#qlDir button');if(f)f.focus();
@@ -12175,7 +12191,7 @@ setTimeout(render,1500);setInterval(render,30000);render();
   function save(){
     if(busy)return;
     if(editCtx){saveEdit();return}
-    var r=qlBuild({dir:dir,res:res,amount:$('qlAmt').value,lot:$('qlLot').value,pips:$('qlPips').value,sym:$('qlSym').value,emotion:emo,note:$('qlNote').value,shot:!!shot,now:Date.now()});
+    var r=qlBuild({dir:dir,res:res,amount:$('qlAmt').value,lot:$('qlLot').value,pips:$('qlPips').value,sym:$('qlSym').value,entry:$('qlEn').value,exit:$('qlEx').value,emotion:emo,note:$('qlNote').value,shot:!!shot,now:Date.now()});
     if(!r.ok){msg(r.why,true);return}
     if(!warned){
       var dp=qlDupes(rd(KB).concat(rd(KT)),r.trade);
@@ -12210,7 +12226,8 @@ setTimeout(render,1500);setInterval(render,30000);render();
     dir=t.side;res=Number(t.pnl)<0?'loss':'win';emo=oj&&QL_EMO.indexOf(oj.emotion)>=0?oj.emotion:'';
     $('qlAmt').value=String(Math.abs(Number(t.pnl)));$('qlLot').value=String(t.volume);
     $('qlPips').value=t.pips!=null&&isFinite(Number(t.pips))?String(Math.abs(Number(t.pips))):'';
-    $('qlSym').value=t.symbol||'';$('qlNote').value=oj?String(oj.body||''):String(t.notes||'');
+    $('qlSym').value=t.symbol||'';$('qlEn').value=t.entry!=null&&isFinite(Number(t.entry))?String(t.entry):'';$('qlEx').value=t.exit!=null&&isFinite(Number(t.exit))?String(t.exit):'';
+    $('qlNote').value=oj?String(oj.body||''):String(t.notes||'');
     shot=list.length===1?list[0]:null;
     $('qlTitle').textContent='Edit Quick Log trade';$('qlSub').textContent='Date and time stay as first logged.';$('qlSave').textContent='Save changes';
     paintSeg();paintShot();
@@ -12220,7 +12237,7 @@ setTimeout(render,1500);setInterval(render,30000);render();
   function saveEdit(){
     var f=findQl(editCtx.id);
     if(!f){msg('That trade is no longer on this device. Nothing was changed.',true);return}
-    var r=qlEditBuild(f.t,f.oj,{dir:dir,res:res,amount:$('qlAmt').value,lot:$('qlLot').value,pips:$('qlPips').value,sym:$('qlSym').value,emotion:emo,note:$('qlNote').value,keepBody:editCtx.locked,shot:!!shot,editedAt:Date.now()});
+    var r=qlEditBuild(f.t,f.oj,{dir:dir,res:res,amount:$('qlAmt').value,lot:$('qlLot').value,pips:$('qlPips').value,sym:$('qlSym').value,entry:$('qlEn').value,exit:$('qlEx').value,emotion:emo,note:$('qlNote').value,keepBody:editCtx.locked,shot:!!shot,editedAt:Date.now()});
     if(!r.ok){msg(r.why,true);return}
     busy=true;$('qlSave').disabled=true;
     var prev={};
