@@ -3483,7 +3483,7 @@ window.__mountOpenPos=function(){const o=(window.__openTrades||[]).concat((windo
             <div class="gg-stepper"><button onclick="ggStep('mrv',-1)">&minus;</button><input id="ggMrv" value="0" readonly><button onclick="ggStep('mrv',1)">+</button></div>
             <small class="gg-field-note">After this many revenge trades in a day, the circuit breaker banner shows on every tab until the 06:00 IST reset. Needs the revenge window above. 0 = off.</small></div>
           <div class="gg-field"><span class="l">Same-direction loss cap (% of initial balance)</span>
-            <div class="gg-stepper"><button onclick="ggStep('sdl',-0.5)">&minus;</button><input id="ggSdl" value="0" readonly><button onclick="ggStep('sdl',0.5)">+</button></div>
+            <div class="gg-stepper"><button onclick="ggStep('sdl',-0.1)">&minus;</button><input id="ggSdl" value="0" readonly><button onclick="ggStep('sdl',0.1)">+</button></div>
             <small class="gg-field-note">Net loss of all BUY trades, or all SELL trades, in one trading day across every symbol. When it reaches this share of your initial balance, the circuit breaker banner shows until the 06:00 IST reset. Closed trades only. 0 = off.</small></div>
           <div class="gg-field"><span class="l">Friday cutoff (IST)</span><input class="gg-select" id="ggFri" type="time">
             <small class="gg-field-note">On Fridays, a banner shows on every tab for the 30 minutes before this time. The journal only warns. It cannot close positions. Empty = off.</small></div>
