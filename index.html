@@ -1044,6 +1044,7 @@
   .t-ql-acts .btn-ghost{margin-top:4px;font-size:11.5px;padding:6px 12px}
   .t-ql-acts .t-ql-del{color:var(--red)}
   .jv-foot .j-ql-del{color:var(--red)}
+  .rc-ql{display:inline-flex;gap:6px;white-space:nowrap}.rc-ql .btn-ghost{font-size:11.5px;padding:6px 12px}.rc-ql .rc-ql-del{color:var(--red)}
   .t-empty{display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center;padding:44px 20px}.t-empty span{color:var(--sub);font-size:12.5px;margin-bottom:6px}
   #tMore{display:flex;justify-content:center;margin-top:6px}
 
@@ -10019,12 +10020,14 @@ window.__renderAnSetups=renderBoth;window.__renderAnEmotions=renderEmo;setTimeou
     if(broken.length) notes.push(['var(--red)','Daily rule broken',broken.join(' and ').replace(/^./,function(m){ return m.toUpperCase(); })+'.']);
 
     var jn=jRows.filter(Boolean).length;
+    var qlLk={};try{(JSON.parse(localStorage.getItem('viztrade_trading_page_trades')||'[]')||[]).forEach(function(q){if(q&&/^ql-/.test(String(q.id)))qlLk[window.JLAdapter.liveKey(q)]=q.id})}catch(_){}
+    var hasQl=rows.some(function(t){ return t._lk!=null&&!!qlLk[t._lk]; });
     var rowsHtml=rows.map(function(t){
-      var p=Number(t.pnl), idx=(window.__trades||[]).indexOf(t);
+      var p=Number(t.pnl), idx=(window.__trades||[]).indexOf(t), qid=t._lk!=null?qlLk[t._lk]:null;
       return '<tr'+(idx>=0?' data-i="'+idx+'" title="Open this trade in the Journal"':'')+'><td>'+(window.iconFor?window.iconFor(t.sym):'')+'</td><td class="mono">'+esc(String(t.t).slice(0,5))+'</td><td style="font-weight:600">'+esc(t.sym)+'</td>'+
         '<td><span class="side-tag '+(t.side==='BUY'?'long':'short')+'">'+(t.side==='BUY'?'Long':'Short')+'</span></td><td style="color:var(--faint)">'+esc(t.ses)+'</td>'+
         '<td class="mono">'+fixed(t.en)+'</td><td class="mono">'+fixed(t.ex)+'</td><td style="color:var(--faint)">Not tracked</td>'+
-        '<td class="mono" style="color:'+(p>=0?'var(--green)':'var(--red)')+';font-weight:650">'+(p>=0?'+':'')+'$'+p.toFixed(2)+'</td><td style="color:var(--sub)">'+esc(WHY[t.why]||'—')+'</td></tr>';
+        '<td class="mono" style="color:'+(p>=0?'var(--green)':'var(--red)')+';font-weight:650">'+(p>=0?'+':'')+'$'+p.toFixed(2)+'</td><td style="color:var(--sub)">'+esc(WHY[t.why]||'—')+'</td>'+(hasQl?'<td>'+(qid?'<span class="rc-ql"><button type="button" class="btn-ghost" data-qled="'+esc(qid)+'">Edit trade</button><button type="button" class="btn-ghost rc-ql-del" data-qldel="'+esc(qid)+'">Delete trade</button></span>':'')+'</td>':'')+'</tr>';
     }).join('');
 
     $('rcBody').innerHTML=
@@ -10051,7 +10054,7 @@ window.__renderAnSetups=renderBoth;window.__renderAnEmotions=renderEmo;setTimeou
         '<div class="rr-tile"><div class="l">ENDING STREAK</div><div class="v">'+streak+'</div></div>'+
       '</div></div>'+
       '<div class="panel glass rc-sim" id="rcSim">'+simHtml(key)+'</div>'+(function(){var h=typeof window.jlDjView==='function'?window.jlDjView(key):'';return h?'<div class="panel glass" id="rcDj">'+h+'</div>':''})()+
-      '<div class="panel glass"><div class="tbl-head"><h2 style="margin:0">Trades this day</h2><span class="pill">'+plural(rows.length,'trade')+'</span></div><div style="overflow-x:auto"><table><thead><tr><th style="width:32px"></th><th>TIME</th><th>SYMBOL</th><th>SIDE</th><th>SESSION</th><th>ENTRY</th><th>EXIT</th><th>DURATION</th><th>P&amp;L</th><th>REASON</th></tr></thead><tbody>'+rowsHtml+'</tbody></table></div></div>';
+      '<div class="panel glass"><div class="tbl-head"><h2 style="margin:0">Trades this day</h2><span class="pill">'+plural(rows.length,'trade')+'</span></div><div style="overflow-x:auto"><table><thead><tr><th style="width:32px"></th><th>TIME</th><th>SYMBOL</th><th>SIDE</th><th>SESSION</th><th>ENTRY</th><th>EXIT</th><th>DURATION</th><th>P&amp;L</th><th>REASON</th>'+(hasQl?'<th></th>':'')+'</tr></thead><tbody>'+rowsHtml+'</tbody></table></div></div>';
   }
   function show(){
     document.querySelectorAll('.view').forEach(function(s){ s.hidden=s.id!=='view-recap'; });
@@ -10063,6 +10066,8 @@ window.__renderAnSetups=renderBoth;window.__renderAnEmotions=renderEmo;setTimeou
   $('rcBack').addEventListener('click',back);
   document.addEventListener('keydown',function(e){ if(e.key==='Escape'&&!view.hidden) back(); });
   $('rcBody').addEventListener('click',function(e){
+    var qb=e.target.closest('[data-qled],[data-qldel]');
+    if(qb){ var qf=qb.hasAttribute('data-qled')?window.qlEditTrade:window.qlDeleteTrade; if(typeof qf==='function') qf(qb.getAttribute('data-qled')||qb.getAttribute('data-qldel'),qb); return; }
     var chip=e.target.closest('[data-simp]');
     if(chip){ simP=chip.getAttribute('data-simp'); var host=$('rcSim'); if(host&&curKey) host.innerHTML=simHtml(curKey); return; }
     var tr=e.target.closest('tr[data-i]'); if(!tr) return;
