@@ -7933,7 +7933,13 @@ function fillHero(){const s=(id,h)=>{const e=$(id);if(e)e.innerHTML=h};
       const w = sub('aicN2'); if(w) w.textContent = A.W+'W · '+A.L+'L · '+A.BE+'BE';
       const p = sub('aicN3'); if(p){ const ex = A.n ? A.net/A.n : 0; p.textContent = 'PF '+(A.pf||0).toFixed(2)+' · exp '+(ex<0?'−$':'$')+Math.abs(ex).toFixed(2)+'/trade'; }
       const lk = $('aicN4'), lv = lk && lk.parentElement.querySelector('.v');
-      if(lv) lv.textContent = (window.__trades||[]).some(t=>t.rev) ? 'Revenge trade' : 'None flagged';
+      if(lv){
+        const ms=((A.leak&&A.leak.Mistakes)||[]).filter(x=>x&&typeof x[1]==='number'&&x[1]<0&&x[2]>0);
+        const wm=ms.length?ms.reduce((a,b)=>b[1]<a[1]?b:a):null;
+        const ls=lk.parentElement.querySelector('.s');
+        if(wm){ lv.textContent=wm[0]; if(ls) ls.textContent=(wm[1]<0?'−$':'$')+Math.abs(wm[1]).toFixed(2)+' across '+wm[2]+(wm[2]===1?' trade':' trades'); }
+        else lv.textContent = (window.__trades||[]).some(t=>t.rev) ? 'Revenge trade' : 'None flagged';
+      }
     })();
     animateBars();
 
