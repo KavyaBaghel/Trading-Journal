@@ -10307,6 +10307,7 @@ function mergeImportedTrades(existingTrades, incomingTrades){
 
 const JOURNAL_TOMB_KEY = 'journall_deleted_journals';
 const JOURNAL_LIST_KEY = 'krishna_journal_page_entries';
+const TRADE_TOMB_KEY = 'journall_deleted_trades';
 
 function mergeJournalTombstones(a, b){
   /* {journalId: {t: timestamp, d: 1 deleted | 0 restored}} - the newest decision per id wins */
@@ -10325,11 +10326,16 @@ function mergeJournalTombstones(a, b){
 function mergeSyncedStorageMaps(remoteStorage = {}, localStorageSnapshot = {}){
   const merged = {...remoteStorage};
   const tombs = mergeJournalTombstones(remoteStorage?.[JOURNAL_TOMB_KEY], localStorageSnapshot?.[JOURNAL_TOMB_KEY]);
+  const tombsT = mergeJournalTombstones(remoteStorage?.[TRADE_TOMB_KEY], localStorageSnapshot?.[TRADE_TOMB_KEY]);
   const keys = new Set([...Object.keys(remoteStorage || {}), ...Object.keys(localStorageSnapshot || {})]);
   keys.forEach(key => {
     if(!shouldSyncKey(key)) return;
     if(key === JOURNAL_TOMB_KEY){
       if(Object.keys(tombs).length) merged[key] = JSON.stringify(tombs);
+      return;
+    }
+    if(key === TRADE_TOMB_KEY){
+      if(Object.keys(tombsT).length) merged[key] = JSON.stringify(tombsT);
       return;
     }
     const remoteVal = remoteStorage?.[key];
@@ -10371,6 +10377,16 @@ function mergeSyncedStorageMaps(remoteStorage = {}, localStorageSnapshot = {}){
 
     merged[key] = localVal;
   });
+  /* drop Quick Log trades that were deleted on any device, whichever side still holds them (trade lists merge as a union, so without this a deleted trade comes back) */
+  if(Object.keys(tombsT).length){
+    ['viztrade_trades', 'viztrade_trading_page_trades'].forEach(k => {
+      if(typeof merged[k] !== 'string') return;
+      const l = parseSyncValue(merged[k]);
+      if(!Array.isArray(l)) return;
+      const kept = l.filter(t => !(t && t.id != null && tombsT[String(t.id)] && tombsT[String(t.id)].d === 1));
+      if(kept.length !== l.length) merged[k] = JSON.stringify(kept);
+    });
+  }
   /* drop journals that were deleted on any device, whichever side still holds them */
   if(typeof merged[JOURNAL_LIST_KEY] === 'string'){
     let list = parseSyncValue(merged[JOURNAL_LIST_KEY]);
