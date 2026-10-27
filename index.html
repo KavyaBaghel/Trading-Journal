@@ -1040,6 +1040,8 @@
   .t-expand-cell p b{color:var(--faint);font-weight:600;margin-right:5px}
   .t-expand-empty{font-style:italic;color:var(--faint)!important}
   .t-expand-open{margin-top:4px;font-size:11.5px;padding:6px 12px}
+  .t-ql-acts{display:inline-flex;gap:8px;margin-left:8px;flex-wrap:wrap}
+  .t-ql-acts .btn-ghost{margin-top:4px;font-size:11.5px;padding:6px 12px}
   .t-empty{display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center;padding:44px 20px}.t-empty span{color:var(--sub);font-size:12.5px;margin-bottom:6px}
   #tMore{display:flex;justify-content:center;margin-top:6px}
 
@@ -5780,6 +5782,8 @@ const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;'
 // Same key shape as the Journal tab's key() — kept local since it's a trivial pure
 // function of trade fields, not stateful data worth sharing via window.
 const trKey=t=>t.d+' '+t.t+' '+t.side+' '+t.en+' '+t.pnl;
+/* Quick Log trades (ids starting ql-) get Edit in the expanded row; map their live key to the stored id */
+const qlMap=()=>{const m={};try{(JSON.parse(localStorage.getItem('viztrade_trading_page_trades')||'[]')||[]).forEach(t=>{if(t&&/^ql-/.test(String(t.id)))m[window.JLAdapter.liveKey(t)]=t.id})}catch(_){}return m};
 const col=k=>k==='win'?'var(--green)':k==='loss'?'var(--red)':'var(--faint)';
 const sec=t=>{const p=t.split(':');return +p[0]*3600+ +p[1]*60+ +p[2]};
 
@@ -5843,7 +5847,7 @@ function row(x,mx,journals){const k=kind(x.pnl),mv=x.side==='BUY'?x.ex-x.en:x.en
   '<td><div class="mono t-pl" style="color:'+col(k)+'">'+money(x.pnl)+'</div><div class="t-mag"><i style="width:'+Math.max(4,Math.abs(x.pnl)/mx*100)+'%;background:'+col(k)+'"></i></div></td>'+
   '<td>'+((je&&(je.setup||je.emotion))?'<div class="t-stags">'+(je.setup?'<span class="t-stag">'+esc(je.setup)+'</span>':'')+(je.emotion?'<span class="t-stag t-stag-emo">'+esc(je.emotion)+'</span>':'')+'</div>':'<span class="t-dash" title="No setup or emotion tagged">-</span>')+(je?'<div style="margin-top:6px">'+window.jGradeChip(je.q)+'</div>':'')+'</td>'+
   '<td>'+(x.tags&&x.tags.length?x.tags.map(g=>'<span class="t-tag">'+g+'</span>').join(''):'')+(x.rev?'<span class="t-tag t-tag-rev">Revenge trade · lot '+x.revSize+'</span>':'')+'<div class="t-jn'+(x.j?' ok':'')+'">'+(x.j?'Journaled':'Needs journal')+'</div></td></tr>'+
-  '<tr class="t-expand-row" data-key="'+esc(rk)+'"><td colspan="10"><div class="t-expand-cell">'+detailHtml+'<button type="button" class="btn-ghost t-expand-open" data-openkey="'+esc(rk)+'">Open full journal →</button></div></td></tr>'}
+  '<tr class="t-expand-row" data-key="'+esc(rk)+'"><td colspan="10"><div class="t-expand-cell">'+detailHtml+'<button type="button" class="btn-ghost t-expand-open" data-openkey="'+esc(rk)+'">Open full journal →</button>'+((window.__qlM||{})[x._lk]?'<span class="t-ql-acts"><button type="button" class="btn-ghost t-ql-edit" data-qlid="'+esc((window.__qlM||{})[x._lk])+'">Edit trade</button></span>':'')+'</div></td></tr>'}
 
 function kpis(a){const w=a.filter(x=>kind(x.pnl)==='win'),l=a.filter(x=>kind(x.pnl)==='loss'),n=a.length,sum=z=>z.reduce((s,x)=>s+x.pnl,0),net=sum(a)+a.reduce((q,x)=>q+(x.cost||0),0),ns=a.filter(x=>x.sl==null).length,jd=a.filter(x=>x.j).length,rvTrades=a.filter(x=>x.rev),rv=rvTrades.length;
   const revWin=Number(window.jlRevWindowMin)||0;
@@ -5857,6 +5861,7 @@ function kpis(a){const w=a.filter(x=>kind(x.pnl)==='win'),l=a.filter(x=>kind(x.p
   ['Journaled',jd+' / '+n,'',(n-jd)+' still need a note']].map(c=>'<div><span>'+c[0]+'</span><b'+(c[2]?' style="color:'+c[2]+'"':'')+'>'+c[1]+'</b><small>'+c[3]+'</small></div>').join('')}
 
 function render(){
+  window.__qlM=qlMap();
   let a=f.merge?group(T):T;
   a=a.filter(x=>(f.ses==='All'||x.ses===f.ses)&&(f.res==='All'||kind(x.pnl)===f.res));
   $('tSub').textContent=jlN(T.length,'trade')+' loaded'+(window.__imported?' · from '+window.__imported:'');
@@ -5876,6 +5881,8 @@ function tabs(){document.querySelectorAll('#view-trades .a-tabs[data-g]').forEac
 $('view-trades').addEventListener('click',e=>{
   if(e.target.closest('#tMoreBtn')){f.n+=25;render();return}
   if(e.target.closest('#tClear')){f.ses=f.res='All';f.n=25;tabs();render();return}
+  const qlB=e.target.closest('.t-ql-edit,.t-ql-del');
+  if(qlB){const fn=qlB.classList.contains('t-ql-edit')?window.qlEditTrade:window.qlDeleteTrade;if(typeof fn==='function')fn(qlB.getAttribute('data-qlid'),qlB);return}
   const openBtn=e.target.closest('.t-expand-open');
   if(openBtn){
     const idx=T.findIndex(t=>trKey(t)===openBtn.dataset.openkey);
@@ -12028,6 +12035,37 @@ setTimeout(render,1500);setInterval(render,30000);render();
     if(o.doc>QL_DOC)return{ok:false,why:'Your synced data is close to the cloud size limit, so no more screenshots can be added.'};
     return{ok:true,why:''};
   }
+  function qlOrigMs(id){var m=/^ql-([0-9a-z]+)$/.exec(String(id));if(!m)return NaN;var n=parseInt(m[1],36);return isFinite(n)&&n>0?n:NaN}
+  function qlAutoTitle(res,sym,side){return(res==='win'?'Win':'Loss')+' Journal - '+[sym,side].filter(Boolean).join(' ')}
+  function qlTomb(tomb,id,d,ts){var o={};if(tomb&&typeof tomb==='object'&&!Array.isArray(tomb))Object.keys(tomb).forEach(function(k){o[k]=tomb[k]});o[String(id)]={t:ts,d:d};return o}
+  function qlEditBuild(old,oj,o){
+    o=o||{};
+    if(!old||typeof old!=='object'||!/^ql-/.test(String(old.id)))return{ok:false,why:'This is not a Quick Log trade.'};
+    var ms=qlOrigMs(old.id);if(!isFinite(ms))return{ok:false,why:'Could not read the original time of this trade.'};
+    var keep=!!(o.keepBody&&oj);
+    var b=qlBuild({dir:o.dir,res:o.res,amount:o.amount,lot:o.lot,pips:o.pips,sym:o.sym,emotion:o.emotion,note:keep?String(oj.body||'').slice(0,300):o.note,shot:!!o.shot,now:ms});
+    if(!b.ok)return b;
+    var t=Object.assign({},old);
+    t.side=b.trade.side;t.symbol=b.trade.symbol;t.volume=b.trade.volume;t.pnl=b.trade.pnl;t.notes=b.trade.notes;
+    if(b.trade.pips!=null)t.pips=b.trade.pips;else if(old.pips!=null)t.pips=null;
+    var key=qlLiveKey(t),emo=String(o.emotion||''),noteTxt=keep?String(oj.body||''):b.trade.notes;
+    var has=!!(emo||noteTxt||o.shot);
+    var out={ok:true,trade:t,journal:null,dropJournal:false};
+    var ts=Number(o.editedAt),iso=isFinite(ts)?new Date(ts).toISOString():'';
+    if(oj){
+      var autoOld=qlAutoTitle(oj.result,old.symbol,old.side),plain=!oj.fields||Object.keys(oj.fields).length===0;
+      if(!has&&plain&&oj.title===autoOld){out.dropJournal=true;return out}
+      var j=Object.assign({},oj);
+      j.tradeKey=key;
+      j.trade=Object.assign({},oj.trade||{},{date:t.date,time:t.time,symbol:t.symbol,side:t.side,pnl:t.pnl});
+      j.result=o.res;
+      if(oj.title===autoOld)j.title=qlAutoTitle(o.res,t.symbol,t.side);
+      j.emotion=emo;j.body=keep?oj.body:b.trade.notes;
+      if(iso)j.updatedAt=iso;
+      out.journal=j;
+    }else if(has){out.journal=b.journal}
+    return out;
+  }
   /*QL-PURE-END*/
 
   var KT='viztrade_trading_page_trades',KB='viztrade_trades',KJ='krishna_journal_page_entries',KS='journall_shots_v1';
@@ -12052,12 +12090,12 @@ setTimeout(render,1500);setInterval(render,30000);render();
   fab.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>';
   document.body.appendChild(fab);
 
-  var scrim=null,dir='',res='',emo='',shot=null,warned=false,busy=false,opener=null;
+  var scrim=null,dir='',res='',emo='',shot=null,warned=false,busy=false,opener=null,editCtx=null;
   function build(){
     scrim=document.createElement('div');scrim.className='ql-scrim';scrim.id='qlScrim';scrim.hidden=true;
     scrim.innerHTML='<div class="ql-card" role="dialog" aria-modal="true" aria-labelledby="qlTitle">'
     +'<div class="ql-head"><h2 id="qlTitle">Quick log</h2><button type="button" class="ql-x" id="qlX" aria-label="Close">&times;</button></div>'
-    +'<p class="ql-sub">Saves as a normal trade, dated now in IST.</p>'
+    +'<p class="ql-sub" id="qlSub">Saves as a normal trade, dated now in IST.</p>'
     +'<div class="ql-row"><div class="ql-seg" id="qlDir" role="group" aria-label="Direction"><button type="button" data-v="BUY" aria-pressed="false">Buy</button><button type="button" data-v="SELL" aria-pressed="false">Sell</button></div>'
     +'<div class="ql-seg win" id="qlRes" role="group" aria-label="Result"><button type="button" data-v="win" aria-pressed="false">Win</button><button type="button" data-v="loss" aria-pressed="false">Loss</button></div></div>'
     +'<div class="ql-grid"><label>Result amount (USD)<input type="text" id="qlAmt" inputmode="decimal" autocomplete="off"></label>'
@@ -12102,7 +12140,8 @@ setTimeout(render,1500);setInterval(render,30000);render();
   function reset(){if(warned){warned=false;$('qlSave').textContent='Save trade'}msg('',false)}
   function open(){
     if(!scrim)build();
-    dir='';res='';emo='';shot=null;warned=false;busy=false;
+    dir='';res='';emo='';shot=null;warned=false;busy=false;editCtx=null;
+    $('qlTitle').textContent='Quick log';$('qlSub').textContent='Saves as a normal trade, dated now in IST.';$('qlNote').disabled=false;$('qlAddShot').hidden=false;
     ['qlAmt','qlLot','qlPips','qlSym','qlNote'].forEach(function(id){$(id).value=''});
     $('qlFile').value='';$('qlSave').textContent='Save trade';$('qlSave').disabled=false;msg('',false);paintSeg();paintShot();
     opener=document.activeElement;scrim.hidden=false;fab.style.visibility='hidden';
@@ -12114,7 +12153,7 @@ setTimeout(render,1500);setInterval(render,30000);render();
     if(!/^image\//.test(f.type)){msg('Only image files can be attached.',true);return}
     var d=null;try{d=await shrink(f)}catch(_){msg('Could not read that image.',true);return}
     if(!d){msg('That screenshot is still too large after shrinking.',true);return}
-    var m=rdShots(),before=shotsTotal(m);
+    var m=rdShots(),before=shotsTotal(m)-(editCtx&&editCtx.jid!=null&&m[String(editCtx.jid)]?chars(m[String(editCtx.jid)]):0);
     var r=qlShotCheck({img:d.length,total:before+d.length,totalBefore:before,doc:syncedSize()+d.length});
     if(!r.ok){msg(r.why,true);return}
     shot=d;paintShot();msg('',false);
@@ -12134,6 +12173,7 @@ setTimeout(render,1500);setInterval(render,30000);render();
   }
   function save(){
     if(busy)return;
+    if(editCtx){saveEdit();return}
     var r=qlBuild({dir:dir,res:res,amount:$('qlAmt').value,lot:$('qlLot').value,pips:$('qlPips').value,sym:$('qlSym').value,emotion:emo,note:$('qlNote').value,shot:!!shot,now:Date.now()});
     if(!r.ok){msg(r.why,true);return}
     if(!warned){
@@ -12150,6 +12190,65 @@ setTimeout(render,1500);setInterval(render,30000);render();
     if(typeof window.jlToast==='function')window.jlToast({icon:'check',text:'Trade logged',sub:'Updating the page',duration:2400});
     setTimeout(function(){try{location.reload()}catch(e){}},2500);
   }
+  function toast(o){if(typeof window.jlToast==='function')window.jlToast(o)}
+  var KJT='journall_deleted_journals';
+  function rdObj(k){try{var v=JSON.parse(localStorage.getItem(k)||'null');return v&&typeof v==='object'&&!Array.isArray(v)?v:{}}catch(e){return{}}}
+  function findQl(id){
+    var t=rd(KT).filter(function(x){return x&&x.id===id})[0];if(!t||!/^ql-/.test(String(id)))return null;
+    var key=qlLiveKey(t),ms=qlOrigMs(id),J=rd(KJ);
+    var oj=J.filter(function(e){return e&&String(e.tradeKey)===key})[0]||J.filter(function(e){return e&&String(e.id)===String(ms)})[0]||null;
+    return{t:t,oj:oj};
+  }
+  function editTrade(id,btn){
+    var f=findQl(id);
+    if(!f){toast({icon:'trash',text:'Could not find that trade on this device',duration:3200,progress:false});return}
+    var t=f.t,oj=f.oj,list=oj?(rdShots()[String(oj.id)]||[]):[];
+    open();
+    if(btn)opener=btn;
+    editCtx={id:id,jid:oj?oj.id:null,locked:!!(oj&&String(oj.body||'').length>300),shotLocked:list.length>1};
+    dir=t.side;res=Number(t.pnl)<0?'loss':'win';emo=oj&&QL_EMO.indexOf(oj.emotion)>=0?oj.emotion:'';
+    $('qlAmt').value=String(Math.abs(Number(t.pnl)));$('qlLot').value=String(t.volume);
+    $('qlPips').value=t.pips!=null&&isFinite(Number(t.pips))?String(Math.abs(Number(t.pips))):'';
+    $('qlSym').value=t.symbol||'';$('qlNote').value=oj?String(oj.body||''):String(t.notes||'');
+    shot=list.length===1?list[0]:null;
+    $('qlTitle').textContent='Edit Quick Log trade';$('qlSub').textContent='Date and time stay as first logged.';$('qlSave').textContent='Save changes';
+    paintSeg();paintShot();
+    if(editCtx.locked){$('qlNote').disabled=true;msg('This note is longer than 300 characters, so it stays as it is. Edit it in Journal.',false)}
+    if(editCtx.shotLocked){$('qlAddShot').hidden=true;$('qlShotMsg').textContent=list.length+' screenshots, manage them in Journal'}
+  }
+  function saveEdit(){
+    var f=findQl(editCtx.id);
+    if(!f){msg('That trade is no longer on this device. Nothing was changed.',true);return}
+    var r=qlEditBuild(f.t,f.oj,{dir:dir,res:res,amount:$('qlAmt').value,lot:$('qlLot').value,pips:$('qlPips').value,sym:$('qlSym').value,emotion:emo,note:$('qlNote').value,keepBody:editCtx.locked,shot:!!shot,editedAt:Date.now()});
+    if(!r.ok){msg(r.why,true);return}
+    busy=true;$('qlSave').disabled=true;
+    var prev={};
+    function snap(k){if(!(k in prev))prev[k]=localStorage.getItem(k)}
+    try{
+      snap(KT);var T=rd(KT),i=T.findIndex(function(x){return x&&x.id===editCtx.id});if(i<0)throw new Error('gone');T[i]=r.trade;localStorage.setItem(KT,JSON.stringify(T));
+      var oj=f.oj,jid=null;
+      if(r.dropJournal||r.journal){
+        snap(KJ);var J=rd(KJ);
+        if(r.dropJournal){jid=oj.id;J=J.filter(function(e){return !(e&&String(e.id)===String(oj.id))});snap(KJT);localStorage.setItem(KJT,JSON.stringify(qlTomb(rdObj(KJT),oj.id,1,Date.now())))}
+        else{
+          jid=r.journal.id;var k=J.findIndex(function(e){return e&&String(e.id)===String(jid)});if(k>=0)J[k]=r.journal;else J.push(r.journal);
+          var tb=rdObj(KJT);if(tb[String(jid)]&&tb[String(jid)].d===1){snap(KJT);localStorage.setItem(KJT,JSON.stringify(qlTomb(tb,jid,0,Date.now())))}
+        }
+        localStorage.setItem(KJ,JSON.stringify(J));
+      }
+      if(jid!=null&&!editCtx.shotLocked){
+        var m=rdShots(),kk=String(jid),want=shot?[shot]:[];
+        if(JSON.stringify(m[kk]||[])!==JSON.stringify(want)){snap(KS);m[kk]=want;localStorage.setItem(KS,JSON.stringify(m))}
+      }
+    }catch(e){
+      Object.keys(prev).forEach(function(k){try{if(prev[k]==null)localStorage.removeItem(k);else localStorage.setItem(k,prev[k])}catch(_){}});
+      busy=false;$('qlSave').disabled=false;msg('Could not save. Your browser storage may be full. Nothing was changed.',true);return;
+    }
+    close();
+    toast({icon:'check',text:'Trade updated',sub:'Updating the page',duration:2400});
+    setTimeout(function(){try{location.reload()}catch(e){}},2500);
+  }
+  window.qlEditTrade=editTrade;
   fab.addEventListener('click',open);
 })();
 </script>
