@@ -1043,6 +1043,7 @@
   .t-ql-acts{display:inline-flex;gap:8px;margin-left:8px;flex-wrap:wrap}
   .t-ql-acts .btn-ghost{margin-top:4px;font-size:11.5px;padding:6px 12px}
   .t-ql-acts .t-ql-del{color:var(--red)}
+  .jv-foot .j-ql-del{color:var(--red)}
   .t-empty{display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center;padding:44px 20px}.t-empty span{color:var(--sub);font-size:12.5px;margin-bottom:6px}
   #tMore{display:flex;justify-content:center;margin-top:6px}
 
@@ -6222,8 +6223,11 @@ function ecard(e){(window.__jlShareE=window.__jlShareE||{})[e.id]=e;const k=e.pn
     '<div class="jv-id"><b>'+ttl+'</b><span class="mono">'+esc([e.date,e.time,e.sym,e.side].filter(Boolean).join(' · '))+'</span></div>'+
     '<div class="jv-r">'+(e.pnl==null?'':'<span class="jv-pnl mono">'+money(e.pnl)+'</span>')+window.jGradeChip(e.q)+'</div></div>'+
     (chips?'<div class="jv-chips">'+chips+'</div>':'')+(notes?'<div class="jv-notes">'+notes+'</div>':'')+
-    '<div class="jv-foot">'+(e.pnl==null?'':'<button type="button" class="btn-ghost j-sm" data-share="'+esc(e.id)+'">Share</button>')+'<button type="button" class="btn-ghost j-sm" data-ed="'+esc(e.id)+'">Edit</button><button type="button" class="btn-ghost j-sm" data-del="'+esc(e.id)+'">Delete</button></div></article>'}
-function renderList(){const s=qs.toLowerCase(),a=J.filter(e=>(jf==='All'||(e.pnl==null?'note':kind(e.pnl))===jf)&&(!s||JSON.stringify(e).toLowerCase().includes(s)));
+    '<div class="jv-foot">'+(e.pnl==null?'':'<button type="button" class="btn-ghost j-sm" data-share="'+esc(e.id)+'">Share</button>')+'<button type="button" class="btn-ghost j-sm" data-ed="'+esc(e.id)+'">Edit</button><button type="button" class="btn-ghost j-sm" data-del="'+esc(e.id)+'">Delete</button>'+(qlByKey[e.key]?'<button type="button" class="btn-ghost j-sm" data-qled="'+esc(qlByKey[e.key])+'">Edit trade</button><button type="button" class="btn-ghost j-sm j-ql-del" data-qldel="'+esc(qlByKey[e.key])+'">Delete trade</button>':'')+'</div></article>'}
+var qlByKey={};
+function qlKeys(){const m={},lk={};try{(JSON.parse(localStorage.getItem('viztrade_trading_page_trades')||'[]')||[]).forEach(t=>{if(t&&/^ql-/.test(String(t.id)))lk[window.JLAdapter.liveKey(t)]=t.id})}catch(_){}
+  T.forEach(t=>{const id=t&&t._lk!=null?lk[t._lk]:null;if(id)m[key(t)]=id});return m}
+function renderList(){qlByKey=qlKeys();const s=qs.toLowerCase(),a=J.filter(e=>(jf==='All'||(e.pnl==null?'note':kind(e.pnl))===jf)&&(!s||JSON.stringify(e).toLowerCase().includes(s)));
   $('jCnt').textContent=J.length+(J.length===1?' entry':' entries');
   $('jList').innerHTML=a.length?a.map(ecard).join(''):'<div class="j-none">No journals match. Save a trade journal or clear the search.</div>'}
 function jKP(){const d=T.filter(t=>t.j).length,left=T.length-d,pct=T.length?d/T.length*100:0,
@@ -6257,6 +6261,7 @@ function sync(){T.forEach(t=>{t.j=J.some(e=>e.key===key(t))});const d=T.filter(t
   jKP();renderList();misCard();fillSel();if(window.__trRender)window.__trRender()}
 
 $('view-journal').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;const d=b.dataset,pid=b.parentNode.id;
+  if(d.qled||d.qldel){const fn=d.qled?window.qlEditTrade:window.qlDeleteTrade;if(typeof fn==='function')fn(d.qled||d.qldel,b);return}
   if(d.emo){cur.emotion=cur.emotion===d.emo?'':d.emo;card();return}
   if(d.t){const i=cur.tags.indexOf(d.t);if(i<0)cur.tags.push(d.t);else cur.tags.splice(i,1);tags();return}
   if(b.parentNode.dataset.q!=null){cur.q[+b.parentNode.dataset.q]=d.v;yn();return}
