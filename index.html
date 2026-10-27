@@ -2901,7 +2901,7 @@ window.jlLiveBalance=function(Z){
     function top(g){return Object.keys(g).map(function(k){return[k,g[k]]}).sort(function(a,b){return b[1].n-a[1].n||(a[0]<b[0]?-1:1)}).slice(0,8)}
     var su={},em={},tg={};
     J.forEach(function(j){if(!use(j))return;var p=+j.pnl,s=String(j.setup||'').trim().slice(0,40),e=String(j.emotion||'').trim().slice(0,40);
-      if(s){add(su,s,p);if(j.key)bykey[j.key]=s}if(e)add(em,e,p);(Array.isArray(j.tags)?j.tags:[]).forEach(function(x){x=String(x||'').trim().slice(0,40);if(x)add(tg,x,p)})});
+      if(s){add(su,s,p);if(j.key)bykey[j.key]=s}if(e)add(em,e,p);(Array.isArray(j.tags)?j.tags:[]).forEach(function(x){x=String(x||'').trim().slice(0,40);if(x==='Lot Over 0.02')x='Lot Over Limit';if(x)add(tg,x,p)})});
     var pb=[];try{var raw=JSON.parse(localStorage.getItem('journall_playbook_v1')||'[]');if(Array.isArray(raw))raw.slice(0,8).forEach(function(p){if(p&&p.name)pb.push({name:String(p.name).slice(0,40),take:String(p.take||'').replace(/\s+/g,' ').trim().slice(0,300),skip:String(p.skip||'').replace(/\s+/g,' ').trim().slice(0,300)})})}catch(e){}
     return{setups:top(su),emotions:top(em),tags:top(tg),playbook:pb,bykey:bykey}}
   function ctx(){
@@ -4657,7 +4657,7 @@ window.jlApplyChLimits=function(o){
   if(mode==='real'){try{const im=JSON.parse(localStorage.getItem('jlImport')||'null');if(im&&Array.isArray(im.closed)){/* fold commission + swap into P&L so every figure is net, like the MT5 report */const nt=t=>{if(t&&!t._n){t.gpnl=t.pnl;t.pnl=Math.round((t.pnl+(t.cost||0))*100)/100;t.cost=0;t._n=1}return t};im.closed.forEach(nt);(im.open||[]).forEach(nt);window.__trades=im.closed;window.__openTrades=im.open||[];window.__imported=im.file}}catch(e){}}
   /* aggregates every Analytics widget reads (nothing per-widget is hardcoded) */
   const T=(window.__trades||[]).slice().sort((a,b)=>a.d+a.t<b.d+b.t?-1:1),demo=mode==='demo',n=T.length;
-  let JJ=[];try{JJ=JSON.parse(localStorage.getItem('jlJournals'))||[]}catch(e){}const jm={};JJ.forEach(e=>{if(e&&e.key&&e.tags&&e.tags.length)jm[e.key]=e.tags});
+  let JJ=[];try{JJ=JSON.parse(localStorage.getItem('jlJournals'))||[]}catch(e){}const jm={};JJ.forEach(e=>{if(e&&e.key&&e.tags&&e.tags.length)jm[e.key]=e.tags.map(x=>x==='Lot Over 0.02'?'Lot Over Limit':x)});
   (window.__trades||[]).forEach(t=>{t.tags=demo?(t.tag?[t.tag]:[]):(jm[t.d+' '+t.t+' '+t.side+' '+t.en+' '+t.pnl]||[])});
   let gp=0,gl=0,W=0,L=0,BE=0,c=0,pk=0,dd=0;const eq=[];
   let sw=0,sl=0; /* sw/sl = money in trades classed win/loss; gp/gl stay total money for net and profit factor */
@@ -6070,7 +6070,7 @@ const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;'
 const money=v=>(v<0?'-$':'+$')+Math.abs(v).toFixed(2),kind=p=>window.jlKind(p);
 const col=k=>k==='win'?'var(--green)':k==='loss'?'var(--red)':'var(--faint)';
 const key=t=>t.d+' '+t.t+' '+t.side+' '+t.en+' '+t.pnl;
-const TAGS=['No Patience','Revenge Trade','Overtrading','Moved SL','No SL','FOMO','SL Too Tight','Early Exit','Early Entry','Fear Entry','Not My Setup','Same Entry','Over Limit','News Trade','Missed Entry','Trailed SL Early','Stacked Position','Lot Over 0.02'];
+const TAGS=['No Patience','Revenge Trade','Overtrading','Moved SL','No SL','FOMO','SL Too Tight','Early Exit','Early Entry','Fear Entry','Not My Setup','Same Entry','Over Limit','News Trade','Missed Entry','Trailed SL Early','Stacked Position','Lot Over Limit'];
 const EMOTIONS=['Calm','Confident','FOMO','Fear','Greed','Anxious','Frustrated','Revenge'];
 const PH={shot:'No screenshot attached',rec:'No recording attached'};
 const SEED=[];
@@ -6193,7 +6193,7 @@ $('jConfWrap').addEventListener('click',e=>{const x=e.target.closest('[data-cfx]
 $('jConfNew').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();addConf()}});
 /*CF-END*/
 function paint(){fillSel();card();yn();tags();conf();resetAtt();if(typeof syncCounts==='function')syncCounts();$('jChk').innerHTML=''}
-function load(e){blank();cur.id=e.id;cur.idx=T.findIndex(t=>key(t)===e.key);cur.free=cur.idx<0;cur.q=(e.q||[null,null,null]).slice();cur.tags=(e.tags||[]).slice();cur.conf=(e.conf||[]).slice();cur.emotion=e.emotion||'';cur.shot=e.shot||'';cur.shots=shFor(e.id);cur.rec=e.rec||'';fields(e);paint();msg('Editing saved journal.')}
+function load(e){blank();cur.id=e.id;cur.idx=T.findIndex(t=>key(t)===e.key);cur.free=cur.idx<0;cur.q=(e.q||[null,null,null]).slice();cur.tags=(e.tags||[]).map(x=>x==='Lot Over 0.02'?'Lot Over Limit':x);cur.conf=(e.conf||[]).slice();cur.emotion=e.emotion||'';cur.shot=e.shot||'';cur.shots=shFor(e.id);cur.rec=e.rec||'';fields(e);paint();msg('Editing saved journal.')}
 function pick(i){const e0=i>=0?J.find(e=>e.key===key(T[i])):null;if(e0){load(e0);return}
   blank();cur.idx=i>=0?i:-1;cur.free=i===-2;fields(null);
   if(i>=0){const t=T[i];$('jDate').value=t.d;$('jSetup').value='';cur.tags=(t.tags||[]).slice().concat(t.sl==null&&!(t.tags||[]).includes('No SL')?['No SL']:[])}
@@ -6231,7 +6231,7 @@ function check(){const e=read(),t=T[cur.idx],r=[],bad=s=>r.push(['var(--red)',s]
 function ecard(e){(window.__jlShareE=window.__jlShareE||{})[e.id]=e;const k=e.pnl==null?'note':kind(e.pnl),c=k==='note'?'var(--accent-2)':col(k),ttl={win:'Win journal',loss:'Loss journal',be:'Break-even journal',note:'Free note'}[k];
   const ic={win:'<path d="M12 19V5M6 11l6-6 6 6"/>',loss:'<path d="M12 5v14M6 13l6 6 6-6"/>',be:'<path d="M5 12h14"/>',note:'<path d="M12 6v14M12 6C10 4.5 7 4 3 4v14c4 0 7 .5 9 2 2-1.5 5-2 9-2V4c-4 0-7 .5-9 2z"/>'}[k];
   const real=v=>{v=String(v==null?'':v).trim();return v&&!/^none$/i.test(v)?v:''},mis=real(e.mistake),imp=real(e.improve);
-  const chips=(e.setup?'<span class="jv-chip"><i>Setup</i>'+esc(e.setup)+'</span>':'')+(e.emotion?'<span class="jv-chip"><i>Feeling</i>'+esc(e.emotion)+'</span>':'')+(e.conf&&e.conf.length?e.conf.map(c=>'<span class="jv-cf">'+esc(c)+'</span>').join(''):'')+(e.tags&&e.tags.length?e.tags.map(t=>'<span class="t-tag">'+esc(t)+'</span>').join(''):'');
+  const chips=(e.setup?'<span class="jv-chip"><i>Setup</i>'+esc(e.setup)+'</span>':'')+(e.emotion?'<span class="jv-chip"><i>Feeling</i>'+esc(e.emotion)+'</span>':'')+(e.conf&&e.conf.length?e.conf.map(c=>'<span class="jv-cf">'+esc(c)+'</span>').join(''):'')+(e.tags&&e.tags.length?e.tags.map(t=>'<span class="t-tag">'+esc(t==='Lot Over 0.02'?'Lot Over Limit':t)+'</span>').join(''):'');
   const notes=(mis?'<div class="jv-note jv-bad"><small>Mistake</small>'+esc(mis)+'</div>':'')+(imp?'<div class="jv-note jv-good"><small>Improve</small>'+esc(imp)+'</div>':'');
   return '<article class="j-entry jv" style="--c:'+c+'"><div class="jv-top"><span class="jv-ic"><svg viewBox="0 0 24 24">'+ic+'</svg></span>'+
     '<div class="jv-id"><b>'+ttl+'</b><span class="mono">'+esc([e.date,e.time,e.sym,e.side].filter(Boolean).join(' · '))+'</span></div>'+
@@ -6358,7 +6358,7 @@ function drRender(){const sec=$('jDraftSec');if(!sec)return;const d=drRead();
 function drResume(){const d=drRead();if(!d)return;const e=d.e,o=d.id?J.find(x=>x.id===d.id):null;
   blank();const idx=d.free?-1:T.findIndex(t=>key(t)===e.key);
   cur.idx=idx;cur.free=!!d.free||idx<0;cur.id=o?o.id:null;cur.shots=cur.id?shFor(cur.id):[];
-  cur.q=(e.q||[null,null,null]).slice();cur.tags=(e.tags||[]).slice();cur.conf=(e.conf||[]).slice();cur.emotion=e.emotion||'';cur.shot=e.shot||'';cur.rec=e.rec||'';
+  cur.q=(e.q||[null,null,null]).slice();cur.tags=(e.tags||[]).map(x=>x==='Lot Over 0.02'?'Lot Over Limit':x);cur.conf=(e.conf||[]).slice();cur.emotion=e.emotion||'';cur.shot=e.shot||'';cur.rec=e.rec||'';
   fields(e);paint();
   msg(!d.free&&idx<0?'That trade is no longer in your list, so the draft opened as a free note.':'Draft restored.');
   const el=$('jTrade');if(el&&el.scrollIntoView)el.scrollIntoView({behavior:'smooth',block:'center'})}
