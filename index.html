@@ -5345,8 +5345,8 @@ const $ = id => document.getElementById(id);
       a.n++;a.net+=p.net;b.n++;b.net+=p.net;
     });
     var flag=function(o){return Object.keys(o).map(function(x){return o[x]}).filter(function(x){return x.n>=minTrades&&x.net<-0.005}).sort(function(a,b){return a.net-b.net})};
-    var paused=raw>0;
-    return {total:order.length,days:flag(byD),hours:paused?[]:flag(byH),paused:paused};
+    var paused=raw>0,totNet=0;order.forEach(function(k){totNet+=pos[k].net});
+    return {total:order.length,avg:order.length?totNet/order.length:0,days:flag(byD),hours:paused?[]:flag(byH),paused:paused};
   }
   /*WT-PURE-END*/
   window.jlWeakTimes=weakTimes;
@@ -8525,7 +8525,8 @@ function fridayEval(nowMs,cutoff,leadMin){
 function weakNowEval(st,nowMs){
   var DN=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'],s=new Date(nowMs+19800000),h=s.getUTCHours(),dw=DN[s.getUTCDay()],parts=[];
   var m=function(x){return (x.net<0?'-':'')+'$'+Math.abs(x.net).toFixed(2)};
-  ((st&&st.days)||[]).forEach(function(x){if(x.k===dw)parts.push(dw+' is a weak weekday for you: net '+m(x)+' over '+x.n+' trades')});
+  var av=function(v){return (v<0?'-':'')+'$'+Math.abs(v).toFixed(2)};
+  ((st&&st.days)||[]).forEach(function(x){if(x.k!==dw)return;var hasAvg=st&&typeof st.avg==='number';if(hasAvg&&!(x.net/x.n<st.avg))return;parts.push(dw+' is a weak weekday for you: net '+m(x)+' over '+x.n+' trades'+(hasAvg?' (avg '+av(x.net/x.n)+' per trade vs '+av(st.avg)+' for all days)':''))});
   ((st&&st.hours)||[]).forEach(function(x){if(x.k===h)parts.push('The '+String(h).padStart(2,'0')+':00 IST hour is weak for you: net '+m(x)+' over '+x.n+' trades')});
   return{warn:parts.length>0,parts:parts,hour:h,dow:dw};
 }
