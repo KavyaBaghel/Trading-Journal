@@ -10148,101 +10148,85 @@ window.__renderAnSetups=renderBoth;window.__renderAnEmotions=renderEmo;setTimeou
 }
 </style>
 <style id="jl-weekly-review-github">
-/* Weekly review: GitHub (Primer dark) look. CSS only, scoped to #weeklyReview. Revert by deleting this block. */
+/* Weekly review: premium dark. CSS only, scoped to #weeklyReview. Revert by deleting this block. */
 #weeklyReview{
-  --gh-bg:#0d1117;--gh-sub:#161b22;--gh-sub2:#1c2128;--gh-bd:#30363d;--gh-tx:#e6edf3;--gh-mut:#8b949e;
-  --gh-grn:#3fb950;--gh-red:#f85149;--gh-amb:#d29922;--gh-blu:#58a6ff;
-  --panel:var(--gh-sub);--panel-2:var(--gh-bg);--border:var(--gh-bd);--border-hi:#484f58;
-  --text:var(--gh-tx);--sub:var(--gh-mut);--faint:var(--gh-mut);
-  --green:var(--gh-grn);--red:var(--gh-red);--warn:var(--gh-amb);--accent:#388bfd;--accent-2:var(--gh-blu);--silver:var(--gh-grn);
-  --pos:var(--gh-grn);--neg:var(--gh-red);--wr-line:var(--gh-bd);--wr-soft:var(--gh-sub);--wr-soft2:var(--gh-sub2);
-  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans",Helvetica,Arial,sans-serif;letter-spacing:0;
-  background:var(--gh-bg);border:1px solid var(--gh-bd);border-radius:6px;padding:24px;color:var(--gh-tx)}
-#weeklyReview *{letter-spacing:0}
-#weeklyReview .mono,#weeklyReview .panel-head .hint,#weeklyReview .wr-hh,#weeklyReview .wr-hd{font-family:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,monospace}
+  --pr-mint:#6fe0a8;--pr-mint-d:#2f9e6b;--pr-coral:#f2897d;--pr-coral-d:#b5483f;--pr-vio:#a99bff;--pr-line:rgba(255,255,255,.075);--pr-card:linear-gradient(180deg,rgba(255,255,255,.04),rgba(255,255,255,.012));
+  --green:var(--pr-mint);--red:var(--pr-coral);--pos:var(--pr-mint);--neg:var(--pr-coral);--silver:var(--pr-mint);--wr-line:var(--pr-line);
+  position:relative;padding:30px 30px 32px;border-radius:30px;border:1px solid var(--pr-line);
+  background:radial-gradient(900px 340px at 8% -4%,rgba(124,108,240,.13),transparent 62%),linear-gradient(180deg,rgba(255,255,255,.022),rgba(255,255,255,.006));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 40px 80px -50px rgba(0,0,0,.9)}
+#weeklyReview .panel-head{margin-bottom:22px;gap:12px;flex-wrap:wrap}
+#weeklyReview .panel-head h2{font-size:19px;font-weight:650;letter-spacing:-.02em;gap:12px}
+#weeklyReview .panel-head h2::before{display:block;width:34px;height:34px;border-radius:11px;border:1px solid rgba(169,155,255,.28);background-color:rgba(124,108,240,.14);box-shadow:inset 0 1px 0 rgba(255,255,255,.08)}
+#weeklyReview .panel-head .hint{font:500 11.5px "IBM Plex Mono",ui-monospace,monospace;color:var(--sub);padding:7px 14px;border-radius:99px;border:1px solid var(--pr-line);background:rgba(255,255,255,.025)}
 
-/* header */
-#weeklyReview .panel-head{margin-bottom:16px;padding-bottom:16px;border-bottom:1px solid var(--gh-bd);gap:12px;flex-wrap:wrap}
-#weeklyReview .panel-head h2{font-size:24px;font-weight:600;line-height:1.25}
-#weeklyReview .panel-head h2::before{display:none}
-#weeklyReview .panel-head .hint{font-size:12px;font-weight:500;color:var(--gh-mut);border:1px solid var(--gh-bd);border-radius:2em;padding:2px 10px;background:none}
+/* hero */
+#weeklyReview .wr-hero{border-radius:24px;border:1px solid var(--pr-line);overflow:hidden;margin-bottom:16px;
+  background:radial-gradient(620px 260px at 0% 0%,rgba(111,224,168,.11),transparent 70%),var(--pr-card);box-shadow:inset 0 1px 0 rgba(255,255,255,.07)}
+#weeklyReview .wr-hero:has(.wr-net[style*="--red"]){background:radial-gradient(620px 260px at 0% 0%,rgba(242,137,125,.12),transparent 70%),var(--pr-card)}
+#weeklyReview .wr-hero-main{padding:34px 36px 26px}
+#weeklyReview .wr-lab{font-size:12px;font-weight:550;letter-spacing:.01em;text-transform:none;color:var(--sub)}
+#weeklyReview .wr-net{margin-top:10px;font-size:clamp(46px,6.4vw,68px);font-weight:650;line-height:1;letter-spacing:-.045em;font-variant-numeric:tabular-nums;
+  background:linear-gradient(180deg,#c9ffe3 0%,#6fe0a8 55%,#3bb27a 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent!important;filter:drop-shadow(0 10px 30px rgba(111,224,168,.22))}
+#weeklyReview .wr-net[style*="--red"]{background:linear-gradient(180deg,#ffd3cd 0%,#f2897d 55%,#d4574b 100%);-webkit-background-clip:text;background-clip:text;filter:drop-shadow(0 10px 30px rgba(242,137,125,.2))}
+#weeklyReview .wr-net-sub{margin-top:14px;font-size:13.5px;color:var(--sub);max-width:60ch}
 
-/* labels: sentence case, no tracking */
-#weeklyReview .wr-lab,#weeklyReview .wr-sec,#weeklyReview .wr-mini th,#weeklyReview .wr-tbl th,#weeklyReview .wr-an>.wr-tiles>.wr-tile .l{text-transform:none;letter-spacing:0;font-size:12px;font-weight:500;color:var(--gh-mut)}
-
-/* hero box */
-#weeklyReview .wr-hero{border:1px solid var(--gh-bd);border-radius:6px;background:var(--gh-bg);margin-bottom:16px}
-#weeklyReview .wr-hero-main{padding:20px 24px 16px}
-#weeklyReview .wr-net{margin-top:6px;font-size:clamp(36px,5vw,48px);font-weight:600;line-height:1.1;letter-spacing:-.02em}
-#weeklyReview .wr-net-sub{margin-top:8px;font-size:14px;color:var(--gh-mut)}
-
-/* trade tape -> contribution graph */
-#weeklyReview .wr-tape{height:auto;margin:18px 0 0;padding:0;background:none;display:flex;flex-wrap:wrap;align-items:flex-start;gap:4px}
-#weeklyReview .wr-tape::before,#weeklyReview .wr-tape::after{display:none}
-#weeklyReview .wr-tape .tk{flex:none;width:14px;height:14px;min-width:14px;max-width:14px;border-radius:3px;border:1px solid rgba(240,246,252,.06);background:#21262d;transition:outline-color .15s;outline:1px solid transparent}
-#weeklyReview .wr-tape .tk i{display:none}
-#weeklyReview .wr-tape .tk.w{background:color-mix(in srgb,#39d353 calc(22% + var(--h)*.78%),#0e4429)}
-#weeklyReview .wr-tape .tk.l{background:color-mix(in srgb,#ff7b72 calc(22% + var(--h)*.78%),#4c1d1f)}
-#weeklyReview .wr-tape .tk.b{background:#30363d}
-#weeklyReview .wr-tape .tk:hover{outline:1px solid var(--gh-tx);outline-offset:1px}
-#weeklyReview .wr-tape-cap{margin-top:10px;font-size:12px;color:var(--gh-mut)}
+/* trade tape */
+#weeklyReview .wr-tape{height:92px;margin-top:30px;gap:4px}
+#weeklyReview .wr-tape .tk{min-width:3px;max-width:9px}
+#weeklyReview .wr-tape .tk i{border-radius:99px;opacity:1}
+#weeklyReview .wr-tape .tk.w i{background:linear-gradient(0deg,var(--pr-mint-d),#9af2c5);box-shadow:0 0 14px -2px rgba(111,224,168,.45)}
+#weeklyReview .wr-tape .tk.l i{background:linear-gradient(180deg,var(--pr-coral-d),#f7a399);opacity:.92;box-shadow:0 0 14px -2px rgba(242,137,125,.35)}
+#weeklyReview .wr-tape .tk.b i{background:rgba(255,255,255,.28)}
+#weeklyReview .wr-tape .tk:hover i{filter:brightness(1.25)}
+#weeklyReview .wr-tape-cap{margin-top:12px;font-size:11.5px;color:var(--faint)}
 
 /* stat strip */
-#weeklyReview .wr-kpis{background:var(--gh-sub);border-top:1px solid var(--gh-bd)}
-#weeklyReview .wr-k{padding:16px 24px}
-#weeklyReview .wr-k+.wr-k::before{top:0;bottom:0;background:var(--gh-bd)}
-#weeklyReview .wr-kv{margin-top:4px;font-size:24px;font-weight:600;line-height:1.25;letter-spacing:0}
-#weeklyReview .wr-ss{font-size:12px;color:var(--gh-mut);margin-top:2px}
-#weeklyReview .wr-prog{height:8px;border-radius:4px;background:var(--gh-bd);margin-top:10px}
-#weeklyReview .wr-prog i{background:var(--gh-grn);border-radius:4px}
+#weeklyReview .wr-kpis{border-top:1px solid var(--pr-line);background:rgba(8,8,13,.35)}
+#weeklyReview .wr-k{padding:22px 28px 24px}
+#weeklyReview .wr-k+.wr-k::before{top:22px;bottom:22px;width:1px;background:linear-gradient(180deg,transparent,rgba(255,255,255,.12),transparent)}
+#weeklyReview .wr-kv{margin-top:8px;font-size:26px;font-weight:650;letter-spacing:-.03em;font-variant-numeric:tabular-nums}
+#weeklyReview .wr-ss{margin-top:4px;font-size:12px;color:var(--faint)}
+#weeklyReview .wr-prog{height:5px;border-radius:99px;margin-top:14px;background:rgba(255,255,255,.07)}
+#weeklyReview .wr-prog i{border-radius:99px;background:linear-gradient(90deg,var(--pr-mint-d),var(--pr-mint))}
 
-/* boxes */
-#weeklyReview .a-s,#weeklyReview .wr-block{background:var(--gh-bg);border:1px solid var(--gh-bd);border-radius:6px;padding:16px 20px;box-shadow:none}
-#weeklyReview .a-s-head{padding-bottom:12px;margin-bottom:0;border-bottom:1px solid var(--gh-bd)}
-#weeklyReview .a-s-head:has(+.sub){padding-bottom:0;border-bottom:0;margin-bottom:0}
-#weeklyReview .a-s-ic{width:20px;height:20px;border:0;background:none}
-#weeklyReview .a-s-ic svg{stroke:var(--gh-mut)}
-#weeklyReview .a-s h3{font-size:14px;font-weight:600}
-#weeklyReview .a-s .sub{margin:2px 0 0 0;padding-bottom:12px;border-bottom:1px solid var(--gh-bd);font-size:12px;color:var(--gh-mut)}
-#weeklyReview .a-plot,#weeklyReview .a-ins.tight{margin-top:14px}
-#weeklyReview .a-read{border-top:1px solid var(--gh-bd);color:var(--gh-mut)}
+/* cards */
+#weeklyReview .wr-cols{gap:16px}
+#weeklyReview .a-s,#weeklyReview .wr-block{padding:26px 28px;border-radius:24px;border:1px solid var(--pr-line);background:var(--pr-card);box-shadow:inset 0 1px 0 rgba(255,255,255,.06)}
+#weeklyReview .a-s-head{margin-bottom:14px}
+#weeklyReview .a-s-ic{width:34px;height:34px;border-radius:11px;border:1px solid rgba(169,155,255,.28);background:rgba(124,108,240,.14);box-shadow:inset 0 1px 0 rgba(255,255,255,.08)}
+#weeklyReview .a-s-ic svg,#weeklyReview .a-s:hover .a-s-ic svg{stroke:var(--pr-vio)}
+#weeklyReview .a-s h3{font-size:15.5px;font-weight:650;letter-spacing:-.015em}
+#weeklyReview .a-s .sub{margin:2px 0 0 46px;font-size:12.5px;color:var(--faint)}
+#weeklyReview .a-plot{margin-top:22px}
 
 /* daily bars */
-#weeklyReview .wr-day{grid-template-columns:36px minmax(0,1fr) 84px;font-size:14px;margin-bottom:12px}
-#weeklyReview .wr-day b{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12px;font-weight:500;color:var(--gh-mut)}
-#weeklyReview .wr-track{height:8px;border-radius:4px;background:var(--gh-sub);border:1px solid var(--gh-bd);overflow:hidden}
-#weeklyReview .wr-track i.wr-up{background:var(--gh-grn);opacity:1}
-#weeklyReview .wr-track i.wr-dn{background:var(--gh-red);opacity:1}
-#weeklyReview .wr-day span.val{font-weight:600;font-variant-numeric:tabular-nums;color:var(--gh-tx)!important}
-#weeklyReview .wr-day:has(.wr-up) span.val{color:var(--gh-grn)!important}
-#weeklyReview .wr-day:has(.wr-dn) span.val{color:var(--gh-red)!important}
+#weeklyReview .wr-day{grid-template-columns:40px minmax(0,1fr) 84px;margin-bottom:16px;font-size:13.5px}
+#weeklyReview .wr-day b{font:500 12px "IBM Plex Mono",ui-monospace,monospace;color:var(--sub)}
+#weeklyReview .wr-track{height:9px;border-radius:99px;background:rgba(255,255,255,.045);border:0;overflow:hidden}
+#weeklyReview .wr-track i.wr-up{background:linear-gradient(90deg,var(--pr-mint-d),#8cf0bd);opacity:1;box-shadow:0 0 16px rgba(111,224,168,.35)}
+#weeklyReview .wr-track i.wr-dn{background:linear-gradient(90deg,var(--pr-coral-d),#f7a399);opacity:1;box-shadow:0 0 16px rgba(242,137,125,.3)}
+#weeklyReview .wr-day span.val{font-weight:650;font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+#weeklyReview .wr-day:has(.wr-up) span.val{color:var(--pr-mint)!important}
+#weeklyReview .wr-day:has(.wr-dn) span.val{color:var(--pr-coral)!important}
 
-/* review points -> issue rows */
-#weeklyReview .a-ins.tight li{font-size:14px;line-height:1.5;color:var(--gh-tx);padding:12px 0 12px 28px;border-bottom:1px solid var(--gh-bd)}
-#weeklyReview .a-ins.tight li:last-child{padding-bottom:0;border-bottom:0}
-#weeklyReview .a-ins.tight li::before,#weeklyReview .a-ins.tight li:last-child::before{left:0;top:15px;width:16px;height:16px;background:transparent;border:2px solid var(--c,var(--gh-mut));box-shadow:none;opacity:1}
-#weeklyReview .a-ins.tight li:last-child::before{top:3px}
-#weeklyReview .a-ins.tight li:last-child:first-child::before{top:3px}
+/* review points */
+#weeklyReview .a-ins.tight{margin-top:18px;padding:0}
+#weeklyReview .a-ins.tight li,#weeklyReview .a-ins.tight li:last-child{margin:0 0 8px;padding:13px 16px 13px 42px;border:1px solid var(--pr-line);border-radius:14px;background:rgba(255,255,255,.022);color:#c9ccd8;font-size:13.5px;line-height:1.5}
+#weeklyReview .a-ins.tight li:last-child{margin-bottom:0}
+#weeklyReview .a-ins.tight li::before,#weeklyReview .a-ins.tight li:last-child::before{left:17px;top:20px;width:8px;height:8px;background:var(--c,var(--faint));opacity:1;box-shadow:0 0 0 4px color-mix(in srgb,var(--c,var(--faint)) 18%,transparent),0 0 14px color-mix(in srgb,var(--c,var(--faint)) 55%,transparent)}
 
-/* tables */
-#weeklyReview .wr-mini td,#weeklyReview .wr-tbl td{border-top:1px solid var(--gh-bd)}
-#weeklyReview .wr-tbl tr.wr-dayrow td{background:var(--gh-sub)}
-
-/* heatmap cells = contribution squares */
-#weeklyReview .wr-hc{border-radius:3px;border:1px solid rgba(240,246,252,.06)}
-#weeklyReview .wr-hc[data-t]:hover{transform:none;outline:1px solid var(--gh-tx);outline-offset:1px}
-
-/* monday prep */
-#weeklyReview .wr-rule,#weeklyReview .wr-mnote textarea{border-radius:6px;border:1px solid var(--gh-bd);background:var(--gh-bg)}
-#weeklyReview .wr-mnote textarea:focus{border-color:#1f6feb;box-shadow:0 0 0 3px rgba(31,111,235,.3);background:var(--gh-bg)}
-#weeklyReview .wr-chip{border-radius:2em}
+/* tables, heatmap, prep */
+#weeklyReview .wr-mini th,#weeklyReview .wr-tbl th,#weeklyReview .wr-sec{text-transform:none;letter-spacing:.01em;font-size:12px;font-weight:550}
+#weeklyReview .wr-hc{border-radius:7px}
+#weeklyReview .wr-rule,#weeklyReview .wr-mnote textarea{border-radius:18px}
 
 @media(max-width:900px){
-  #weeklyReview{padding:16px;border-radius:6px}
-  #weeklyReview .wr-hero-main{padding:16px}
-  #weeklyReview .wr-k{padding:14px 16px}
-  #weeklyReview .a-s,#weeklyReview .wr-block{padding:14px 16px;border-radius:6px}
-  #weeklyReview .panel-head h2{font-size:20px}
+  #weeklyReview{padding:18px 14px 20px;border-radius:24px}
+  #weeklyReview .wr-hero-main{padding:24px 20px 20px}
+  #weeklyReview .wr-k{padding:18px 20px}
+  #weeklyReview .a-s,#weeklyReview .wr-block{padding:20px 18px;border-radius:20px}
+  #weeklyReview .wr-tape{height:76px}
 }
 </style>
 <script id="jl-weekly-review">
