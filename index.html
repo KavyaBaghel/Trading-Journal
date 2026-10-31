@@ -4211,11 +4211,11 @@ document.addEventListener('input',e=>{if(cur&&RUN[cur.dataset.tool]&&cur.contain
 <style id="kpCss">
 /* Trades + Journal headline stat tiles (scoped to #tKP / #jKP so the Analytics strip is untouched) */
 #tKP,#jKP{display:grid;grid-template-columns:repeat(auto-fit,minmax(172px,1fr));gap:12px;background:transparent!important;border:0!important;border-radius:0!important;overflow:visible!important;margin-bottom:18px}
-#tKP>div,#jKP>div{--kc:rgba(124,108,240,.30);--kd:var(--accent,#7c6cf0);position:relative;overflow:hidden;isolation:isolate;padding:16px 18px 15px;border-radius:16px!important;border:1px solid var(--border)!important;background:linear-gradient(155deg,rgba(255,255,255,.045),rgba(255,255,255,0) 52%),var(--panel)!important;box-shadow:0 10px 28px -18px rgba(0,0,0,.8);transition:transform .75s cubic-bezier(.16,1,.3,1),border-color .6s ease,box-shadow .75s cubic-bezier(.16,1,.3,1);will-change:transform}
-#tKP>div:hover,#jKP>div:hover{transform:translateY(-2px);border-color:var(--border-hi,rgba(255,255,255,.18))!important;box-shadow:0 16px 34px -16px rgba(0,0,0,.9),0 0 0 1px rgba(255,255,255,.03)}
+#tKP>div,#jKP>div{--kc:rgba(124,108,240,.30);--kd:var(--accent,#7c6cf0);position:relative;overflow:hidden;isolation:isolate;padding:16px 18px 15px;border-radius:16px!important;border:1px solid var(--border)!important;background:linear-gradient(155deg,rgba(255,255,255,.045),rgba(255,255,255,0) 52%),var(--panel)!important;box-shadow:0 10px 28px -18px rgba(0,0,0,.8);transition:transform 1s cubic-bezier(.25,.1,.25,1),border-color 1s ease,box-shadow 1s ease!important;will-change:transform}
+#tKP>div:hover,#jKP>div:hover{transform:translateY(-1px);border-color:var(--border-hi,rgba(255,255,255,.18))!important;box-shadow:0 16px 34px -16px rgba(0,0,0,.9),0 0 0 1px rgba(255,255,255,.03)}
 #tKP>div::before,#jKP>div::before{display:none!important}
-#tKP>div::after,#jKP>div::after{content:"";position:absolute;z-index:-1;right:-34px;top:-44px;width:150px;height:150px;border-radius:50%;background:radial-gradient(circle,var(--kc),transparent 68%);opacity:.55;transition:opacity .9s ease,transform 1.1s cubic-bezier(.16,1,.3,1);pointer-events:none}
-#tKP>div:hover::after,#jKP>div:hover::after{opacity:.85;transform:scale(1.1) translate(-4px,4px)}
+#tKP>div::after,#jKP>div::after{content:"";position:absolute;z-index:-1;right:-34px;top:-44px;width:150px;height:150px;border-radius:50%;background:radial-gradient(circle,var(--kc),transparent 68%);opacity:.55;transition:opacity 1.2s ease,transform 1.4s ease!important;pointer-events:none}
+#tKP>div:hover::after,#jKP>div:hover::after{opacity:.8;transform:scale(1.08)}
 #tKP>div:has(b[style*="--red"]),#jKP>div:has(b[style*="--red"]){--kc:rgba(239,68,68,.34);--kd:var(--red)}
 #tKP>div:has(b[style*="--green"]),#jKP>div:has(b[style*="--green"]){--kc:rgba(39,166,68,.32);--kd:var(--green)}
 #tKP>div:has(b[style*="--amber"]),#jKP>div:has(b[style*="--amber"]){--kc:rgba(86,170,255,.30);--kd:var(--amber)}
@@ -4224,7 +4224,7 @@ document.addEventListener('input',e=>{if(cur&&RUN[cur.dataset.tool]&&cur.contain
 #tKP b,#jKP b{font-size:26px!important;font-weight:760;letter-spacing:-.03em;line-height:1.1;margin:10px 0 6px!important;white-space:nowrap}
 #tKP small,#jKP small{display:block;font-size:11.5px;line-height:1.4;color:var(--sub)}
 @media(max-width:640px){#tKP,#jKP{grid-template-columns:1fr 1fr}#tKP b,#jKP b{font-size:22px!important}}
-@media(prefers-reduced-motion:reduce){#tKP>div,#jKP>div,#tKP>div::after,#jKP>div::after{transition:none}}
+@media(prefers-reduced-motion:reduce){#tKP>div:hover,#jKP>div:hover{transform:none}}
 </style>
 <style id="mkCss">
 #view-market{--mk-hi:var(--red,#ef4444);--mk-md:var(--accent-2,#f5a524);--mk-lo:var(--green,#27a644);--mk-pr:var(--primary,#494fdf)}
