@@ -9735,170 +9735,136 @@ window.__renderAnSetups=renderBoth;window.__renderAnEmotions=renderEmo;setTimeou
 @media(max-width:900px){#weeklyReview .wr-an>.wr-tiles{grid-template-columns:repeat(2,minmax(0,1fr))}}
 </style>
 <style id="jl-weekly-review-premium">
-/* Weekly review, premium pass: hero result card, trade tape, ring, KPI strip, refined cards. Design-system tokens only. */
-#weeklyReview{position:relative;overflow:hidden;border-radius:26px;padding:26px 28px 28px;
-  background:radial-gradient(760px 260px at 0% 0%,rgba(124,108,240,.12),transparent 70%),radial-gradient(520px 220px at 100% 0%,rgba(199,203,214,.05),transparent 70%),rgba(255,255,255,.015);
-  border:1px solid var(--border);box-shadow:0 1px 0 rgba(255,255,255,.04) inset,0 30px 60px -36px rgba(0,0,0,.8)}
-#weeklyReview::before{content:"";position:absolute;left:28px;right:28px;top:0;height:1px;background:linear-gradient(90deg,transparent,rgba(179,159,251,.55),transparent);opacity:.7;pointer-events:none}
-#weeklyReview .panel-head{margin-bottom:18px;align-items:center}
-#weeklyReview .panel-head h2{font-size:17px;font-weight:700;letter-spacing:-.015em}
-#weeklyReview .panel-head .hint{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.02em;color:var(--sub);padding:6px 12px;border-radius:var(--r-pill);background:rgba(255,255,255,.03);border:1px solid var(--border)}
-#weeklyReview .wr-prep-head{margin-top:36px;padding-top:26px;border-top:0;position:relative}
-#weeklyReview .wr-prep-head::before{content:"";position:absolute;left:0;right:0;top:0;height:1px;background:linear-gradient(90deg,transparent,var(--border-hi) 18%,var(--border-hi) 82%,transparent)}
+/* Weekly review: minimal. One neutral palette, hairlines, no glows. Colour only where it carries meaning (P&L sign, losses). */
+#weeklyReview{--pos:#7ccf9d;--neg:#e58a80;position:relative;border-radius:22px;padding:28px 30px 30px;background:rgba(255,255,255,.012);border:1px solid var(--border);box-shadow:none;overflow:visible}
+#weeklyReview::before{display:none}
+#weeklyReview .panel-head{margin-bottom:20px;align-items:center}
+#weeklyReview .panel-head h2{font-size:15px;font-weight:600;letter-spacing:-.01em}
+#weeklyReview .panel-head h2::before{background-color:transparent;border:1px solid var(--border)}
+#weeklyReview .panel-head .hint{font:500 11.5px "IBM Plex Mono",monospace;color:var(--faint);padding:0;border:0;background:none}
+#weeklyReview .wr-prep-head{margin-top:44px;padding-top:28px;border-top:1px solid var(--border)}
+#weeklyReview .wr-prep-head::before{display:none}
+#weeklyReview [style^="color:var(--green)"]{color:var(--pos)!important}
+#weeklyReview [style^="color:var(--red)"]{color:var(--neg)!important}
 
-/* shared micro-labels */
-#weeklyReview .wr-lab{font-size:10.5px;font-weight:650;letter-spacing:.09em;color:var(--sub);text-transform:uppercase}
-#weeklyReview .wr-ss{font-size:11.5px;color:var(--faint);margin-top:3px;line-height:1.4}
+#weeklyReview .wr-lab{font-size:11px;font-weight:600;letter-spacing:.08em;color:var(--faint);text-transform:uppercase}
+#weeklyReview .wr-ss{font-size:12px;color:var(--faint);margin-top:4px;line-height:1.4}
 
 /* hero */
-#weeklyReview .wr-hero{--tone:124,108,240;display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);position:relative;overflow:hidden;margin-bottom:14px;border-radius:22px;
-  border:1px solid var(--border);background:linear-gradient(160deg,rgba(255,255,255,.045),rgba(255,255,255,0) 46%),var(--panel);
-  box-shadow:0 1px 0 rgba(255,255,255,.05) inset,0 22px 44px -28px rgba(0,0,0,.85)}
-#weeklyReview .wr-hero.up{--tone:67,215,135}
-#weeklyReview .wr-hero.down{--tone:240,104,92}
-#weeklyReview .wr-hero::before{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(560px 240px at 0% 0%,rgba(var(--tone),.17),transparent 68%)}
-#weeklyReview .wr-hero::after{content:"";position:absolute;left:0;right:0;top:0;height:2px;background:linear-gradient(90deg,rgba(var(--tone),.95),rgba(var(--tone),0) 70%);transform-origin:0 50%;animation:kpBarIn 1s var(--ease-out) both}
-#weeklyReview .wr-hero-main,#weeklyReview .wr-hero-side{position:relative;padding:26px 28px}
-#weeklyReview .wr-hero-side{border-left:1px solid var(--border);display:flex;flex-direction:column;justify-content:center;gap:18px;background:rgba(0,0,0,.14)}
-#weeklyReview .wr-hero-top{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
-#weeklyReview .wr-verdict{font-size:11px;font-weight:650;padding:4px 11px;border-radius:var(--r-pill);color:rgb(var(--tone));background:rgba(var(--tone),.12);border:1px solid rgba(var(--tone),.3)}
-#weeklyReview .wr-flag{font-size:11px;font-weight:600;padding:4px 11px;border-radius:var(--r-pill);border:1px solid var(--border);color:var(--sub);background:rgba(255,255,255,.03)}
-#weeklyReview .wr-flag.bad{color:var(--red);border-color:rgba(240,104,92,.3);background:rgba(240,104,92,.09)}
-#weeklyReview .wr-flag.ok{color:var(--green);border-color:rgba(67,215,135,.28);background:rgba(67,215,135,.08)}
-#weeklyReview .wr-net{margin-top:14px;font-size:clamp(36px,5.2vw,56px);line-height:1;font-weight:780;letter-spacing:-.04em;font-variant-numeric:tabular-nums}
-#weeklyReview .wr-net-sub{margin-top:10px;font-size:12.5px;color:var(--sub)}
-
-/* trade tape: wins rise above the midline, losses fall below it */
-#weeklyReview .wr-tape{position:relative;display:flex;align-items:stretch;gap:3px;height:76px;margin-top:24px;overflow:hidden;
-  background:linear-gradient(to bottom,transparent calc(50% - .5px),rgba(255,255,255,.14) calc(50% - .5px),rgba(255,255,255,.14) calc(50% + .5px),transparent calc(50% + .5px))}
-#weeklyReview .wr-tape .tk{position:relative;flex:1 1 0;min-width:2px;max-width:12px}
-#weeklyReview .wr-tape .tk i{position:absolute;left:0;right:0;display:block;border-radius:3px;transition:filter .2s var(--ease),transform .2s var(--ease)}
-#weeklyReview .wr-tape .tk.w i{bottom:50%;height:calc(var(--h)*.5%);background:linear-gradient(to top,rgba(67,215,135,.5),var(--green))}
-#weeklyReview .wr-tape .tk.l i{top:50%;height:calc(var(--h)*.5%);background:linear-gradient(to bottom,rgba(240,104,92,.5),var(--red))}
+#weeklyReview .wr-hero{margin-bottom:14px;border:1px solid var(--border);border-radius:18px;background:var(--panel);overflow:hidden;box-shadow:none}
+#weeklyReview .wr-hero-main{padding:30px 32px 26px}
+#weeklyReview .wr-net{margin-top:12px;font-size:clamp(34px,4.6vw,46px);line-height:1;font-weight:600;letter-spacing:-.035em;font-variant-numeric:tabular-nums}
+#weeklyReview .wr-net-sub{margin-top:12px;font-size:12.5px;color:var(--sub)}
+#weeklyReview .wr-tape{position:relative;display:flex;align-items:stretch;gap:3px;height:60px;margin-top:28px;overflow:hidden;
+  background:linear-gradient(to bottom,transparent calc(50% - .5px),rgba(255,255,255,.12) calc(50% - .5px),rgba(255,255,255,.12) calc(50% + .5px),transparent calc(50% + .5px))}
+#weeklyReview .wr-tape .tk{position:relative;flex:1 1 0;min-width:2px;max-width:10px}
+#weeklyReview .wr-tape .tk i{position:absolute;left:0;right:0;display:block;border-radius:2px}
+#weeklyReview .wr-tape .tk.w i{bottom:50%;height:calc(var(--h)*.5%);background:rgba(255,255,255,.82)}
+#weeklyReview .wr-tape .tk.l i{top:50%;height:calc(var(--h)*.5%);background:var(--neg);opacity:.8}
 #weeklyReview .wr-tape .tk.b i{top:calc(50% - 1px);height:2px;background:var(--faint)}
-#weeklyReview .wr-tape .tk:hover i{filter:brightness(1.35)}
-#weeklyReview .wr-tape-cap{display:flex;justify-content:space-between;margin-top:8px;font:500 9.5px "IBM Plex Mono",monospace;letter-spacing:.04em;color:var(--faint);text-transform:uppercase}
-
-/* ring + split + profit factor */
-#weeklyReview .wr-ring-row{display:flex;align-items:center;gap:16px}
-#weeklyReview .wr-ringw{position:relative;width:84px;height:84px;flex:none;display:grid;place-items:center}
-#weeklyReview .wr-ring{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
-#weeklyReview .wr-ring circle{fill:none;stroke-width:7}
-#weeklyReview .wr-ring .rg-t{stroke:rgba(255,255,255,.07)}
-#weeklyReview .wr-ring .rg-v{stroke-linecap:round;transform:rotate(-90deg);transform-origin:40px 40px;filter:drop-shadow(0 0 6px rgba(var(--tone),.35));transition:stroke-dasharray .9s var(--ease-out)}
-#weeklyReview .wr-ringw b{position:relative;font-size:17px;font-weight:750;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
-#weeklyReview .wr-split{display:flex;gap:3px;height:8px}
-#weeklyReview .wr-split i{display:block;border-radius:99px;min-width:6px}
-#weeklyReview .wr-split .w{background:var(--green)}
-#weeklyReview .wr-split .l{background:var(--red)}
-#weeklyReview .wr-split .b{background:var(--faint)}
-#weeklyReview .wr-pf{display:flex;align-items:center;justify-content:space-between;gap:14px;padding-top:16px;border-top:1px solid var(--border)}
-#weeklyReview .wr-pfv{font-size:28px;font-weight:760;letter-spacing:-.03em;font-variant-numeric:tabular-nums}
-
-/* KPI strip */
-#weeklyReview .wr-kpis{grid-column:1/-1;position:relative;display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));border-top:1px solid var(--border);background:rgba(0,0,0,.1)}
-#weeklyReview .wr-k{padding:18px 28px;position:relative;min-width:0}
-#weeklyReview .wr-k+.wr-k::before{content:"";position:absolute;left:0;top:18px;bottom:18px;width:1px;background:var(--border)}
-#weeklyReview .wr-kv{margin-top:7px;font-size:22px;font-weight:740;letter-spacing:-.025em;font-variant-numeric:tabular-nums}
-#weeklyReview .wr-prog{height:5px;border-radius:99px;margin-top:10px;background:rgba(255,255,255,.07);overflow:hidden}
-#weeklyReview .wr-prog i{display:block;height:100%;border-radius:99px;transition:width .8s var(--ease-out)}
+#weeklyReview .wr-tape .tk:hover i{opacity:1;filter:brightness(1.15)}
+#weeklyReview .wr-tape-cap{display:flex;justify-content:space-between;margin-top:10px;font-size:11px;color:var(--faint)}
+#weeklyReview .wr-kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));border-top:1px solid var(--border)}
+#weeklyReview .wr-k{position:relative;padding:20px 32px 22px;min-width:0}
+#weeklyReview .wr-k+.wr-k::before{content:"";position:absolute;left:0;top:20px;bottom:20px;width:1px;background:var(--border)}
+#weeklyReview .wr-kv{margin-top:8px;font-size:20px;font-weight:600;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+#weeklyReview .wr-prog{height:2px;border-radius:2px;margin-top:12px;background:rgba(255,255,255,.08);overflow:hidden}
+#weeklyReview .wr-prog i{display:block;height:100%;background:var(--silver)}
 
 /* cards */
-#weeklyReview .a-s,#weeklyReview .wr-block{border-radius:20px;padding:24px 26px;border:1px solid var(--border);
-  background:linear-gradient(160deg,rgba(255,255,255,.04),rgba(255,255,255,0) 44%),var(--panel);box-shadow:0 1px 0 rgba(255,255,255,.04) inset,0 18px 36px -30px rgba(0,0,0,.9)}
-#weeklyReview .a-s:hover{transform:none;border-color:var(--border-hi)}
-#weeklyReview .a-s-ic{width:30px;height:30px;border-radius:9px;background:linear-gradient(160deg,rgba(124,108,240,.16),rgba(124,108,240,.04));border-color:rgba(124,108,240,.28)}
-#weeklyReview .a-s-ic svg{stroke:var(--accent-2)}
-#weeklyReview .a-s h3{font-size:14.5px;font-weight:680;letter-spacing:-.01em}
-#weeklyReview .a-read{border-top:1px solid var(--border)}
+#weeklyReview .a-s,#weeklyReview .wr-block{border-radius:18px;padding:24px 26px;border:1px solid var(--border);background:var(--panel);box-shadow:none}
+#weeklyReview .a-s:hover{transform:none;border-color:var(--border);box-shadow:none}
+#weeklyReview .a-s-ic{width:28px;height:28px;border-radius:8px;background:none;border:1px solid var(--border)}
+#weeklyReview .a-s-ic svg,#weeklyReview .a-s:hover .a-s-ic svg{stroke:var(--sub)}
+#weeklyReview .a-s h3{font-size:14px;font-weight:600;letter-spacing:-.005em}
+#weeklyReview .a-read{border-top:1px solid var(--border);color:var(--sub)}
+#weeklyReview .wr-an{gap:14px;margin-top:14px}
+#weeklyReview .wr-cols{gap:14px}
+#weeklyReview .wr-sec{margin:22px 2px 2px;font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--faint)}
+#weeklyReview .wr-sec:first-child{margin-top:8px}
+#weeklyReview .wr-big{margin:16px 0 0;font-size:22px;line-height:1;font-weight:600;letter-spacing:-.025em;font-variant-numeric:tabular-nums;display:flex;align-items:baseline;gap:10px}
+#weeklyReview .wr-big small{font-size:11.5px;font-weight:500;letter-spacing:0;text-transform:none;color:var(--faint)}
+#weeklyReview .wr-big+.a-plot{margin-top:14px}
 
 /* daily bars */
-#weeklyReview .wr-track{height:12px;background:rgba(255,255,255,.045)}
-#weeklyReview .wr-track i.wr-up{background:linear-gradient(90deg,rgba(67,215,135,.45),var(--green));box-shadow:0 0 16px -4px rgba(67,215,135,.55)}
-#weeklyReview .wr-track i.wr-dn{background:linear-gradient(90deg,rgba(240,104,92,.45),var(--red));box-shadow:0 0 16px -4px rgba(240,104,92,.55)}
-#weeklyReview .wr-day b{font-weight:650;color:var(--sub);font-size:12.5px;letter-spacing:.02em}
+#weeklyReview .wr-day{grid-template-columns:36px minmax(0,1fr) 78px;font-size:13px;margin-bottom:14px}
+#weeklyReview .wr-day b{font-weight:500;color:var(--sub)}
+#weeklyReview .wr-track{height:6px;background:rgba(255,255,255,.05)}
+#weeklyReview .wr-track i.wr-up{background:rgba(255,255,255,.8)}
+#weeklyReview .wr-track i.wr-dn{background:var(--neg);opacity:.85}
+#weeklyReview .wr-day span.val{font-weight:500;color:var(--text)!important}
 
-/* review points */
-#weeklyReview .a-ins.tight li{padding:12px 14px 12px 16px;border-radius:12px;border-left-width:2px;
-  background:linear-gradient(90deg,color-mix(in srgb,var(--c) 9%,transparent),rgba(255,255,255,.02) 60%)}
-#weeklyReview .a-ins.tight li:hover{background:linear-gradient(90deg,color-mix(in srgb,var(--c) 14%,transparent),rgba(255,255,255,.04) 60%)}
+/* review points: plain list, one small dot */
+#weeklyReview .a-ins.tight{margin-top:14px}
+#weeklyReview .a-ins.tight li{display:flex;gap:12px;align-items:baseline;margin:0;padding:12px 2px;border:0;border-radius:0;background:none;border-top:1px solid var(--border);font-size:13px;color:var(--sub)}
+#weeklyReview .a-ins.tight li:first-child{border-top:0}
+#weeklyReview .a-ins.tight li::before{content:"";flex:none;width:6px;height:6px;border-radius:50%;background:var(--c);opacity:.85;transform:translateY(-1px)}
+#weeklyReview .a-ins.tight li:hover{background:none}
+
+/* averages and streaks: plain hairline row */
+#weeklyReview .wr-an>.wr-tiles{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:0;margin:0;border:1px solid var(--border);border-radius:18px;background:var(--panel);overflow:hidden}
+#weeklyReview .wr-an>.wr-tiles>.wr-tile{border:0;border-radius:0;background:none;box-shadow:none;padding:20px 24px;position:relative}
+#weeklyReview .wr-an>.wr-tiles>.wr-tile+.wr-tile::after{content:"";position:absolute;left:0;top:20px;bottom:20px;width:1px;background:var(--border)}
+#weeklyReview .wr-an>.wr-tiles>.wr-tile::before{display:none}
+#weeklyReview .wr-an>.wr-tiles>.wr-tile:hover{background:none;border:0}
+#weeklyReview .wr-an>.wr-tiles>.wr-tile .l{font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--faint)}
+#weeklyReview .wr-an>.wr-tiles>.wr-tile .v{margin-top:8px;font-size:20px;font-weight:600;letter-spacing:-.02em}
+#weeklyReview .wr-an>.wr-tiles>.wr-tile .v[style]{color:var(--text)!important}
 
 /* tables */
-#weeklyReview .wr-mini th,#weeklyReview .wr-tbl th{font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--faint)}
-#weeklyReview .wr-mini td,#weeklyReview .wr-tbl td{border-top-color:rgba(255,255,255,.055)}
-#weeklyReview .wr-tbl tbody tr:not(.wr-dayrow):hover td{background:rgba(255,255,255,.025)}
-#weeklyReview .wr-tbl tr.wr-dayrow td{background:linear-gradient(90deg,rgba(124,108,240,.12),rgba(124,108,240,.02));color:var(--accent-2);font-size:11.5px;letter-spacing:.04em;text-transform:uppercase}
-#weeklyReview .wr-rule{border-radius:16px;padding:16px 20px;background:linear-gradient(90deg,rgba(124,108,240,.12),rgba(255,255,255,.015) 70%);border:1px solid rgba(124,108,240,.26)}
-#weeklyReview .wr-rule .l{color:var(--accent-2);font-weight:650}
-#weeklyReview .wr-rule .t{font-size:14.5px;font-weight:550}
-#weeklyReview .wr-hc{border-radius:7px}
+#weeklyReview .wr-mini th{font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--faint)}
+#weeklyReview .wr-mini td{padding:12px 10px 12px 0;border-top:1px solid var(--border)}
+#weeklyReview .wr-mini td:first-child{color:var(--text);font-weight:500}
+#weeklyReview .wr-mini tbody tr:hover td{background:none}
+#weeklyReview .wr-mb{display:none}
+#weeklyReview .wr-dl{display:inline;padding:0;border:0;background:none;color:var(--sub);font-weight:500}
+#weeklyReview .wr-cap{font-size:12px;color:var(--faint)}
 
-@keyframes wr-tick{from{opacity:0;transform:scaleY(.2)}to{opacity:1;transform:scaleY(1)}}
+/* heatmap */
+#weeklyReview .wr-hc{border-radius:5px;box-shadow:none}
+#weeklyReview .wr-hh,#weeklyReview .wr-hd{color:var(--faint)}
+
+/* next week */
+#weeklyReview .wr-rule{border:1px solid var(--border);border-radius:16px;padding:18px 22px;background:var(--panel)}
+#weeklyReview .wr-rule .l{font-size:11px;font-weight:600;letter-spacing:.08em;color:var(--faint)}
+#weeklyReview .wr-rule .t{margin-top:2px;font-size:14px;font-weight:500;color:var(--text)}
+#weeklyReview .wr-evgrid{display:grid;gap:14px}
+#weeklyReview .wr-evday{border:1px solid var(--border);border-radius:16px;overflow:hidden;background:var(--panel)}
+#weeklyReview .wr-evh{display:flex;align-items:baseline;justify-content:space-between;padding:14px 22px;border-bottom:1px solid var(--border);background:none}
+#weeklyReview .wr-evh b{font-size:13.5px;font-weight:600}
+#weeklyReview .wr-evh span{font-size:12px;color:var(--faint)}
+#weeklyReview .wr-ev{display:grid;grid-template-columns:52px 44px 30px minmax(0,1fr) 80px 80px;align-items:center;gap:12px;padding:13px 22px;font-size:13px;color:var(--sub)}
+#weeklyReview .wr-ev+.wr-ev{border-top:1px solid var(--border)}
+#weeklyReview .wr-ev:hover{background:rgba(255,255,255,.02)}
+#weeklyReview .wr-ev .tm{font:500 12px "IBM Plex Mono",monospace;color:var(--sub)}
+#weeklyReview .wr-ev .cc{justify-self:start;font:500 11px "IBM Plex Mono",monospace;letter-spacing:.04em;color:var(--sub)}
+#weeklyReview .wr-ev .nm{color:var(--text);font-weight:500;min-width:0}
+#weeklyReview .wr-ev .fp{display:flex;flex-direction:column;font-size:12.5px;color:var(--text);font-variant-numeric:tabular-nums}
+#weeklyReview .wr-ev .fp em{font-style:normal;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);margin-bottom:1px}
+#weeklyReview .wr-imp i{width:4px;height:11px}
+
 @media(prefers-reduced-motion:no-preference){
-  #weeklyReview .wr-hero{animation:jl-card-in .55s var(--ease-out) both}
-  #weeklyReview .wr-tape .tk i{animation:wr-tick .6s var(--ease-out) both;animation-delay:calc(var(--i)*14ms + 120ms);transform-origin:50% 50%}
-  #weeklyReview .wr-kpis .wr-k{animation:jl-card-in .5s var(--ease-out) both}
-  #weeklyReview .wr-kpis .wr-k:nth-child(2){animation-delay:.05s}#weeklyReview .wr-kpis .wr-k:nth-child(3){animation-delay:.1s}#weeklyReview .wr-kpis .wr-k:nth-child(4){animation-delay:.15s}
+  #weeklyReview .wr-hero{animation:jl-card-in .5s var(--ease-out) both}
+  #weeklyReview .wr-tape .tk i{animation:wr-tick .5s var(--ease-out) both;animation-delay:calc(var(--i)*10ms + 100ms)}
 }
+@keyframes wr-tick{from{opacity:0;transform:scaleY(.3)}to{opacity:1;transform:scaleY(1)}}
 @media(max-width:900px){
-  #weeklyReview{padding:18px 16px 20px;border-radius:22px}
-  #weeklyReview::before{left:16px;right:16px}
-  #weeklyReview .wr-hero{grid-template-columns:1fr}
-  #weeklyReview .wr-hero-main,#weeklyReview .wr-hero-side{padding:20px}
-  #weeklyReview .wr-hero-side{border-left:0;border-top:1px solid var(--border)}
+  #weeklyReview{padding:18px 16px 20px;border-radius:18px}
+  #weeklyReview .wr-hero-main{padding:22px 20px 20px}
   #weeklyReview .wr-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}
   #weeklyReview .wr-k{padding:16px 20px}
   #weeklyReview .wr-k:nth-child(odd)::before{display:none}
   #weeklyReview .wr-k:nth-child(n+3){border-top:1px solid var(--border)}
   #weeklyReview .a-s,#weeklyReview .wr-block{padding:18px}
+  #weeklyReview .wr-an>.wr-tiles{grid-template-columns:repeat(2,minmax(0,1fr))}
+  #weeklyReview .wr-an>.wr-tiles>.wr-tile:nth-child(odd)::after{display:none}
+  #weeklyReview .wr-an>.wr-tiles>.wr-tile:nth-child(n+3){border-top:1px solid var(--border)}
 }
-@media(max-width:480px){#weeklyReview .wr-tape{height:64px;gap:2px}#weeklyReview .wr-kv{font-size:19px}}
-
-/* ---- full-panel pass: section labels, stat headers, delta pills, inline bars, event cards ---- */
-#weeklyReview .wr-an{gap:14px}
-#weeklyReview .wr-sec{display:flex;align-items:center;gap:14px;margin:14px 2px 0;font:600 10.5px "IBM Plex Mono",monospace;letter-spacing:.16em;text-transform:uppercase;color:var(--faint)}
-#weeklyReview .wr-sec:first-child{margin-top:6px}
-#weeklyReview .wr-sec::after{content:"";flex:1;height:1px;background:linear-gradient(90deg,var(--border-hi),transparent)}
-#weeklyReview .wr-big{margin:16px 0 0;font-size:30px;line-height:1;font-weight:770;letter-spacing:-.035em;font-variant-numeric:tabular-nums;display:flex;align-items:baseline;gap:10px}
-#weeklyReview .wr-big small{font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--faint)}
-#weeklyReview .wr-big+.a-plot{margin-top:14px}
-
-/* averages and streaks: separate stat cards instead of one joined grid */
-#weeklyReview .wr-an>.wr-tiles{gap:12px;background:none;border:0;border-radius:0;overflow:visible}
-#weeklyReview .wr-an>.wr-tiles>.wr-tile{border:1px solid var(--border);border-radius:18px;padding:18px 20px 17px;background:linear-gradient(160deg,rgba(255,255,255,.04),rgba(255,255,255,0) 44%),var(--panel);box-shadow:0 1px 0 rgba(255,255,255,.04) inset,0 18px 36px -30px rgba(0,0,0,.9);transition:border-color .3s var(--ease)}
-#weeklyReview .wr-an>.wr-tiles>.wr-tile:hover{background:linear-gradient(160deg,rgba(255,255,255,.05),rgba(255,255,255,0) 44%),var(--panel);border:1px solid var(--border-hi)}
-#weeklyReview .wr-an>.wr-tiles>.wr-tile .l{font-size:10.5px;letter-spacing:.09em;text-transform:uppercase}
-#weeklyReview .wr-an>.wr-tiles>.wr-tile .v{margin-top:4px;font-size:24px;letter-spacing:-.03em}
-
-/* delta pills and inline bars */
-#weeklyReview .wr-dl{--c:var(--faint);display:inline-block;min-width:44px;text-align:center;padding:3px 10px;border-radius:var(--r-pill);font-size:11.5px;font-weight:650;color:var(--c);background:color-mix(in srgb,var(--c) 12%,transparent);border:1px solid color-mix(in srgb,var(--c) 28%,transparent)}
-#weeklyReview .wr-mb{display:block;height:3px;margin-top:6px;border-radius:99px;background:rgba(255,255,255,.06);overflow:hidden}
-#weeklyReview .wr-mb i{display:block;height:100%;border-radius:99px;opacity:.85}
-#weeklyReview .wr-mini td{padding-top:11px;padding-bottom:11px}
-#weeklyReview .wr-mini td:first-child{font-weight:600}
-#weeklyReview .wr-cap{font-size:11.5px;color:var(--faint)}
-
-/* next week: event cards grouped by day (no sideways scroll) */
-#weeklyReview .wr-evgrid{display:grid;gap:12px}
-#weeklyReview .wr-evday{border:1px solid var(--border);border-radius:18px;overflow:hidden;background:linear-gradient(160deg,rgba(255,255,255,.035),rgba(255,255,255,0) 44%),var(--panel)}
-#weeklyReview .wr-evh{display:flex;align-items:baseline;justify-content:space-between;gap:10px;padding:13px 20px;background:linear-gradient(90deg,rgba(124,108,240,.13),rgba(124,108,240,.02) 70%);border-bottom:1px solid var(--border)}
-#weeklyReview .wr-evh b{font-size:13.5px;font-weight:680;letter-spacing:-.01em}
-#weeklyReview .wr-evh span{font:500 11px "IBM Plex Mono",monospace;color:var(--accent-2);letter-spacing:.04em}
-#weeklyReview .wr-ev{display:grid;grid-template-columns:52px 44px 34px minmax(0,1fr) 84px 84px;align-items:center;gap:12px;padding:12px 20px;font-size:13px;color:var(--sub);transition:background .25s var(--ease)}
-#weeklyReview .wr-ev+.wr-ev{border-top:1px solid rgba(255,255,255,.055)}
-#weeklyReview .wr-ev:hover{background:rgba(255,255,255,.03)}
-#weeklyReview .wr-ev .tm{font:600 12px "IBM Plex Mono",monospace;color:var(--text);font-variant-numeric:tabular-nums}
-#weeklyReview .wr-ev .cc{justify-self:start;font:650 10.5px "IBM Plex Mono",monospace;letter-spacing:.06em;padding:3px 7px;border-radius:7px;color:var(--silver);background:rgba(255,255,255,.05);border:1px solid var(--border)}
-#weeklyReview .wr-ev .nm{color:var(--text);font-weight:550;min-width:0}
-#weeklyReview .wr-ev .fp{display:flex;flex-direction:column;font-size:12.5px;color:var(--text);font-variant-numeric:tabular-nums}
-#weeklyReview .wr-ev .fp em{font-style:normal;font-size:9.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--faint);margin-bottom:1px}
 @media(max-width:700px){
-  #weeklyReview .wr-ev{grid-template-columns:48px 40px 30px minmax(0,1fr);row-gap:8px;padding:12px 16px}
-  #weeklyReview .wr-ev .nm{grid-column:4}
+  #weeklyReview .wr-ev{grid-template-columns:48px 40px 28px minmax(0,1fr);row-gap:6px;padding:12px 16px}
   #weeklyReview .wr-ev .fp{grid-column:span 2;flex-direction:row;gap:6px;align-items:baseline}
   #weeklyReview .wr-ev .fp:nth-of-type(1){grid-column:1/3}
   #weeklyReview .wr-ev .fp em{margin:0}
-  #weeklyReview .wr-an>.wr-tiles{grid-template-columns:repeat(2,minmax(0,1fr))}
   #weeklyReview .wr-evh{padding:12px 16px}
 }
 </style>
@@ -9967,7 +9933,7 @@ window.__renderAnSetups=renderBoth;window.__renderAnEmotions=renderEmo;setTimeou
   }
   function tileHtml(l,v,s,col){ return '<div class="wr-tile"><div class="l">'+l+'</div><div class="v"'+(col?' style="color:'+col+'"':'')+'>'+v+'</div>'+(s?'<div class="s">'+s+'</div>':'')+'</div>'; }
   /* ---------- chart + heatmap cards: same plot language as the Analytics tab, each one in its own card ---------- */
-  var CG='#43d787', CR='#f0685c', charts={};
+  var CG='#c7cbd6', CR='#c7cbd6', charts={};
   var IC_EQ='<path d="M3 17l5-6 4 3 8-9"/>', IC_DD='<path d="M3 6h18M3 12c3 4 6-4 9 0s6 4 9 0"/>', IC_HM='<rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/>';
   function cardHead(ic,title,sub){ return '<div class="a-s-head"><div class="a-s-ttl"><span class="a-s-ic"><svg viewBox="0 0 24 24">'+ic+'</svg></span><h3>'+title+'</h3></div></div>'+(sub?'<div class="sub">'+sub+'</div>':''); }
   function axMoney(v,span){ var a=Math.abs(v); if(a<0.005) return '$0'; return (v<0?'-':'+')+'$'+a.toFixed(span>=40?0:1); }
@@ -10013,16 +9979,14 @@ window.__renderAnSetups=renderBoth;window.__renderAnEmotions=renderEmo;setTimeou
       +tileHtml('AVG WIN',m.avgW==null?'-':money(m.avgW),m.W+' winning trade'+(m.W===1?'':'s'),m.avgW==null?'':'var(--green)')
       +tileHtml('AVG LOSS',m.avgL==null?'-':'-$'+m.avgL.toFixed(2),m.L+' losing trade'+(m.L===1?'':'s'),m.avgL==null?'':'var(--red)')
       +tileHtml('EXPECTANCY',m.exp==null?'-':money(m.exp),'Average P&amp;L per trade',m.exp==null?'':m.exp<0?'var(--red)':'var(--green)')
-      +tileHtml('BEST WIN STREAK',String(m.maxW),'Breakeven trades skipped')
-      +tileHtml('WORST LOSS STREAK',String(m.maxL),'Breakeven trades skipped',m.maxL>=3?'var(--red)':'')
-      +tileHtml('CURRENT STREAK',st,'As of the last trade',m.cur<0?'var(--red)':m.cur>0?'var(--green)':'')
+            +tileHtml('WORST LOSS STREAK',String(m.maxL),'Breakeven trades skipped',m.maxL>=3?'var(--red)':'')
       +'</div>';
   }
   function cmpHtml(a,p){
     var has=p.rows>0;
     function sg(v,fmt){ return v==null?'-':fmt(v); }
     function dlt(x,y,fmt,goodUp){ if(!has||x==null||y==null) return ['-','']; var d=x-y; if(Math.abs(d)<1e-9) return ['0','']; return [(d>0?'+':'')+fmt(d), goodUp==null?'':((d>0)===goodUp?'var(--green)':'var(--red)')]; }
-    function row(label,va,vb,d){ return '<tr><td class="ev">'+label+'</td><td>'+va+'</td><td>'+(has?vb:'-')+'</td><td><span class="wr-dl"'+(d[1]?' style="--c:'+d[1]+'"':'')+'>'+d[0]+'</span></td></tr>'; }
+    function row(label,va,vb,d){ return '<tr><td class="ev">'+label+'</td><td>'+va+'</td><td>'+(has?vb:'-')+'</td><td><span class="wr-dl">'+d[0]+'</span></td></tr>'; }
     var f2=function(v){ return v.toFixed(2); }, f0=function(v){ return String(Math.round(v)); };
     var html='<div class="wr-block a-s">'+hd('THIS WEEK VS LAST WEEK')+'<div class="wr-scroll"><table class="wr-mini"><thead><tr><th>Metric</th><th>This week</th><th>Last week</th><th>Change</th></tr></thead><tbody>'
       +row('Net P&amp;L',money(a.net),money(p.net),dlt(a.net,p.net,function(v){ return (v<0?'-$':'$')+Math.abs(v).toFixed(2); },true))
@@ -10070,9 +10034,9 @@ window.__renderAnSetups=renderBoth;window.__renderAnEmotions=renderEmo;setTimeou
       hours.forEach(function(x){
         var c=cell[d+'|'+x];
         if(!c){ grid+='<span class="wr-hc"></span>'; return; }
-        var f=maxAbs?Math.min(1,Math.abs(c.net)/maxAbs):0, a=(.16+f*.5).toFixed(2), rgb=c.net<0?'240,104,92':c.net>0?'67,215,135':'139,144,163';
+        var f=maxAbs?Math.min(1,Math.abs(c.net)/maxAbs):0, a=(.1+f*.34).toFixed(2), rgb=c.net<0?'240,104,92':c.net>0?'67,215,135':'139,144,163';
         var tip='<div class="th">'+dayName(d)+' '+pad(x)+':00</div><div class="tr"><span>Trades</span><b>'+c.n+'</b></div><div class="tr"><span>Net P&amp;L</span><b>'+money(c.net)+'</b></div>';
-        grid+='<span class="wr-hc" data-t="'+esc(tip)+'" style="background:rgba('+rgb+','+a+');box-shadow:inset 0 0 0 1px rgba('+rgb+',.4)">'+c.n+'</span>';
+        grid+='<span class="wr-hc" data-t="'+esc(tip)+'" style="background:rgba('+rgb+','+a+');box-shadow:inset 0 0 0 1px rgba('+rgb+',.2)">'+c.n+'</span>';
       });
     });
     return '<section class="a-s wr-block">'+head+'<div class="a-plot wr-hm-wrap">'+grid+'</div></div>'
@@ -10142,37 +10106,27 @@ window.__renderAnSetups=renderBoth;window.__renderAnEmotions=renderEmo;setTimeou
     dk.forEach(function(d){ if(!best||days[d].net>days[best].net) best=d; if(!worst||days[d].net<days[worst].net) worst=d; });
     var lossLim=Number(window.jlDailyLossLimit)||0, tradeLim=Number(window.jlMaxTradesPerDay)||0, weekLim=Number(window.jlWeeklyLossLimit)||0;
     var broken=dk.filter(function(d){ var x=days[d], cnt=Object.keys(x.keys).length; return (lossLim>0&&x.loss>=lossLim)||(tradeLim>0&&cnt>=tradeLim); });
-    /* premium hero: net result, trade tape, win-rate ring, profit factor, then a KPI strip (all from this week's real trades) */
-    var tone=net>0?'up':net<0?'down':'flat', verdict=net>0?'Green week':net<0?'Red week':'Flat week';
+    /* hero: one calm result card (net result, trade tape, a few numbers) */
+    var verdict=net>0?'Green week':net<0?'Red week':'Flat week';
     var ordered=sortedRows(rows), maxTick=0;
     ordered.forEach(function(t){ maxTick=Math.max(maxTick,Math.abs(Number(t.pnl))); });
     var tape=ordered.map(function(t,i){
       var p=Number(t.pnl), hh=maxTick?Math.max(6,Math.round(Math.abs(p)/maxTick*100)):6;
       return '<span class="tk '+(p>0?'w':p<0?'l':'b')+'" style="--i:'+Math.min(i,70)+';--h:'+hh+'" title="'+esc(dayName(t.d)+' '+String(t.t||'').slice(0,5)+'  '+money(p))+'"><i></i></span>';
     }).join('');
-    var flag=(lossLim>0||tradeLim>0)?(broken.length?'<span class="wr-flag bad">'+broken.length+' rule-break day'+(broken.length===1?'':'s')+'</span>':'<span class="wr-flag ok">Rules held</span>'):'';
-    var RC=2*Math.PI*32, dash=decided?(wr/100*RC):0, wrCol=wr>=50?'var(--green)':'var(--warn)';
-    var ring='<svg class="wr-ring" viewBox="0 0 80 80" aria-hidden="true"><circle class="rg-t" cx="40" cy="40" r="32"/><circle class="rg-v" cx="40" cy="40" r="32" style="stroke:'+wrCol+';stroke-dasharray:'+dash.toFixed(1)+' '+RC.toFixed(1)+'"/></svg><b>'+(decided?wr+'%':'-')+'</b>';
-    var split='<div class="wr-split" role="img" aria-label="'+W+' wins, '+L+' losses, '+BE+' breakeven">'+(W?'<i class="w" style="flex:'+W+'"></i>':'')+(BE?'<i class="b" style="flex:'+BE+'"></i>':'')+(L?'<i class="l" style="flex:'+L+'"></i>':'')+'</div>';
-    var pfNum=parseFloat(pf), pfCol=isFinite(pfNum)?(pfNum>=1?'var(--green)':'var(--red)'):'';
-    var hero='<section class="wr-hero '+tone+'">'
-      +'<div class="wr-hero-main"><div class="wr-hero-top"><span class="wr-lab">NET P&amp;L</span><span class="wr-verdict">'+verdict+'</span>'+flag+'</div>'
+    function kc(l,v,s,extra){ return '<div class="wr-k"><div class="wr-lab">'+l+'</div><div class="wr-kv">'+v+'</div>'+(s?'<div class="wr-ss">'+s+'</div>':'')+(extra||'')+'</div>'; }
+    var kp=kc('WIN RATE',decided?wr+'%':'-',W+'W / '+L+'L'+(BE?' / '+BE+'BE':''))
+      +kc('PROFIT FACTOR',pf,gl>0?'Wins divided by losses':'No losing trades')
+      +kc('BEST DAY',best?money(days[best].net):'-',best?dayName(best):'')
+      +kc('WORST DAY',(worst&&worst!==best)?money(days[worst].net):'-',(worst&&worst!==best)?dayName(worst):'');
+    if(weekLim>0){ var wl=Math.max(0,-net), wlr=wl/weekLim;
+      kp+=kc('WEEK LOSS','$'+wl.toFixed(2),'of $'+weekLim.toFixed(0)+' limit','<div class="wr-prog"><i style="width:'+Math.min(100,Math.round(wlr*100))+'%"></i></div>'); }
+    var hero='<section class="wr-hero"><div class="wr-hero-main"><div class="wr-lab">NET P&amp;L</div>'
       +'<div class="wr-net"'+(net>0?' style="color:var(--green)"':net<0?' style="color:var(--red)"':'')+'>'+money(net)+'</div>'
-      +'<div class="wr-net-sub">After commission and swap &middot; '+n+' trade'+(n===1?'':'s')+' over '+dk.length+' trading day'+(dk.length===1?'':'s')+'</div>'
+      +'<div class="wr-net-sub">'+verdict+' &middot; '+n+' trade'+(n===1?'':'s')+' over '+dk.length+' trading day'+(dk.length===1?'':'s')+' &middot; after commission and swap</div>'
       +'<div class="wr-tape" role="img" aria-label="Every trade this week in order, wins above the line and losses below">'+tape+'</div>'
-      +'<div class="wr-tape-cap"><span>First trade</span><span>Every trade, in order</span><span>Last trade</span></div></div>'
-      +'<div class="wr-hero-side">'
-      +'<div class="wr-ring-row"><div class="wr-ringw">'+ring+'</div><div><div class="wr-lab">WIN RATE</div><div class="wr-ss">'+W+'W / '+L+'L'+(BE?' / '+BE+'BE':'')+'</div></div></div>'
-      +split
-      +'<div class="wr-pf"><div><div class="wr-lab">PROFIT FACTOR</div><div class="wr-ss">'+(gl>0?'Gross wins divided by gross losses':'No losing trades')+'</div></div><div class="wr-pfv"'+(pfCol?' style="color:'+pfCol+'"':'')+'>'+pf+'</div></div>'
-      +'</div>';
-    function kc(l,v,s,col,extra){ return '<div class="wr-k"><div class="wr-lab">'+l+'</div><div class="wr-kv"'+(col?' style="color:'+col+'"':'')+'>'+v+'</div>'+(s?'<div class="wr-ss">'+s+'</div>':'')+(extra||'')+'</div>'; }
-    var kp=kc('TRADES',String(n),dk.length+' trading day'+(dk.length===1?'':'s'))
-      +kc('BEST DAY',best?money(days[best].net):'-',best?dayName(best):'',best&&days[best].net>0?'var(--green)':'')
-      +kc('WORST DAY',(worst&&worst!==best)?money(days[worst].net):'-',(worst&&worst!==best)?dayName(worst):'',(worst&&worst!==best&&days[worst].net<0)?'var(--red)':'');
-    if(weekLim>0){ var wl=Math.max(0,-net), wlr=wl/weekLim, wlc=wlr>=1?'var(--red)':wlr>=.6?'var(--warn)':'';
-      kp+=kc('WEEK LOSS','$'+wl.toFixed(2),'of $'+weekLim.toFixed(0)+' limit',wlc,'<div class="wr-prog"><i style="width:'+Math.min(100,Math.round(wlr*100))+'%;background:'+(wlc||'linear-gradient(90deg,var(--accent),var(--accent-2))')+'"></i></div>'); }
-    hero+='<div class="wr-kpis">'+kp+'</div></section>';
+      +'<div class="wr-tape-cap"><span>First trade</span><span>Last trade</span></div></div>'
+      +'<div class="wr-kpis">'+kp+'</div></section>';
 
     /* daily bars: Mon-Fri always, Sat/Sun only if they have trades */
     var span=[0,1,2,3,4].concat(days[addDays(b.ws,5)]?[5]:[],days[addDays(b.ws,6)]?[6]:[]);
@@ -10204,7 +10158,7 @@ window.__renderAnSetups=renderBoth;window.__renderAnEmotions=renderEmo;setTimeou
     var IC1='<svg viewBox="0 0 24 24"><path d="M4 19V9M11 19V4M18 19v-7"/></svg>', IC2='<svg viewBox="0 0 24 24"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/></svg>';
     var foot=(best?'<b>Best:</b> '+dayName(best)+' ('+money(days[best].net)+')':'')+((worst&&worst!==best)?' &middot; <b>Worst:</b> '+dayName(worst)+' ('+money(days[worst].net)+')':'')+(best?'.':'');
     return hero
-      +'<div class="wr-cols"><section class="a-s"><div class="a-s-head"><div class="a-s-ttl"><span class="a-s-ic">'+IC1+'</span><h3>Daily P&amp;L</h3></div></div><div class="sub">Net result per trading day</div><div class="a-plot">'+bars+'</div>'+(foot?'<div class="a-read">'+foot+'</div>':'')+'</section>'
+      +'<div class="wr-cols"><section class="a-s"><div class="a-s-head"><div class="a-s-ttl"><span class="a-s-ic">'+IC1+'</span><h3>Daily P&amp;L</h3></div></div><div class="sub">Net result per trading day</div><div class="a-plot">'+bars+'</div>'+''+'</section>'
       +'<section class="a-s"><div class="a-s-head"><div class="a-s-ttl"><span class="a-s-ic">'+IC2+'</span><h3>What to review</h3></div></div><div class="sub">Computed from this week\'s trades</div><ul class="a-ins tight">'+li.join('')+'</ul></section></div>'
       +(function(){ try{ return analyticsHtml(rows,b); }catch(err){ return '<div class="wr-an"><div class="wr-block a-s"><div class="wr-empty">Analytics could not load ('+esc(err&&err.message||'error')+').</div></div></div>'; } })();
   }
@@ -10245,7 +10199,7 @@ window.__renderAnSetups=renderBoth;window.__renderAnEmotions=renderEmo;setTimeou
         if(dk!==last){ if(open) html+='</div></section>'; last=dk; open=true;
           html+='<section class="wr-evday"><div class="wr-evh"><b>'+esc(fmtDay(dk,{weekday:'long'}))+'</b><span>'+esc(fmtDay(dk,{month:'short',day:'numeric'}))+'</span></div><div class="wr-evl">'; }
         html+='<div class="wr-ev"><span class="tm">'+istClock(x.t)+'</span><span class="cc">'+esc(CCY[e.country]||e.country||'-')+'</span><span class="wr-imp" title="'+(x.l===3?'High':x.l===2?'Medium':'Low')+' impact">'
-          +[1,2,3].map(function(n){ return '<i style="background:'+(n<=x.l?impColor(x.l):'rgba(255,255,255,.1)')+'"></i>'; }).join('')
+          +[1,2,3].map(function(n){ return '<i style="background:'+(n<=x.l?'rgba(255,255,255,.85)':'rgba(255,255,255,.14)')+'"></i>'; }).join('')
           +'</span><span class="nm">'+esc(e.event||'-')+'</span><span class="fp"><em>Forecast</em>'+esc(e.estimate==null||e.estimate===''?'-':e.estimate)+'</span><span class="fp"><em>Previous</em>'+esc(e.prev==null||e.prev===''?'-':e.prev)+'</span></div>';
       });
       if(open) html+='</div></section>';
