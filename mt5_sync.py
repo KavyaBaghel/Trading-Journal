@@ -179,6 +179,21 @@ def main():
     except Exception: pass
 
     deals = list(deals) + extra_deals
+
+    # Stop loss lives on ORDERS, not deals. Per position, prefer the opening order's SL
+    # (the SL you set at entry); otherwise fall back to any order on that position with an SL.
+    sl_by_pid = {}
+    try:
+        for o in (mt5.history_orders_get(from_date, to_date) or []):
+            if not getattr(o, "position_id", 0): continue
+            osl = float(getattr(o, "sl", 0) or 0)
+            if osl <= 0: continue
+            is_open_order = o.type in (0, 1)  # market buy/sell that opened the position
+            cur = sl_by_pid.get(o.position_id)
+            if cur is None or (is_open_order and not cur[1]):
+                sl_by_pid[o.position_id] = (osl, is_open_order)
+    except Exception: pass
+
     position_groups = {}
     for d in deals:
         if d.position_id == 0: continue
@@ -222,7 +237,8 @@ def main():
             "openTime": open_srv.strftime("%Y-%m-%d %H:%M:%S"),
             "closeTime": close_srv.strftime("%Y-%m-%d %H:%M:%S"),
             "holdSec": max(0, int(last_deal.time - first_deal.time)),
-            "notes": f"MT5 Sync (#{pid}) {comment}"
+            "notes": f"MT5 Sync (#{pid}) {comment}",
+            "sl": round(sl_by_pid[pid][0], 5) if pid in sl_by_pid else None
         })
 
     account_balance = account_info.balance
