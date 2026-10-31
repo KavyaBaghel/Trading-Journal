@@ -1069,7 +1069,7 @@
   .j-yn{margin:0}
   .j-yn .a-tab[data-v="Yes"].on{background:linear-gradient(135deg,var(--green),#2fa968);color:#062b17;box-shadow:0 4px 14px -2px rgba(67,215,135,.5)}
   .j-yn .a-tab[data-v="No"].on{background:linear-gradient(135deg,var(--red),#c74a40);color:#2b0b08;box-shadow:0 4px 14px -2px rgba(240,104,92,.5)}
-  .j-yn .a-tab[data-v="Yes"]::before{content:"✓ ";opacity:.55}.j-yn .a-tab[data-v="No"]::before{content:"✕ ";opacity:.55}
+  .j-yn .a-tab[data-v="Yes"]::before{content:"â ";opacity:.55}.j-yn .a-tab[data-v="No"]::before{content:"â ";opacity:.55}
   .j-yn .a-tab.on::before{opacity:.9}
 
   /* section sub-headers, matching the a-h language at panel scale */
@@ -1274,7 +1274,7 @@
   .j-cb-empty{padding:22px 12px;text-align:center;font-size:12.5px;color:var(--faint)}
   
 
-  /* ===== CALENDAR PAGE — full redesign ===== */
+  /* ===== CALENDAR PAGE â full redesign ===== */
   #view-calendar .wrap{max-width:960px}
 
   /* ---- header ---- */
@@ -1461,7 +1461,7 @@
   .ldg-wk .ldg-meta{color:var(--sub);border-top:1px solid rgba(255,255,255,.07)}
   .ldg-wk.upcoming{opacity:.85}
 
-  /* week subtotal — spans the full 7-column grid */
+  /* week subtotal â spans the full 7-column grid */
   .ldg-sub{grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;gap:14px;
     padding:9px 16px;font-family:"IBM Plex Mono",monospace;font-size:10.5px;color:var(--faint);
     background:rgba(255,255,255,.025);border:1px dashed var(--border);border-radius:10px}
@@ -1681,7 +1681,7 @@
 
   .psy-foot{text-align:center;font-size:11px;color:var(--faint);margin-top:18px;font-family:"IBM Plex Mono",monospace;letter-spacing:.02em}
 
-  /* ===== PSYCHOLOGY TAB — smoother hover / tap / progress-bar motion ===== */
+  /* ===== PSYCHOLOGY TAB â smoother hover / tap / progress-bar motion ===== */
   #view-psychology button{-webkit-tap-highlight-color:transparent}
 
   #view-psychology .psy-rail button{
@@ -1731,7 +1731,7 @@
     100%{box-shadow:inset 0 1px 4px rgba(0,0,0,.45),0 0 0 0 rgba(67,215,135,0)}
   }
 
-  /* ===== APP-WIDE — same smoother hover-lift / spring-tap / progress-glide treatment,
+  /* ===== APP-WIDE â same smoother hover-lift / spring-tap / progress-glide treatment,
      extended to every other interactive surface in the app (dashboard, analytics, journal, calendar) ===== */
   .glass,.a-s,.card,.rr-tile,.a-kp div,.j-entry,.j-drop,.j-cb-btn,.cal-dow-cell,.a-tab,.j-tg,.cal-arrow,.cal-now,.nav,.checklist li,.ring-card,.a-led div,.a-ins li,.a-mix>div,.hc[data-t]{
     transition-timing-function:cubic-bezier(.22,.61,.36,1);
@@ -1788,7 +1788,7 @@
 
   .ring-card svg,.card svg{transition:filter .36s cubic-bezier(.22,.61,.36,1),stroke .36s cubic-bezier(.22,.61,.36,1)}
 
-  /* progress bars used outside the Psychology tab (Today's Summary checklist, journal coverage) —
+  /* progress bars used outside the Psychology tab (Today's Summary checklist, journal coverage) â
      same glide-instead-of-jump easing, plus a completion pulse class JS can toggle */
   .progress i{transition:width .9s cubic-bezier(.65,0,.35,1),background .5s cubic-bezier(.22,.61,.36,1)}
   .progress.full{animation:appProgressPulse 1.4s cubic-bezier(.22,.61,.36,1) .2s 1}
@@ -2147,7 +2147,7 @@
     font-family:inherit;font-size:12.5px;font-weight:600;cursor:pointer;transition:all .2s var(--ease-out)}
   .aic-mark:hover{color:var(--text);border-color:var(--accent-2)}
   .aic-mark.on{background:linear-gradient(135deg,var(--accent),#6a5ae0);border-color:transparent;color:#fff}
-  .aic-mark.on::before{content:"✓ ";}
+  .aic-mark.on::before{content:"â ";}
 
   .aic-report{padding:20px 22px;margin-bottom:14px}
   .aic-report-actions{display:flex;gap:9px}
@@ -2406,7 +2406,7 @@
   body.rm *{animation-duration:.01ms !important;animation-iteration-count:1 !important;transition-duration:.01ms !important}
 
   /* micro-cascade: items inside AI Coach / Profile cards fade in as part of the same
-     cascade as their parent card — plain opacity fade (no extra translate layer),
+     cascade as their parent card â plain opacity fade (no extra translate layer),
      delays continuing the card's own small step-sequence instead of a separate wave */
   .aic-chips .aic-chip{opacity:0;animation:ggFade .45s var(--ease) both}
   .aic-chips .aic-chip:nth-child(1){animation-delay:.3s}
@@ -3153,12 +3153,12 @@ window.jlLiveBalance=function(Z){
   <div class="top aic-reveal" style="animation-delay:0ms">
     <div>
       <div class="eyebrow">
-        <span class="streak" id="streakBadge">🔥 1-day streak</span>
+        <span class="streak" id="streakBadge">ð¥ 1-day streak</span>
         <span class="streak-nudge" id="streakNudge" hidden></span>
         <span class="date mono" id="dateStr"></span>
       </div>
       <h1>Today's Summary</h1>
-      <p>AI-powered · Trade review</p>
+      <p>AI-powered Â· Trade review</p>
     </div>
     <div class="top-right">
       <div class="who"><span class="dot"></span><span data-user-name></span></div>
@@ -3296,14 +3296,14 @@ window.jlLiveBalance=function(Z){
       </div>
     </div>
     <div class="panel glass">
-      <div class="panel-head"><h2>Risk / reward — today</h2><span class="hint">Session view</span></div>
+      <div class="panel-head"><h2>Risk / reward â today</h2><span class="hint">Session view</span></div>
       <div class="rr-grid">
-        <div class="rr-tile"><div class="l">AVG WIN / AVG LOSS</div><div class="v" id="avgWL">—</div></div>
-        <div class="rr-tile"><div class="l">TRADES TO TARGET</div><div class="v" id="toTarget">—</div></div>
-        <div class="rr-tile"><div class="l">PROFIT FACTOR</div><div class="v" id="pfactor">—</div></div>
-        <div class="rr-tile"><div class="l">EXPECTANCY / TRADE</div><div class="v" id="expectancy">—</div></div>
-        <div class="rr-tile"><div class="l">MOOD</div><div class="v" id="mood">—</div></div>
-        <div class="rr-tile"><div class="l">WIN STREAK</div><div class="v" id="streak">—</div></div>
+        <div class="rr-tile"><div class="l">AVG WIN / AVG LOSS</div><div class="v" id="avgWL">â</div></div>
+        <div class="rr-tile"><div class="l">TRADES TO TARGET</div><div class="v" id="toTarget">â</div></div>
+        <div class="rr-tile"><div class="l">PROFIT FACTOR</div><div class="v" id="pfactor">â</div></div>
+        <div class="rr-tile"><div class="l">EXPECTANCY / TRADE</div><div class="v" id="expectancy">â</div></div>
+        <div class="rr-tile"><div class="l">MOOD</div><div class="v" id="mood">â</div></div>
+        <div class="rr-tile"><div class="l">WIN STREAK</div><div class="v" id="streak">â</div></div>
       </div>
     </div>
   </div>
@@ -3358,8 +3358,8 @@ window.jlLiveBalance=function(Z){
   <div class="a-big" style="color:var(--red)">$4,698.08</div><div class="hint" style="font-size:12px;color:var(--faint)"><b style="color:var(--red)">-$435.02</b> from the $5,000.00 start</div>
   <div class="a-scale"><div class="a-mk" style="left:0"><span>$4,500<br>max drawdown</span></div><div class="a-mk" style="left:55.56%"><span>$5,000<br>start</span></div><div class="a-mk" style="left:100%"><span>$5,400<br>target</span></div><div class="a-now" style="left:22.01%"><em>$4,698.08</em></div></div></div>
  <div class="a-v2"><div class="a-top"><span>Daily drawdown</span><span class="a-badge ok" id="ddBadge">0% used</span></div>
-  <div class="a-big" id="ddBig" style="color:var(--green)">$0.00</div><div style="font-size:12px;color:var(--faint)"><span id="ddDate"></span> · <span id="ddCnt">0 trades</span> today</div>
-  <div class="a-track"><i id="ddBar" style="width:0%"></i></div><div id="ddNote" style="font-size:12px;color:var(--sub)">Loading your saved limit…</div></div>
+  <div class="a-big" id="ddBig" style="color:var(--green)">$0.00</div><div style="font-size:12px;color:var(--faint)"><span id="ddDate"></span> Â· <span id="ddCnt">0 trades</span> today</div>
+  <div class="a-track"><i id="ddBar" style="width:0%"></i></div><div id="ddNote" style="font-size:12px;color:var(--sub)">Loading your saved limitâ¦</div></div>
  <div class="a-led"><div><span>Net P&amp;L</span><b style="color:var(--red)">-$435.02</b><small>After commission and swap</small></div><div><span>Win rate</span><b style="color:var(--text)">24%</b><small>172W / 335L / 197BE</small></div><div><span>Profit factor</span><b style="color:var(--amber)">0.74</b><small>Gross profit / gross loss</small></div><div><span>Avg win</span><b style="color:var(--green)">+$7.30</b><small>Mean winning trade</small></div><div><span>Avg loss</span><b style="color:var(--red)">-$5.04</b><small>Mean losing trade</small></div><div><span>Max drawdown</span><b style="color:var(--red)">-$447.69</b><small>Worst equity dip</small></div><div><span>Mistakes</span><b style="color:var(--text)">1258</b><small>Universal rule mistakes</small></div></div>
 </section>
 
@@ -3440,7 +3440,7 @@ window.__mountOpenPos=function(){const o=(window.__openTrades||[]).concat((windo
 <div id="tDays"></div><div id="tMore"></div>
 </div></div>
 <div class="view" id="view-journal" hidden><div class="wrap">
-<div class="top aic-reveal" style="animation-delay:0ms"><div><div class="eyebrow"><span class="date mono" id="dateStrJ"></span></div><h1>Journal</h1><p id="jSub">One journal per trade · saved on this device</p></div><div class="top-right"><div class="who"><span class="dot"></span><span data-user-name></span></div></div></div>
+<div class="top aic-reveal" style="animation-delay:0ms"><div><div class="eyebrow"><span class="date mono" id="dateStrJ"></span></div><h1>Journal</h1><p id="jSub">One journal per trade Â· saved on this device</p></div><div class="top-right"><div class="who"><span class="dot"></span><span data-user-name></span></div></div></div>
 <div class="a-kp" id="jKP"></div>
 <div class="j-grid">
 <div class="j-main">
@@ -3448,11 +3448,11 @@ window.__mountOpenPos=function(){const o=(window.__openTrades||[]).concat((windo
 <div class="a-s-head"><div class="a-s-ttl"><span class="a-s-ic"><svg viewBox="0 0 24 24"><path d="M12 6v14M12 6C10 4.5 7 4 3 4v14c4 0 7 .5 9 2 2-1.5 5-2 9-2V4c-4 0-7 .5-9 2z"/></svg></span><h3>Trade journal</h3></div><div class="j-cov"><svg class="j-ring" width="32" height="32" viewBox="0 0 36 36"><circle class="j-ring-tr" cx="18" cy="18" r="16"/><circle class="j-ring-v" id="jRingV" cx="18" cy="18" r="16" stroke-dashoffset="100.5"/></svg><span class="pill" id="jCov"></span></div></div>
 <div class="progress" id="jBarWrap" style="margin:14px 0 0"><i id="jBar" style="width:0"></i></div>
 <div class="j-r2"><div class="j-f"><span class="j-l">Show trades</span><div class="a-tabs j-yn" id="jFilt" style="margin:0" role="group" aria-label="Trade filter"><button type="button" class="a-tab on" data-v="All" aria-pressed="true">All</button><button type="button" class="a-tab" data-v="need" aria-pressed="false">Needs journal</button><button type="button" class="a-tab" data-v="done" aria-pressed="false">Journaled</button></div></div>
-<div class="j-f"><label for="jSelBtn">Trade</label><div class="j-cb" id="jCb"><button type="button" class="j-cb-btn" id="jSelBtn" aria-haspopup="listbox" aria-expanded="false"><span id="jSelLbl">Choose a trade…</span><svg class="j-cb-chev" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg></button><div class="j-cb-pop" id="jSelPop" role="listbox" hidden><div class="j-cb-search"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg><input type="search" id="jSelSearch" placeholder="Search by date, side or result…" aria-label="Search trades"></div><div class="j-cb-list" id="jSelList"></div></div></div></div></div>
+<div class="j-f"><label for="jSelBtn">Trade</label><div class="j-cb" id="jCb"><button type="button" class="j-cb-btn" id="jSelBtn" aria-haspopup="listbox" aria-expanded="false"><span id="jSelLbl">Choose a tradeâ¦</span><svg class="j-cb-chev" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg></button><div class="j-cb-pop" id="jSelPop" role="listbox" hidden><div class="j-cb-search"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg><input type="search" id="jSelSearch" placeholder="Search by date, side or resultâ¦" aria-label="Search trades"></div><div class="j-cb-list" id="jSelList"></div></div></div></div></div>
 <div class="j-tc empty" id="jTrade"></div>
 <div class="j-sh"><span class="j-sh-ic"><svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4M22 12v6a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h11"/></svg></span><h4>Checklist</h4><span>Setup and execution quality</span></div>
 <div class="j-r2" style="margin-top:12px"><div class="j-f"><label for="jDate">Date</label><div class="j-fw"><span class="j-fw-ic"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg></span><input class="j-in j-fw-in" type="date" id="jDate"></div></div><div class="j-f"><label for="jSetupBtn">Setup</label><div class="j-cb" id="jSetupCb"><span class="j-fw-ic"><svg viewBox="0 0 24 24"><path d="M4 6h8M18 6h2M4 12h2M12 12h8M4 18h10M20 18h0"/><circle cx="15" cy="6" r="2"/><circle cx="9" cy="12" r="2"/><circle cx="17" cy="18" r="2"/></svg></span><button type="button" class="j-cb-btn" id="jSetupBtn" style="padding-left:36px" aria-haspopup="listbox" aria-expanded="false"><span id="jSetupLbl" style="color:var(--faint)">Select setup</span><svg class="j-cb-chev" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg></button><div class="j-cb-pop" id="jSetupPop" role="listbox" hidden><div class="j-cb-list" id="jSetupList"></div></div><input type="hidden" id="jSetup" value=""></div><div class="j-setrules" id="jSetupRules" hidden></div></div></div>
-<div class="j-q3"><div class="j-f"><span class="j-l">Entry at a good point?</span><div class="a-tabs j-yn" data-q="0" role="group" aria-label="Entry at a good point?"><button type="button" class="a-tab" data-v="Yes" aria-pressed="false">Yes</button><button type="button" class="a-tab" data-v="No" aria-pressed="false">No</button></div></div><div class="j-f"><span class="j-l">Entry with confirmation?</span><div class="a-tabs j-yn" data-q="1" role="group" aria-label="Entry with confirmation?"><button type="button" class="a-tab" data-v="Yes" aria-pressed="false">Yes</button><button type="button" class="a-tab" data-v="No" aria-pressed="false">No</button></div></div><div class="j-f"><span class="j-l">Exit with confirmation?</span><div class="a-tabs j-yn" data-q="2" role="group" aria-label="Exit with confirmation?"><button type="button" class="a-tab" data-v="Yes" aria-pressed="false">Yes</button><button type="button" class="a-tab" data-v="No" aria-pressed="false">No</button></div></div></div><div class="j-gr-box" id="jGradeBox"></div><div class="j-cf" id="jConfWrap"><div class="j-cf-h"><span class="j-l">Confluences</span><button type="button" class="j-cf-mg" id="jConfMg" aria-pressed="false">Edit list</button></div><div class="j-chips" id="jConf"></div><div class="j-cf-add"><input class="j-in" id="jConfNew" type="text" maxlength="40" placeholder="Add a confluence…" autocomplete="off" aria-label="New confluence name"><button type="button" class="btn-ghost j-sm" id="jConfAdd">Add</button></div></div>
+<div class="j-q3"><div class="j-f"><span class="j-l">Entry at a good point?</span><div class="a-tabs j-yn" data-q="0" role="group" aria-label="Entry at a good point?"><button type="button" class="a-tab" data-v="Yes" aria-pressed="false">Yes</button><button type="button" class="a-tab" data-v="No" aria-pressed="false">No</button></div></div><div class="j-f"><span class="j-l">Entry with confirmation?</span><div class="a-tabs j-yn" data-q="1" role="group" aria-label="Entry with confirmation?"><button type="button" class="a-tab" data-v="Yes" aria-pressed="false">Yes</button><button type="button" class="a-tab" data-v="No" aria-pressed="false">No</button></div></div><div class="j-f"><span class="j-l">Exit with confirmation?</span><div class="a-tabs j-yn" data-q="2" role="group" aria-label="Exit with confirmation?"><button type="button" class="a-tab" data-v="Yes" aria-pressed="false">Yes</button><button type="button" class="a-tab" data-v="No" aria-pressed="false">No</button></div></div></div><div class="j-gr-box" id="jGradeBox"></div><div class="j-cf" id="jConfWrap"><div class="j-cf-h"><span class="j-l">Confluences</span><button type="button" class="j-cf-mg" id="jConfMg" aria-pressed="false">Edit list</button></div><div class="j-chips" id="jConf"></div><div class="j-cf-add"><input class="j-in" id="jConfNew" type="text" maxlength="40" placeholder="Add a confluenceâ¦" autocomplete="off" aria-label="New confluence name"><button type="button" class="btn-ghost j-sm" id="jConfAdd">Add</button></div></div>
 <div class="j-sh"><span class="j-sh-ic"><svg viewBox="0 0 24 24"><path d="M12 9v4M12 17h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg></span><h4>What went wrong</h4><span>Tap any that apply</span></div>
 <div class="glass j-mc" id="jMisCard"><div class="j-mc-h"><b>Mistakes</b><div class="a-tabs" id="jMisTabs" role="group" aria-label="Mistake period" style="margin:0"><button type="button" class="a-tab on" data-p="Today" aria-pressed="true">Today</button><button type="button" class="a-tab" data-p="Week" aria-pressed="false">This Week</button><button type="button" class="a-tab" data-p="Month" aria-pressed="false">This Month</button><button type="button" class="a-tab" data-p="All" aria-pressed="false">All time</button></div></div><div id="jMisBody"></div></div>
 <div class="j-chips" id="jTags" style="margin-top:12px"></div>
@@ -3483,7 +3483,7 @@ window.__mountOpenPos=function(){const o=(window.__openTrades||[]).concat((windo
 </div></div></div>
 <div class="view" id="view-calendar" hidden><div class="wrap">
 <div class="cal-top">
-  <div><div class="eyebrow"><span class="date mono" id="dateStrC"></span></div><h1>Trading calendar</h1><p>Daily P&amp;L, trade count and rule discipline · <span class="mono" id="cBarScale">Full bar = $50 move</span></p></div>
+  <div><div class="eyebrow"><span class="date mono" id="dateStrC"></span></div><h1>Trading calendar</h1><p>Daily P&amp;L, trade count and rule discipline Â· <span class="mono" id="cBarScale">Full bar = $50 move</span></p></div>
   <div class="cal-nav"><button type="button" class="cal-arrow" id="cPrevM" aria-label="Previous month"><svg viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg></button><button type="button" class="cal-now" id="cNowM">Current month</button><button type="button" class="cal-arrow" id="cNextM" aria-label="Next month"><svg viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg></button>
   <div class="j-cb cal-cb cal-cb-mon" id="cMonCb"><input type="hidden" id="cMonSel"><button type="button" class="j-cb-btn" id="cMonBtn" aria-haspopup="listbox" aria-expanded="false" aria-label="Month"><span id="cMonLbl"></span><svg class="j-cb-chev" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg></button><div class="j-cb-pop" id="cMonPop" role="listbox" hidden><div class="j-cb-list" id="cMonList"></div></div></div><div class="j-cb cal-cb cal-cb-yr" id="cYrCb"><input type="hidden" id="cYrSel"><button type="button" class="j-cb-btn" id="cYrBtn" aria-haspopup="listbox" aria-expanded="false" aria-label="Year"><span id="cYrLbl"></span><svg class="j-cb-chev" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg></button><div class="j-cb-pop" id="cYrPop" role="listbox" hidden><div class="j-cb-list" id="cYrList"></div></div></div></div>
 </div>
@@ -3527,12 +3527,12 @@ window.__mountOpenPos=function(){const o=(window.__openTrades||[]).concat((windo
     <div class="psy-side-card glass up-reveal" style="animation-delay:80ms">
       <div class="psy-side-head"><span class="psy-side-ic"><svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></span><h3>The 6-stage ritual</h3></div>
       <div class="psy-list">
-        <div class="psy-list-item"><b>1 · Mind Check</b><span>Six honest questions before you're allowed near a chart.</span></div>
-        <div class="psy-list-item"><b>2 · Setup Scan</b><span>Confirm a valid setup is actually forming — no forcing it.</span></div>
-        <div class="psy-list-item"><b>3 · Checklist</b><span>News, risk, entry and exit plan all signed off before the trigger.</span></div>
-        <div class="psy-list-item"><b>4 · Live Trade</b><span>Three hard rules while the position is open — no SL/TP tinkering.</span></div>
-        <div class="psy-list-item"><b>5 · Debrief</b><span>Screenshot it, feel it, write it down while it's fresh.</span></div>
-        <div class="psy-list-item"><b>6 · Cooldown</b><span>Mandatory pause. No re-entry on impulse, ever.</span></div>
+        <div class="psy-list-item"><b>1 Â· Mind Check</b><span>Six honest questions before you're allowed near a chart.</span></div>
+        <div class="psy-list-item"><b>2 Â· Setup Scan</b><span>Confirm a valid setup is actually forming â no forcing it.</span></div>
+        <div class="psy-list-item"><b>3 Â· Checklist</b><span>News, risk, entry and exit plan all signed off before the trigger.</span></div>
+        <div class="psy-list-item"><b>4 Â· Live Trade</b><span>Three hard rules while the position is open â no SL/TP tinkering.</span></div>
+        <div class="psy-list-item"><b>5 Â· Debrief</b><span>Screenshot it, feel it, write it down while it's fresh.</span></div>
+        <div class="psy-list-item"><b>6 Â· Cooldown</b><span>Mandatory pause. No re-entry on impulse, ever.</span></div>
       </div>
     </div>
     <div class="psy-side-card glass up-reveal" style="animation-delay:120ms">
@@ -3587,22 +3587,22 @@ window.__mountOpenPos=function(){const o=(window.__openTrades||[]).concat((windo
           <small class="gg-field-note">Fills daily loss 4%, max drawdown 12%, profit target (10% for Phase 1, 6% for Phase 2), consistency rule 0, minimum trading days 0 and profit split 0. Nothing is saved until you tap Save setup. Check the values against your FundingPips dashboard.</small></div>
         <div class="gg-mgrid">
           <div class="gg-field"><span class="l">Initial account balance ($)</span>
-            <div class="gg-stepper"><button onclick="ggStep('bal',-100)">−</button><input id="ggBal" value="" readonly><button onclick="ggStep('bal',100)">+</button></div></div>
+            <div class="gg-stepper"><button onclick="ggStep('bal',-100)">â</button><input id="ggBal" value="" readonly><button onclick="ggStep('bal',100)">+</button></div></div>
           <div class="gg-field" id="ggPhaseField"><span class="l">Account phase</span>
             <div class="gg-select" id="ggPhaseDisplay" style="cursor:default;user-select:none">Not set</div>
-            <small class="gg-field-note">Auto-detected from your MT5 account sync — not set manually.</small></div>
+            <small class="gg-field-note">Auto-detected from your MT5 account sync â not set manually.</small></div>
           <div class="gg-field"><span class="l">Account type</span>
             <select class="gg-select" id="ggAcctType"><option value="">Not set</option><option value="funded">Funded account (prop firm)</option><option value="live">Live account</option></select>
-            <small class="gg-field-note">Prop-firm rules like daily loss and drawdown limits only apply to a funded account. Journall can't tell this from the sync automatically — set it here.</small></div>
+            <small class="gg-field-note">Prop-firm rules like daily loss and drawdown limits only apply to a funded account. Journall can't tell this from the sync automatically â set it here.</small></div>
         </div>
       </div>
       <div class="gg-tab-panel" data-p="tgt" hidden>
         <div class="gg-mgrid">
           <div class="gg-field"><span class="l">Profit target</span>
-            <div class="gg-combo"><div class="gg-stepper" style="flex:1"><button onclick="ggStep('pt',-1)">−</button><input id="ggPt" value="8" readonly><button onclick="ggStep('pt',1)">+</button></div><select><option>%</option><option>$</option></select></div></div>
+            <div class="gg-combo"><div class="gg-stepper" style="flex:1"><button onclick="ggStep('pt',-1)">â</button><input id="ggPt" value="8" readonly><button onclick="ggStep('pt',1)">+</button></div><select><option>%</option><option>$</option></select></div></div>
           <div class="gg-field"><span class="l">Phase deadline (optional)</span><input class="gg-select" id="ggDeadline" type="date"></div>
           <div class="gg-field"><span class="l">Max trades per day</span>
-            <div class="gg-stepper"><button onclick="ggStep('mt',-1)">−</button><input id="ggMt" value="8" readonly><button onclick="ggStep('mt',1)">+</button></div></div>
+            <div class="gg-stepper"><button onclick="ggStep('mt',-1)">â</button><input id="ggMt" value="8" readonly><button onclick="ggStep('mt',1)">+</button></div></div>
           <div class="gg-field"><span class="l">Day profit target</span>
             <div class="gg-combo"><div class="gg-stepper" style="flex:1"><button onclick="ggStep('dpt',-1)">-</button><input id="ggDpt" value="0" readonly><button onclick="ggStep('dpt',1)">+</button></div><select id="ggDptUnit"><option>%</option><option>$</option></select></div></div>
           <div class="gg-field"><span class="l">Weekly profit target</span>
@@ -3612,13 +3612,13 @@ window.__mountOpenPos=function(){const o=(window.__openTrades||[]).concat((windo
       <div class="gg-tab-panel" data-p="risk" hidden>
         <div class="gg-mgrid">
           <div class="gg-field"><span class="l">Risk per trade (%)</span>
-            <div class="gg-stepper"><button onclick="ggStep('rpt',-.1)">−</button><input id="ggRpt" value="" placeholder="Not set" readonly><button onclick="ggStep('rpt',.1)">+</button></div></div>
+            <div class="gg-stepper"><button onclick="ggStep('rpt',-.1)">â</button><input id="ggRpt" value="" placeholder="Not set" readonly><button onclick="ggStep('rpt',.1)">+</button></div></div>
           <div class="gg-field"><span class="l">Minimum RR</span>
-            <div class="gg-stepper"><button onclick="ggStep('rr',-1)">−</button><input id="ggRr" value="" placeholder="Not set" readonly><button onclick="ggStep('rr',1)">+</button></div></div>
+            <div class="gg-stepper"><button onclick="ggStep('rr',-1)">â</button><input id="ggRr" value="" placeholder="Not set" readonly><button onclick="ggStep('rr',1)">+</button></div></div>
           <div class="gg-field"><span class="l">Max daily loss</span>
-            <div class="gg-combo"><div class="gg-stepper" style="flex:1"><button onclick="ggStep('mdl',-5)">−</button><input id="ggMdl" value="20" readonly><button onclick="ggStep('mdl',5)">+</button></div><select id="ggMdlUnit"><option>$</option><option>%</option></select></div></div>
+            <div class="gg-combo"><div class="gg-stepper" style="flex:1"><button onclick="ggStep('mdl',-5)">â</button><input id="ggMdl" value="20" readonly><button onclick="ggStep('mdl',5)">+</button></div><select id="ggMdlUnit"><option>$</option><option>%</option></select></div></div>
           <div class="gg-field"><span class="l">Max weekly loss</span>
-            <div class="gg-combo"><div class="gg-stepper" style="flex:1"><button onclick="ggStep('mwl',-10)">−</button><input id="ggMwl" value="0" readonly><button onclick="ggStep('mwl',10)">+</button></div><select id="ggMwlUnit"><option>$</option><option>%</option></select></div></div>
+            <div class="gg-combo"><div class="gg-stepper" style="flex:1"><button onclick="ggStep('mwl',-10)">â</button><input id="ggMwl" value="0" readonly><button onclick="ggStep('mwl',10)">+</button></div><select id="ggMwlUnit"><option>$</option><option>%</option></select></div></div>
           <div class="gg-field"><span class="l">Max losses in a row</span>
             <div class="gg-stepper"><button onclick="ggStep('mcl',-1)">&minus;</button><input id="ggMcl" value="0" readonly><button onclick="ggStep('mcl',1)">+</button></div>
             <small class="gg-field-note">After this many losing trades in a row, the circuit breaker banner shows on every tab until the 06:00 IST reset. 0 = off.</small></div>
@@ -3640,9 +3640,9 @@ window.__mountOpenPos=function(){const o=(window.__openTrades||[]).concat((windo
             <div class="gg-stepper"><button onclick="ggStep('spl',-5)">&minus;</button><input id="ggSpl" value="0" readonly><button onclick="ggStep('spl',5)">+</button></div>
             <small class="gg-field-note">Used to estimate your share of the profit. 0 = off.</small></div>
           <div class="gg-field"><span class="l">Max overall drawdown</span>
-            <div class="gg-combo"><div class="gg-stepper" style="flex:1"><button onclick="ggStep('mdd',-1)">−</button><input id="ggMdd" value="10" readonly><button onclick="ggStep('mdd',1)">+</button></div><select id="ggMddUnit"><option>%</option><option>$</option></select></div></div>
+            <div class="gg-combo"><div class="gg-stepper" style="flex:1"><button onclick="ggStep('mdd',-1)">â</button><input id="ggMdd" value="10" readonly><button onclick="ggStep('mdd',1)">+</button></div><select id="ggMddUnit"><option>%</option><option>$</option></select></div></div>
           <div class="gg-field"><span class="l">Revenge trade window (minutes)</span>
-            <div class="gg-stepper"><button onclick="ggStep('revWin',-1)">−</button><input id="ggRevWin" value="" placeholder="Not set" readonly><button onclick="ggStep('revWin',1)">+</button></div>
+            <div class="gg-stepper"><button onclick="ggStep('revWin',-1)">â</button><input id="ggRevWin" value="" placeholder="Not set" readonly><button onclick="ggStep('revWin',1)">+</button></div>
             <small class="gg-field-note">A trade opened within this many minutes of a same-day loss closing is flagged as a revenge trade.</small></div>
           <div class="gg-field"><span class="l">Lot size</span>
             <div class="gg-stepper"><button onclick="ggStep('lot',-.01)">&minus;</button><input id="ggLot" value="0" readonly><button onclick="ggStep('lot',.01)">+</button></div>
@@ -3751,7 +3751,7 @@ window.__mountOpenPos=function(){const o=(window.__openTrades||[]).concat((windo
 
     <div class="gg-goals-sec">
       <div class="gg-goals-head">
-        <div><h2>Your goals</h2><div class="meta" id="ggGoalsMeta">Track more than the phase target — set win-rate, streak, volume and custom goals</div></div>
+        <div><h2>Your goals</h2><div class="meta" id="ggGoalsMeta">Track more than the phase target â set win-rate, streak, volume and custom goals</div></div>
         <button class="gg-btn-outline gg-add-goal-btn" onclick="ggOpenTypePicker()">
           <svg viewBox="0 0 24 24" width="13" height="13"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.2" fill="none" stroke-linecap="round"/></svg>
           Add goal
@@ -3766,13 +3766,13 @@ window.__mountOpenPos=function(){const o=(window.__openTrades||[]).concat((windo
 
 <div class="gg-modal-scrim" id="ggModalScrim" onclick="if(event.target===this)ggCloseModal()">
   <div class="gg-modal">
-    <div class="gg-modal-head"><h3 id="ggModalTitle">Choose a goal type</h3><button class="gg-modal-x" onclick="ggCloseModal()">✕</button></div>
+    <div class="gg-modal-head"><h3 id="ggModalTitle">Choose a goal type</h3><button class="gg-modal-x" onclick="ggCloseModal()">â</button></div>
     <div class="gg-modal-body">
       <div class="gg-type-grid" id="ggTypeGrid"></div>
       <div class="gg-goal-form" id="ggGoalForm" hidden></div>
     </div>
     <div class="gg-modal-foot" id="ggModalFoot" hidden>
-      <button class="gg-btn-outline" onclick="ggBackToTypes()">← Back</button>
+      <button class="gg-btn-outline" onclick="ggBackToTypes()">â Back</button>
       <button class="gg-btn-solid" onclick="ggCreateGoal()">Create goal</button>
     </div>
   </div>
@@ -3782,28 +3782,28 @@ window.__mountOpenPos=function(){const o=(window.__openTrades||[]).concat((windo
 
   <div class="top aic-reveal" style="animation-delay:0ms">
     <div>
-      <div class="eyebrow"><span class="streak aic-live"><span class="aic-live-dot"></span>AI Coach · reading your trade log</span><span class="date mono" id="dateStrAI"></span></div>
+      <div class="eyebrow"><span class="streak aic-live"><span class="aic-live-dot"></span>AI Coach Â· reading your trade log</span><span class="date mono" id="dateStrAI"></span></div>
       <h1>AI Coach</h1>
-      <p>Grounded in what you actually logged. No hype, no signals — just what the numbers say.</p>
+      <p>Grounded in what you actually logged. No hype, no signals â just what the numbers say.</p>
     </div>
     <div class="top-right"><div class="who"><span class="dot"></span><span data-user-name></span></div></div>
   </div>
 
   <div class="aic-snap">
     <div class="aic-snap-card glass aic-reveal" style="animation-delay:60ms"><div class="l"><svg viewBox="0 0 24 24"><path d="M5 20V11M12 20V4M19 20v-6"/></svg>TRADES LOGGED</div><div class="v mono" id="aicN1">0</div><div class="s">All sessions</div></div>
-    <div class="aic-snap-card glass aic-reveal" style="animation-delay:120ms"><div class="l"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/></svg>WIN RATE</div><div class="v mono" id="aicN2">0%</div><div class="s">0W · 0L · 0BE</div></div>
-    <div class="aic-snap-card glass neg aic-reveal" style="animation-delay:180ms"><div class="l"><svg viewBox="0 0 24 24"><path d="M4 6l6 6 4-4 6 8M14 16h6v-6"/></svg>NET P&amp;L</div><div class="v mono" id="aicN3">$0.00</div><div class="s">PF 0.00 · exp $0.00/trade</div></div>
-    <div class="aic-snap-card glass neg aic-reveal" style="animation-delay:240ms"><div class="l"><svg viewBox="0 0 24 24"><path d="M12 3 2 20h20z"/><path d="M12 10v4M12 17h.01"/></svg>MAIN LEAK</div><div class="v">None flagged</div><div class="s" id="aicN4">−$0.00 logged</div></div>
+    <div class="aic-snap-card glass aic-reveal" style="animation-delay:120ms"><div class="l"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/></svg>WIN RATE</div><div class="v mono" id="aicN2">0%</div><div class="s">0W Â· 0L Â· 0BE</div></div>
+    <div class="aic-snap-card glass neg aic-reveal" style="animation-delay:180ms"><div class="l"><svg viewBox="0 0 24 24"><path d="M4 6l6 6 4-4 6 8M14 16h6v-6"/></svg>NET P&amp;L</div><div class="v mono" id="aicN3">$0.00</div><div class="s">PF 0.00 Â· exp $0.00/trade</div></div>
+    <div class="aic-snap-card glass neg aic-reveal" style="animation-delay:240ms"><div class="l"><svg viewBox="0 0 24 24"><path d="M12 3 2 20h20z"/><path d="M12 10v4M12 17h.01"/></svg>MAIN LEAK</div><div class="v">None flagged</div><div class="s" id="aicN4">â$0.00 logged</div></div>
   </div>
 
   <div class="aic-grid">
     <div class="aic-chat glass aic-reveal" style="animation-delay:280ms">
       <div class="aic-chat-head">
-        <span class="aic-avatar-wrap"><span class="aic-avatar" id="aicHeadAvatar">✦</span></span>
-        <div><div class="t">Ask the coach</div><div class="s">Answers pull from your logged trades — never a reason to size up.</div></div>
+        <span class="aic-avatar-wrap"><span class="aic-avatar" id="aicHeadAvatar">â¦</span></span>
+        <div><div class="t">Ask the coach</div><div class="s">Answers pull from your logged trades â never a reason to size up.</div></div>
       </div>
       <div class="aic-thread" id="aicThread">
-        <div class="aic-msg ai"><span class="aic-avatar sm">✦</span><div class="aic-bubble"><span id="aicHello"></span> Pick a question below, or type your own — performance, your biggest leak, today's one fix, psychology, or whether you actually have a proven setup.</div></div>
+        <div class="aic-msg ai"><span class="aic-avatar sm">â¦</span><div class="aic-bubble"><span id="aicHello"></span> Pick a question below, or type your own â performance, your biggest leak, today's one fix, psychology, or whether you actually have a proven setup.</div></div>
       </div>
       <div class="aic-chips" id="aicChips">
         <button class="aic-chip" data-q="performance">Review performance</button>
@@ -3844,7 +3844,7 @@ window.__mountOpenPos=function(){const o=(window.__openTrades||[]).concat((windo
 
   <div class="aic-report glass aic-reveal" style="animation-delay:520ms">
     <div class="aic-card-head">
-      <div><div class="t" style="font-size:15px;font-weight:650">AI report card</div><div class="s" style="color:var(--sub);font-size:12px;margin-top:2px">Full-log grade, generated on request — not saved anywhere</div></div>
+      <div><div class="t" style="font-size:15px;font-weight:650">AI report card</div><div class="s" style="color:var(--sub);font-size:12px;margin-top:2px">Full-log grade, generated on request â not saved anywhere</div></div>
       <div class="aic-report-actions">
         <button class="gg-btn-solid" id="aicGen">Generate report</button>
         <button class="gg-btn-outline" id="aicClear">Clear</button>
@@ -3857,7 +3857,7 @@ window.__mountOpenPos=function(){const o=(window.__openTrades||[]).concat((windo
 
   <div class="aic-report glass aic-reveal" style="animation-delay:580ms">
     <div class="aic-card-head">
-      <div><div class="t" style="font-size:15px;font-weight:650">AI widgets</div><div class="s" style="color:var(--sub);font-size:12px;margin-top:2px">One card per pattern in your log — pin the ones you want to watch daily</div></div>
+      <div><div class="t" style="font-size:15px;font-weight:650">AI widgets</div><div class="s" style="color:var(--sub);font-size:12px;margin-top:2px">One card per pattern in your log â pin the ones you want to watch daily</div></div>
       <div class="aic-report-actions">
         <button class="gg-btn-solid" id="aicWGen">Generate widgets</button>
         <button class="gg-btn-outline" id="aicWClear">Clear</button>
@@ -3903,11 +3903,11 @@ window.__mountOpenPos=function(){const o=(window.__openTrades||[]).concat((windo
     <div class="up-cover"></div>
     <div class="up-hero-body">
       <div class="up-hero-left">
-        <div class="up-avatar-wrap"><div class="up-avatar" id="upAvatar">?</div><span class="up-avatar-badge" title="MT5 sync active">✓</span></div>
+        <div class="up-avatar-wrap"><div class="up-avatar" id="upAvatar">?</div><span class="up-avatar-badge" title="MT5 sync active">â</span></div>
         <div>
           <div class="up-name-row"><span class="up-name" id="upName" data-user-name contenteditable="true" spellcheck="false" title="Click to edit your name"></span><span class="up-phase-chip" id="upPhaseChip">Not set</span></div>
           <div class="up-bio" id="upBio" contenteditable="true" spellcheck="false"></div>
-          <div class="up-meta"><span class="up-meta-chip" id="upMemberChip" hidden></span><span class="up-meta-chip" id="upJournalStreakChip">🔥 Loading…</span></div>
+          <div class="up-meta"><span class="up-meta-chip" id="upMemberChip" hidden></span><span class="up-meta-chip" id="upJournalStreakChip">ð¥ Loadingâ¦</span></div>
         </div>
       </div>
       <div class="up-settings-wrap">
@@ -3916,8 +3916,8 @@ window.__mountOpenPos=function(){const o=(window.__openTrades||[]).concat((windo
           <span>Edit profile</span>
         </button>
         <div class="up-settings-menu" id="upSettingsMenu">
-          <button type="button" data-act="avatar"><span class="ic">🖼️</span> Change profile photo</button>
-          <button type="button" data-act="cover"><span class="ic">🌆</span> Change banner</button>
+          <button type="button" data-act="avatar"><span class="ic">ð¼ï¸</span> Change profile photo</button>
+          <button type="button" data-act="cover"><span class="ic">ð</span> Change banner</button>
         </div>
         <input type="file" id="upAvatarInput" accept="image/*" hidden>
         <input type="file" id="upCoverInput" accept="image/*" hidden>
@@ -3926,52 +3926,52 @@ window.__mountOpenPos=function(){const o=(window.__openTrades||[]).concat((windo
   </div>
 
   <div class="up-stats">
-    <div class="up-stat glass up-reveal" style="animation-delay:110ms"><div class="l">📒 TRADES LOGGED</div><div class="v mono" id="upN1">0</div></div>
-    <div class="up-stat glass up-reveal" style="animation-delay:150ms"><div class="l">🎯 WIN RATE</div><div class="v mono" id="upN2">0%</div></div>
-    <div class="up-stat glass neg up-reveal" style="animation-delay:190ms"><div class="l">💰 NET P&amp;L</div><div class="v mono" id="upN3">$0.00</div></div>
-    <div class="up-stat glass up-reveal" style="animation-delay:230ms"><div class="l">⚖️ PROFIT FACTOR</div><div class="v mono" id="upN4">0.00</div></div>
-    <div class="up-stat glass neg up-reveal" style="animation-delay:270ms"><div class="l">📉 MAX DRAWDOWN</div><div class="v mono" id="upN5">$0.00</div></div>
+    <div class="up-stat glass up-reveal" style="animation-delay:110ms"><div class="l">ð TRADES LOGGED</div><div class="v mono" id="upN1">0</div></div>
+    <div class="up-stat glass up-reveal" style="animation-delay:150ms"><div class="l">ð¯ WIN RATE</div><div class="v mono" id="upN2">0%</div></div>
+    <div class="up-stat glass neg up-reveal" style="animation-delay:190ms"><div class="l">ð° NET P&amp;L</div><div class="v mono" id="upN3">$0.00</div></div>
+    <div class="up-stat glass up-reveal" style="animation-delay:230ms"><div class="l">âï¸ PROFIT FACTOR</div><div class="v mono" id="upN4">0.00</div></div>
+    <div class="up-stat glass neg up-reveal" style="animation-delay:270ms"><div class="l">ð MAX DRAWDOWN</div><div class="v mono" id="upN5">$0.00</div></div>
   </div>
 
   <div class="up-grid">
     <div class="up-col">
       <div class="up-card glass up-reveal" style="animation-delay:310ms">
-        <div class="up-card-head">🧭 Trading identity</div>
+        <div class="up-card-head">ð§­ Trading identity</div>
         <div class="up-tags" id="upTags">
                     <button class="up-tag add" id="upTagAdd" type="button">+ Add</button>
         </div>
       </div>
       <div class="up-card glass up-reveal" style="animation-delay:350ms">
-        <div class="up-card-head">🛡️ Risk profile</div>
+        <div class="up-card-head">ð¡ï¸ Risk profile</div>
         <div class="up-risk-row"><span>Daily loss limit</span><b id="upRiskLoss">Not set</b></div>
         <div class="up-risk-row"><span>Trade limit / day</span><b id="upRiskTrades">Not set</b></div>
                 <div class="up-risk-row"><span>Minimum reward:risk</span><b id="upRiskRR">Not set</b></div>
       </div>
       <div class="up-card glass up-reveal" style="animation-delay:390ms">
-        <div class="up-card-head">🕒 Session record</div>
-        <div id="upSessRows"><div class="up-sess"><span>Loading…</span><b>—</b></div></div>
+        <div class="up-card-head">ð Session record</div>
+        <div id="upSessRows"><div class="up-sess"><span>Loadingâ¦</span><b>â</b></div></div>
       </div>
     </div>
 
     <div class="up-col">
       <div class="up-card glass up-reveal" style="animation-delay:310ms">
-        <div class="up-card-head">📈 Monthly trend — 2026</div>
+        <div class="up-card-head">ð Monthly trend â 2026</div>
         <div class="up-chart" id="upChart"></div>
       </div>
       <div class="up-card glass up-reveal" style="animation-delay:350ms">
-        <div class="up-card-head">🏆 Achievements</div>
+        <div class="up-card-head">ð Achievements</div>
         <div class="up-badges">
-          <div class="up-badge" id="upBadgeTrades"><span class="ic" id="upBadgeTradesIcon">🔒</span><div><b>700+ trades logged</b><span id="upBadgeTradesSub">Consistency milestone</span></div></div>
-          <div class="up-badge" id="upBadgeStreak"><span class="ic" id="upBadgeStreakIcon">🔒</span><div><b>30-day journal streak</b><span id="upBadgeStreakSub">0 / 30 days</span><div class="up-badge-bar"><i data-target="0"></i></div></div></div>
-          <div class="up-badge" id="upBadgeGreenMonth"><span class="ic" id="upBadgeGreenMonthIcon">🔒</span><div><b>First green month</b><span id="upBadgeGreenMonthSub">Not tracked yet</span></div></div>
-          <div class="up-badge" id="upBadgeRevenge"><span class="ic" id="upBadgeRevengeIcon">🔒</span><div><b>Zero revenge trades, 7 days</b><span id="upBadgeRevengeSub">Not tracked yet</span></div></div>
+          <div class="up-badge" id="upBadgeTrades"><span class="ic" id="upBadgeTradesIcon">ð</span><div><b>700+ trades logged</b><span id="upBadgeTradesSub">Consistency milestone</span></div></div>
+          <div class="up-badge" id="upBadgeStreak"><span class="ic" id="upBadgeStreakIcon">ð</span><div><b>30-day journal streak</b><span id="upBadgeStreakSub">0 / 30 days</span><div class="up-badge-bar"><i data-target="0"></i></div></div></div>
+          <div class="up-badge" id="upBadgeGreenMonth"><span class="ic" id="upBadgeGreenMonthIcon">ð</span><div><b>First green month</b><span id="upBadgeGreenMonthSub">Not tracked yet</span></div></div>
+          <div class="up-badge" id="upBadgeRevenge"><span class="ic" id="upBadgeRevengeIcon">ð</span><div><b>Zero revenge trades, 7 days</b><span id="upBadgeRevengeSub">Not tracked yet</span></div></div>
         </div>
       </div>
     </div>
   </div>
 
   <div class="up-card glass up-reveal" style="animation-delay:430ms">
-    <div class="up-card-head">⚙️ Preferences</div>
+    <div class="up-card-head">âï¸ Preferences</div>
     <div class="up-toggle-row"><div><b>Daily rule reminders</b><span>Before your first trade, remind you on Today's Summary if the last trading day broke a rule</span></div><button class="up-switch on" data-k="reminders" type="button"></button></div>
     <div class="up-toggle-row"><div><b>Risk warnings</b><span>Show a warning on Today's Summary at 80% of your daily loss limit, or 1 trade before the max</span></div><button class="up-switch on" data-k="risk" type="button"></button></div>
     <div class="up-toggle-row"><div><b>Reduce motion</b><span>Turn off animated entrances and transitions across the app</span></div><button class="up-switch" data-k="motion" type="button"></button></div>
@@ -4153,7 +4153,7 @@ document.addEventListener('input',e=>{if(cur&&RUN[cur.dataset.tool]&&cur.contain
 <div class="top"><div><h1>Market</h1><p>Upcoming economic events and market news.</p></div></div>
 <div class="mk-bar"><div class="mk-chips" id="mkRangeChips" data-group="range"><button type="button" class="mk-chip" data-val="today">Today</button><button type="button" class="mk-chip on" data-val="week">This week</button><button type="button" class="mk-chip" data-val="next">Next week</button></div><div class="mk-chips" id="mkImpactChips" data-group="impact"><button type="button" class="mk-chip" data-val="all">All</button><button type="button" class="mk-chip on" data-val="high">High</button><button type="button" class="mk-chip" data-val="medium">Medium</button><button type="button" class="mk-chip" data-val="low">Low</button></div><div class="mk-chips" id="mkCcyChips" data-group="ccy"><button type="button" class="mk-chip on" data-val="USD">USD</button><button type="button" class="mk-chip" data-val="EUR">EUR</button><button type="button" class="mk-chip" data-val="GBP">GBP</button><button type="button" class="mk-chip" data-val="JPY">JPY</button><button type="button" class="mk-chip" data-val="CAD">CAD</button><button type="button" class="mk-chip" data-val="AUD">AUD</button><button type="button" class="mk-chip" data-val="CHF">CHF</button><button type="button" class="mk-chip" data-val="NZD">NZD</button><button type="button" class="mk-chip" data-val="all">All</button></div><button type="button" class="mk-status" id="mkStatus" style="cursor:pointer;background:none"><i></i>Not connected</button></div>
 <div class="mk-grid">
-<section class="glass mk-card"><h3>Economic calendar <small>Times in your local timezone</small></h3><div class="mk-scroll"><table class="mk-tbl"><thead><tr><th>Time</th><th>Cur</th><th>Impact</th><th>Event</th><th>Actual</th><th>Forecast</th><th>Previous</th></tr></thead><tbody id="mkCalBody"><tr class="mk-day"><td colspan="7">DAY, DATE</td></tr><tr><td><span class="mk-sk" style="width:44px"></span></td><td><span class="mk-sk" style="width:32px"></span></td><td><span class="mk-imp"><i></i><i></i><i></i></span></td><td><span class="mk-sk" style="width:80%"></span></td><td><span class="mk-sk" style="width:38px"></span></td><td><span class="mk-sk" style="width:38px"></span></td><td><span class="mk-sk" style="width:38px"></span></td></tr></tbody></table></div><p class="mk-note" id="mkCalNote">Loading calendar…</p></section>
+<section class="glass mk-card"><h3>Economic calendar <small>Times in your local timezone</small></h3><div class="mk-scroll"><table class="mk-tbl"><thead><tr><th>Time</th><th>Cur</th><th>Impact</th><th>Event</th><th>Actual</th><th>Forecast</th><th>Previous</th></tr></thead><tbody id="mkCalBody"><tr class="mk-day"><td colspan="7">DAY, DATE</td></tr><tr><td><span class="mk-sk" style="width:44px"></span></td><td><span class="mk-sk" style="width:32px"></span></td><td><span class="mk-imp"><i></i><i></i><i></i></span></td><td><span class="mk-sk" style="width:80%"></span></td><td><span class="mk-sk" style="width:38px"></span></td><td><span class="mk-sk" style="width:38px"></span></td><td><span class="mk-sk" style="width:38px"></span></td></tr></tbody></table></div><p class="mk-note" id="mkCalNote">Loading calendarâ¦</p></section>
 <div class="mk-side"><section class="glass mk-card"><h3>Key events <small>Next up (High + Medium)</small></h3><div class="mk-key" id="mkKeyEvents"><div class="mk-k"><b>FOMC</b><span>Date: --</span><br><span>Time: --</span></div><div class="mk-k"><b>CPI</b><span>Date: --</span><br><span>Time: --</span></div><div class="mk-k"><b>NFP</b><span>Date: --</span><br><span>Time: --</span></div><div class="mk-k"><b>Interest rate decision</b><span>Date: --</span><br><span>Time: --</span></div></div></section>
 <section class="glass mk-card"><h3>Market news <small>Latest</small></h3><div class="mk-news" id="mkNewsList"><div class="mk-n"><span class="mk-sk" style="width:35%"></span><span class="mk-sk" style="width:95%"></span><span class="mk-sk" style="width:70%"></span></div></div></section></div>
 </div></div></div>
@@ -4173,25 +4173,25 @@ document.addEventListener('input',e=>{if(cur&&RUN[cur.dataset.tool]&&cur.contain
       <span class="ud-dot" id="udDot"></span>
       <div>
         <div class="ud-status-title" id="udTitle">Awaiting sync</div>
-        <div class="ud-status-sub">MT5 bridge · <b id="udSyncTxt">not synced yet</b></div>
+        <div class="ud-status-sub">MT5 bridge Â· <b id="udSyncTxt">not synced yet</b></div>
       </div>
     </div>
-    <button class="gg-btn-solid" id="udSyncBtn" style="width:auto;padding:10px 18px">⟳ Sync balance</button>
+    <button class="gg-btn-solid" id="udSyncBtn" style="width:auto;padding:10px 18px">â³ Sync balance</button>
   </div>
 
   <div class="up-grid">
     <div class="up-col">
       <div class="up-card glass up-reveal" style="animation-delay:110ms">
-        <div class="up-card-head">🔌 Broker connection</div>
+        <div class="up-card-head">ð Broker connection</div>
         <div class="up-risk-row"><span>Broker</span><b>MetaTrader 5</b></div>
         <div class="up-risk-row"><span>Bridge</span><b>Local, localhost:8787</b></div>
-        <div class="up-risk-row"><span>Last synced</span><b id="udLastSync">—</b></div>
+        <div class="up-risk-row"><span>Last synced</span><b id="udLastSync">â</b></div>
       </div>
 
       <div class="up-card glass up-reveal" style="animation-delay:150ms">
-        <div class="up-card-head">📥 Import from CSV or HTML</div>
+        <div class="up-card-head">ð¥ Import from CSV or HTML</div>
         <div class="ud-drop" id="udDrop" tabindex="0" role="button">
-          <div class="ud-drop-ic">⇪</div>
+          <div class="ud-drop-ic">âª</div>
           <div class="ud-drop-t">Drop your MT5 / broker export here</div>
           <div class="ud-drop-s">or click to choose a .csv or .html file</div>
           <input type="file" id="udFile" accept=".csv,.html,.htm" hidden>
@@ -4202,11 +4202,11 @@ document.addEventListener('input',e=>{if(cur&&RUN[cur.dataset.tool]&&cur.contain
 
     <div class="up-col">
       <div class="up-card glass up-reveal" style="animation-delay:110ms">
-        <div class="up-card-head">🧾 What syncing keeps</div>
+        <div class="up-card-head">ð§¾ What syncing keeps</div>
         <div class="ud-note"><b>Sync balance</b> reads your account balance from MT5 and adds recent trades that are not in your journal yet. For older history, export your MT5 history as .html or .csv and drop it below; a report import stays the final word. Your journal notes, screenshots and psychology checks always stay local and are never overwritten.</div>
       </div>
       <div class="up-card glass up-reveal" style="animation-delay:150ms">
-        <div class="up-card-head">🛠️ Bridge setup</div>
+        <div class="up-card-head">ð ï¸ Bridge setup</div>
         <div class="ud-steps">
           <div class="ud-step"><span class="ud-step-n">1</span><div><b>Run the local bridge</b><span class="ud-step-d">Start the local bridge (<code>local-server.ps1</code>) with MT5 open.</span></div></div>
           <div class="ud-step"><span class="ud-step-n">2</span><div><b>Keep MT5 signed in</b><span class="ud-step-d">The bridge reads your account balance from the terminal.</span></div></div>
@@ -4302,7 +4302,7 @@ document.addEventListener('input',e=>{if(cur&&RUN[cur.dataset.tool]&&cur.contain
         if(R.err){ showResult(R.err, 'err'); return; }
         let S; try{ S = window.jlSaveImport(R); }
         catch(e){ showResult('Could not save the import in this browser.', 'err'); return; }
-        showResult('Imported '+S.total+' closed trade'+(S.total===1?'':'s')+' ('+S.added+' new'+(S.replaced?', '+S.replaced+' bridge trade'+(S.replaced===1?'':'s')+' replaced':'')+(S.removed?', '+S.removed+' unmatched bridge trade'+(S.removed===1?'':'s')+' removed':'')+(S.updated?', '+S.updated+' updated from the report':'')+(S.skipped?', '+S.skipped+' already present':'')+(S.relinked?', '+S.relinked+' journal'+(S.relinked===1?'':'s')+' re-linked':'')+') and '+R.open.length+' open position'+(R.open.length===1?'':'s')+' from '+file.name+'. Reloading…', 'ok');
+        showResult('Imported '+S.total+' closed trade'+(S.total===1?'':'s')+' ('+S.added+' new'+(S.replaced?', '+S.replaced+' bridge trade'+(S.replaced===1?'':'s')+' replaced':'')+(S.removed?', '+S.removed+' unmatched bridge trade'+(S.removed===1?'':'s')+' removed':'')+(S.updated?', '+S.updated+' updated from the report':'')+(S.skipped?', '+S.skipped+' already present':'')+(S.relinked?', '+S.relinked+' journal'+(S.relinked===1?'':'s')+' re-linked':'')+') and '+R.open.length+' open position'+(R.open.length===1?'':'s')+' from '+file.name+'. Reloadingâ¦', 'ok');
         setTimeout(()=>location.reload(), (S.replaced||S.removed||S.updated)?6000:1200);
       };
       reader.onerror = ()=> showResult('Could not read that file. Try again.', 'err');
@@ -4362,7 +4362,7 @@ window.jlApplyChLimits=function(o){
   // name/shape of the synced phase value hasn't been given yet either.
   // TODO(real-phase-wiring): once the Firebase field name is known, replace the read of
   // ggAccount.phase below with the real synced value (e.g. from onSnapshot / the account
-  // doc), and stop reading/writing it from localStorage — it should only ever reflect the
+  // doc), and stop reading/writing it from localStorage â it should only ever reflect the
   // bridge, never a manual choice. Only relevant when Account type = funded; for live
   // accounts, phase does not apply and the whole field is hidden (see ggApplyAcctType below).
   const ACC_KEY = 'jlAccountSettings';
@@ -4403,7 +4403,7 @@ window.jlApplyChLimits=function(o){
     else if(days === 0){ v.textContent = 'Due today'; m.textContent = 'Ends ' + label; }
     else { v.textContent = 'Deadline passed'; m.textContent = Math.abs(days) + (Math.abs(days) === 1 ? ' day' : ' days') + ' ago \u00b7 ' + label; }
   }
-  // Ring helper (Account Settings): fills with the share USED and colors by how much is used —
+  // Ring helper (Account Settings): fills with the share USED and colors by how much is used â
   // green under 60%, yellow 60-90%, red over 90%. (--amber in this theme is sky blue, so yellow is set here.)
   window.ggRingTone = function(ring, used){
     if(!ring) return;
@@ -4503,7 +4503,7 @@ window.jlApplyChLimits=function(o){
   const ggDeadlineEl = document.getElementById('ggDeadline'); if(ggDeadlineEl) ggDeadlineEl.value = ggAccount.deadline || '';
   ggApplyAccountDisplay(ggAccount);
 
-  // Account phase only applies to a funded (prop-firm) account — a live account has no
+  // Account phase only applies to a funded (prop-firm) account â a live account has no
   // phase concept, so hide the whole field rather than show a meaningless value.
   function ggApplyAcctType(type){
     const field = document.getElementById('ggPhaseField');
@@ -4532,7 +4532,7 @@ window.jlApplyChLimits=function(o){
   window.ggSaveSetup = function(){
     ggAccount = {
       balance: ggState.bal,
-      phase: ggAccount.phase, // not user-set — carries over until real bridge sync is wired (see TODO above)
+      phase: ggAccount.phase, // not user-set â carries over until real bridge sync is wired (see TODO above)
       type: ggAcctTypeSel ? ggAcctTypeSel.value : ggAccount.type,
       revWindowMin: ggState.revWin,
       profitTargetPct: ggState.pt,
@@ -4706,13 +4706,13 @@ window.jlApplyChLimits=function(o){
     const grid = document.getElementById('ggGoalsGrid');
     document.getElementById('ggGoalsMeta').textContent = ggGoals.length
       ? ggGoals.length+' active goal'+(ggGoals.length===1?'':'s')+' alongside your phase target'
-      : 'No goals yet — add a win-rate, streak or custom goal to track';
+      : 'No goals yet â add a win-rate, streak or custom goal to track';
     grid.innerHTML = ggGoals.map((g,i)=>{
       const t = ggType(g.typeId), st = ggGoalStatus(g), pct = (st.ratio*100).toFixed(0);
       return '<div class="gg-goal-card" style="--gc:'+t.color+';animation-delay:'+(i*.05)+'s">'
         +'<div class="gg-goal-top"><div class="gg-goal-ic"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">'+GG_ICON[t.icon]+'</svg></div>'
         +'<button class="gg-goal-del" title="Remove goal" onclick="ggDeleteGoal('+g.id+')"><svg viewBox="0 0 24 24" width="14" height="14"><path d="M6 6l12 12M18 6 6 18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></svg></button></div>'
-        +'<div class="gg-goal-title">'+g.title+'</div><div class="gg-goal-sub">'+t.name+(g.manual?' · manual':'')+'</div>'
+        +'<div class="gg-goal-title">'+g.title+'</div><div class="gg-goal-sub">'+t.name+(g.manual?' Â· manual':'')+'</div>'
         +'<div class="gg-goal-bar"><i style="width:'+pct+'%"></i></div>'
         +'<div class="gg-goal-nums"><b>'+g.current+(g.unit==='%'?'%':'')+'</b><span>of '+g.target+(g.unit&&g.unit!=='%'?' '+g.unit:g.unit==='%'?'%':'')+'</span></div>'
         +'<div class="gg-goal-foot"><span class="gg-goal-badge '+st.cls+'">'+st.label+'</span>'
@@ -4794,26 +4794,26 @@ window.jlApplyChLimits=function(o){
 <aside class="day-panel" id="dayPanel" aria-hidden="true" aria-label="Day trade detail">
   <div class="day-panel-head">
     <div><div class="day-panel-date" id="dpDate"></div><div class="day-panel-pnl" id="dpPnl"></div></div>
-    <button type="button" class="day-panel-close" id="dpClose" aria-label="Close">✕</button>
+    <button type="button" class="day-panel-close" id="dpClose" aria-label="Close">â</button>
   </div>
   <div class="day-panel-stats" id="dpStats"></div>
-  <div class="day-panel-sub">TRADES THIS DAY · TAP ONE TO OPEN ITS JOURNAL</div>
+  <div class="day-panel-sub">TRADES THIS DAY Â· TAP ONE TO OPEN ITS JOURNAL</div>
   <div class="day-panel-list" id="dpList"></div>
 </aside>
 <div class="day-panel-scrim" id="monthPanelScrim"></div>
 <aside class="day-panel" id="monthPanel" aria-hidden="true" aria-label="Month detail">
   <div class="day-panel-head">
     <div><div class="day-panel-date" id="mpTitle"></div><div class="day-panel-pnl" id="mpPnl"></div></div>
-    <button type="button" class="day-panel-close" id="mpClose" aria-label="Close">✕</button>
+    <button type="button" class="day-panel-close" id="mpClose" aria-label="Close">â</button>
   </div>
   <div class="day-panel-stats" id="mpStats"></div>
   <button type="button" class="day-panel-view" id="mpViewFull"><svg viewBox="0 0 24 24"><path d="M9 6h11M9 12h11M9 18h11M4 6h.01M4 12h.01M4 18h.01"/></svg>View full month calendar</button>
-  <div class="day-panel-sub">WEEKS THIS MONTH · TAP ONE TO JUMP TO IT</div>
+  <div class="day-panel-sub">WEEKS THIS MONTH Â· TAP ONE TO JUMP TO IT</div>
   <div class="day-panel-list" id="mpList"></div>
 </aside>
 <script>
   // ---------- single source of truth for real trade data ----------
-  // Used by Today's Summary (this file), Trades and Journal — defined once, here, near the
+  // Used by Today's Summary (this file), Trades and Journal â defined once, here, near the
   // top of the page's scripts so every tab reads window.__trades instead of keeping its own
   // hardcoded copy that could silently drift out of sync with the others.
   window.__rawTradesData = []; // no built-in trades: data comes from an imported CSV now, synced data later
@@ -4876,8 +4876,8 @@ window.jlApplyChLimits=function(o){
   document.getElementById('dateStr').textContent = new Date().toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
 
   // ---------- streak-aware nudge (Today's Summary) ----------
-  // Real date-based tracking via localStorage — no fake/hardcoded break state.
-  // Trading-day boundary matches the prop-firm reset used elsewhere on this tab (06:00 IST) —
+  // Real date-based tracking via localStorage â no fake/hardcoded break state.
+  // Trading-day boundary matches the prop-firm reset used elsewhere on this tab (06:00 IST) â
   // a trade at 05:50 IST still belongs to yesterday's trading day, not the new calendar date.
   function getTradingDayIST(){
     const IST_OFFSET_MS = 5.5*60*60*1000, RESET_HOUR_IST = 6;
@@ -4896,7 +4896,7 @@ window.jlApplyChLimits=function(o){
       const raw = localStorage.getItem('jlStreak');
       let data = raw ? JSON.parse(raw) : null;
       if(!data){
-        // First time this device has tracked a real streak — keep the existing
+        // First time this device has tracked a real streak â keep the existing
         // baseline count already shown in the design rather than inventing a new number.
         const baseline = parseInt((badge.textContent.match(/\d+/)||[1])[0], 10) || 1;
         data = { count: baseline, lastDate: todayKey };
@@ -4909,16 +4909,16 @@ window.jlApplyChLimits=function(o){
         } else if(daysGap === 1){
           data.count += 1;
         } else if(daysGap > 1){
-          nudge.textContent = 'Missed ' + (daysGap-1) + ' day' + (daysGap-1!==1?'s':'') + ' — streak reset. Fresh start today.';
+          nudge.textContent = 'Missed ' + (daysGap-1) + ' day' + (daysGap-1!==1?'s':'') + ' â streak reset. Fresh start today.';
           nudge.hidden = false;
           requestAnimationFrame(()=>nudge.classList.add('show'));
           data.count = 1;
         }
         data.lastDate = todayKey;
       }
-      badge.textContent = '🔥 ' + data.count + '-day streak';
+      badge.textContent = 'ð¥ ' + data.count + '-day streak';
       localStorage.setItem('jlStreak', JSON.stringify(data));
-    }catch(e){ /* localStorage unavailable — leave the static baseline badge as-is */ }
+    }catch(e){ /* localStorage unavailable â leave the static baseline badge as-is */ }
   })();
 
   // ---------- shared tooltip ----------
@@ -4943,7 +4943,7 @@ window.jlApplyChLimits=function(o){
     return '<svg width="20" height="20" viewBox="0 0 20 20" style="filter:drop-shadow(0 1px 2px rgba(0,0,0,.4))"><circle cx="10" cy="10" r="10" fill="#2b2e3d"/><path d="M5.5 14V10.5M9.2 14V7M12.9 14V9M16 14V6" stroke="#43d787" stroke-width="1.5" stroke-linecap="round"/></svg>';
   }
   // Exposed on window so the Trades and Journal tabs (separate script blocks) can render the
-  // same real per-instrument logo instead of a hardcoded gold dot — one source of truth for the icon.
+  // same real per-instrument logo instead of a hardcoded gold dot â one source of truth for the icon.
   window.iconFor = iconFor;
 
   // ---------- psychology checklist (Today's Summary) ----------
@@ -5016,9 +5016,9 @@ window.jlApplyChLimits=function(o){
     {name:'New York', color:'#43d787', spans:[[13,22]]}
   ];
   const OVERLAPS = [
-    {label:'Sydney × Tokyo', sub:'Asian session, lighter volume', start:0, end:7, color:'199,203,214'},
-    {label:'Tokyo × London', sub:'Handover window, brief liquidity dip', start:8, end:9, color:'199,203,214'},
-    {label:'London × New York', sub:'Highest volatility window of the day', start:13, end:17, color:'199,203,214'}
+    {label:'Sydney Ã Tokyo', sub:'Asian session, lighter volume', start:0, end:7, color:'199,203,214'},
+    {label:'Tokyo Ã London', sub:'Handover window, brief liquidity dip', start:8, end:9, color:'199,203,214'},
+    {label:'London Ã New York', sub:'Highest volatility window of the day', start:13, end:17, color:'199,203,214'}
   ];
   function pct(h){ return (h/24*100)+'%'; }
   let sessHtml = '';
@@ -5040,7 +5040,7 @@ window.jlApplyChLimits=function(o){
     band.style.left = pct(o.start); band.style.width = pct(o.end-o.start); band.style.height = rowsH+'px';
     band.style.pointerEvents = 'auto';
     band.addEventListener('mouseenter', e=>showTip(e,
-      '<div class="th">🟣 '+o.label+'</div><div class="tsub">'+o.sub+'</div><div class="tr" style="margin-top:6px"><span>Window</span><b>'+String(o.start).padStart(2,'0')+':00–'+String(o.end).padStart(2,'0')+':00 UTC</b></div>'));
+      '<div class="th">ð£ '+o.label+'</div><div class="tsub">'+o.sub+'</div><div class="tr" style="margin-top:6px"><span>Window</span><b>'+String(o.start).padStart(2,'0')+':00â'+String(o.end).padStart(2,'0')+':00 UTC</b></div>'));
     band.addEventListener('mousemove', e=>showTip(e, ttip.innerHTML));
     band.addEventListener('mouseleave', hideTip);
     overlay.appendChild(band);
@@ -5080,7 +5080,7 @@ window.jlApplyChLimits=function(o){
     try { ist = new Intl.DateTimeFormat('en-GB',{timeZone:'Asia/Kolkata',hour:'2-digit',minute:'2-digit',hour12:false}).format(d); }
     catch(e){ ist = '--:--'; }
     nowLine.style.left = (st.h/24*100)+'%';
-    nowLine.setAttribute('data-t','now · '+ist+' IST');
+    nowLine.setAttribute('data-t','now Â· '+ist+' IST');
     const pillEl = document.getElementById('nowTxt');
     if(pillEl) pillEl.textContent = st.pill;
     // Weekend: hide Market Session + the 4 cards under it while forex is closed
@@ -5108,7 +5108,7 @@ window.jlApplyChLimits=function(o){
   function buildChart(trades, pnlLabel){
     const W=420,H=180,padL=40,padR=10,padT=18,padB=25;
     let bal = 0;
-    const series = [{label:'Day start',time:'—',sym:null,pnl:0,bal:0}];
+    const series = [{label:'Day start',time:'â',sym:null,pnl:0,bal:0}];
     trades.forEach(t=>{ bal += t.pnl; series.push({label:t.sym,time:t.time,sym:t.sym,side:t.side,pnl:t.pnl,bal:bal}); });
     const vals = series.map(s=>s.bal);
     const min = Math.min(0,...vals) - 8, max = Math.max(...vals) + 8;
@@ -5157,7 +5157,7 @@ window.jlApplyChLimits=function(o){
     });
   }
 
-  // ---------- rule-based post-session review — built from real flags, no fabricated narrative ----------
+  // ---------- rule-based post-session review â built from real flags, no fabricated narrative ----------
   function buildReview(rawToday, net){
     const money = v => (v<0?'-$':'+$')+Math.abs(v).toFixed(2);
     const wins = rawToday.filter(t=>window.jlKind(t.pnl)==='win'), losses = rawToday.filter(t=>window.jlKind(t.pnl)==='loss');
@@ -5173,12 +5173,12 @@ window.jlApplyChLimits=function(o){
     if(!worked.length) worked.push("Nothing to point to as a clear win from today's trades.");
 
     const toFix = [];
-    if(revenge.length) toFix.push(revenge.length+' trade'+(revenge.length!==1?'s were':' was')+' flagged as a revenge trade — re-entered inside the cooldown window after a loss.');
+    if(revenge.length) toFix.push(revenge.length+' trade'+(revenge.length!==1?'s were':' was')+' flagged as a revenge trade â re-entered inside the cooldown window after a loss.');
     if(noSl.length) toFix.push(noSl.length+' of '+rawToday.length+' trade'+(rawToday.length!==1?'s':'')+' had no stop-loss recorded.');
     if(worst && worst[1]<0) toFix.push(worst[0]+' was the weakest session today at '+money(worst[1])+'.');
-    if(!toFix.length) toFix.push('Nothing flagged — no revenge trades and every trade had a recorded stop.');
+    if(!toFix.length) toFix.push('Nothing flagged â no revenge trades and every trade had a recorded stop.');
 
-    let rule = "Keep following today's plan — nothing flagged to change.";
+    let rule = "Keep following today's plan â nothing flagged to change.";
     if(revenge.length) rule = 'After a loss, wait out the full cooldown window before the next entry.';
     else if(noSl.length) rule = 'Set a stop-loss before every entry, no exceptions.';
     else if(worst && worst[1]<0) rule = 'Reduce size or skip '+worst[0]+' until setup quality there improves.';
@@ -5250,7 +5250,7 @@ window.jlApplyChLimits=function(o){
     const trades = rawToday.map(t=>({
       time: t.t.slice(0,5), sym: t.sym, side: t.side==='BUY'?'Long':'Short', session: t.ses,
       entry: (Number.isFinite(t.en)?t.en.toFixed(2):'-'), exit: (Number.isFinite(t.ex)?t.ex.toFixed(2):'-'), dur: 'Not tracked', pnl: t.pnl,
-      reason: WHY_LABEL[t.why] || '—'
+      reason: WHY_LABEL[t.why] || 'â'
     }));
     const wins = trades.filter(t=>window.jlKind(t.pnl)==='win'), losses = trades.filter(t=>window.jlKind(t.pnl)==='loss');
     const pnlTotal = trades.reduce((s,t)=>s+t.pnl,0);
@@ -5259,7 +5259,7 @@ window.jlApplyChLimits=function(o){
     const avgWin = wins.length? wins.reduce((s,t)=>s+t.pnl,0)/wins.length : 0;
     const avgLoss = losses.length? Math.abs(losses.reduce((s,t)=>s+t.pnl,0))/losses.length : 0;
     const grossWin = trades.reduce((s,t)=>t.pnl>0?s+t.pnl:s,0), grossLoss = grossLossAmt;
-    const pf = grossLoss? (grossWin/grossLoss).toFixed(2) : '—';
+    const pf = grossLoss? (grossWin/grossLoss).toFixed(2) : 'â';
     const expVal = trades.length ? (pnlTotal/trades.length).toFixed(2) : 0;
     const pnlPct = targetUSD>0 ? Math.min(100, Math.max(0, Math.round(pnlTotal/targetUSD*100))) : 0;
 
@@ -5273,7 +5273,7 @@ window.jlApplyChLimits=function(o){
       notesHint.textContent=''; curveHint.textContent='';
       notesPanel.innerHTML='<div class="notes-empty"><div class="t">No insights yet</div><div class="s">Upload today\'s trading export to generate live review notes.</div></div>';
       curvePanel.innerHTML='<div class="curve-empty"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="var(--faint)" stroke-width="1.5"><path d="M3 17l6-6 4 4 8-8"/></svg>Upload today\'s trading export to generate the intraday curve.</div>';
-      avgWL.textContent='—'; toTarget.textContent='—'; pfactor.textContent='—'; expectancy.textContent='—'; mood.textContent='—'; streak.textContent='—';
+      avgWL.textContent='â'; toTarget.textContent='â'; pfactor.textContent='â'; expectancy.textContent='â'; mood.textContent='â'; streak.textContent='â';
       tradesPill.textContent='0 trades'; syncTxt.textContent='Awaiting first sync'; lastAlertArgs=[0,0]; alertBroken=false; if(window.__refreshHeadsUp) window.__refreshHeadsUp();
       tradesBody.innerHTML='<tr><td colspan="10">No trades found for today. Upload today\'s export.</td></tr>';
       reviewStatus.textContent='No trades found for today.';
@@ -5287,7 +5287,7 @@ window.jlApplyChLimits=function(o){
       const breaksNow = (hasL&&lossUsed>=lossLimit?1:0) + (hasT&&tradeCount>=tradeLimit?1:0);
       if(breaksNow>0){ bestAction.textContent='Stop for today'; bestActionMeta.textContent='A daily rule has been reached'; }
       else if(hasTg&&pnlTotal>=targetUSD){ bestAction.textContent='Target reached'; bestActionMeta.textContent='Consider stopping for the day'; }
-      else { bestAction.textContent='Continue your plan'; bestActionMeta.textContent=trades.length+' trade(s) so far · '+pnlPct+'% of target'; }
+      else { bestAction.textContent='Continue your plan'; bestActionMeta.textContent=trades.length+' trade(s) so far Â· '+pnlPct+'% of target'; }
       statusVal.textContent='On pace'; statusDot.style.background='var(--amber)'; statusDot.classList.remove('danger'); statusMeta.textContent=hasTg?pnlPct+'% of daily target reached':'Profit target not set';
       updateRuleAlert(lossUsed, trades.length);
       const remainingTarget=Math.max(0,targetUSD-pnlTotal), remainingSlots=Math.max(0,tradeLimit-tradeCount);
@@ -5295,7 +5295,7 @@ window.jlApplyChLimits=function(o){
       else if(remainingSlots>0){ riskVal.textContent='$'+(remainingTarget/remainingSlots).toFixed(2); riskMeta.textContent='Based on $'+remainingTarget.toFixed(2)+' remaining target over '+remainingSlots+' trade(s) left'; }
       else { riskVal.textContent='$0.00'; riskMeta.textContent='No trade slots remaining today'; }
       const revenge=rawToday.filter(t=>t.rev), noSl=rawToday.filter(t=>t.sl==null), notes=[];
-      if(revenge.length) notes.push(['var(--red)','Revenge trade flagged','Re-entered inside the cooldown window after a loss — '+revenge.length+' trade(s).']);
+      if(revenge.length) notes.push(['var(--red)','Revenge trade flagged','Re-entered inside the cooldown window after a loss â '+revenge.length+' trade(s).']);
       if(noSl.length) notes.push(['var(--amber)','No stop-loss on '+noSl.length+' trade(s)','Set a stop before entry next time.']);
       notes.push(['var(--accent-2)','Pace check', trades.length+' of '+fT+' trades taken'+(hasTg?', '+pnlPct+'% of target so far.':'.')]);
       notesHint.textContent=notes.length+' insight'+(notes.length!==1?'s':''); curveHint.textContent='Hover the line for per-trade detail';
@@ -5309,7 +5309,7 @@ window.jlApplyChLimits=function(o){
       else mood.textContent='Not tracked';
       let run=0,lastKind=null;
       for(let i=trades.length-1;i>=0;i--){ const k=window.jlKind(trades[i].pnl); if(lastKind===null)lastKind=k; if(k!==lastKind)break; run++; }
-      streak.textContent = lastKind==='be' ? '—' : run+' '+(lastKind==='win' ? (run!==1?'wins':'win') : (run!==1?'losses':'loss'));
+      streak.textContent = lastKind==='be' ? 'â' : run+' '+(lastKind==='win' ? (run!==1?'wins':'win') : (run!==1?'losses':'loss'));
       tradesPill.textContent=trades.length+' trade'+(trades.length!==1?'s':''); syncTxt.textContent='Synced from your trade log';
       tradesBody.innerHTML = trades.map(t=>`<tr>
         <td>${iconFor(t.sym)}</td>
@@ -5344,11 +5344,11 @@ window.jlApplyChLimits=function(o){
     }
     const genBtn = document.getElementById('genReview');
     genBtn.disabled = true;
-    reviewBox.innerHTML = '<div class="review-loading"><span class="review-spin"></span>Reading today\'s trades and building your review…</div>';
+    reviewBox.innerHTML = '<div class="review-loading"><span class="review-spin"></span>Reading today\'s trades and building your reviewâ¦</div>';
     setTimeout(()=>{
       const r = buildReview(lastState.rawToday, lastState.pnlTotal);
       reviewBox.innerHTML =
-        '<div class="review-sec"><h3>SUMMARY</h3><ul><li>'+r.wins.length+' win(s), '+r.losses.length+' loss(es) · net '+(r.net>=0?'+$':'-$')+Math.abs(r.net).toFixed(2)+'</li></ul></div>'+
+        '<div class="review-sec"><h3>SUMMARY</h3><ul><li>'+r.wins.length+' win(s), '+r.losses.length+' loss(es) Â· net '+(r.net>=0?'+$':'-$')+Math.abs(r.net).toFixed(2)+'</li></ul></div>'+
         '<div class="review-sec"><h3>WHAT WORKED</h3><ul>'+r.worked.map(l=>'<li>'+l+'</li>').join('')+'</ul></div>'+
         '<div class="review-sec"><h3>WHAT TO FIX</h3><ul>'+r.toFix.map(l=>'<li>'+l+'</li>').join('')+'</ul></div>'+
         '<div class="review-sec"><h3>SUGGESTED RULE FOR TOMORROW</h3><ul><li>'+r.rule+'</li></ul></div>';
@@ -5359,7 +5359,7 @@ window.jlApplyChLimits=function(o){
 
   // Defer the initial render: window.__trades' revenge-trade flags (jlRecomputeRevenge) and
   // window.__getJournals are populated by later <script> blocks on this page that haven't
-  // run yet at this point — a macrotask delay lets them finish first.
+  // run yet at this point â a macrotask delay lets them finish first.
   setTimeout(renderToday, 0);
   window.__renderToday = renderToday;
 
@@ -5381,7 +5381,7 @@ const $ = id => document.getElementById(id);
     $('aLeak').innerHTML=d.map(([n,v],i)=>'<span class="hn">'+n+'</span><span class="ht" data-i="'+i+'"><u style="left:'+z+'%"></u><i style="left:'+(v<0?(v-lo)/sp*100:z)+'%;width:'+Math.abs(v)/sp*100+'%;background:'+col(v)+'"></i></span><span class="hv" style="color:'+col(v)+'">'+money(v)+'</span>').join('');
     $('aLeak').querySelectorAll('.ht').forEach(e=>tip(e,()=>{const x=d[+e.dataset.i];return '<div class="th">'+x[0]+'</div><div class="tr"><span>Net P&amp;L</span><b style="color:'+(x[1]<0?'var(--red)':'var(--green)')+'">'+money(x[1])+'</b></div>'}));
     const w=d.reduce((a,b)=>b[1]<a[1]?b:a),b=d.reduce((a,c)=>c[1]>a[1]?c:a);
-    $('aLeakRead').innerHTML='<b>Worst:</b> '+w[0]+' ('+money(w[1])+') · <b>Best:</b> '+b[0]+' ('+money(b[1])+').'+(k==='Mistakes'?' Remove the biggest leak first.':'')}
+    $('aLeakRead').innerHTML='<b>Worst:</b> '+w[0]+' ('+money(w[1])+') Â· <b>Best:</b> '+b[0]+' ('+money(b[1])+').'+(k==='Mistakes'?' Remove the biggest leak first.':'')}
   document.querySelectorAll('.a-tab[data-k]').forEach(b=>b.addEventListener('click',()=>{b.parentNode.querySelectorAll('.a-tab[data-k]').forEach(x=>{x.classList.toggle('on',x===b);x.setAttribute('aria-pressed',x===b)});leak(b.dataset.k)}));
   leak('Mistakes');
   const MIX=window.__A.mix;
@@ -5575,7 +5575,7 @@ const A=window.__A,N=A.n,W=A.W,L=A.L,BE=A.BE,GP=A.gp,GL=A.gl,NET=A.net,DD=A.dd,A
 })();
 const getDDB=function(){var cm=Number(window.jlChMddPct)||0;if(cm>0)return Number(window.jlStartBalance||0)*cm/100;var e=document.getElementById('ggMdd'),v=Number(e&&e.value)||0,u=e&&e.closest('.gg-combo')&&e.closest('.gg-combo').querySelector('select');return u&&u.value==='$'?v:Number(window.jlStartBalance||0)*v/100},TGT=Math.round(window.jlProfitTargetUSD||0),payoff=AW/AL,beWR=AL/(AW+AL)*100,decWR=W+L?W/(W+L)*100:0,expc=N?NET/N:0,rf=DD?NET/DD:0,pf=GL?GP/GL:0,costs=NET-(GP-GL);
 
-$('aKP').innerHTML=[['Expectancy / trade',money(expc),expc>0?'var(--green)':expc<0?'var(--red)':'var(--text)','Net P&L \u00b7 '+jlN(N,'trade')],['Payoff ratio',payoff.toFixed(2),payoff>=1?'var(--green)':'var(--red)','Avg win ÷ avg loss'],['Break-even win rate',beWR.toFixed(1)+'%','var(--amber)','Needed at this payoff'],['Decisive win rate',decWR.toFixed(1)+'%',decWR>=beWR?'var(--green)':'var(--red)','Wins ÷ (wins + losses)'],['Recovery factor',rf.toFixed(2),rf>0?'var(--green)':rf<0?'var(--red)':'var(--text)','Net ÷ max drawdown'],['Scratched trades',(BE/N*100).toFixed(1)+'%','var(--text)',BE+' of '+N+' break-even'],['Commission + swap',Math.abs(costs)<.005?'$0.00':money(costs),'var(--text)','Gap between gross and net']].map(k=>'<div><span>'+k[0]+'</span><b style="color:'+k[2]+'">'+k[1]+'</b><small>'+k[3]+'</small></div>').join('');
+$('aKP').innerHTML=[['Expectancy / trade',money(expc),expc>0?'var(--green)':expc<0?'var(--red)':'var(--text)','Net P&L \u00b7 '+jlN(N,'trade')],['Payoff ratio',payoff.toFixed(2),payoff>=1?'var(--green)':'var(--red)','Avg win Ã· avg loss'],['Break-even win rate',beWR.toFixed(1)+'%','var(--amber)','Needed at this payoff'],['Decisive win rate',decWR.toFixed(1)+'%',decWR>=beWR?'var(--green)':'var(--red)','Wins Ã· (wins + losses)'],['Recovery factor',rf.toFixed(2),rf>0?'var(--green)':rf<0?'var(--red)':'var(--text)','Net Ã· max drawdown'],['Scratched trades',(BE/N*100).toFixed(1)+'%','var(--text)',BE+' of '+N+' break-even'],['Commission + swap',Math.abs(costs)<.005?'$0.00':money(costs),'var(--text)','Gap between gross and net']].map(k=>'<div><span>'+k[0]+'</span><b style="color:'+k[2]+'">'+k[1]+'</b><small>'+k[3]+'</small></div>').join('');
 
 // ----- donut -----
 function donut(id,data,cTop,cSub){
@@ -5628,7 +5628,7 @@ $('aTake').innerHTML=A.take.map(t=>'<li style="--c:'+t[0]+'"><b>'+t[1]+'</b><spa
 // ----- edge per trade by session -----
 (function(){const d=A.ses.map(x=>[x[0],x[1]/x[2],x[1],x[2]]),lo=Math.min(...d.map(x=>x[1])),sp=-lo,c=v=>v<0?R:G;
   $('aSE').innerHTML=d.map((x,i)=>'<span class="hn">'+x[0]+'</span><span class="ht" data-i="'+i+'"><u style="left:100%"></u><i style="left:'+(100-Math.abs(x[1])/sp*100)+'%;width:'+Math.abs(x[1])/sp*100+'%;background:'+c(x[1])+'"></i></span><span class="hv" style="color:'+c(x[1])+'">'+money(x[1])+'</span>').join('');
-  $('aSE').querySelectorAll('.ht').forEach(e=>{const x=d[+e.dataset.i];tipOn(e,()=>th(x[0])+row('Per trade',money(x[1]))+row('Net P&amp;L',money(x[2]))+row('Trades','≈'+x[3]))});
+  $('aSE').querySelectorAll('.ht').forEach(e=>{const x=d[+e.dataset.i];tipOn(e,()=>th(x[0])+row('Per trade',money(x[1]))+row('Net P&amp;L',money(x[2]))+row('Trades','â'+x[3]))});
   $('aSER').innerHTML='<b>Worst per trade:</b> '+(d.length?(w=>w[0]+' ('+money(w[1])+')')(d.reduce((a,b)=>b[1]<a[1]?b:a)):'none')+'.'})();
 
 // ----- vertical columns (up = green, down = red) -----
@@ -5676,7 +5676,7 @@ if(eq.length){
   const K=Math.max(1,Math.min(50,eq.length>>1)),ro=[];for(let i=K;i<eq.length;i++)ro.push(eq[i]-eq[i-K]);
   if(ro.length>1)area('cRO',ro,LI,f,'Last '+K+' trades');
   const last=ro[ro.length-1],best=Math.max(...ro),worst=Math.min(...ro);
-  $('cROR').innerHTML='Latest window: <b style="color:'+cv(last)+'">'+money(last)+'</b> · best <b style="color:var(--green)">'+money(best)+'</b> · worst <b style="color:var(--red)">'+money(worst)+'</b>. Above zero means the last 50 trades made money.';
+  $('cROR').innerHTML='Latest window: <b style="color:'+cv(last)+'">'+money(last)+'</b> Â· best <b style="color:var(--green)">'+money(best)+'</b> Â· worst <b style="color:var(--red)">'+money(worst)+'</b>. Above zero means the last 50 trades made money.';
 }
 })();
 let lastRules=[0,0,0,0];
@@ -5706,7 +5706,7 @@ let lastRules=[0,0,0,0];
     ['Account',[['Account Settings','set'],['User Profile','user'],['Upload Data','up']]]
   ];
   const ROUTES = {"Today's Summary":'summary', 'Analytics':'analytics', 'Trades':'trades', 'Journal':'journal', 'Calendar':'calendar', 'Psychology':'psychology', 'AI Coach':'ai', 'Account Settings':'settings', 'User Profile':'profile', 'Upload Data':'upload', 'Trade Tools':'tools', 'Market':'market'};
-  const TITLES = {summary:"Today's Summary — Journall", analytics:'Analytics — Journall', trades:'Trades — Journall', journal:'Journal — Journall', calendar:'Calendar — Journall', psychology:'Psychology — Journall', ai:'AI Coach — Journall', settings:'Account Settings — Journall', profile:'User Profile — Journall', upload:'Upload Data — Journall', tools:'Trade Tools · Journall', market:'Market · Journall'};
+  const TITLES = {summary:"Today's Summary â Journall", analytics:'Analytics â Journall', trades:'Trades â Journall', journal:'Journal â Journall', calendar:'Calendar â Journall', psychology:'Psychology â Journall', ai:'AI Coach â Journall', settings:'Account Settings â Journall', profile:'User Profile â Journall', upload:'Upload Data â Journall', tools:'Trade Tools Â· Journall', market:'Market Â· Journall'};
   document.getElementById('sbNav').innerHTML = NAV.map(([g,items])=>
     '<div class="grp">'+g+'</div>'+items.map(([l,k])=>{
       const r = ROUTES[l];
@@ -5755,7 +5755,7 @@ let lastRules=[0,0,0,0];
 
   // ---------- instant rule-break flag (Today's Summary) ----------
   // Real computation from the same numbers driving the rings/meters. Limits are read from
-  // Account Settings ▸ Targets/Risk limits (window.jl*) at call time, with sane fallbacks —
+  // Account Settings â¸ Targets/Risk limits (window.jl*) at call time, with sane fallbacks â
   // one source of truth instead of a separate hardcoded copy per tab.
   function ruleLimits(){
     return { loss: Number(window.jlDailyLossLimit)||0, trades: Number(window.jlMaxTradesPerDay)||0, target: Number(window.jlProfitTargetUSD)||0, dayTarget: Number(window.jlDayProfitTargetUSD)||0 };
@@ -5817,10 +5817,10 @@ let lastRules=[0,0,0,0];
     lastAlertArgs = [lossUsed, n]; alertBroken = breaks > 0;
     if(breaks > 0){
       const msg = lossBroken && tradeBroken
-        ? 'Daily loss limit and trade limit both reached — stop trading for today.'
+        ? 'Daily loss limit and trade limit both reached â stop trading for today.'
         : lossBroken
-          ? 'Daily loss limit reached ($'+lossUsed.toFixed(2)+' / $'+lim.loss.toFixed(0)+') — stop trading for today.'
-          : 'Trade limit reached ('+n+' / '+lim.trades+') — no more entries today.';
+          ? 'Daily loss limit reached ($'+lossUsed.toFixed(2)+' / $'+lim.loss.toFixed(0)+') â stop trading for today.'
+          : 'Trade limit reached ('+n+' / '+lim.trades+') â no more entries today.';
       document.getElementById('ruleAlertTitle').textContent = 'Rule broken';
       document.getElementById('ruleAlertMsg').textContent = msg;
       alertEl.classList.remove('warn'); alertEl.classList.add('show');
@@ -5865,10 +5865,10 @@ let lastRules=[0,0,0,0];
 
   window.addEventListener('hashchange',()=>route()); route();
 
-  // ---------- prop firm daily rule countdown (India — resets 06:00 IST, same for every user) ----------
+  // ---------- prop firm daily rule countdown (India â resets 06:00 IST, same for every user) ----------
   // Matches the existing "Since 06:00 IST reset" status text. Real date math, timezone-independent:
   // Date.now() is an epoch ms value, not tied to the viewer's local clock, so this reads correctly
-  // for any user regardless of their device's timezone — the reset hour itself is a shared prop-firm
+  // for any user regardless of their device's timezone â the reset hour itself is a shared prop-firm
   // rule, not a per-user setting, so it's a real constant rather than hardcoded per-trader state.
   const IST_OFFSET_MS = 5.5 * 60 * 60 * 1000, RESET_HOUR_IST = 6;
   function msUntilRuleReset(){
@@ -5957,8 +5957,8 @@ let lastRules=[0,0,0,0];
 (function(){
 const $=id=>document.getElementById(id);
 $('dateStrT').textContent=new Date().toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
-// Real trade data lives in one place — window.__trades, set near the top of the page's
-// scripts — so Today's Summary, Trades and Journal all read the exact same rows instead of
+// Real trade data lives in one place â window.__trades, set near the top of the page's
+// scripts â so Today's Summary, Trades and Journal all read the exact same rows instead of
 // each tab keeping its own copy that could drift out of sync.
 const SC={'London':'#c7cbd6','New York':'#43d787','Asia':'#b39ffb'};
 const T=window.__trades||[];
@@ -5966,7 +5966,7 @@ const f={ses:'All',res:'All',merge:false,n:25};
 const money=v=>(v<0?'-$':'+$')+Math.abs(v).toFixed(2);
 const kind=p=>window.jlKind(p);
 const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-// Same key shape as the Journal tab's key() — kept local since it's a trivial pure
+// Same key shape as the Journal tab's key() â kept local since it's a trivial pure
 // function of trade fields, not stateful data worth sharing via window.
 const trKey=t=>t.d+' '+t.t+' '+t.side+' '+t.en+' '+t.pnl;
 /* Quick Log trades (ids starting ql-) get Edit in the expanded row; map their live key to the stored id */
@@ -5975,12 +5975,12 @@ const col=k=>k==='win'?'var(--green)':k==='loss'?'var(--red)':'var(--faint)';
 const sec=t=>{const p=t.split(':');return +p[0]*3600+ +p[1]*60+ +p[2]};
 
 // ---------- revenge-trade detector ----------
-// Flags a trade opened within the cooldown window (user-set in Account Settings ▸ Risk limits,
+// Flags a trade opened within the cooldown window (user-set in Account Settings â¸ Risk limits,
 // default 15 min) after a same-day loss closed.
 // Per your call: size doesn't factor into detection, only the quick re-entry inside the
 // cooldown does. It's computed here only to show alongside each flagged trade for context.
 // T is ordered newest-first, so T[i+1] is the chronologically-previous trade for T[i].
-// Exposed on window + reusable so Account Settings ▸ Save can re-run it live when the
+// Exposed on window + reusable so Account Settings â¸ Save can re-run it live when the
 // window setting changes, instead of only taking effect on the next page reload.
 window.jlRecomputeRevenge=function(opts){
   const REV_WINDOW=(Number(window.jlRevWindowMin)||0)*60;
@@ -5993,7 +5993,7 @@ window.jlRecomputeRevenge=function(opts){
     c.revSize=c.rev?(c.lot>p.lot?'higher':c.lot<p.lot?'lower':'equal'):null;
   }
   // Only re-render when explicitly asked (Save calling this later, once the page has
-  // fully loaded) — not on this file's own initial pass below, where render()/card() and
+  // fully loaded) â not on this file's own initial pass below, where render()/card() and
   // the journal's `cur` state haven't been declared yet and would throw if called early.
   if(opts&&opts.rerender){
     if(typeof render==='function') render();
@@ -6029,20 +6029,20 @@ function row(x,mx,journals){const k=kind(x.pnl),mv=x.side==='BUY'?x.ex-x.en:x.en
   '<td><span class="t-ses"><em style="background:'+SC[x.ses]+'"></em>'+x.ses+'</span></td>'+
   '<td class="mono">'+(Number.isFinite(x.en)?x.en.toFixed(2):'-')+'<span class="t-arr"> to </span>'+(Number.isFinite(x.ex)?x.ex.toFixed(2):'-')+'<small style="color:'+(Number.isFinite(mv)?(mv>=0?'var(--green)':'var(--red)'):'var(--sub)')+'">'+(Number.isFinite(mv)?(mv>=0?'+':'')+mv.toFixed(2)+' pts':'no price')+'</small></td>'+
   '<td>'+(x.sl==null?'<span class="t-chip t-warn" title="No stop loss set">No SL</span>':'<span class="mono">'+x.sl+'</span>')+'<small>No target</small></td>'+
-  '<td class="mono">'+x.lot.toFixed(2)+(x.fills>1?'<b class="t-x" title="'+x.fills+' fills merged">×'+x.fills+'</b>':'')+'<small>'+(x.hold==null?'hold not tracked':'held '+(x.hold<60?x.hold+'s':x.hold<3600?(x.hold/60).toFixed(1)+'m':(x.hold/3600).toFixed(1)+'h'))+'</small></td>'+
+  '<td class="mono">'+x.lot.toFixed(2)+(x.fills>1?'<b class="t-x" title="'+x.fills+' fills merged">Ã'+x.fills+'</b>':'')+'<small>'+(x.hold==null?'hold not tracked':'held '+(x.hold<60?x.hold+'s':x.hold<3600?(x.hold/60).toFixed(1)+'m':(x.hold/3600).toFixed(1)+'h'))+'</small></td>'+
   '<td><div class="t-whys">'+why(x.why)+'</div></td>'+
   '<td><div class="mono t-pl" style="color:'+col(k)+'">'+money(x.pnl)+'</div><div class="t-mag"><i style="width:'+Math.max(4,Math.abs(x.pnl)/mx*100)+'%;background:'+col(k)+'"></i></div></td>'+
   '<td>'+((je&&(je.setup||je.emotion))?'<div class="t-stags">'+(je.setup?'<span class="t-stag">'+esc(je.setup)+'</span>':'')+(je.emotion?'<span class="t-stag t-stag-emo">'+esc(je.emotion)+'</span>':'')+'</div>':'<span class="t-dash" title="No setup or emotion tagged">-</span>')+(je?'<div style="margin-top:6px">'+window.jGradeChip(je.q)+'</div>':'')+'</td>'+
-  '<td>'+(x.tags&&x.tags.length?x.tags.map(g=>'<span class="t-tag">'+g+'</span>').join(''):'')+(x.rev?'<span class="t-tag t-tag-rev">Revenge trade · lot '+x.revSize+'</span>':'')+'<div class="t-jn'+(x.j?' ok':'')+'">'+(x.j?'Journaled':'Needs journal')+'</div></td></tr>'+
-  '<tr class="t-expand-row" data-key="'+esc(rk)+'"><td colspan="10"><div class="t-expand-cell">'+detailHtml+'<button type="button" class="btn-ghost t-expand-open" data-openkey="'+esc(rk)+'">Open full journal →</button>'+((window.__qlM||{})[x._lk]?'<span class="t-ql-acts"><button type="button" class="btn-ghost t-ql-edit" data-qlid="'+esc((window.__qlM||{})[x._lk])+'">Edit trade</button><button type="button" class="btn-ghost t-ql-del" data-qlid="'+esc((window.__qlM||{})[x._lk])+'">Delete trade</button></span>':'')+'</div></td></tr>'}
+  '<td>'+(x.tags&&x.tags.length?x.tags.map(g=>'<span class="t-tag">'+g+'</span>').join(''):'')+(x.rev?'<span class="t-tag t-tag-rev">Revenge trade Â· lot '+x.revSize+'</span>':'')+'<div class="t-jn'+(x.j?' ok':'')+'">'+(x.j?'Journaled':'Needs journal')+'</div></td></tr>'+
+  '<tr class="t-expand-row" data-key="'+esc(rk)+'"><td colspan="10"><div class="t-expand-cell">'+detailHtml+'<button type="button" class="btn-ghost t-expand-open" data-openkey="'+esc(rk)+'">Open full journal â</button>'+((window.__qlM||{})[x._lk]?'<span class="t-ql-acts"><button type="button" class="btn-ghost t-ql-edit" data-qlid="'+esc((window.__qlM||{})[x._lk])+'">Edit trade</button><button type="button" class="btn-ghost t-ql-del" data-qlid="'+esc((window.__qlM||{})[x._lk])+'">Delete trade</button></span>':'')+'</div></td></tr>'}
 
 function kpis(a){const w=a.filter(x=>kind(x.pnl)==='win'),l=a.filter(x=>kind(x.pnl)==='loss'),n=a.length,sum=z=>z.reduce((s,x)=>s+x.pnl,0),net=sum(a)+a.reduce((q,x)=>q+(x.cost||0),0),ns=a.filter(x=>x.sl==null).length,jd=a.filter(x=>x.j).length,rvTrades=a.filter(x=>x.rev),rv=rvTrades.length;
   const revWin=Number(window.jlRevWindowMin)||0;
   const sizeCounts={higher:0,lower:0,equal:0};rvTrades.forEach(x=>{if(x.revSize)sizeCounts[x.revSize]++});
-  const revSub=rv?'Re-entry inside '+revWin+' min of a loss · lot '+sizeCounts.higher+' higher, '+sizeCounts.lower+' lower, '+sizeCounts.equal+' equal':(revWin>0?'No cooldown breaks in view':'Revenge window not set');
+  const revSub=rv?'Re-entry inside '+revWin+' min of a loss Â· lot '+sizeCounts.higher+' higher, '+sizeCounts.lower+' lower, '+sizeCounts.equal+' equal':(revWin>0?'No cooldown breaks in view':'Revenge window not set');
   $('tKP').innerHTML=[['Net P&amp;L',money(net),net<0?'var(--red)':'var(--green)',jlN(n,'trade')+' in view'],
-  ['Win rate',n?Math.round(w.length/n*100)+'%':'—','',jlN(w.length,'win')+', '+jlN(l.length,'loss','losses')+', '+(n-w.length-l.length)+' break-even'],
-  ['Avg win / avg loss',(w.length?'$'+(sum(w)/w.length).toFixed(2):'—')+' / '+(l.length?'$'+Math.abs(sum(l)/l.length).toFixed(2):'—'),'','Per trade'],
+  ['Win rate',n?Math.round(w.length/n*100)+'%':'â','',jlN(w.length,'win')+', '+jlN(l.length,'loss','losses')+', '+(n-w.length-l.length)+' break-even'],
+  ['Avg win / avg loss',(w.length?'$'+(sum(w)/w.length).toFixed(2):'â')+' / '+(l.length?'$'+Math.abs(sum(l)/l.length).toFixed(2):'â'),'','Per trade'],
   ['Trades without SL',ns+' / '+n,ns?'var(--amber)':'var(--green)',ns?'Set a stop before entry':'All trades protected'],
   ['Revenge trades',rv+' / '+n,rv?'var(--amber)':'var(--green)',revSub],
   ['Journaled',jd+' / '+n,'',(n-jd)+' still need a note']].map(c=>'<div><span>'+c[0]+'</span><b'+(c[2]?' style="color:'+c[2]+'"':'')+'>'+c[1]+'</b><small>'+c[3]+'</small></div>').join('')}
@@ -6051,7 +6051,7 @@ function render(){
   window.__qlM=qlMap();
   let a=f.merge?group(T):T;
   a=a.filter(x=>(f.ses==='All'||x.ses===f.ses)&&(f.res==='All'||kind(x.pnl)===f.res));
-  $('tSub').textContent=jlN(T.length,'trade')+' loaded'+(window.__imported?' · from '+window.__imported:'');
+  $('tSub').textContent=jlN(T.length,'trade')+' loaded'+(window.__imported?' Â· from '+window.__imported:'');
   kpis(a);
   if(!a.length){$('tDays').innerHTML='<div class="a-s t-empty"><b>No trades match these filters</b><span>Try another session or result.</span><button class="btn-ghost" id="tClear">Clear filters</button></div>';$('tMore').innerHTML='';return}
   const journals=window.__getJournals?window.__getJournals():[];
@@ -6270,7 +6270,7 @@ const list=()=>T.map((t,i)=>i).filter(i=>filt==='All'||(filt==='need'?!T[i].j:T[
 
 function fillSel(){
   const items=[{v:'free',lbl:'Free note (no trade)',sub:'Not linked to a trade',pnl:null,k:'note'}]
-    .concat(list().map(i=>{const t=T[i];return{v:String(i),lbl:t.d.slice(5)+' · '+t.t+' IST',sub:t.side+' · '+t.ses+(t.j?' · journaled':' · needs journal'),pnl:t.pnl,k:kind(t.pnl)}}));
+    .concat(list().map(i=>{const t=T[i];return{v:String(i),lbl:t.d.slice(5)+' Â· '+t.t+' IST',sub:t.side+' Â· '+t.ses+(t.j?' Â· journaled':' Â· needs journal'),pnl:t.pnl,k:kind(t.pnl)}}));
   const q=($('jSelSearch').value||'').toLowerCase();
   const shown=q?items.filter(o=>(o.lbl+' '+o.sub).toLowerCase().includes(q)):items;
   const selV=cur.free?'free':cur.idx>=0?String(cur.idx):'';
@@ -6282,7 +6282,7 @@ function fillSel(){
       '<svg class="j-cb-ck" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></div>'}).join('')
     :'<div class="j-cb-empty">No trades match "'+esc(q)+'"</div>';
   const cur2=items.find(o=>o.v===selV);
-  $('jSelLbl').textContent=cur2?cur2.lbl+(cur2.pnl==null?'':' · '+money(cur2.pnl)):'Choose a trade…'}
+  $('jSelLbl').textContent=cur2?cur2.lbl+(cur2.pnl==null?'':' Â· '+money(cur2.pnl)):'Choose a tradeâ¦'}
 let jCbOpen=false;
 function jCbSet(open){jCbOpen=open;$('jCb').dataset.open=open?'1':'0';$('jSelPop').hidden=!open;$('jSelBtn').setAttribute('aria-expanded',open);if(open){$('jSelSearch').value='';fillSel();setTimeout(()=>$('jSelSearch').focus(),0)}}
 $('jSelBtn').addEventListener('click',e=>{e.stopPropagation();jCbSet(!jCbOpen)});
@@ -6297,16 +6297,16 @@ function card(){const t=T[cur.idx],el=$('jTrade');
   const mv=t.side==='BUY'?t.ex-t.en:t.en-t.ex;
   el.className='j-tc';el.style.setProperty('--rc',c);
   el.innerHTML='<span class="j-tc-ic"><svg viewBox="0 0 24 24">'+arrow+'</svg></span>'+
-  '<div><span class="t-sym">'+(window.iconFor?window.iconFor(t.sym):'<i class="t-coin"></i>')+t.sym+'</span><span class="side-tag '+(t.side==='BUY'?'long':'short')+'">'+t.side+'</span>'+(t.rev?'<span class="t-tag t-tag-rev" style="margin-left:6px">Revenge trade · lot '+t.revSize+'</span>':'')+'<small>'+t.d+' · '+t.t+' IST · '+t.ses+'</small></div>'+
+  '<div><span class="t-sym">'+(window.iconFor?window.iconFor(t.sym):'<i class="t-coin"></i>')+t.sym+'</span><span class="side-tag '+(t.side==='BUY'?'long':'short')+'">'+t.side+'</span>'+(t.rev?'<span class="t-tag t-tag-rev" style="margin-left:6px">Revenge trade Â· lot '+t.revSize+'</span>':'')+'<small>'+t.d+' Â· '+t.t+' IST Â· '+t.ses+'</small></div>'+
   '<div class="tp"><div class="tp-row">'+
     '<div class="tp-pt"><span>ENTRY</span><b class="mono">'+(Number.isFinite(t.en)?t.en.toFixed(2):'-')+'</b></div>'+
     '<div class="tp-track"><i></i><span class="tp-dot a"></span><span class="tp-dot b"></span></div>'+
     '<div class="tp-pt tp-r"><span>EXIT</span><b class="mono">'+(Number.isFinite(t.ex)?t.ex.toFixed(2):'-')+'</b></div>'+
-  '</div><div class="tp-foot"><span class="tp-pts" style="color:'+c+'">'+(Number.isFinite(mv)?(mv>=0?'+':'')+mv.toFixed(2)+' pts':'no price data')+'</span>'+(W[t.why]?'<span>· Closed by '+W[t.why]+'</span>':'')+'</div></div>'+
+  '</div><div class="tp-foot"><span class="tp-pts" style="color:'+c+'">'+(Number.isFinite(mv)?(mv>=0?'+':'')+mv.toFixed(2)+' pts':'no price data')+'</span>'+(W[t.why]?'<span>Â· Closed by '+W[t.why]+'</span>':'')+'</div></div>'+
   '<div>'+(t.sl==null?'<span class="t-chip t-warn">No SL</span>':'')+'</div><div class="j-pl mono" style="color:'+c+'">'+money(t.pnl)+'</div>'+
   '<div class="j-emo-row" style="grid-column:1/-1;margin-top:10px;display:flex;flex-wrap:wrap;gap:6px">'+EMOTIONS.map(x=>'<button type="button" class="j-tg'+(cur.emotion===x?' on':'')+'" data-emo="'+x+'" aria-pressed="'+(cur.emotion===x)+'">'+x+'</button>').join('')+'</div>'}
 window.jGrade=function(q){if(!Array.isArray(q)||q.length<3||q.slice(0,3).some(function(v){return v!=='Yes'&&v!=='No'}))return null;var n=q.slice(0,3).filter(function(v){return v==='Yes'}).length;return [{g:'F',c:'var(--red)'},{g:'C',c:'var(--amber)'},{g:'B',c:'var(--accent-2)'},{g:'A+',c:'var(--green)'}][n]};
-window.jGradeChip=function(q){var r=window.jGrade(q);return r?'<span class="j-gr" style="--gc:'+r.c+'" title="Trade grade from your 3 Yes/No checks"><b>'+r.g+'</b>Grade</span>':'<span class="j-gr none" title="Answer all 3 Yes/No checks to grade this trade"><b>–</b>Not graded</span>'};
+window.jGradeChip=function(q){var r=window.jGrade(q);return r?'<span class="j-gr" style="--gc:'+r.c+'" title="Trade grade from your 3 Yes/No checks"><b>'+r.g+'</b>Grade</span>':'<span class="j-gr none" title="Answer all 3 Yes/No checks to grade this trade"><b>â</b>Not graded</span>'};
 function yn(){var gb=document.getElementById('jGradeBox');if(gb)gb.innerHTML=window.jGradeChip(cur.q)+'<span class="sub">Auto-graded from your 3 Yes/No checks.</span>';document.querySelectorAll('#view-journal .j-yn[data-q]').forEach(g=>g.querySelectorAll('.a-tab').forEach(b=>{const on=cur.q[+g.dataset.q]===b.dataset.v;b.classList.toggle('on',on);b.setAttribute('aria-pressed',on)}))}
 function tags(){$('jTags').innerHTML=TAGS.map(t=>{const on=cur.tags.includes(t);return '<button type="button" class="j-tg'+(on?' on':'')+'" data-t="'+t+'" aria-pressed="'+on+'">'+t+'</button>'}).join('')}
 /*SH-START*/
@@ -6353,7 +6353,7 @@ function fields(e){e=e||{};$('jMis').value=e.mistake||'';$('jBef').value=e.befor
 const CFK='journall_confluence_list_v1';let CF=[];try{const v=JSON.parse(localStorage.getItem(CFK));if(Array.isArray(v))CF=v.filter(x=>typeof x==='string'&&x.trim()).map(x=>x.trim())}catch(e){}
 let cfEdit=false;const cfSave=()=>{try{localStorage.setItem(CFK,JSON.stringify(CF))}catch(e){}};
 function conf(){const w=$('jConf');if(!w)return;const all=CF.concat((cur.conf||[]).filter(x=>!CF.includes(x)));
-  w.innerHTML=all.length?all.map(t=>{const on=cur.conf.includes(t),inList=CF.includes(t);return '<button type="button" class="j-tg cf'+(on?' on':'')+'" data-cf="'+esc(t)+'" aria-pressed="'+on+'">'+esc(t)+(cfEdit&&inList?'<span class="cf-x" data-cfx="'+esc(t)+'" role="button" aria-label="Remove '+esc(t)+' from list">×</span>':'')+'</button>'}).join(''):'<span class="j-cf-empty">No confluences yet. Add your first one below.</span>';
+  w.innerHTML=all.length?all.map(t=>{const on=cur.conf.includes(t),inList=CF.includes(t);return '<button type="button" class="j-tg cf'+(on?' on':'')+'" data-cf="'+esc(t)+'" aria-pressed="'+on+'">'+esc(t)+(cfEdit&&inList?'<span class="cf-x" data-cfx="'+esc(t)+'" role="button" aria-label="Remove '+esc(t)+' from list">Ã</span>':'')+'</button>'}).join(''):'<span class="j-cf-empty">No confluences yet. Add your first one below.</span>';
   $('jConfMg').setAttribute('aria-pressed',cfEdit);$('jConfMg').textContent=cfEdit?'Done':'Edit list'}
 function addConf(){const inp=$('jConfNew'),v=inp.value.replace(/\s+/g,' ').trim();if(!v)return;const dup=CF.find(c=>c.toLowerCase()===v.toLowerCase()),name=dup||v;
   if(!dup){CF.push(name);cfSave()}if(!cur.conf.includes(name))cur.conf.push(name);inp.value='';conf()}
@@ -6370,12 +6370,12 @@ function pick(i){const e0=i>=0?J.find(e=>e.key===key(T[i])):null;if(e0){load(e0)
   if(i>=0){const t=T[i];$('jDate').value=t.d;$('jSetup').value='';cur.tags=(t.tags||[]).slice().concat(t.sl==null&&!(t.tags||[]).includes('No SL')?['No SL']:[])}
   paint();msg('')}
 window.__jPick = pick;
-// Getter (not a snapshot) because J gets reassigned on delete/import, not just mutated —
+// Getter (not a snapshot) because J gets reassigned on delete/import, not just mutated â
 // a plain window.__journals=J here would go stale after those. Used by the Calendar day
 // panel to show mistake/emotion/notes without duplicating this file's persistence logic.
 window.__getJournals = () => J;
 // The Trades script's own initial render() already ran before this script (document
-// order), when window.__getJournals didn't exist yet — so its "Journaled" status and
+// order), when window.__getJournals didn't exist yet â so its "Journaled" status and
 // inline mistake/emotion details would be stale/empty until something re-renders it.
 // Re-render it now that real journal data is available.
 if(window.__trRender) window.__trRender();
@@ -6396,7 +6396,7 @@ function check(){const e=read(),t=T[cur.idx],r=[],bad=s=>r.push(['var(--red)',s]
   if(e.improve.length<15)warn('Improvement is too short. Write one concrete change for the next trade.');
   const nb=r.filter(x=>x[0]==='var(--red)').length,nw=r.filter(x=>x[0]==='var(--amber)').length;
   if(!r.length)r.push(['var(--green)','No gaps found. Save the journal.']);
-  const grade=nb?['var(--red)','#2b0b08','!']:nw?['var(--amber)','#2b1c04',String(nw)]:['var(--green)','#062b17','✓'];
+  const grade=nb?['var(--red)','#2b0b08','!']:nw?['var(--amber)','#2b1c04',String(nw)]:['var(--green)','#062b17','â'];
   const head='<div class="j-chk-head"><span class="j-badge" style="background:linear-gradient(135deg,'+grade[0]+',color-mix(in srgb,'+grade[0]+' 60%,#000));color:'+grade[1]+'">'+grade[2]+'</span><div><b style="font-size:13.5px">'+(nb?nb+' blocking issue'+(nb>1?'s':''):nw?nw+' thing'+(nw>1?'s':'')+' worth fixing':'Ready to save')+'</b><div class="sub" style="margin-top:2px">'+(nb?'Fix these before you save.':nw?'Not blocking, but worth a look.':'No gaps found in this journal.')+'</div></div></div>';
   $('jChk').innerHTML=head+'<ul class="a-ins tight" style="margin-top:14px">'+r.map(x=>'<li style="--c:'+x[0]+'">'+x[1]+'</li>').join('')+'</ul>'}
 function ecard(e){(window.__jlShareE=window.__jlShareE||{})[e.id]=e;const k=e.pnl==null?'note':kind(e.pnl),c=k==='note'?'var(--accent-2)':col(k),ttl={win:'Win journal',loss:'Loss journal',be:'Break-even journal',note:'Free note'}[k];
@@ -6405,7 +6405,7 @@ function ecard(e){(window.__jlShareE=window.__jlShareE||{})[e.id]=e;const k=e.pn
   const chips=(e.setup?'<span class="jv-chip"><i>Setup</i>'+esc(e.setup)+'</span>':'')+(e.emotion?'<span class="jv-chip"><i>Feeling</i>'+esc(e.emotion)+'</span>':'')+(e.conf&&e.conf.length?e.conf.map(c=>'<span class="jv-cf">'+esc(c)+'</span>').join(''):'')+(e.tags&&e.tags.length?e.tags.map(t=>'<span class="t-tag">'+esc(t==='Lot Over 0.02'?'Lot Over Limit':t)+'</span>').join(''):'');
   const notes=(mis?'<div class="jv-note jv-bad"><small>Mistake</small>'+esc(mis)+'</div>':'')+(imp?'<div class="jv-note jv-good"><small>Improve</small>'+esc(imp)+'</div>':'');
   return '<article class="j-entry jv" style="--c:'+c+'"><div class="jv-top"><span class="jv-ic"><svg viewBox="0 0 24 24">'+ic+'</svg></span>'+
-    '<div class="jv-id"><b>'+ttl+'</b><span class="mono">'+esc([e.date,e.time,e.sym,e.side].filter(Boolean).join(' · '))+'</span></div>'+
+    '<div class="jv-id"><b>'+ttl+'</b><span class="mono">'+esc([e.date,e.time,e.sym,e.side].filter(Boolean).join(' Â· '))+'</span></div>'+
     '<div class="jv-r">'+(e.pnl==null?'':'<span class="jv-pnl mono">'+money(e.pnl)+'</span>')+window.jGradeChip(e.q)+'</div></div>'+
     (chips?'<div class="jv-chips">'+chips+'</div>':'')+(notes?'<div class="jv-notes">'+notes+'</div>':'')+
     '<div class="jv-foot">'+(e.pnl==null?'':'<button type="button" class="btn-ghost j-sm" data-share="'+esc(e.id)+'">Share</button>')+'<button type="button" class="btn-ghost j-sm" data-ed="'+esc(e.id)+'">Edit</button><button type="button" class="btn-ghost j-sm" data-del="'+esc(e.id)+'">Delete</button>'+(qlByKey[e.key]?'<button type="button" class="btn-ghost j-sm" data-qled="'+esc(qlByKey[e.key])+'">Edit trade</button><button type="button" class="btn-ghost j-sm j-ql-del" data-qldel="'+esc(qlByKey[e.key])+'">Delete trade</button>':'')+'</div></article>'}
@@ -6425,7 +6425,7 @@ function jKP(){const d=T.filter(t=>t.j).length,left=T.length-d,pct=T.length?d/T.
     ['Coverage',pct.toFixed(0)+'%',pct>=80?'var(--green)':pct>=40?'var(--amber)':'var(--red)',d+' of '+jlN(T.length,'trade')+' journaled'],
     ['Needs journal',String(left),left?'var(--amber)':'var(--green)',left?'Trades still missing a note':'All trades journaled'],
     ['Entries saved',String(J.length),'var(--text)',J.length===1?'1 note on this device':J.length+' notes on this device'],
-    ['Checklist clean',answered.length?cleanPct.toFixed(0)+'%':'—',cleanPct>=70?'var(--green)':cleanPct>=40?'var(--amber)':'var(--red)',clean+' of '+answered.length+' fully confirmed'],
+    ['Checklist clean',answered.length?cleanPct.toFixed(0)+'%':'â',cleanPct>=70?'var(--green)':cleanPct>=40?'var(--amber)':'var(--red)',clean+' of '+answered.length+' fully confirmed'],
     ['Rule breaks logged',String(breaks),breaks?'var(--red)':'var(--green)',mist+' entries with a named mistake']
   ].map(k=>'<div><span>'+k[0]+'</span><b style="color:'+k[2]+'">'+k[1]+'</b><small>'+k[3]+'</small></div>').join('')}
 let misP='Today';
@@ -6442,7 +6442,7 @@ function sync(){T.forEach(t=>{t.j=J.some(e=>e.key===key(t))});const d=T.filter(t
   $('jBarWrap').classList.toggle('full', jFull);
   if(jFull && !jWasFull){ const w=$('jBarWrap'); w.style.animation='none'; void w.offsetWidth; w.style.animation=''; }
   $('jRingV').style.strokeDashoffset=(100.5*(1-pct)).toFixed(1);
-  $('jSub').textContent=jlN(T.length,'trade')+' · '+J.length+(J.length===1?' journal entry':' journal entries')+' · saved on this device';
+  $('jSub').textContent=jlN(T.length,'trade')+' Â· '+J.length+(J.length===1?' journal entry':' journal entries')+' Â· saved on this device';
   jKP();renderList();misCard();fillSel();if(window.__trRender)window.__trRender()}
 
 $('view-journal').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;const d=b.dataset,pid=b.parentNode.id;
@@ -6455,11 +6455,11 @@ $('view-journal').addEventListener('click',e=>{const b=e.target.closest('button'
   if(d.del){const x=J.find(y=>y.id===d.del);if(!x)return;
     const k=x.pnl==null?'note':kind(x.pnl),ttl={win:'Win journal',loss:'Loss journal',be:'Break-even journal',note:'Free note'}[k];
     window.jlConfirm({title:'Delete this journal?',body:'This removes the entry from this device. You get 5 seconds to undo it.',
-      preview:{title:ttl,sub:[x.date,x.sym,x.side].filter(Boolean).join(' · '),value:x.pnl==null?'':money(x.pnl),color:k==='note'?'var(--accent-2)':col(k)},
+      preview:{title:ttl,sub:[x.date,x.sym,x.side].filter(Boolean).join(' Â· '),value:x.pnl==null?'':money(x.pnl),color:k==='note'?'var(--accent-2)':col(k)},
       confirmText:'Delete',cancelText:'Keep it',danger:true,opener:b}).then(ok=>{
       if(!ok)return;const i=J.findIndex(y=>y.id===x.id);if(i<0)return;
       J.splice(i,1);save();sync();setTimeout(()=>{if(!J.some(y=>y.id===x.id))shClear(x.id)},6000);
-      window.jlToast({icon:'trash',text:'Journal deleted',sub:[ttl,x.sym].filter(Boolean).join(' · '),actionText:'Undo',duration:5000,
+      window.jlToast({icon:'trash',text:'Journal deleted',sub:[ttl,x.sym].filter(Boolean).join(' Â· '),actionText:'Undo',duration:5000,
         onAction:()=>{if(J.some(y=>y.id===x.id))return;J.splice(Math.min(i,J.length),0,x);save();sync();window.jlToast({icon:'check',text:'Journal restored',duration:2200,progress:false})}})});
     return}
   if(pid==='jFilt'){filt=d.v;seg(b);fillSel();return}
@@ -6520,7 +6520,7 @@ function drRender(){const sec=$('jDraftSec');if(!sec)return;const d=drRead();
     at=new Date(d.at);
   $('jDraftPill').textContent='Saved '+at.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
   $('jDraftBody').innerHTML='<article class="j-entry jv" style="--c:'+c+'"><div class="jv-top"><span class="jv-ic"><svg viewBox="0 0 24 24">'+ic+'</svg></span>'+
-    '<div class="jv-id"><b>'+ttl+'</b><span class="mono">'+esc([e.date,e.time,e.sym,e.side].filter(Boolean).join(' · '))+'</span></div>'+
+    '<div class="jv-id"><b>'+ttl+'</b><span class="mono">'+esc([e.date,e.time,e.sym,e.side].filter(Boolean).join(' Â· '))+'</span></div>'+
     '<div class="jv-r">'+(e.pnl==null?'':'<span class="jv-pnl mono">'+money(e.pnl)+'</span>')+window.jGradeChip(e.q)+'</div></div>'+
     (chips?'<div class="jv-chips">'+chips+'</div>':'')+
     (snip?'<div class="jv-notes"><div class="jv-note"><small>Last note</small>'+esc(snip.length>140?snip.slice(0,140)+'...':snip)+'</div></div>':'')+
@@ -6557,7 +6557,7 @@ const money=v=>(v<0?'-$':'+$')+Math.abs(v).toFixed(2);
 const MONTHS=['January','February','March','April','May','June','July','August','September','October','November','December'];
 const TL=()=>Number(window.jlMaxTradesPerDay)||0, LL=()=>Number(window.jlDailyLossLimit)||0;
 
-// Day stats are computed from real trades (window.__trades — the same array the Trades
+// Day stats are computed from real trades (window.__trades â the same array the Trades
 // and Journal tabs use), not a separate hand-authored dataset. This is intentionally
 // sparse: only Sept 17/18/21 2026 have real trades right now, so most days will show
 // empty until a fuller history syncs in from MT5. Cached per (year, 1-indexed month)
@@ -6579,7 +6579,7 @@ function fill(y,m){
   FILL_CACHE[mk]=out;
   return out;
 }
-// Year rollup — computed from window.__trades with the shared win/loss/break-even rule, so sums match Analytics exactly
+// Year rollup â computed from window.__trades with the shared win/loss/break-even rule, so sums match Analytics exactly
 const YEARS=(function(){const Y={},MNm=['January','February','March','April','May','June','July','August','September','October','November','December'];
   (window.__trades||[]).slice().sort((a,b)=>a.d+a.t<b.d+b.t?-1:1).forEach(t=>{const y=+t.d.slice(0,4),mi=+t.d.slice(5,7)-1;
     const Q=Y[y]=Y[y]||{net:0,trades:0,wins:0,losses:0,be:0,gp:0,gl:0,dd:0,pf:0,exp:0,months:[],_c:0,_pk:0,_mm:{}};
@@ -6719,18 +6719,18 @@ function renderGrid(){
       '<div class="kpi-ring-row"><svg width="44" height="44" viewBox="0 0 44 44">'+
         '<circle class="kpi-ring-track" cx="22" cy="22" r="20"/>'+
         '<circle class="kpi-ring-val" cx="22" cy="22" r="20" stroke="'+winColor+'" style="--off:'+ringOff+'"/></svg>'+
-      '<div><b style="color:'+winColor+'">'+(trades?winPct+'%':'—')+'</b><small>'+jlN(wins,'win')+'</small></div></div></div>',
+      '<div><b style="color:'+winColor+'">'+(trades?winPct+'%':'â')+'</b><small>'+jlN(wins,'win')+'</small></div></div></div>',
     '<div class="kpi-acc" style="--acc:'+pfColor+'"><span><i class="kpi-dot" style="background:'+pfColor+'"></i>Profit factor</span>'+
-      '<b style="color:'+pfColor+'">'+(active.length?(mpf===Infinity?'∞':mpf.toFixed(2)):'—')+'</b><small>Gross profit ÷ gross loss</small>'+
+      '<b style="color:'+pfColor+'">'+(active.length?(mpf===Infinity?'â':mpf.toFixed(2)):'â')+'</b><small>Gross profit Ã· gross loss</small>'+
       '<div class="kpi-bar"><i data-w="'+pfPct+'%" style="background:'+pfColor+';color:'+pfColor+'"></i></div></div>',
     '<div class="kpi-acc" style="--acc:var(--accent-2)"><span>Active days</span><b>'+active.length+'</b><small>of '+rows.length*5+' trading days</small>'+
       '<div class="kpi-bar"><i data-w="'+daysPct+'%" style="background:var(--accent-2);color:var(--accent-2)"></i></div></div>',
     '<div class="kpi-acc" style="--acc:var(--green)"><span>Avg win / loss day</span>'+
-      '<b>'+(active.length?'<span style="color:var(--green)">+'+avgWinDay.toFixed(0)+'</span> / <span style="color:var(--red)">-'+avgLossDay.toFixed(0)+'</span>':'—')+'</b>'+
+      '<b>'+(active.length?'<span style="color:var(--green)">+'+avgWinDay.toFixed(0)+'</span> / <span style="color:var(--red)">-'+avgLossDay.toFixed(0)+'</span>':'â')+'</b>'+
       '<small>per winning / losing day</small>'+
       '<div class="kpi-bar split"><i data-w="'+wlWinPct+'%" style="background:var(--green);color:var(--green)"></i><i data-w="'+(100-wlWinPct)+'%" style="background:var(--red);color:var(--red)"></i></div></div>',
-    '<div><span>Best day</span><b'+(best?' style="color:var(--green)"':'')+'>'+(best?money(dm[best].pnl):'—')+'</b><small>'+(best?MONTHS[vm].slice(0,3)+' '+best:'')+'</small></div>',
-    '<div><span>Worst day</span><b'+(worst?' style="color:var(--red)"':'')+'>'+(worst?money(dm[worst].pnl):'—')+'</b><small>'+(worst?MONTHS[vm].slice(0,3)+' '+worst:'')+'</small></div>'
+    '<div><span>Best day</span><b'+(best?' style="color:var(--green)"':'')+'>'+(best?money(dm[best].pnl):'â')+'</b><small>'+(best?MONTHS[vm].slice(0,3)+' '+best:'')+'</small></div>',
+    '<div><span>Worst day</span><b'+(worst?' style="color:var(--red)"':'')+'>'+(worst?money(dm[worst].pnl):'â')+'</b><small>'+(worst?MONTHS[vm].slice(0,3)+' '+worst:'')+'</small></div>'
   ].join('');
 
   requestAnimationFrame(()=>{
@@ -6755,9 +6755,9 @@ function renderGrid(){
   $('cDow').innerHTML=dowAgg.map((x,i)=>{
     const cls=!x.n?'empty':i===dowBest&&x.pnl>0?'best':i===dowWorst&&x.pnl<0?'worst':'';
     return '<div class="cal-dow-cell '+cls+'"><div class="d">'+DOW[i]+'</div>'+
-      '<div class="p" style="color:'+(!x.n?'var(--faint)':x.pnl>=0?'var(--green)':'var(--red)')+'">'+(x.n?money(x.pnl):'—')+'</div>'+
+      '<div class="p" style="color:'+(!x.n?'var(--faint)':x.pnl>=0?'var(--green)':'var(--red)')+'">'+(x.n?money(x.pnl):'â')+'</div>'+
       '<div class="track">'+(x.n?'<i style="width:'+Math.min(100,Math.abs(x.pnl)/dowMax*100)+'%;background:'+(x.pnl>=0?'var(--green)':'var(--red)')+'"></i>':'')+'</div>'+
-      '<div class="n">'+(x.n?jlN(x.t,'trade')+' · '+x.n+'d':'no data')+'</div></div>'
+      '<div class="n">'+(x.n?jlN(x.t,'trade')+' Â· '+x.n+'d':'no data')+'</div></div>'
   }).join('');
 
   const DOWS=['MON','TUE','WED','THU','FRI'];
@@ -6797,7 +6797,7 @@ function renderGrid(){
         '<div class="ldg-meta">'+v.t+' tr &middot; '+v.w+'W/'+v.l+'L/'+v.be+'BE'+flags+'</div>'+
         '<div class="ldg-pnl" style="color:'+(v.pnl>0?'var(--green)':v.pnl<0?'var(--red)':'var(--faint)')+'">'+money(v.pnl)+'</div></div>';
     }).join('')+wkCell(5)+wkCell(6); /* Weekly review cell on both Saturday and Sunday */
-    const sub=ds.length?'<div class="ldg-sub" data-week="'+wi+'"><div>WEEK '+(wi+1)+'</div><i>subtotal</i><b>'+jlN(wt,'trade')+'</b><span class="m-pnl" style="color:'+(wp>0?'var(--green)':wp<0?'var(--red)':'var(--faint)')+'">'+(wt?money(wp):'—')+'</span></div>':'';
+    const sub=ds.length?'<div class="ldg-sub" data-week="'+wi+'"><div>WEEK '+(wi+1)+'</div><i>subtotal</i><b>'+jlN(wt,'trade')+'</b><span class="m-pnl" style="color:'+(wp>0?'var(--green)':wp<0?'var(--red)':'var(--faint)')+'">'+(wt?money(wp):'â')+'</span></div>':'';
     return dayRows+sub;
   }).join('');
 
@@ -6830,15 +6830,15 @@ function renderYear(){
   $('cYKP').innerHTML=[
     ['Net P&amp;L',money(y.net),y.net<0?'var(--red)':'var(--green)',jlN(y.trades,'trade')],
     ['Win rate',Math.round(y.wins/y.trades*100)+'%','',y.wins+'W / '+y.losses+'L / '+y.be+'BE'],
-    ['Profit factor',y.pf.toFixed(2),y.pf<1?'var(--red)':'var(--green)','Gross profit ÷ gross loss'],
+    ['Profit factor',y.pf.toFixed(2),y.pf<1?'var(--red)':'var(--green)','Gross profit Ã· gross loss'],
     ['Max drawdown',money(y.dd),'var(--red)','Peak to trough'],
-    ['Expectancy / trade',money(y.exp),y.exp<0?'var(--red)':'var(--green)','Net P&amp;L ÷ trades'],
+    ['Expectancy / trade',money(y.exp),y.exp<0?'var(--red)':'var(--green)','Net P&amp;L Ã· trades'],
     ['Avg trades / day',avgTradesPerDay,'','across active months']
   ].map(c=>'<div><span>'+c[0]+'</span><b'+(c[2]?' style="color:'+c[2]+'"':'')+'>'+c[1]+'</b><small>'+c[3]+'</small></div>').join('');
 
   $('cYrBadges').innerHTML=
-    '<span class="cal-yr-badge '+(bestM.net>=0?'pos':'gold')+'">Best month · '+bestM.m+' <b>'+money(bestM.net)+'</b></span>'+
-    '<span class="cal-yr-badge '+(worstM.net<0?'neg':'')+'">Worst month · '+worstM.m+' <b>'+money(worstM.net)+'</b></span>';
+    '<span class="cal-yr-badge '+(bestM.net>=0?'pos':'gold')+'">Best month Â· '+bestM.m+' <b>'+money(bestM.net)+'</b></span>'+
+    '<span class="cal-yr-badge '+(worstM.net<0?'neg':'')+'">Worst month Â· '+worstM.m+' <b>'+money(worstM.net)+'</b></span>';
 
   // yearly cumulative equity curve, built from real month net values
   $('cYEqV').innerHTML='<span style="color:'+(y.net<0?'var(--red)':'var(--green)')+'">'+money(y.net)+'</span>';
@@ -6847,12 +6847,12 @@ function renderYear(){
   $('cMonths').innerHTML=y.months.map((m,i)=>{
     const vals=monthPath(cy,m.i);
     const pf=m.gl?(m.gp/m.gl):(m.gp?Infinity:0);
-    const tag=m===bestM&&y.months.length>1?' <span style="color:var(--silver)">· best</span>':m===worstM&&y.months.length>1?' <span style="color:var(--red)">· worst</span>':'';
+    const tag=m===bestM&&y.months.length>1?' <span style="color:var(--silver)">Â· best</span>':m===worstM&&y.months.length>1?' <span style="color:var(--red)">Â· worst</span>':'';
     const rowCls=m===bestM&&y.months.length>1?' best':m===worstM&&y.months.length>1?' worst':'';
     return '<div class="ldg-mrow'+rowCls+'" data-my="'+cy+'-'+m.i+'"><div class="m-name">'+m.m+'<small>'+jlN(m.trades,'trade')+tag+'</small></div>'+
     '<div class="ldg-mspark">'+sparkFill(vals,300,28,m.net<0?'var(--red)':'var(--green)')+'</div>'+
     '<div class="m-pnl" style="color:'+(m.net<0?'var(--red)':'var(--green)')+'">'+money(m.net)+'</div>'+
-    '<div class="m-meta">PF <b>'+(pf===Infinity?'∞':pf.toFixed(2))+'</b><br>'+m.w+'W / '+m.l+'L / '+m.be+'BE</div></div>'
+    '<div class="m-meta">PF <b>'+(pf===Infinity?'â':pf.toFixed(2))+'</b><br>'+m.w+'W / '+m.l+'L / '+m.be+'BE</div></div>'
   }).join('');
 }
 
@@ -6894,7 +6894,7 @@ renderGrid();renderYear();
 // ---------- day detail slide-in panel ----------
 let dpOpen=false;
 const dpEsc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-// Same key shape as the Journal tab's key() — kept local rather than exposed cross-script
+// Same key shape as the Journal tab's key() â kept local rather than exposed cross-script
 // since it's a trivial pure function of trade fields, not stateful data.
 const dpKey=t=>t.d+' '+t.t+' '+t.side+' '+t.en+' '+t.pnl;
 function dayDateStr(y,m,d){return y+'-'+String(m+1).padStart(2,'0')+'-'+String(d).padStart(2,'0')}
@@ -6955,7 +6955,7 @@ function monthWeeksData(y,mIdx,mObj){
       const ds=r.filter(d=>d!=null);
       const wt=ds.reduce((s,d)=>s+(dm[d]?dm[d].t:0),0), wp=ds.reduce((s,d)=>s+(dm[d]?dm[d].pnl:0),0);
       const first=ds[0], last=ds[ds.length-1];
-      return {wi,trades:wt,net:wp,range:(first&&last)?MONTHS[mIdx].slice(0,3)+' '+first+'–'+last:''};
+      return {wi,trades:wt,net:wp,range:(first&&last)?MONTHS[mIdx].slice(0,3)+' '+first+'â'+last:''};
     });
   }
   // No real per-day data for this month: show empty weeks (the panel draws a dash) instead of made-up numbers.
@@ -6978,7 +6978,7 @@ function openMonthPanel(y,mIdx){
   $('mpTitle').textContent=m.m+' '+y;
   $('mpPnl').innerHTML='<span style="color:'+(m.net<0?'var(--red)':'var(--green)')+'">'+money(m.net)+'</span>';
   $('mpStats').innerHTML=[['Trades',m.trades,'var(--text)'],['Win rate',m.trades?Math.round(m.w/m.trades*100)+'%':'\u2014','var(--text)'],
-    ['Profit factor',pf===Infinity?'∞':pf.toFixed(2),pf<1?'var(--red)':'var(--green)'],['B/E',m.be,'var(--faint)']]
+    ['Profit factor',pf===Infinity?'â':pf.toFixed(2),pf<1?'var(--red)':'var(--green)'],['B/E',m.be,'var(--faint)']]
     .map(x=>'<div><span>'+x[0]+'</span><b style="color:'+x[2]+'">'+x[1]+'</b></div>').join('');
   $('mpViewFull').onclick=()=>{closeMonthPanel();gotoMonth(y,mIdx)};
   const weeks=monthWeeksData(y,mIdx,m);
@@ -6987,7 +6987,7 @@ function openMonthPanel(y,mIdx){
     return '<button type="button" class="dp-week" style="animation-delay:'+(ri*35)+'ms" data-wi="'+w.wi+'">'+
       '<span class="dp-w-label"><b>Week '+(w.wi+1)+'</b><small>'+w.range+'</small></span>'+
       '<span class="dp-w-meta">'+jlN(w.trades,'trade')+'</span>'+
-      '<span class="dp-w-pnl mono" style="color:'+c+'">'+(w.trades?money(w.net):'—')+'</span>'+
+      '<span class="dp-w-pnl mono" style="color:'+c+'">'+(w.trades?money(w.net):'â')+'</span>'+
       '<svg class="dp-t-arrow" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg></button>';
   }).join('');
   document.body.classList.add('mp-open'); $('monthPanel').setAttribute('aria-hidden','false'); mpOpen=true;
@@ -7014,7 +7014,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'){if(mpOpen)closeMont
 
   // Default room content. Edits made with the pencil buttons are saved on this device and override these.
   const SETUP_DEFAULTS = [{"k": "req_1", "t": "Both side confirmation"}, {"k": "req_2", "t": "No blockage"}, {"k": "req_3", "t": "No losses back to back; if lost 1, stop for this session"}, {"k": "req_4", "t": "SL above candle and under 40 pips"}, {"k": "req_5", "t": "No c2c before 70 pips"}, {"k": "req_6", "t": "If 1 confirmed and another doesn't, and no blockage on both, you can still take the trade"}];
-  const CHECKLIST_DEFAULTS = [{"k": "news", "t": "News Checked", "d": "No high-impact USD news within 30 minutes"}, {"k": "emotion2", "t": "Emotion Calm", "d": "Still calm right before pulling the trigger."}, {"k": "rulesmet", "t": "Plan Rules Met", "d": "Entering only because my plan and risk rules are fully met — not because I want action."}, {"k": "risklimit", "t": "Risk Under Limit", "d": "Lot is 0.02 and risk is about $10 or less"}, {"k": "entry", "t": "Entry Confirmed", "d": "Price action confirms the entry on the setup's confirmed candle or timeframe close."}, {"k": "signal", "t": "Confirmation Signal", "d": "Daily stop not hit: under 4 trades, under 2 losses, week above -$80"}, {"k": "exit", "t": "Exit Plan Set", "d": "SL behind structure, TP at least 2R, and the 1.5R partial planned, all written before entry"}];
+  const CHECKLIST_DEFAULTS = [{"k": "news", "t": "News Checked", "d": "No high-impact USD news within 30 minutes"}, {"k": "emotion2", "t": "Emotion Calm", "d": "Still calm right before pulling the trigger."}, {"k": "rulesmet", "t": "Plan Rules Met", "d": "Entering only because my plan and risk rules are fully met â not because I want action."}, {"k": "risklimit", "t": "Risk Under Limit", "d": "Lot is 0.02 and risk is about $10 or less"}, {"k": "entry", "t": "Entry Confirmed", "d": "Price action confirms the entry on the setup's confirmed candle or timeframe close."}, {"k": "signal", "t": "Confirmation Signal", "d": "Daily stop not hit: under 4 trades, under 2 losses, week above -$80"}, {"k": "exit", "t": "Exit Plan Set", "d": "SL behind structure, TP at least 2R, and the 1.5R partial planned, all written before entry"}];
   const LIVE_DEFAULTS = [{"k": "live1", "t": "No SL or TP changes.", "d": "Once the trade is live, the stop and target stay where the plan set them. The only change allowed is the move at 1.5R below. Never widen the SL, never remove it."}, {"k": "live2", "t": "At +$7.50 (1.5R), close 0.01 and move SL to entry +$1.", "d": "Wait for a 5M candle close beyond +$7.50. Close half, move the SL on the rest to entry plus $1, then leave the runner to $12-15 or the next structure level."}, {"k": "live3", "t": "Follow the written exit plan.", "d": "Scale or exit only according to the plan written before entry. Never on impulse, and never because price \"feels\" like it will reverse."}];
   const DEBRIEF_DEFAULTS = [{"k": "d1", "t": "Screenshot the trade.", "d": "Save the chart before emotion edits the memory."}, {"k": "d2", "t": "Stop trading for 1 minute.", "d": "Do nothing. Breathe. Do not instantly re-enter."}, {"k": "d3", "t": "If loss happens, take 5 minutes.", "d": "Feel it, then journal why the loss happened."}, {"k": "d4", "t": "Write violated rule for tomorrow.", "d": "Tomorrow dashboard will remind you what not to repeat."}];
   const COOLDOWN_DEFAULT_MIN = [5, 10, 15];
@@ -7268,7 +7268,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'){if(mpOpen)closeMont
         if(n === 6 && !checklistDone()) locked = true;
         const disabled = locked && n > state.step;
         return `<button class="${cls.trim()}" data-act="goto" data-n="${n}" ${disabled ? "disabled" : ""}>
-          <span class="n">${n < state.step ? "✓" : n}</span><span>${s}</span>
+          <span class="n">${n < state.step ? "â" : n}</span><span>${s}</span>
         </button>`;
       }).join("")}
     </div>`;
@@ -7482,7 +7482,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'){if(mpOpen)closeMont
     const pct = total ? Math.round((count/total)*100) : 0;
     const full = total>0 && count===total;
     return `<div class="progress-wrap${full?' full':''}">
-      <div class="progress-top"><span class="lbl">${label||'Progress'}</span><span class="pct mono">${count}/${total} · ${pct}%</span></div>
+      <div class="progress-top"><span class="lbl">${label||'Progress'}</span><span class="pct mono">${count}/${total} Â· ${pct}%</span></div>
       <div class="progress-lg"><div class="fill" data-pid="${pid||slugPid(label)}" style="width:${pct}%"></div></div>
     </div>`;
   }
@@ -7522,7 +7522,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'){if(mpOpen)closeMont
         if(r && r.value) state.reminder = JSON.parse(r.value);
       }catch(e){}
     }
-    // trade is logged — move to the mandatory cooldown step before resetting for the next trade
+    // trade is logged â move to the mandatory cooldown step before resetting for the next trade
     state.lastTradeCompletedAt = completedAt;
     state.cooldown15StartedAt = null;
     state.cooldownDurationMs = null;
@@ -7563,7 +7563,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'){if(mpOpen)closeMont
   }
 
   function renderStatusNote(){
-    if(state.step===1) return `<div class="psy-note${cooldownActive()?' warn':''}">${cooldownActive() ? "In cooldown — no need to trade right now." : "Complete every mind check to unlock the setup scan."}</div>`;
+    if(state.step===1) return `<div class="psy-note${cooldownActive()?' warn':''}">${cooldownActive() ? "In cooldown â no need to trade right now." : "Complete every mind check to unlock the setup scan."}</div>`;
     if(state.step===2) return `<div class="psy-note">Setup scan unlocked. Confirm the setup is real before checklist.</div>`;
     if(state.step===3) return `<div class="psy-note">Setup scan complete. Pre-trade checklist unlocked.</div>`;
     if(state.step===4 || state.step===5) return `<div class="psy-note">Checklist complete. Live trade rules unlocked.</div>`;
@@ -7604,7 +7604,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'){if(mpOpen)closeMont
       </div>
       <div class="sub" style="margin:4px 0 14px">Check your mental state before planning any trade.</div>
       ${progressBar(count, MIND_ITEMS.length, 'Mind stability', 'mind')}
-      ${cooling ? `<div class="psy-note alert">Cooldown active — no back-to-back trades. ${formatRemaining(cooldownRemainingMs())} left before you can start the next one.</div>` : ""}
+      ${cooling ? `<div class="psy-note alert">Cooldown active â no back-to-back trades. ${formatRemaining(cooldownRemainingMs())} left before you can start the next one.</div>` : ""}
       ${MIND_ITEMS.map(i=>`
         <div class="psy-row ${state.mind[i.k]?'checked':''}" data-act="toggle-mind" data-k="${i.k}">
           <span class="ic">${rowIcon(i.k)}</span>
@@ -7705,7 +7705,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'){if(mpOpen)closeMont
           <span class="cp"><b>${i.t}</b><span>${liveDesc(i.d)}</span></span>
           <span class="ck">${icon()}</span>
         </div>`).join("")}
-      ${done ? `<div class="psy-note ok">Cleared for planned execution — every line confirmed, entry meets your saved risk limit and minimum 2:1 reward-to-risk plan.</div>` : ""}
+      ${done ? `<div class="psy-note ok">Cleared for planned execution â every line confirmed, entry meets your saved risk limit and minimum 2:1 reward-to-risk plan.</div>` : ""}
       <div class="psy-actions">
         <button class="btn-ghost" data-act="reset-checklist">Reset</button>
         <button class="btn-ghost" data-act="goto" data-n="2">Back</button>
@@ -7840,13 +7840,13 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'){if(mpOpen)closeMont
       </div>
       <div class="sub" style="margin:4px 0 6px">Trade logged. Step away for ${mins} minute${mins===1?"":"s"} before you're clear to plan the next one.</div>
       ${active
-        ? `<div class="psy-note alert">⏸ Cooldown active — ${formatRemaining(remaining)} left. No back-to-back trades.</div>`
+        ? `<div class="psy-note alert">â¸ Cooldown active â ${formatRemaining(remaining)} left. No back-to-back trades.</div>`
         : `<div class="psy-note ok">Cooldown complete. You're clear to start the next trade whenever you're ready.</div>`}
       <div class="psy-info"><span class="ic">${rowIcon('d2')}</span><div><b>Step away from the screen.</b><span>Close the chart. Don't watch price during the pause.</span></div></div>
       <div class="psy-info"><span class="ic">${rowIcon('d3')}</span><div><b>No re-entry on impulse.</b><span>The next trade only starts after a fresh Mind Check.</span></div></div>
       <div class="psy-actions">
         <button class="btn-ghost" data-act="goto" data-n="5">Back</button>
-        <button class="btn-primary psy-full" data-act="start-next-trade" ${done?"":"disabled"}>${done ? "Start next trade" : `⏸ Pause ${mins}m cooldown`}${arrowIcon()}</button>
+        <button class="btn-primary psy-full" data-act="start-next-trade" ${done?"":"disabled"}>${done ? "Start next trade" : `â¸ Pause ${mins}m cooldown`}${arrowIcon()}</button>
       </div>`;
   }
 
@@ -7870,7 +7870,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'){if(mpOpen)closeMont
     else body = renderCooldownStep();
 
     const reminderHtml = (state.step===1 && state.reminder) ?
-      `<div class="psy-note warn">Yesterday's reminder — don't repeat: ${state.reminder.text}</div>` : "";
+      `<div class="psy-note warn">Yesterday's reminder â don't repeat: ${state.reminder.text}</div>` : "";
 
     stageEl.innerHTML = `
       <div class="top">
@@ -7879,7 +7879,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'){if(mpOpen)closeMont
             <span class="streak">${STEPS[state.step-1]}</span>
           </div>
           <h1>Psychology Command Room</h1>
-          <p>Runs fully on this device · trade review</p>
+          <p>Runs fully on this device Â· trade review</p>
         </div>
       </div>
       ${tabsHtml()}
@@ -7887,7 +7887,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'){if(mpOpen)closeMont
       ${renderStatusNote()}
       ${reminderHtml}
       <section class="a-s">${body}</section>
-      <div class="psy-foot">6-stage pre-trade ritual · local only</div>
+      <div class="psy-foot">6-stage pre-trade ritual Â· local only</div>
     `;
     animateProgressFills();
   }
@@ -7958,7 +7958,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'){if(mpOpen)closeMont
   function mount(){
     const host = document.getElementById('psyHost');
     if(!host) return;
-    if(host.dataset.mounted) return; // idempotent — only mount once
+    if(host.dataset.mounted) return; // idempotent â only mount once
     host.dataset.mounted = '1';
     stageEl = host;
     host.addEventListener('click', handleClick);
@@ -8044,7 +8044,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'){if(mpOpen)closeMont
   function addMsg(thread, role, html){
     const row = document.createElement('div');
     row.className = 'aic-msg ' + role;
-    row.innerHTML = (role==='ai' ? '<span class="aic-avatar sm">✦</span>' : '') + '<div class="aic-bubble">'+html+'</div>';
+    row.innerHTML = (role==='ai' ? '<span class="aic-avatar sm">â¦</span>' : '') + '<div class="aic-bubble">'+html+'</div>';
     thread.appendChild(row);
     thread.scrollTop = thread.scrollHeight;
     return row;
@@ -8054,7 +8054,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'){if(mpOpen)closeMont
     if(headAvatar) headAvatar.classList.add('thinking');
     const typing = document.createElement('div');
     typing.className = 'aic-msg ai';
-    typing.innerHTML = '<span class="aic-avatar sm thinking">✦</span><div class="aic-bubble aic-typing"><span></span><span></span><span></span></div>';
+    typing.innerHTML = '<span class="aic-avatar sm thinking">â¦</span><div class="aic-bubble aic-typing"><span></span><span></span><span></span></div>';
     thread.appendChild(typing);
     thread.scrollTop = thread.scrollHeight;
     const chips = document.querySelectorAll('.aic-chip'); chips.forEach(c=>c.disabled=true);
@@ -8065,7 +8065,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'){if(mpOpen)closeMont
       e=>{ typing.remove(); addMsg(thread, 'ai', (ANSWERS[key] || FALLBACK)+'<div style="margin-top:8px;opacity:.65;font-size:12px">Cloud AI unavailable ('+window.jlCoachHtml((e&&e.message)||'error')+'). Local answer from your logged trades.</div>'); done(); });
   }
 
-  // ---------- AI widgets — one card per pattern, wired back into the coach + Trades/Journal ----------
+  // ---------- AI widgets â one card per pattern, wired back into the coach + Trades/Journal ----------
   const WIDGETS = !A.n?[]:[
   {stat:m$(A.net)+' net', cls:A.net<0?'neg':'', sub:'Account pressure', tags:['All trades',A.n+' trades'], desc:'Total net across all logged trades.', askKey:'performance', route:'trades'},
   {stat:rvT.length?m$(rvNet)+' leak':'0 flagged', cls:rvT.length?'neg':'', sub:'Revenge trading', tags:['Revenge trade',rvT.length+' flagged'], desc:'Trades flagged by the revenge window in Account Settings.', askKey:'weakness', route:'journal'},
@@ -8117,14 +8117,14 @@ function fillHero(){const s=(id,h)=>{const e=$(id);if(e)e.innerHTML=h};
     countUp($('aicN4'), Math.abs(rvNet), {prefix:rvNet<0?'-$':'$', decimals:2, suffix:' flagged'});
     (function(){ /* snapshot subtext + main leak from the real data (was static demo text) */
       const sub = id => { const e = $(id); return e && e.parentElement.querySelector('.s'); };
-      const w = sub('aicN2'); if(w) w.textContent = A.W+'W · '+A.L+'L · '+A.BE+'BE';
-      const p = sub('aicN3'); if(p){ const ex = A.n ? A.net/A.n : 0; p.textContent = 'PF '+(A.pf||0).toFixed(2)+' · exp '+(ex<0?'−$':'$')+Math.abs(ex).toFixed(2)+'/trade'; }
+      const w = sub('aicN2'); if(w) w.textContent = A.W+'W Â· '+A.L+'L Â· '+A.BE+'BE';
+      const p = sub('aicN3'); if(p){ const ex = A.n ? A.net/A.n : 0; p.textContent = 'PF '+(A.pf||0).toFixed(2)+' Â· exp '+(ex<0?'â$':'$')+Math.abs(ex).toFixed(2)+'/trade'; }
       const lk = $('aicN4'), lv = lk && lk.parentElement.querySelector('.v');
       if(lv){
         const ms=((A.leak&&A.leak.Mistakes)||[]).filter(x=>x&&typeof x[1]==='number'&&x[1]<0&&x[2]>0);
         const wm=ms.length?ms.reduce((a,b)=>b[1]<a[1]?b:a):null;
         const ls=lk.parentElement.querySelector('.s');
-        if(wm){ lv.textContent=wm[0]; if(ls) ls.textContent=(wm[1]<0?'−$':'$')+Math.abs(wm[1]).toFixed(2)+' across '+wm[2]+(wm[2]===1?' trade':' trades'); }
+        if(wm){ lv.textContent=wm[0]; if(ls) ls.textContent=(wm[1]<0?'â$':'$')+Math.abs(wm[1]).toFixed(2)+' across '+wm[2]+(wm[2]===1?' trade':' trades'); }
         else lv.textContent = (window.__trades||[]).some(t=>t.rev) ? 'Revenge trade' : 'None flagged';
       }
     })();
@@ -8157,7 +8157,7 @@ function fillHero(){const s=(id,h)=>{const e=$(id);if(e)e.innerHTML=h};
     $('aicGen').addEventListener('click', ()=>{
       const box = $('aicReportBox'), btn = $('aicGen');
       btn.disabled = true;
-      box.innerHTML = '<div class="review-loading"><span class="review-spin"></span>Reading '+A.n+' trades and building your report…</div>';
+      box.innerHTML = '<div class="review-loading"><span class="review-spin"></span>Reading '+A.n+' trades and building your reportâ¦</div>';
       window.jlCoachReport().then(r=>{
         const h = reportHtml(), head = h.slice(0, h.indexOf('<div class="review-sec">')), li = a=>a.map(x=>'<li>'+window.jlCoachHtml(x)+'</li>').join('');
         box.innerHTML = head+'<div class="review-sec"><h3>WHAT\'S WORKING</h3><ul>'+(r.working.length?li(r.working):'<li>Nothing stands out yet.</li>')+'</ul></div><div class="review-sec"><h3>WHAT\'S BROKEN</h3><ul>'+(r.broken.length?li(r.broken):'<li>Nothing flagged.</li>')+'</ul></div><div class="review-sec"><h3>RULE FOR TOMORROW</h3><ul><li>'+window.jlCoachHtml(r.rule)+'</li></ul></div>';
@@ -8173,7 +8173,7 @@ function fillHero(){const s=(id,h)=>{const e=$(id);if(e)e.innerHTML=h};
     const wBox = $('aicWidgetBox'), wGen = $('aicWGen');
     wGen.addEventListener('click', ()=>{
       wGen.disabled = true;
-      wBox.innerHTML = '<div class="review-loading"><span class="review-spin"></span>Scanning '+A.n+' trades for repeatable patterns…</div>';
+      wBox.innerHTML = '<div class="review-loading"><span class="review-spin"></span>Scanning '+A.n+' trades for repeatable patternsâ¦</div>';
       setTimeout(()=>{
         wBox.innerHTML = !WIDGETS.length?'<div class="review-empty"><div class="t">No trades yet.</div></div>':'<div class="aic-wgrid">' + WIDGETS.map(widgetHtml).join('') + '</div>';
         wGen.disabled = false;
@@ -8196,7 +8196,7 @@ function fillHero(){const s=(id,h)=>{const e=$(id);if(e)e.innerHTML=h};
         respond(thread, w.askKey, 'Explain my "'+w.sub+'" ('+w.stat+') and what to change.');
         document.querySelector('.aic-chat').scrollIntoView({behavior:'smooth', block:'start'});
       } else if(btn.dataset.act === 'copy'){
-        const text = w.stat+' — '+w.sub+'. '+w.desc.replace(/<[^>]+>/g,'');
+        const text = w.stat+' â '+w.sub+'. '+w.desc.replace(/<[^>]+>/g,'');
         const done = ()=>{ btn.classList.add('copied'); const old = btn.textContent; btn.textContent='Copied'; setTimeout(()=>{btn.classList.remove('copied'); btn.textContent=old;},1300); };
         if(navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(done).catch(done);
         else done();
@@ -8235,7 +8235,7 @@ function fillHero(){const s=(id,h)=>{const e=$(id);if(e)e.innerHTML=h};
   // ---------- real lifetime stats, computed from window.__trades ----------
   // Same "real data + real logic, no fake numbers" rule as every other rebuilt tab.
   // Revenge flags (t.rev) come from window.jlRecomputeRevenge, already run once the
-  // trades array is set up near the top of the page — read here, not re-derived.
+  // trades array is set up near the top of the page â read here, not re-derived.
   function computeProfileStats(){
     const trades = window.__trades || [];
     const n = trades.length;
@@ -8265,16 +8265,16 @@ function fillHero(){const s=(id,h)=>{const e=$(id);if(e)e.innerHTML=h};
   function renderSessionRecord(){
     const host = $('upSessRows'); if(!host) return;
     const entries = computeSessionRecord();
-    if(!entries.length){ host.innerHTML = '<div class="up-sess"><span>Not tracked yet</span><b>—</b></div>'; return; }
+    if(!entries.length){ host.innerHTML = '<div class="up-sess"><span>Not tracked yet</span><b>â</b></div>'; return; }
     if(entries.length===1){
       const [ses,net] = entries[0];
-      host.innerHTML = '<div class="up-sess"><span>Only session so far</span><b class="'+(net>=0?'pos':'neg')+'">'+ses+' · '+(net>=0?'+$':'−$')+Math.abs(net).toFixed(2)+'</b></div>';
+      host.innerHTML = '<div class="up-sess"><span>Only session so far</span><b class="'+(net>=0?'pos':'neg')+'">'+ses+' Â· '+(net>=0?'+$':'â$')+Math.abs(net).toFixed(2)+'</b></div>';
       return;
     }
     const [bestSes,bestNet] = entries[0], [worstSes,worstNet] = entries[entries.length-1];
     host.innerHTML =
-      '<div class="up-sess"><span>Best</span><b class="'+(bestNet>=0?'pos':'neg')+'">'+bestSes+' · '+(bestNet>=0?'+$':'−$')+Math.abs(bestNet).toFixed(2)+'</b></div>'+
-      '<div class="up-sess"><span>Worst</span><b class="'+(worstNet>=0?'pos':'neg')+'">'+worstSes+' · '+(worstNet>=0?'+$':'−$')+Math.abs(worstNet).toFixed(2)+'</b></div>';
+      '<div class="up-sess"><span>Best</span><b class="'+(bestNet>=0?'pos':'neg')+'">'+bestSes+' Â· '+(bestNet>=0?'+$':'â$')+Math.abs(bestNet).toFixed(2)+'</b></div>'+
+      '<div class="up-sess"><span>Worst</span><b class="'+(worstNet>=0?'pos':'neg')+'">'+worstSes+' Â· '+(worstNet>=0?'+$':'â$')+Math.abs(worstNet).toFixed(2)+'</b></div>';
   }
 
   // Last 6 months that have trades (real months only, oldest to newest).
@@ -8294,7 +8294,7 @@ function fillHero(){const s=(id,h)=>{const e=$(id);if(e)e.innerHTML=h};
       if(!m.has) return '<div class="up-chart-col" style="opacity:.4"><div class="up-chart-bar" data-target="4" style="background:rgba(255,255,255,.14)"></div><span class="n">No trades</span><span class="m">'+m.m+'</span></div>';
       const pct = Math.round(Math.abs(m.net)/max*100);
       const bg = m.net>=0 ? 'linear-gradient(180deg,#7fe0a8,var(--green))' : 'linear-gradient(180deg,#e8888c,var(--red))';
-      return '<div class="up-chart-col"><div class="up-chart-bar" data-target="'+pct+'" style="background:'+bg+'"></div><span class="n">'+(m.net>=0?'+$':'−$')+Math.abs(m.net).toFixed(2)+'</span><span class="m">'+m.m+'</span></div>';
+      return '<div class="up-chart-col"><div class="up-chart-bar" data-target="'+pct+'" style="background:'+bg+'"></div><span class="n">'+(m.net>=0?'+$':'â$')+Math.abs(m.net).toFixed(2)+'</span><span class="m">'+m.m+'</span></div>';
     }).join('');
     requestAnimationFrame(()=>{
       host.querySelectorAll('.up-chart-bar').forEach(b=> b.style.height = b.dataset.target+'%');
@@ -8303,7 +8303,7 @@ function fillHero(){const s=(id,h)=>{const e=$(id);if(e)e.innerHTML=h};
   }
 
   // Consecutive-day journal streak from real journal entries (window.__getJournals),
-  // ending on the most recent journaled date — not today's date, so a stale streak
+  // ending on the most recent journaled date â not today's date, so a stale streak
   // doesn't silently keep counting.
   function computeJournalStreak(){
     const journals = window.__getJournals ? (window.__getJournals()||[]) : [];
@@ -8320,7 +8320,7 @@ function fillHero(){const s=(id,h)=>{const e=$(id);if(e)e.innerHTML=h};
   }
 
   // Distinct trading days (from window.__trades) since the last day that had a
-  // revenge-flagged trade — trading days, not calendar days, since that's the unit
+  // revenge-flagged trade â trading days, not calendar days, since that's the unit
   // the rest of the app already uses for activity.
   function computeRevengeFreeStreak(){
     const trades = (window.__trades||[]);
@@ -8340,14 +8340,14 @@ function fillHero(){const s=(id,h)=>{const e=$(id);if(e)e.innerHTML=h};
     const tradesTarget = 700;
     const tOn = stats.n >= tradesTarget;
     $('upBadgeTrades').classList.toggle('on', tOn);
-    $('upBadgeTradesIcon').textContent = tOn ? '✅' : '🔒';
+    $('upBadgeTradesIcon').textContent = tOn ? 'â' : 'ð';
     $('upBadgeTradesSub').textContent = tOn ? 'Consistency milestone, unlocked' : (stats.n+' / '+tradesTarget+' trades logged');
 
     // 30-day journal streak
     const js = computeJournalStreak();
     const jTarget = 30, jOn = js.streak >= jTarget;
     $('upBadgeStreak').classList.toggle('on', jOn);
-    $('upBadgeStreakIcon').textContent = jOn ? '✅' : '🔒';
+    $('upBadgeStreakIcon').textContent = jOn ? 'â' : 'ð';
     $('upBadgeStreakSub').textContent = js.entries===0 ? 'No journal entries yet' : (js.streak+' / '+jTarget+' days');
     const streakBar = document.querySelector('#upBadgeStreak .up-badge-bar i');
     if(streakBar){ streakBar.dataset.target = String(Math.min(100, Math.round(js.streak/jTarget*100))); requestAnimationFrame(()=> streakBar.style.width = streakBar.dataset.target+'%'); }
@@ -8357,12 +8357,12 @@ function fillHero(){const s=(id,h)=>{const e=$(id);if(e)e.innerHTML=h};
     const green = tracked.find(m=>m.net>0);
     const gOn = !!green;
     $('upBadgeGreenMonth').classList.toggle('on', gOn);
-    $('upBadgeGreenMonthIcon').textContent = gOn ? '✅' : '🔒';
+    $('upBadgeGreenMonthIcon').textContent = gOn ? 'â' : 'ð';
     if(gOn){
-      $('upBadgeGreenMonthSub').textContent = 'Unlocked — '+green.m+', +$'+green.net.toFixed(2);
+      $('upBadgeGreenMonthSub').textContent = 'Unlocked â '+green.m+', +$'+green.net.toFixed(2);
     } else if(tracked.length){
       const best = tracked.slice().sort((a,b)=>b.net-a.net)[0];
-      $('upBadgeGreenMonthSub').textContent = 'Not yet — best so far: '+best.m+', '+(best.net>=0?'+$':'−$')+Math.abs(best.net).toFixed(2);
+      $('upBadgeGreenMonthSub').textContent = 'Not yet â best so far: '+best.m+', '+(best.net>=0?'+$':'â$')+Math.abs(best.net).toFixed(2);
     } else {
       $('upBadgeGreenMonthSub').textContent = 'Not tracked yet';
     }
@@ -8371,7 +8371,7 @@ function fillHero(){const s=(id,h)=>{const e=$(id);if(e)e.innerHTML=h};
     const rv = computeRevengeFreeStreak();
     const rTarget = 7;
     $('upBadgeRevenge').classList.toggle('on', rv.days>=rTarget);
-    $('upBadgeRevengeIcon').textContent = rv.days>=rTarget ? '✅' : '🔒';
+    $('upBadgeRevengeIcon').textContent = rv.days>=rTarget ? 'â' : 'ð';
     if(rv.days===0 && !rv.hasRevenge){
       $('upBadgeRevengeSub').textContent = 'Not tracked yet';
     } else if(!rv.hasRevenge){
@@ -8506,10 +8506,10 @@ function fillHero(){const s=(id,h)=>{const e=$(id);if(e)e.innerHTML=h};
     const stats = computeProfileStats();
     countUp($('upN1'), stats.n);
     countUp($('upN2'), stats.winRate, {suffix:'%'});
-    countUp($('upN3'), Math.abs(stats.net), {prefix: stats.net>=0?'+$':'−$', decimals:2});
+    countUp($('upN3'), Math.abs(stats.net), {prefix: stats.net>=0?'+$':'â$', decimals:2});
     $('upN3').closest('.up-stat').classList.toggle('neg', stats.net<0);
     countUp($('upN4'), stats.pf===Infinity ? 0 : stats.pf, {decimals:2});
-    countUp($('upN5'), stats.maxDD, {prefix:'−$', decimals:2});
+    countUp($('upN5'), stats.maxDD, {prefix:'â$', decimals:2});
 
     renderSessionRecord();
     const months = buildChart();
@@ -8517,7 +8517,7 @@ function fillHero(){const s=(id,h)=>{const e=$(id);if(e)e.innerHTML=h};
 
     const js = computeJournalStreak();
     const streakChip = $('upJournalStreakChip');
-    if(streakChip) streakChip.textContent = js.entries===0 ? '🔥 No journal entries yet' : ('🔥 '+js.streak+'-day journal streak');
+    if(streakChip) streakChip.textContent = js.entries===0 ? 'ð¥ No journal entries yet' : ('ð¥ '+js.streak+'-day journal streak');
 
     // ---------- editable bio (click straight into the text) ----------
     const bio = $('upBio');
@@ -9389,13 +9389,13 @@ window.__renderAnSetups=renderBoth;window.__renderAnEmotions=renderEmo;setTimeou
         const dayKey=t.toDateString();
         if(dayKey!==lastDay){ lastDay=dayKey; html+='<tr class="mk-day"><td colspan="7">'+t.toLocaleDateString(undefined,{weekday:'long',month:'short',day:'numeric'})+'</td></tr>'; }
         const lvl=impLvl(e.impact);
-        html+='<tr><td>'+t.toLocaleTimeString(undefined,{hour:'2-digit',minute:'2-digit'})+'</td><td>'+esc(CCY_MAP[e.country]||e.country||'—')+'</td>'
+        html+='<tr><td>'+t.toLocaleTimeString(undefined,{hour:'2-digit',minute:'2-digit'})+'</td><td>'+esc(CCY_MAP[e.country]||e.country||'â')+'</td>'
           +'<td><span class="mk-imp">'+[1,2,3].map(n=>'<i style="background:'+(n<=lvl?impColor(lvl):'rgba(255,255,255,.1)')+'"></i>').join('')+'</span></td>'
-          +'<td>'+esc(e.event||'—')+'</td><td>'+esc(e.actual??'—')+'</td><td>'+esc(e.estimate??'—')+'</td><td>'+esc(e.prev??'—')+'</td></tr>';
+          +'<td>'+esc(e.event||'â')+'</td><td>'+esc(e.actual??'â')+'</td><td>'+esc(e.estimate??'â')+'</td><td>'+esc(e.prev??'â')+'</td></tr>';
       });
       body.innerHTML=html;
     }
-    if(note) note.textContent=loaded?('Showing '+rows.length+' event'+(rows.length===1?'':'s')+(calSrc==='forexfactory'?' via Forex Factory (forecast/previous only, no actuals; updates hourly).':' via Finnhub. Free-tier data may lag or omit some releases.')):'Loading calendar…';
+    if(note) note.textContent=loaded?('Showing '+rows.length+' event'+(rows.length===1?'':'s')+(calSrc==='forexfactory'?' via Forex Factory (forecast/previous only, no actuals; updates hourly).':' via Finnhub. Free-tier data may lag or omit some releases.')):'Loading calendarâ¦';
     renderKeyEvents();
   }
   function renderKeyEvents(){
@@ -9422,14 +9422,14 @@ window.__renderAnSetups=renderBoth;window.__renderAnEmotions=renderEmo;setTimeou
       const k=h.toLowerCase().replace(/\s+/g,' '); if(seen[k]) return false; seen[k]=1; return true;
     }).sort((a,b)=>(b.datetime||0)-(a.datetime||0)).slice(0,12);
     if(!list.length){
-      const msg=loaded?(newsMsg||'No news returned right now.'):'Loading news…';
+      const msg=loaded?(newsMsg||'No news returned right now.'):'Loading newsâ¦';
       host.innerHTML='<div class="mk-n"><span style="color:var(--faint)">'+esc(msg)+'</span>'+(loaded?'<button type="button" class="mk-chip mk-retry" id="mkNewsRetry">Retry</button>':'')+'</div>';
       return;
     }
     host.innerHTML=list.map(n=>{
       const t=n.datetime?ago(n.datetime):'';
       const url=safeUrl(n.url), head=esc(String(n.headline).trim());
-      const meta='<span class="mk-nm">'+esc(n.source||'News')+(t?' · '+esc(t):'')+'</span>';
+      const meta='<span class="mk-nm">'+esc(n.source||'News')+(t?' Â· '+esc(t):'')+'</span>';
       return '<div class="mk-n">'+meta+(url==='#'?'<span class="mk-nh">'+head+'</span>':'<a class="mk-nh" href="'+esc(url)+'" target="_blank" rel="noopener noreferrer">'+head+'</a>')+'</div>';
     }).join('');
   }
@@ -9643,6 +9643,68 @@ window.__renderAnSetups=renderBoth;window.__renderAnEmotions=renderEmo;setTimeou
 #weeklyReview .wr-hc{height:34px;border-radius:6px;background:rgba(255,255,255,.025);display:grid;place-items:center;font-size:10px;font-weight:700;color:#fff;overflow:visible;position:relative;cursor:default;transition:transform .28s cubic-bezier(.22,.61,.36,1)}
 #weeklyReview .wr-hc[data-t]:hover{transform:scale(1.18);z-index:2}
 @media(max-width:900px){#weeklyReview .wr-an>.wr-tiles{grid-template-columns:repeat(2,minmax(0,1fr))}}
+/* Weekly review: premium layer (additive, scoped to #weeklyReview, theme variables only) */
+#weeklyReview{position:relative;background:radial-gradient(120% 60% at 0% 0%,color-mix(in srgb,var(--accent) 9%,transparent),transparent 60%),linear-gradient(180deg,rgba(255,255,255,.022),rgba(255,255,255,.008));border-radius:24px;padding:26px 28px;box-shadow:0 1px 0 rgba(255,255,255,.05) inset,0 30px 60px -36px rgba(0,0,0,.85)}
+#weeklyReview::before{content:"";position:absolute;left:28px;right:28px;top:0;height:1px;background:linear-gradient(90deg,transparent,color-mix(in srgb,var(--accent-2) 55%,transparent),transparent);pointer-events:none}
+#weeklyReview .a-s,#weeklyReview .wr-block{position:relative;border-radius:20px;padding:24px 26px;background:linear-gradient(165deg,rgba(255,255,255,.045),rgba(255,255,255,0) 46%),var(--panel);box-shadow:0 1px 0 rgba(255,255,255,.045) inset,0 22px 44px -30px rgba(0,0,0,.9);transition:border-color .35s var(--ease),box-shadow .35s var(--ease)}
+#weeklyReview .a-s:hover,#weeklyReview .wr-block:hover{border-color:var(--border-hi);box-shadow:0 1px 0 rgba(255,255,255,.06) inset,0 26px 50px -30px rgba(0,0,0,.95),0 0 0 1px color-mix(in srgb,var(--accent) 10%,transparent)}
+#weeklyReview .a-s-ttl h3,#weeklyReview .wr-sub{font-size:14px;font-weight:650;letter-spacing:-.005em;color:var(--text)}
+#weeklyReview .a-s-ic{width:30px;height:30px;border-radius:9px;display:inline-grid;place-items:center;background:linear-gradient(160deg,color-mix(in srgb,var(--accent) 22%,transparent),rgba(255,255,255,.02));border:1px solid color-mix(in srgb,var(--accent) 30%,var(--border));box-shadow:0 0 18px -6px color-mix(in srgb,var(--accent) 60%,transparent)}
+#weeklyReview .a-s-ic svg{stroke:var(--accent-2)}
+/* KPI tiles */
+#weeklyReview .wr-tiles{border-radius:18px;box-shadow:0 1px 0 rgba(255,255,255,.05) inset,0 18px 40px -30px rgba(0,0,0,.9)}
+#weeklyReview .wr-tiles>.wr-tile{padding:18px 20px;background:linear-gradient(165deg,rgba(255,255,255,.04),rgba(255,255,255,0) 55%),var(--panel)}
+#weeklyReview .wr-tiles>.wr-tile .l{font-size:10.5px;text-transform:uppercase;letter-spacing:.11em;font-weight:650;color:var(--faint);margin-bottom:9px}
+#weeklyReview .wr-tiles>.wr-tile .v{font-size:23px;font-weight:760;letter-spacing:-.025em;font-variant-numeric:tabular-nums}
+#wrStats>.wr-tiles>.wr-tile:first-child{background:radial-gradient(90% 140% at 0% 0%,color-mix(in srgb,var(--accent) 20%,transparent),transparent 62%),var(--panel)}
+#wrStats>.wr-tiles>.wr-tile:first-child .v{font-size:32px;letter-spacing:-.035em}
+#weeklyReview .wr-tile:has(.v[style*="--green"]) .v{text-shadow:0 0 26px color-mix(in srgb,var(--green) 40%,transparent)}
+#weeklyReview .wr-tile:has(.v[style*="--red"]) .v{text-shadow:0 0 26px color-mix(in srgb,var(--red) 40%,transparent)}
+/* Tables: Session, Pair, Mistake, Emotion */
+#weeklyReview .wr-mini{border-collapse:separate;border-spacing:0}
+#weeklyReview .wr-mini th{font-size:10.5px;text-transform:uppercase;letter-spacing:.11em;font-weight:650;color:var(--faint);padding:0 12px 10px 0;border-bottom:1px solid var(--border)}
+#weeklyReview .wr-mini td{padding:12px 12px 12px 0;border-top:0;border-bottom:1px solid color-mix(in srgb,var(--border) 60%,transparent);font-size:13px}
+#weeklyReview .wr-mini tbody tr:last-child td{border-bottom:0}
+#weeklyReview .wr-mini th:nth-child(n+2),#weeklyReview .wr-mini td:nth-child(n+2){text-align:right}
+#weeklyReview .wr-mini th:last-child,#weeklyReview .wr-mini td:last-child{padding-right:0}
+#weeklyReview .wr-mini td.ev{font-weight:600;color:var(--text)}
+#weeklyReview .wr-mini td[style*="--green"]{font-weight:700}
+#weeklyReview .wr-mini td[style*="--red"]{font-weight:700}
+#weeklyReview .wr-mini tbody tr{transition:background .25s var(--ease)}
+#weeklyReview .wr-mini tbody tr:hover td{background:color-mix(in srgb,var(--accent) 6%,transparent)}
+#weeklyReview .wr-block>.wr-cols{gap:0}
+#weeklyReview .wr-block>.wr-cols>div{padding:0 22px}
+#weeklyReview .wr-block>.wr-cols>div:first-child{padding-left:0}
+#weeklyReview .wr-block>.wr-cols>div:last-child{padding-right:0}
+#weeklyReview .wr-block>.wr-cols>div+div{border-left:1px solid var(--border)}
+#weeklyReview .wr-block>.wr-cols .wr-sub{margin-bottom:14px}
+#weeklyReview .wr-cap{font-size:11.5px;color:var(--faint);padding-top:14px;margin:16px 0 0;border-top:1px solid var(--border)}
+#weeklyReview .wr-empty{font-size:13px;color:var(--faint);padding:14px 0;line-height:1.5}
+/* Heatmap */
+#weeklyReview .wr-hh{font:600 9px "IBM Plex Mono",monospace;letter-spacing:.02em;color:var(--faint)}
+#weeklyReview .wr-hd{font:650 10.5px "IBM Plex Mono",monospace;letter-spacing:.06em;text-transform:uppercase;color:var(--sub)}
+#weeklyReview .wr-hc{height:36px;border-radius:8px;background:rgba(255,255,255,.02);box-shadow:inset 0 0 0 1px rgba(255,255,255,.03);transition:transform .25s cubic-bezier(.34,1.56,.64,1),box-shadow .25s var(--ease),filter .25s var(--ease)}
+#weeklyReview .wr-hc[data-t]{font-size:11px;font-weight:750;text-shadow:0 1px 2px rgba(0,0,0,.5);cursor:pointer}
+#weeklyReview .wr-hc[data-t]:hover{transform:scale(1.14);filter:brightness(1.25) saturate(1.1);box-shadow:0 8px 22px -6px rgba(0,0,0,.8),0 0 0 1px rgba(255,255,255,.28)}
+#weeklyReview .a-read{font-size:11.5px;color:var(--faint);margin-top:16px;padding-top:14px;border-top:1px solid var(--border);line-height:1.5}
+/* Next week prep */
+#weeklyReview .wr-rule{position:relative;overflow:hidden;padding:16px 20px 16px 22px;border-radius:14px;border:1px solid color-mix(in srgb,var(--accent) 28%,var(--border));border-left:3px solid var(--accent);background:linear-gradient(100deg,color-mix(in srgb,var(--accent) 13%,transparent),rgba(255,255,255,0) 70%),var(--panel-2);box-shadow:0 14px 30px -24px color-mix(in srgb,var(--accent) 70%,transparent)}
+#weeklyReview .wr-rule .l{font-size:10.5px;text-transform:uppercase;letter-spacing:.13em;font-weight:700;color:var(--accent-2);margin-bottom:7px}
+#weeklyReview .wr-rule .t{font-size:14.5px;font-weight:550;letter-spacing:-.005em}
+#weeklyReview .wr-chips{display:inline-flex;gap:2px;padding:3px;border-radius:12px;background:var(--panel-2);border:1px solid var(--border)}
+#weeklyReview .wr-chip{border:0;border-radius:9px;padding:7px 15px;font-size:12.5px;font-weight:600;color:var(--sub);background:transparent;cursor:pointer;transition:color .25s var(--ease),background .25s var(--ease),box-shadow .25s var(--ease)}
+#weeklyReview .wr-chip:hover{color:var(--text)}
+#weeklyReview .wr-chip.on{color:#fff;background:linear-gradient(160deg,var(--accent-2),var(--accent));box-shadow:0 6px 18px -6px color-mix(in srgb,var(--accent) 80%,transparent),inset 0 1px 0 rgba(255,255,255,.25)}
+#weeklyReview .wr-refresh{border-radius:11px;border:1px solid var(--border-hi);background:linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,.015));color:var(--text);font-weight:600;cursor:pointer;transition:border-color .25s var(--ease),transform .25s var(--ease),background .25s var(--ease)}
+#weeklyReview .wr-refresh:hover{border-color:color-mix(in srgb,var(--accent) 55%,transparent);background:color-mix(in srgb,var(--accent) 10%,transparent);transform:translateY(-1px)}
+#weeklyReview .wr-tbl th{font-size:10.5px;text-transform:uppercase;letter-spacing:.11em;color:var(--faint);padding:8px 12px 10px}
+#weeklyReview .wr-tbl td{padding:11px 12px;border-top:1px solid color-mix(in srgb,var(--border) 60%,transparent)}
+#weeklyReview .wr-tbl tbody tr:not(.wr-dayrow){transition:background .25s var(--ease)}
+#weeklyReview .wr-tbl tbody tr:not(.wr-dayrow):hover td{background:color-mix(in srgb,var(--accent) 6%,transparent)}
+#weeklyReview .wr-tbl tr.wr-dayrow td{background:color-mix(in srgb,var(--accent) 8%,var(--panel-2));font-size:12px;letter-spacing:.04em;color:var(--accent-2)}
+#weeklyReview .wr-imp i{width:4px;height:13px;border-radius:3px}
+#weeklyReview .panel-head .hint{padding:4px 11px;border-radius:99px;border:1px solid var(--border);background:rgba(255,255,255,.02);font-size:11.5px;color:var(--sub)}
+@media(max-width:900px){#weeklyReview{padding:18px 16px;border-radius:20px}#weeklyReview .a-s,#weeklyReview .wr-block{padding:18px}#weeklyReview .wr-block>.wr-cols>div{padding:0}#weeklyReview .wr-block>.wr-cols>div+div{border-left:0;border-top:1px solid var(--border);padding-top:18px;margin-top:18px}#wrStats>.wr-tiles>.wr-tile:first-child .v{font-size:28px}}
 </style>
 <script id="jl-weekly-review">
 /* Weekend weekly review (Saturday and Sunday trading days), shown on Today's Summary and at the top of the Calendar tab (one panel, moved to whichever of the two is open). Trading day and week use the same 06:00 IST / Monday-Sunday rules as the rest of the app.
@@ -9818,12 +9880,12 @@ window.__renderAnSetups=renderBoth;window.__renderAnEmotions=renderEmo;setTimeou
       +'<div class="a-read">Number is trades opened that hour. <span style="color:var(--green)">Green</span> is net profit, <span style="color:var(--red)">red</span> is net loss. Brighter means a bigger P&amp;L swing.</div></section>';
   }
   function impactHtml(rows){
-    var J=(window.__getJournals?window.__getJournals():[])||[], em={}, mt={}, eo={}, none=0;
+    var J=(window.__getJournals?window.__getJournals():[])||[], em={}, mt={}, eo={}, allPos={}, tagPos={};
     J.forEach(function(e){ if(e&&e.key&&e.emotion) em[e.key]=e.emotion; });
     rows.forEach(function(t){
       var p=Number(t.pnl), k=t.d+' '+t.t+' '+t.side+' '+t.en+' '+t.pnl, e=em[k];
       var tg=(t.tags||[]).filter(function(g){ return typeof g==='string'&&g; });
-      if(!tg.length&&!e) none++;
+      var pk=posKey(t); allPos[pk]=1; if(tg.length||e) tagPos[pk]=1;
       tg.forEach(function(g){ var x=mt[g]||(mt[g]={n:0,net:0}); x.n++; x.net+=p; });
       if(e){ var y=eo[e]||(eo[e]={n:0,net:0}); y.n++; y.net+=p; }
     });
@@ -9833,10 +9895,11 @@ window.__renderAnSetups=renderBoth;window.__renderAnEmotions=renderEmo;setTimeou
       return '<div>'+hd(title)+'<table class="wr-mini"><thead><tr><th>Name</th><th>Trades</th><th>P&amp;L</th></tr></thead><tbody>'
         +ks.map(function(k){ var x=o[k]; return '<tr><td class="ev">'+esc(k)+'</td><td>'+x.n+'</td><td style="color:'+(x.net<0?'var(--red)':x.net>0?'var(--green)':'var(--sub)')+'">'+money(x.net)+'</td></tr>'; }).join('')+'</tbody></table></div>';
     }
+    var tot=Object.keys(allPos).length, none=tot-Object.keys(tagPos).length;
     return '<div class="wr-block a-s"><div class="wr-cols">'
       +list('MISTAKE IMPACT ON P&amp;L',mt,'No mistake tags saved on this week\'s trades.')
       +list('EMOTION IMPACT ON P&amp;L',eo,'No emotion logged on this week\'s journal entries.')
-      +'</div><div class="wr-cap">'+none+' of '+rows.length+' trade'+(rows.length===1?'':'s')+' have no mistake tag or emotion logged, so they are left out above. A trade with two tags counts under both, so totals can add up to more than net P&amp;L.</div></div>';
+      +'</div><div class="wr-cap">'+none+' of '+tot+' trade'+(tot===1?'':'s')+' have no mistake tag or emotion logged, so they are left out above. A trade with two tags counts under both, so totals can add up to more than net P&amp;L.</div></div>';
   }
   function hd(t){ var s=String(t||''), ttl=s.charAt(0)+s.slice(1).toLowerCase().replace(/\bist\b/g,'IST').replace(/p&amp;l/g,'P&amp;L'); var ic=/EQUITY/.test(s)?'<path d="M3 17l5-6 4 3 8-9"/>':/HEATMAP/.test(s)?'<path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h6v6h-6z"/>':'<path d="M4 19V9M11 19V4M18 19v-7"/>'; return '<div class="a-s-head"><div class="a-s-ttl"><span class="a-s-ic"><svg viewBox="0 0 24 24">'+ic+'</svg></span><h3>'+ttl+'</h3></div></div>'; }
   function safeBlock(label,fn){
@@ -10103,7 +10166,7 @@ window.__renderAnSetups=renderBoth;window.__renderAnEmotions=renderEmo;setTimeou
   function dollars(v){ return (v<0?'-$':'$')+Math.abs(v).toFixed(2); }
   function kind(p){ return typeof window.jlKind==='function' ? window.jlKind(Number(p)) : (p>0?'win':p<0?'loss':'be'); }
   function plural(n,w){ return n+' '+w+(n===1?'':'s'); }
-  function fixed(v){ v=Number(v); return isFinite(v)?v.toFixed(2):'—'; }
+  function fixed(v){ v=Number(v); return isFinite(v)?v.toFixed(2):'â'; }
   function parseKey(k){ var p=k.split('-'); return new Date(Date.UTC(+p[0],+p[1]-1,+p[2])); }
   var simP='day', curKey='';
   /*SIM-PURE-START*/
@@ -10163,11 +10226,11 @@ window.__renderAnSetups=renderBoth;window.__renderAnEmotions=renderEmo;setTimeou
     var tile=function(l,v,col){ return '<div class="rr-tile"><div class="l">'+l+'</div><div class="v"'+(col?' style="color:'+col+'"':'')+'>'+esc(v)+'</div></div>'; };
     var verdict=diff>0?'Following the rules would have added '+dollars(diff)+' over this period.':diff<0?'Following the rules would have cost '+dollars(Math.abs(diff))+' on this data. The trades you skip made money, but they broke a rule.':'Following the rules would have made no difference here.';
     var notes=[];
-    if(r.after.n) notes.push(['var(--red)','Taken after a limit was hit',plural(r.after.n,'trade')+' · net '+money(r.after.net)+'. These would not have been taken.']);
+    if(r.after.n) notes.push(['var(--red)','Taken after a limit was hit',plural(r.after.n,'trade')+' Â· net '+money(r.after.net)+'. These would not have been taken.']);
     else notes.push(['var(--green)','No trades after a limit was hit','Every trade came before a limit was reached.']);
     if(r.rule.n){
       var fl=[]; if(r.rule.rev) fl.push('revenge '+r.rule.rev); if(r.rule.nosl) fl.push('no stop loss '+r.rule.nosl); if(r.rule.lot) fl.push('lot over limit '+r.rule.lot);
-      notes.push(['var(--amber)','Rule-break trades',plural(r.rule.n,'trade')+' · net '+money(r.rule.net)+'. Flags: '+fl.join(', ')+'. A trade can carry more than one flag.']);
+      notes.push(['var(--amber)','Rule-break trades',plural(r.rule.n,'trade')+' Â· net '+money(r.rule.net)+'. Flags: '+fl.join(', ')+'. A trade can carry more than one flag.']);
     } else notes.push(['var(--green)','No rule-break trades','No revenge, no stop loss or oversized lot trades.']);
     var off=[]; if(!o.lossLimit) off.push('daily loss limit'); if(!o.tradeLimit) off.push('daily trade limit'); if(!o.maxConsec) off.push('max losses in a row'); if(!o.lotSize) off.push('lot size');
     return head+chips+
@@ -10208,7 +10271,7 @@ window.__renderAnSetups=renderBoth;window.__renderAnEmotions=renderEmo;setTimeou
     pts.forEach(function(p,i){
       var c=p.s.sym===null?'var(--accent-2)':(p.s.pnl>=0?'var(--green)':'var(--red)');
       if(i===pts.length-1) dots+='<circle class="chart-pt-halo" cx="'+p.x+'" cy="'+p.y+'" r="4" stroke="'+c+'"/>';
-      var tip=p.s.sym===null?'Day start':esc(p.s.sym)+' '+esc(p.s.side)+' '+money(p.s.pnl)+' · balance '+dollars(p.s.bal)+' · '+p.s.time;
+      var tip=p.s.sym===null?'Day start':esc(p.s.sym)+' '+esc(p.s.side)+' '+money(p.s.pnl)+' Â· balance '+dollars(p.s.bal)+' Â· '+p.s.time;
       dots+='<circle class="chart-pt" cx="'+p.x+'" cy="'+p.y+'" r="3.5" fill="'+c+'"/><circle class="chart-hit" pointer-events="all" cx="'+p.x+'" cy="'+p.y+'" r="13"><title>'+tip+'</title></circle>';
     });
     var lo=Math.min.apply(null,vals), hi=Math.max.apply(null,vals);
@@ -10218,8 +10281,8 @@ window.__renderAnSetups=renderBoth;window.__renderAnEmotions=renderEmo;setTimeou
   function render(key){
     var dt=parseKey(key); curKey=key;
     var long=dt.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric',timeZone:'UTC'});
-    $('rcTitle').textContent=long; $('rcEyebrow').textContent='IST trading day · '+key;
-    document.title=dt.toLocaleDateString('en-US',{month:'short',day:'numeric',timeZone:'UTC'})+' recap — Journall';
+    $('rcTitle').textContent=long; $('rcEyebrow').textContent='IST trading day Â· '+key;
+    document.title=dt.toLocaleDateString('en-US',{month:'short',day:'numeric',timeZone:'UTC'})+' recap â Journall';
     var rows=(window.__trades||[]).filter(function(t){ return t&&t.d===key&&isFinite(Number(t.pnl)); }).slice().sort(function(a,b){ return String(a.t).localeCompare(String(b.t)); });
     if(!rows.length){ $('rcSub').textContent='Day recap'; $('rcBody').innerHTML='<div class="panel glass"><div class="rc-empty">No trades logged on this day.</div></div>'; return; }
     var lossLimit=Number(window.jlDailyLossLimit)||0, tradeLimit=Number(window.jlMaxTradesPerDay)||0, target=Number(window.jlDayProfitTargetUSD)||Number(window.jlProfitTargetUSD)||0;
@@ -10233,11 +10296,11 @@ window.__renderAnSetups=renderBoth;window.__renderAnEmotions=renderEmo;setTimeou
     var grossWin=rows.reduce(function(s,t){ return Number(t.pnl)>0?s+Number(t.pnl):s; },0);
     var avgWin=wins.length?wins.reduce(function(s,t){ return s+Number(t.pnl); },0)/wins.length:0;
     var avgLoss=losses.length?Math.abs(losses.reduce(function(s,t){ return s+Number(t.pnl); },0))/losses.length:0;
-    var pf=grossLossAmt?(grossWin/grossLossAmt).toFixed(2):'—';
+    var pf=grossLossAmt?(grossWin/grossLossAmt).toFixed(2):'â';
     var exp=net/rows.length;
     var pct=hasTg?Math.min(100,Math.max(0,Math.round(net/target*100))):0;
     var lr=hasL?lossUsed/lossLimit:0;
-    $('rcSub').textContent='Day recap · '+plural(tradeCount,'trade')+' · net '+money(net);
+    $('rcSub').textContent='Day recap Â· '+plural(tradeCount,'trade')+' Â· net '+money(net);
 
     var broken=[];
     if(hasL&&lossUsed>=lossLimit) broken.push('loss limit reached');
@@ -10251,7 +10314,7 @@ window.__renderAnSetups=renderBoth;window.__renderAnEmotions=renderEmo;setTimeou
     if(emotions.length){ var c={}; emotions.forEach(function(e){ c[e]=(c[e]||0)+1; }); mood=Object.keys(c).sort(function(a,b){ return c[b]-c[a]; })[0]; }
     var run=0,last=null;
     for(var i=rows.length-1;i>=0;i--){ var k=kind(rows[i].pnl); if(last===null) last=k; if(k!==last) break; run++; }
-    var streak=last==='be'||last===null?'—':run+' '+(last==='win'?(run!==1?'wins':'win'):(run!==1?'losses':'loss'));
+    var streak=last==='be'||last===null?'â':run+' '+(last==='win'?(run!==1?'wins':'win'):(run!==1?'losses':'loss'));
 
     var notes=[];
     var revenge=rows.filter(function(t){ return t.rev; }), noSl=rows.filter(function(t){ return t.sl==null; });
@@ -10271,7 +10334,7 @@ window.__renderAnSetups=renderBoth;window.__renderAnEmotions=renderEmo;setTimeou
       return '<tr'+(idx>=0?' data-i="'+idx+'" title="Open this trade in the Journal"':'')+'><td>'+(window.iconFor?window.iconFor(t.sym):'')+'</td><td class="mono">'+esc(String(t.t).slice(0,5))+'</td><td style="font-weight:600">'+esc(t.sym)+'</td>'+
         '<td><span class="side-tag '+(t.side==='BUY'?'long':'short')+'">'+(t.side==='BUY'?'Long':'Short')+'</span></td><td style="color:var(--faint)">'+esc(t.ses)+'</td>'+
         '<td class="mono">'+fixed(t.en)+'</td><td class="mono">'+fixed(t.ex)+'</td><td style="color:var(--faint)">Not tracked</td>'+
-        '<td class="mono" style="color:'+(p>=0?'var(--green)':'var(--red)')+';font-weight:650">'+(p>=0?'+':'')+'$'+p.toFixed(2)+'</td><td style="color:var(--sub)">'+esc(WHY[t.why]||'—')+'</td>'+(hasQl?'<td>'+(qid?'<span class="rc-ql"><button type="button" class="btn-ghost" data-qled="'+esc(qid)+'">Edit trade</button><button type="button" class="btn-ghost rc-ql-del" data-qldel="'+esc(qid)+'">Delete trade</button></span>':'')+'</td>':'')+'</tr>';
+        '<td class="mono" style="color:'+(p>=0?'var(--green)':'var(--red)')+';font-weight:650">'+(p>=0?'+':'')+'$'+p.toFixed(2)+'</td><td style="color:var(--sub)">'+esc(WHY[t.why]||'â')+'</td>'+(hasQl?'<td>'+(qid?'<span class="rc-ql"><button type="button" class="btn-ghost" data-qled="'+esc(qid)+'">Edit trade</button><button type="button" class="btn-ghost rc-ql-del" data-qldel="'+esc(qid)+'">Delete trade</button></span>':'')+'</td>':'')+'</tr>';
     }).join('');
 
     $('rcBody').innerHTML=
@@ -10282,16 +10345,16 @@ window.__renderAnSetups=renderBoth;window.__renderAnEmotions=renderEmo;setTimeou
       '</div>'+
       '<div class="row4">'+
         card('RULES',broken.length?'Rule broken':(hasL||hasT?'Rules kept':'No limits set'),broken.length?broken.join(' and '):(hasL||hasT?'Stayed inside the daily limits':'Set limits in Account Settings'),broken.length?'var(--red)':'')+
-        card('BEST TRADE',esc(best.sym)+' '+money(Number(best.pnl)),String(best.t).slice(0,5)+' · '+(best.side==='BUY'?'Long':'Short'),Number(best.pnl)>0?'var(--green)':'')+
-        card('WORST TRADE',esc(worst.sym)+' '+money(Number(worst.pnl)),String(worst.t).slice(0,5)+' · '+(worst.side==='BUY'?'Long':'Short'),Number(worst.pnl)<0?'var(--red)':'')+
+        card('BEST TRADE',esc(best.sym)+' '+money(Number(best.pnl)),String(best.t).slice(0,5)+' Â· '+(best.side==='BUY'?'Long':'Short'),Number(best.pnl)>0?'var(--green)':'')+
+        card('WORST TRADE',esc(worst.sym)+' '+money(Number(worst.pnl)),String(worst.t).slice(0,5)+' Â· '+(worst.side==='BUY'?'Long':'Short'),Number(worst.pnl)<0?'var(--red)':'')+
         card('FEELING',mood,jn+' of '+plural(rows.length,'trade')+' journaled')+
       '</div>'+
       '<div class="split"><div class="panel glass"><div class="panel-head"><h2>Day notes</h2><span class="hint">'+plural(notes.length,'insight')+'</span></div>'+
         notes.map(function(n){ return '<div class="note-item"><div class="note-dot" style="background:'+n[0]+'"></div><div><div class="t">'+n[1]+'</div><div class="s">'+esc(n[2])+'</div></div></div>'; }).join('')+'</div>'+
       '<div class="panel glass"><div class="panel-head"><h2>Day equity curve</h2><span class="hint">Hover a point for detail</span></div>'+curveHtml(rows)+'</div></div>'+
-      '<div class="panel glass" style="margin-bottom:14px"><div class="panel-head"><h2>Risk / reward — this day</h2><span class="hint">Session view</span></div><div class="rr-grid">'+
+      '<div class="panel glass" style="margin-bottom:14px"><div class="panel-head"><h2>Risk / reward â this day</h2><span class="hint">Session view</span></div><div class="rr-grid">'+
         '<div class="rr-tile"><div class="l">AVG WIN / AVG LOSS</div><div class="v">$'+avgWin.toFixed(2)+' / $'+avgLoss.toFixed(2)+'</div></div>'+
-        '<div class="rr-tile"><div class="l">OF DAILY TARGET</div><div class="v">'+(hasTg?pct+'%':'—')+'</div></div>'+
+        '<div class="rr-tile"><div class="l">OF DAILY TARGET</div><div class="v">'+(hasTg?pct+'%':'â')+'</div></div>'+
         '<div class="rr-tile"><div class="l">PROFIT FACTOR</div><div class="v">'+pf+'</div></div>'+
         '<div class="rr-tile"><div class="l">EXPECTANCY / TRADE</div><div class="v">'+(exp>=0?'+$':'-$')+Math.abs(exp).toFixed(2)+'</div></div>'+
         '<div class="rr-tile"><div class="l">MOOD</div><div class="v">'+esc(mood)+'</div></div>'+
