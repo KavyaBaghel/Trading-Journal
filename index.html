@@ -3570,21 +3570,6 @@ window.__mountOpenPos=function(){const o=(window.__openTrades||[]).concat((windo
       </div>
       <div class="gg-goals-grid" id="ggGoalsGrid"></div>
     </div>
-
-    <div class="gg-calc">
-      <div class="gg-calc-head"><h2>Risk calculator</h2><div class="v mono" id="ggRiskOut">$25.00</div></div>
-      <div class="gg-slider-row">
-        <span class="l">SL pips</span>
-        <input type="range" min="1" max="30" value="5" id="ggSlSlider" oninput="ggSlide('sl',this.value)">
-        <span class="gg-slide-val" id="ggSlVal">5</span>
-      </div>
-      <div class="gg-slider-row">
-        <span class="l">Pip value</span>
-        <input type="range" min="1" max="50" value="5" id="ggPvSlider" oninput="ggSlide('pv',this.value)">
-        <span class="gg-slide-val" id="ggPvVal">0.05</span>
-      </div>
-      <div class="gg-calc-note">Position size: <b id="ggPosSize">100.000</b> · account size × 0.5% / (SL pips × pip value)</div>
-    </div>
   </div>
 </div>
 <div class="gg-toast" id="ggToast">Setup saved</div>
@@ -4425,32 +4410,6 @@ window.jlApplyChLimits=function(o){
     void el.offsetWidth; // restart animation
     el.classList.add('bump');
   }
-  function ggCalcRisk(){
-    const risk = ggState.bal * 0.005;
-    const riskEl = document.getElementById('ggRiskOut');
-    const newRiskTxt = '$' + risk.toFixed(2);
-    if(riskEl.textContent !== newRiskTxt){ riskEl.textContent = newRiskTxt; ggBump(riskEl); }
-    const size = risk / (ggState.sl * ggState.pv);
-    const posEl = document.getElementById('ggPosSize');
-    const newPosTxt = size.toFixed(3);
-    if(posEl.textContent !== newPosTxt){ posEl.textContent = newPosTxt; ggBump(posEl); }
-  }
-  function ggSetFill(el){
-    const min = +el.min || 0, max = +el.max || 100, val = +el.value;
-    const pct = ((val - min) / (max - min)) * 100;
-    el.style.setProperty('--fill', pct + '%');
-  }
-  window.ggSlide = function(id, val){
-    val = +val;
-    const el = document.getElementById(id==='sl' ? 'ggSlSlider' : 'ggPvSlider');
-    if(id==='sl'){ ggState.sl = val; document.getElementById('ggSlVal').textContent = val; }
-    else { ggState.pv = +(val/100).toFixed(2); document.getElementById('ggPvVal').textContent = ggState.pv.toFixed(2); }
-    ggSetFill(el);
-    ggCalcRisk();
-  };
-  ggSetFill(document.getElementById('ggSlSlider'));
-  ggSetFill(document.getElementById('ggPvSlider'));
-  ggCalcRisk();
 
   function ggCountUp(el, end, prefix, dur){
     const t0 = performance.now();
@@ -12281,7 +12240,6 @@ setTimeout(render,1500);setInterval(render,30000);render();
   var fab=document.createElement('button');
   fab.id='qlFab';fab.type='button';fab.title='Quick log a trade';fab.setAttribute('aria-label','Quick log a trade');
   fab.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>';
-  document.body.appendChild(fab);
 
   var scrim=null,dir='',res='',emo='',shot=null,warned=false,busy=false,opener=null,editCtx=null;
   function build(){
