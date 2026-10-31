@@ -10237,6 +10237,18 @@ window.__renderAnSetups=renderBoth;window.__renderAnEmotions=renderEmo;setTimeou
 #weeklyReview .wr-tape .tk:hover i{filter:brightness(1.15)}
 #weeklyReview .wr-track i.wr-up{background:#3fb97f;box-shadow:none}
 #weeklyReview .wr-track i.wr-dn{background:#e0675f;box-shadow:none}
+/* trade chart: full width, colorful gradients, no glow */
+#weeklyReview .wr-tape{height:120px;gap:5px;justify-content:space-between}
+#weeklyReview .wr-tape .tk{flex:1 1 0;min-width:3px;max-width:16px}
+#weeklyReview .wr-tape .tk i{border-radius:6px}
+#weeklyReview .wr-tape .tk.w i{background:linear-gradient(0deg,#0ea5a4 0%,#22c98a 55%,#86efac 100%);box-shadow:none;opacity:1}
+#weeklyReview .wr-tape .tk.l i{background:linear-gradient(180deg,#e11d6a 0%,#f2547d 50%,#fb923c 100%);box-shadow:none;opacity:1}
+#weeklyReview .wr-tape .tk.b i{background:#8b8fa8;opacity:.7}
+#weeklyReview .wr-tape .tk:hover i{filter:brightness(1.2) saturate(1.15)}
+#weeklyReview .wr-tape-cap{margin-top:14px}
+#weeklyReview .wr-track i.wr-up{background:linear-gradient(90deg,#0ea5a4,#4ade80);box-shadow:none}
+#weeklyReview .wr-track i.wr-dn{background:linear-gradient(90deg,#e11d6a,#fb923c);box-shadow:none}
+@media(max-width:900px){#weeklyReview .wr-tape{height:96px}}
 </style>
 <script id="jl-weekly-review">
 /* Weekend weekly review (Saturday and Sunday trading days), shown on Today's Summary and at the top of the Calendar tab (one panel, moved to whichever of the two is open). Trading day and week use the same 06:00 IST / Monday-Sunday rules as the rest of the app.
