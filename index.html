@@ -10230,6 +10230,13 @@ window.__renderAnSetups=renderBoth;window.__renderAnEmotions=renderEmo;setTimeou
 }
 #weeklyReview .a-s-ic svg,#weeklyReview .panel-head h2::before{filter:saturate(1.4)}
 #weeklyReview .wr-kv{text-shadow:0 0 24px rgba(185,164,255,.18)}
+/* charts: normal, flat colors (no glow) */
+#weeklyReview .wr-tape .tk.w i{background:#3fb97f;box-shadow:none;opacity:.95}
+#weeklyReview .wr-tape .tk.l i{background:#e0675f;box-shadow:none;opacity:.9}
+#weeklyReview .wr-tape .tk.b i{background:rgba(255,255,255,.25)}
+#weeklyReview .wr-tape .tk:hover i{filter:brightness(1.15)}
+#weeklyReview .wr-track i.wr-up{background:#3fb97f;box-shadow:none}
+#weeklyReview .wr-track i.wr-dn{background:#e0675f;box-shadow:none}
 </style>
 <script id="jl-weekly-review">
 /* Weekend weekly review (Saturday and Sunday trading days), shown on Today's Summary and at the top of the Calendar tab (one panel, moved to whichever of the two is open). Trading day and week use the same 06:00 IST / Monday-Sunday rules as the rest of the app.
