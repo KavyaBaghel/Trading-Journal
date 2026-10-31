@@ -2776,6 +2776,21 @@ window.jlLiveBalance=function(Z){
   if(typeof module!=='undefined')module.exports=root.JLAdapter;
 })(typeof window!=='undefined'?window:globalThis);
 </script>
+<script id="jl-setups">
+/* Custom setups: the journal's Setup dropdown is fed ONLY from this list (Account Settings > Setups).
+   One-time cleanup: the six old built-in names are cleared from saved journals (backup kept in journall_setups_backup_v1). */
+(function(){var K='journall_setups_v1',LK='krishna_journal_page_entries',MK='journall_setups_migrated_v1',BK='journall_setups_backup_v1',OLD=['breakout','pullback','reversal','range','trend continuation','other'];
+  var S=window.jlSetups={get:function(){try{var a=JSON.parse(localStorage.getItem(K));return Array.isArray(a)?a.filter(function(s){return typeof s==='string'&&s.trim()}):[]}catch(e){return[]}},
+    set:function(a){try{localStorage.setItem(K,JSON.stringify(a))}catch(e){}},
+    add:function(v){v=String(v||'').trim().replace(/\s+/g,' ').slice(0,40);if(!v)return false;var a=S.get();if(a.length>=30||a.some(function(x){return x.toLowerCase()===v.toLowerCase()}))return false;a.push(v);S.set(a);return true},
+    remove:function(i){var a=S.get();a.splice(i,1);S.set(a)}};
+  window.jlSetupOptions=function(){return S.get()};
+  try{if(localStorage.getItem(MK))return;var mine=S.get().map(function(x){return x.toLowerCase()}),arr=JSON.parse(localStorage.getItem(LK)||'null'),bk={},n=0;
+    if(Array.isArray(arr)){arr.forEach(function(e){var f=e&&e.fields;if(!f||typeof f.setup!=='string')return;var s=f.setup.trim().toLowerCase();if(OLD.indexOf(s)>-1&&mine.indexOf(s)<0){bk[e.id]=f.setup;f.setup='';e.updatedAt=new Date().toISOString();n++}});
+      if(n){localStorage.setItem(BK,JSON.stringify(bk));localStorage.setItem(LK,JSON.stringify(arr))}}
+    localStorage.setItem(MK,'1')}catch(err){}
+})();
+</script>
 <script id="jl-bootstrap">
 /* Step 3.2: derive the design's data caches from the LIVE synced keys, before any design script runs.
    jlImport is a derived, unsynced cache (key is not in the sync prefixes): rebuilt on every load, never the source of truth. */
@@ -3585,6 +3600,7 @@ window.__mountOpenPos=function(){const o=(window.__openTrades||[]).concat((windo
         <button class="gg-tab on" data-t="acc">Account</button>
         <button class="gg-tab" data-t="tgt">Targets</button>
         <button class="gg-tab" data-t="risk">Risk limits</button>
+        <button class="gg-tab" data-t="setups">Setups</button>
       </div>
       <div class="gg-tab-panel" data-p="acc">
         <div class="gg-preset"><button type="button" class="gg-btn-outline" id="ggFpFlexBtn" onclick="ggApplyFpFlex(1)">Apply FundingPips 2 Step Flex (Phase 1)</button><button type="button" class="gg-btn-outline" id="ggFpFlexBtn2" onclick="ggApplyFpFlex(2)">Apply FundingPips 2 Step Flex (Phase 2)</button>
@@ -3613,6 +3629,18 @@ window.__mountOpenPos=function(){const o=(window.__openTrades||[]).concat((windo
             <div class="gg-combo"><div class="gg-stepper" style="flex:1"><button onclick="ggStep('wpt',-1)">-</button><input id="ggWpt" value="0" readonly><button onclick="ggStep('wpt',1)">+</button></div><select id="ggWptUnit"><option>%</option><option>$</option></select></div></div>
         </div>
       </div>
+      <div class="gg-tab-panel" data-p="setups" hidden>
+        <style>.stp-add{display:flex;gap:10px;max-width:520px}.stp-add input{flex:1;min-width:0}.stp-list{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}.stp-chip{display:inline-flex;align-items:center;gap:8px;padding:7px 8px 7px 14px;border-radius:999px;font-size:13px;font-weight:600;color:#e6e2ff;background:rgba(124,108,240,.14);border:1px solid rgba(124,108,240,.35)}.stp-chip button{width:20px;height:20px;border-radius:50%;border:0;background:rgba(255,255,255,.08);color:var(--sub);cursor:pointer;line-height:1;font-size:14px}.stp-chip button:hover{background:rgba(240,104,92,.25);color:#fff}.stp-empty{font-size:12.5px;color:var(--faint)}</style>
+        <div class="gg-field" style="max-width:560px"><span class="l">Your setups</span>
+          <div class="stp-add"><input class="gg-select" id="stpIn" type="text" maxlength="40" placeholder="e.g. Liquidity sweep + MSS" autocomplete="off" aria-label="New setup name"><button type="button" class="btn-ghost" id="stpAdd">Add</button></div>
+          <small class="gg-field-note">These are the only options in the journal's Setup dropdown. Saved instantly, no need to press Save setup. Removing one never changes journals you already saved.</small></div>
+        <div class="stp-list" id="stpList"></div>
+      </div>
+      <script>(function(){var $=function(i){return document.getElementById(i)},esc=function(s){return String(s).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})};
+        function paint(){var a=window.jlSetups.get();$('stpList').innerHTML=a.length?a.map(function(s,i){return '<span class="stp-chip">'+esc(s)+'<button type="button" data-i="'+i+'" aria-label="Remove '+esc(s)+'">&times;</button></span>'}).join(''):'<div class="stp-empty">No setups yet. Add your first one above.</div>'}
+        function add(){if(window.jlSetups.add($('stpIn').value))$('stpIn').value='';paint();$('stpIn').focus()}
+        $('stpAdd').addEventListener('click',add);$('stpIn').addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();add()}});
+        $('stpList').addEventListener('click',function(e){var b=e.target.closest('button[data-i]');if(!b)return;window.jlSetups.remove(+b.dataset.i);paint()});paint()})();</script>
       <div class="gg-tab-panel" data-p="risk" hidden>
         <div class="gg-mgrid">
           <div class="gg-field"><span class="l">Risk per trade (%)</span>
@@ -6260,7 +6288,7 @@ const msg=t=>{$('jMsg').textContent=t};
 const SETUPS=['Breakout','Pullback','Reversal','Range','Trend Continuation','Other'];let setupOpen=false;
 (function(){const h=$('jSetup');let v='';
   Object.defineProperty(h,'value',{get(){return v},set(x){v=(x==null?'':String(x)).trim();$('jSetupLbl').textContent=v||'Select setup';$('jSetupLbl').style.color=v?'':'var(--faint)';if(window.jlSetupRulesPaint)window.jlSetupRulesPaint(v);if(setupOpen)setupList()}});})();
-function setupList(){const cv=$('jSetup').value,base=window.jlSetupOptions?window.jlSetupOptions(SETUPS):SETUPS,opts=cv&&!base.includes(cv)?base.concat([cv]):base;$('jSetupList').innerHTML=opts.map(o=>'<div class="j-cb-opt" role="option" tabindex="-1" data-v="'+esc(o)+'" aria-selected="'+(o===$('jSetup').value)+'"><span class="j-cb-main"><span class="j-cb-t1">'+esc(o)+'</span></span><svg class="j-cb-ck" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></div>').join('')}
+function setupList(){const cv=$('jSetup').value,base=window.jlSetupOptions?window.jlSetupOptions(SETUPS):SETUPS,opts=cv&&!base.includes(cv)?base.concat([cv]):base;$('jSetupList').innerHTML=!opts.length?'<div class="j-cb-empty">No setups yet. Add them in Account Settings &#9656; Setups.</div>':opts.map(o=>'<div class="j-cb-opt" role="option" tabindex="-1" data-v="'+esc(o)+'" aria-selected="'+(o===$('jSetup').value)+'"><span class="j-cb-main"><span class="j-cb-t1">'+esc(o)+'</span></span><svg class="j-cb-ck" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></div>').join('')}
 function setupSet(open,focusBtn){setupOpen=open;$('jSetupCb').dataset.open=open?'1':'0';$('jSetupPop').hidden=!open;$('jSetupBtn').setAttribute('aria-expanded',open);if(open){setupList();const o=$('jSetupList').querySelector('[aria-selected="true"]');if(o)o.focus()}else if(focusBtn)$('jSetupBtn').focus()}
 $('jSetupBtn').addEventListener('click',e=>{e.stopPropagation();setupSet(!setupOpen)});
 $('jSetupBtn').addEventListener('keydown',e=>{if(e.key==='ArrowDown'||e.key==='ArrowUp'){e.preventDefault();setupSet(true)}});
