@@ -9766,8 +9766,8 @@ window.__renderAnSetups=renderBoth;window.__renderAnEmotions=renderEmo;setTimeou
 #weeklyReview .wr-ringw{position:relative;width:84px;height:84px;flex:none;display:grid;place-items:center}
 #weeklyReview .wr-ring{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
 #weeklyReview .wr-ring circle{fill:none;stroke-width:7}
-#weeklyReview .wr-ring .tr{stroke:rgba(255,255,255,.07)}
-#weeklyReview .wr-ring .vl{stroke-linecap:round;transform:rotate(-90deg);transform-origin:40px 40px;filter:drop-shadow(0 0 6px rgba(var(--tone),.35));transition:stroke-dasharray .9s var(--ease-out)}
+#weeklyReview .wr-ring .rg-t{stroke:rgba(255,255,255,.07)}
+#weeklyReview .wr-ring .rg-v{stroke-linecap:round;transform:rotate(-90deg);transform-origin:40px 40px;filter:drop-shadow(0 0 6px rgba(var(--tone),.35));transition:stroke-dasharray .9s var(--ease-out)}
 #weeklyReview .wr-ringw b{position:relative;font-size:17px;font-weight:750;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
 #weeklyReview .wr-split{display:flex;gap:3px;height:8px}
 #weeklyReview .wr-split i{display:block;border-radius:99px;min-width:6px}
@@ -9796,8 +9796,8 @@ window.__renderAnSetups=renderBoth;window.__renderAnEmotions=renderEmo;setTimeou
 
 /* daily bars */
 #weeklyReview .wr-track{height:12px;background:rgba(255,255,255,.045)}
-#weeklyReview .wr-track i.up{background:linear-gradient(90deg,rgba(67,215,135,.45),var(--green));box-shadow:0 0 16px -4px rgba(67,215,135,.55)}
-#weeklyReview .wr-track i.dn{background:linear-gradient(90deg,rgba(240,104,92,.45),var(--red));box-shadow:0 0 16px -4px rgba(240,104,92,.55)}
+#weeklyReview .wr-track i.wr-up{background:linear-gradient(90deg,rgba(67,215,135,.45),var(--green));box-shadow:0 0 16px -4px rgba(67,215,135,.55)}
+#weeklyReview .wr-track i.wr-dn{background:linear-gradient(90deg,rgba(240,104,92,.45),var(--red));box-shadow:0 0 16px -4px rgba(240,104,92,.55)}
 #weeklyReview .wr-day b{font-weight:650;color:var(--sub);font-size:12.5px;letter-spacing:.02em}
 
 /* review points */
@@ -9835,6 +9835,54 @@ window.__renderAnSetups=renderBoth;window.__renderAnEmotions=renderEmo;setTimeou
   #weeklyReview .a-s,#weeklyReview .wr-block{padding:18px}
 }
 @media(max-width:480px){#weeklyReview .wr-tape{height:64px;gap:2px}#weeklyReview .wr-kv{font-size:19px}}
+
+/* ---- full-panel pass: section labels, stat headers, delta pills, inline bars, event cards ---- */
+#weeklyReview .wr-an{gap:14px}
+#weeklyReview .wr-sec{display:flex;align-items:center;gap:14px;margin:14px 2px 0;font:600 10.5px "IBM Plex Mono",monospace;letter-spacing:.16em;text-transform:uppercase;color:var(--faint)}
+#weeklyReview .wr-sec:first-child{margin-top:6px}
+#weeklyReview .wr-sec::after{content:"";flex:1;height:1px;background:linear-gradient(90deg,var(--border-hi),transparent)}
+#weeklyReview .wr-big{margin:16px 0 0;font-size:30px;line-height:1;font-weight:770;letter-spacing:-.035em;font-variant-numeric:tabular-nums;display:flex;align-items:baseline;gap:10px}
+#weeklyReview .wr-big small{font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--faint)}
+#weeklyReview .wr-big+.a-plot{margin-top:14px}
+
+/* averages and streaks: separate stat cards instead of one joined grid */
+#weeklyReview .wr-an>.wr-tiles{gap:12px;background:none;border:0;border-radius:0;overflow:visible}
+#weeklyReview .wr-an>.wr-tiles>.wr-tile{border:1px solid var(--border);border-radius:18px;padding:18px 20px 17px;background:linear-gradient(160deg,rgba(255,255,255,.04),rgba(255,255,255,0) 44%),var(--panel);box-shadow:0 1px 0 rgba(255,255,255,.04) inset,0 18px 36px -30px rgba(0,0,0,.9);transition:border-color .3s var(--ease)}
+#weeklyReview .wr-an>.wr-tiles>.wr-tile:hover{background:linear-gradient(160deg,rgba(255,255,255,.05),rgba(255,255,255,0) 44%),var(--panel);border:1px solid var(--border-hi)}
+#weeklyReview .wr-an>.wr-tiles>.wr-tile .l{font-size:10.5px;letter-spacing:.09em;text-transform:uppercase}
+#weeklyReview .wr-an>.wr-tiles>.wr-tile .v{margin-top:4px;font-size:24px;letter-spacing:-.03em}
+
+/* delta pills and inline bars */
+#weeklyReview .wr-dl{--c:var(--faint);display:inline-block;min-width:44px;text-align:center;padding:3px 10px;border-radius:var(--r-pill);font-size:11.5px;font-weight:650;color:var(--c);background:color-mix(in srgb,var(--c) 12%,transparent);border:1px solid color-mix(in srgb,var(--c) 28%,transparent)}
+#weeklyReview .wr-mb{display:block;height:3px;margin-top:6px;border-radius:99px;background:rgba(255,255,255,.06);overflow:hidden}
+#weeklyReview .wr-mb i{display:block;height:100%;border-radius:99px;opacity:.85}
+#weeklyReview .wr-mini td{padding-top:11px;padding-bottom:11px}
+#weeklyReview .wr-mini td:first-child{font-weight:600}
+#weeklyReview .wr-cap{font-size:11.5px;color:var(--faint)}
+
+/* next week: event cards grouped by day (no sideways scroll) */
+#weeklyReview .wr-evgrid{display:grid;gap:12px}
+#weeklyReview .wr-evday{border:1px solid var(--border);border-radius:18px;overflow:hidden;background:linear-gradient(160deg,rgba(255,255,255,.035),rgba(255,255,255,0) 44%),var(--panel)}
+#weeklyReview .wr-evh{display:flex;align-items:baseline;justify-content:space-between;gap:10px;padding:13px 20px;background:linear-gradient(90deg,rgba(124,108,240,.13),rgba(124,108,240,.02) 70%);border-bottom:1px solid var(--border)}
+#weeklyReview .wr-evh b{font-size:13.5px;font-weight:680;letter-spacing:-.01em}
+#weeklyReview .wr-evh span{font:500 11px "IBM Plex Mono",monospace;color:var(--accent-2);letter-spacing:.04em}
+#weeklyReview .wr-ev{display:grid;grid-template-columns:52px 44px 34px minmax(0,1fr) 84px 84px;align-items:center;gap:12px;padding:12px 20px;font-size:13px;color:var(--sub);transition:background .25s var(--ease)}
+#weeklyReview .wr-ev+.wr-ev{border-top:1px solid rgba(255,255,255,.055)}
+#weeklyReview .wr-ev:hover{background:rgba(255,255,255,.03)}
+#weeklyReview .wr-ev .tm{font:600 12px "IBM Plex Mono",monospace;color:var(--text);font-variant-numeric:tabular-nums}
+#weeklyReview .wr-ev .cc{justify-self:start;font:650 10.5px "IBM Plex Mono",monospace;letter-spacing:.06em;padding:3px 7px;border-radius:7px;color:var(--silver);background:rgba(255,255,255,.05);border:1px solid var(--border)}
+#weeklyReview .wr-ev .nm{color:var(--text);font-weight:550;min-width:0}
+#weeklyReview .wr-ev .fp{display:flex;flex-direction:column;font-size:12.5px;color:var(--text);font-variant-numeric:tabular-nums}
+#weeklyReview .wr-ev .fp em{font-style:normal;font-size:9.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--faint);margin-bottom:1px}
+@media(max-width:700px){
+  #weeklyReview .wr-ev{grid-template-columns:48px 40px 30px minmax(0,1fr);row-gap:8px;padding:12px 16px}
+  #weeklyReview .wr-ev .nm{grid-column:4}
+  #weeklyReview .wr-ev .fp{grid-column:span 2;flex-direction:row;gap:6px;align-items:baseline}
+  #weeklyReview .wr-ev .fp:nth-of-type(1){grid-column:1/3}
+  #weeklyReview .wr-ev .fp em{margin:0}
+  #weeklyReview .wr-an>.wr-tiles{grid-template-columns:repeat(2,minmax(0,1fr))}
+  #weeklyReview .wr-evh{padding:12px 16px}
+}
 </style>
 <script id="jl-weekly-review">
 /* Weekend weekly review (Saturday and Sunday trading days), shown on Today's Summary and at the top of the Calendar tab (one panel, moved to whichever of the two is open). Trading day and week use the same 06:00 IST / Monday-Sunday rules as the rest of the app.
@@ -9932,9 +9980,11 @@ window.__renderAnSetups=renderBoth;window.__renderAnEmotions=renderEmo;setTimeou
     rows.forEach(function(t){ c+=Number(t.pnl); cum.push(c); pk=Math.max(pk,c); dd.push(c-pk); mdd=Math.max(mdd,pk-c); });
     var end=cum.length?cum[cum.length-1]:0;
     var eq='<section class="a-s">'+cardHead(IC_EQ,'Equity curve','Cumulative P&amp;L, trade by trade')
+      +'<div class="wr-big" style="color:'+(end<0?'var(--red)':end>0?'var(--green)':'var(--text)')+'">'+money(end)+'<small>week result</small></div>'
       +'<div class="a-plot">'+areaChart('eq',cum,end<0?CR:CG,'Equity','Equity curve for the week')+'</div>'
       +'<div class="a-read">Week ends at <b style="color:'+(end<0?'var(--red)':end>0?'var(--green)':'var(--text)')+'">'+money(end)+'</b>. Peak <b>'+money(pk)+'</b>.</div></section>';
     var dn='<section class="a-s">'+cardHead(IC_DD,'Drawdown','Distance below the weekly equity peak')
+      +'<div class="wr-big" style="color:'+(mdd>0?'var(--red)':'var(--green)')+'">'+(mdd>0?'-$'+mdd.toFixed(2):'$0.00')+'<small>deepest point</small></div>'
       +'<div class="a-plot">'+areaChart('dd',dd,CR,'Below peak','Drawdown for the week')+'</div>'
       +'<div class="a-read">'+(mdd>0?'Deepest point: <b style="color:var(--red)">-$'+mdd.toFixed(2)+'</b> below the running peak.':'No drawdown this week. The account never fell below its running peak.')+'</div></section>';
     return '<div class="wr-cols">'+eq+dn+'</div>';
@@ -9954,7 +10004,7 @@ window.__renderAnSetups=renderBoth;window.__renderAnEmotions=renderEmo;setTimeou
     var has=p.rows>0;
     function sg(v,fmt){ return v==null?'-':fmt(v); }
     function dlt(x,y,fmt,goodUp){ if(!has||x==null||y==null) return ['-','']; var d=x-y; if(Math.abs(d)<1e-9) return ['0','']; return [(d>0?'+':'')+fmt(d), goodUp==null?'':((d>0)===goodUp?'var(--green)':'var(--red)')]; }
-    function row(label,va,vb,d){ return '<tr><td class="ev">'+label+'</td><td>'+va+'</td><td>'+(has?vb:'-')+'</td><td'+(d[1]?' style="color:'+d[1]+'"':'')+'>'+d[0]+'</td></tr>'; }
+    function row(label,va,vb,d){ return '<tr><td class="ev">'+label+'</td><td>'+va+'</td><td>'+(has?vb:'-')+'</td><td><span class="wr-dl"'+(d[1]?' style="--c:'+d[1]+'"':'')+'>'+d[0]+'</span></td></tr>'; }
     var f2=function(v){ return v.toFixed(2); }, f0=function(v){ return String(Math.round(v)); };
     var html='<div class="wr-block a-s">'+hd('THIS WEEK VS LAST WEEK')+'<div class="wr-scroll"><table class="wr-mini"><thead><tr><th>Metric</th><th>This week</th><th>Last week</th><th>Change</th></tr></thead><tbody>'
       +row('Net P&amp;L',money(a.net),money(p.net),dlt(a.net,p.net,function(v){ return (v<0?'-$':'$')+Math.abs(v).toFixed(2); },true))
@@ -9975,9 +10025,10 @@ window.__renderAnSetups=renderBoth;window.__renderAnEmotions=renderEmo;setTimeou
     var head=''+hd(title)+'';
     if(!order.length) return '<div>'+head+'<div class="wr-empty">Nothing recorded.</div></div>';
     order.sort(function(a,c){ return g[c].net-g[a].net; });
+    var mx=0; order.forEach(function(k){ mx=Math.max(mx,Math.abs(g[k].net)); });
     var body=order.map(function(k){
       var x=g[k], d=x.W+x.L, col=x.net<0?'var(--red)':x.net>0?'var(--green)':'var(--sub)';
-      return '<tr><td class="ev">'+esc(k)+'</td><td style="color:'+col+'">'+money(x.net)+'</td><td>'+(d?Math.round(x.W/d*100)+'%':'-')+'</td><td>'+Object.keys(x.seen).length+'</td></tr>';
+      return '<tr><td class="ev">'+esc(k)+'</td><td style="color:'+col+'">'+money(x.net)+'<span class="wr-mb"><i style="width:'+(mx?Math.max(4,Math.round(Math.abs(x.net)/mx*100)):0)+'%;background:'+col+'"></i></span></td><td>'+(d?Math.round(x.W/d*100)+'%':'-')+'</td><td>'+Object.keys(x.seen).length+'</td></tr>';
     }).join('');
     return '<div>'+head+'<table class="wr-mini"><thead><tr><th>Name</th><th>P&amp;L</th><th>Win rate</th><th>Trades</th></tr></thead><tbody>'+body+'</tbody></table></div>';
   }
@@ -10020,10 +10071,11 @@ window.__renderAnSetups=renderBoth;window.__renderAnEmotions=renderEmo;setTimeou
       if(e){ var y=eo[e]||(eo[e]={n:0,net:0}); y.n++; y.net+=p; }
     });
     function list(title,o,empty){
-      var ks=Object.keys(o).sort(function(a,c){ return o[a].net-o[c].net; });
+      var ks=Object.keys(o).sort(function(a,c){ return o[a].net-o[c].net; }), mx=0;
+      ks.forEach(function(k){ mx=Math.max(mx,Math.abs(o[k].net)); });
       if(!ks.length) return '<div>'+hd(title)+'<div class="wr-empty">'+empty+'</div></div>';
       return '<div>'+hd(title)+'<table class="wr-mini"><thead><tr><th>Name</th><th>Trades</th><th>P&amp;L</th></tr></thead><tbody>'
-        +ks.map(function(k){ var x=o[k]; return '<tr><td class="ev">'+esc(k)+'</td><td>'+x.n+'</td><td style="color:'+(x.net<0?'var(--red)':x.net>0?'var(--green)':'var(--sub)')+'">'+money(x.net)+'</td></tr>'; }).join('')+'</tbody></table></div>';
+        +ks.map(function(k){ var x=o[k]; return '<tr><td class="ev">'+esc(k)+'</td><td>'+x.n+'</td><td style="color:'+(x.net<0?'var(--red)':x.net>0?'var(--green)':'var(--sub)')+'">'+money(x.net)+'<span class="wr-mb"><i style="width:'+(mx?Math.max(4,Math.round(Math.abs(x.net)/mx*100)):0)+'%;background:'+(x.net<0?'var(--red)':x.net>0?'var(--green)':'var(--sub)')+'"></i></span></td></tr>'; }).join('')+'</tbody></table></div>';
     }
     return '<div class="wr-block a-s"><div class="wr-cols">'
       +list('MISTAKE IMPACT ON P&amp;L',mt,'No mistake tags saved on this week\'s trades.')
@@ -10038,11 +10090,14 @@ window.__renderAnSetups=renderBoth;window.__renderAnEmotions=renderEmo;setTimeou
     rows=sortedRows(rows);
     var cur=metrics(rows), prev=metrics(wkRows(addDays(b.ws,-7)));
     return '<div class="wr-an">'
+      +'<div class="wr-sec">Performance</div>'
       +safeBlock('EQUITY CURVE AND DRAWDOWN',function(){ return equityHtml(rows); })
       +safeBlock('AVERAGES AND STREAKS',function(){ return kpiHtml(cur); })
       +safeBlock('THIS WEEK VS LAST WEEK',function(){ return cmpHtml(cur,prev); })
+      +'<div class="wr-sec">Where it came from</div>'
       +safeBlock('SESSION AND PAIR BREAKDOWN',function(){ return '<div class="wr-block a-s"><div class="wr-cols">'+groupHtml('SESSION BREAKDOWN',rows,function(t){ return t.ses; })+groupHtml('PAIR BREAKDOWN',rows,function(t){ return t.sym; })+'</div></div>'; })
       +safeBlock('TIME-OF-DAY HEATMAP',function(){ return heatHtml(rows,b); })
+      +'<div class="wr-sec">Behaviour</div>'
       +safeBlock('MISTAKE AND EMOTION IMPACT',function(){ return impactHtml(rows); })
       +'</div>';
   }
@@ -10079,7 +10134,7 @@ window.__renderAnSetups=renderBoth;window.__renderAnEmotions=renderEmo;setTimeou
     }).join('');
     var flag=(lossLim>0||tradeLim>0)?(broken.length?'<span class="wr-flag bad">'+broken.length+' rule-break day'+(broken.length===1?'':'s')+'</span>':'<span class="wr-flag ok">Rules held</span>'):'';
     var RC=2*Math.PI*32, dash=decided?(wr/100*RC):0, wrCol=wr>=50?'var(--green)':'var(--warn)';
-    var ring='<svg class="wr-ring" viewBox="0 0 80 80" aria-hidden="true"><circle class="tr" cx="40" cy="40" r="32"/><circle class="vl" cx="40" cy="40" r="32" style="stroke:'+wrCol+';stroke-dasharray:'+dash.toFixed(1)+' '+RC.toFixed(1)+'"/></svg><b>'+(decided?wr+'%':'-')+'</b>';
+    var ring='<svg class="wr-ring" viewBox="0 0 80 80" aria-hidden="true"><circle class="rg-t" cx="40" cy="40" r="32"/><circle class="rg-v" cx="40" cy="40" r="32" style="stroke:'+wrCol+';stroke-dasharray:'+dash.toFixed(1)+' '+RC.toFixed(1)+'"/></svg><b>'+(decided?wr+'%':'-')+'</b>';
     var split='<div class="wr-split" role="img" aria-label="'+W+' wins, '+L+' losses, '+BE+' breakeven">'+(W?'<i class="w" style="flex:'+W+'"></i>':'')+(BE?'<i class="b" style="flex:'+BE+'"></i>':'')+(L?'<i class="l" style="flex:'+L+'"></i>':'')+'</div>';
     var pfNum=parseFloat(pf), pfCol=isFinite(pfNum)?(pfNum>=1?'var(--green)':'var(--red)'):'';
     var hero='<section class="wr-hero '+tone+'">'
@@ -10092,14 +10147,14 @@ window.__renderAnSetups=renderBoth;window.__renderAnEmotions=renderEmo;setTimeou
       +'<div class="wr-ring-row"><div class="wr-ringw">'+ring+'</div><div><div class="wr-lab">WIN RATE</div><div class="wr-ss">'+W+'W / '+L+'L'+(BE?' / '+BE+'BE':'')+'</div></div></div>'
       +split
       +'<div class="wr-pf"><div><div class="wr-lab">PROFIT FACTOR</div><div class="wr-ss">'+(gl>0?'Gross wins divided by gross losses':'No losing trades')+'</div></div><div class="wr-pfv"'+(pfCol?' style="color:'+pfCol+'"':'')+'>'+pf+'</div></div>'
-      +'</div></section>';
+      +'</div>';
     function kc(l,v,s,col,extra){ return '<div class="wr-k"><div class="wr-lab">'+l+'</div><div class="wr-kv"'+(col?' style="color:'+col+'"':'')+'>'+v+'</div>'+(s?'<div class="wr-ss">'+s+'</div>':'')+(extra||'')+'</div>'; }
     var kp=kc('TRADES',String(n),dk.length+' trading day'+(dk.length===1?'':'s'))
       +kc('BEST DAY',best?money(days[best].net):'-',best?dayName(best):'',best&&days[best].net>0?'var(--green)':'')
       +kc('WORST DAY',(worst&&worst!==best)?money(days[worst].net):'-',(worst&&worst!==best)?dayName(worst):'',(worst&&worst!==best&&days[worst].net<0)?'var(--red)':'');
     if(weekLim>0){ var wl=Math.max(0,-net), wlr=wl/weekLim, wlc=wlr>=1?'var(--red)':wlr>=.6?'var(--warn)':'';
       kp+=kc('WEEK LOSS','$'+wl.toFixed(2),'of $'+weekLim.toFixed(0)+' limit',wlc,'<div class="wr-prog"><i style="width:'+Math.min(100,Math.round(wlr*100))+'%;background:'+(wlc||'linear-gradient(90deg,var(--accent),var(--accent-2))')+'"></i></div>'); }
-    hero+='<div class="wr-kpis">'+kp+'</div>';
+    hero+='<div class="wr-kpis">'+kp+'</div></section>';
 
     /* daily bars: Mon-Fri always, Sat/Sun only if they have trades */
     var span=[0,1,2,3,4].concat(days[addDays(b.ws,5)]?[5]:[],days[addDays(b.ws,6)]?[6]:[]);
@@ -10108,7 +10163,7 @@ window.__renderAnSetups=renderBoth;window.__renderAnEmotions=renderEmo;setTimeou
       var d=addDays(b.ws,i), x=days[d];
       if(!x) return '<div class="wr-day"><b>'+dayName(d)+'</b><div class="wr-track"></div><span class="val" style="color:var(--faint)">no trades</span></div>';
       var w=maxAbs?Math.max(3,Math.round(Math.abs(x.net)/maxAbs*100)):3;
-      return '<div class="wr-day"><b>'+dayName(d)+'</b><div class="wr-track"><i class="'+(x.net<0?'dn':'up')+'" style="width:'+w+'%"></i></div><span class="val" style="color:'+(x.net<0?'var(--red)':x.net>0?'var(--green)':'var(--sub)')+'">'+money(x.net)+'</span></div>';
+      return '<div class="wr-day"><b>'+dayName(d)+'</b><div class="wr-track"><i class="'+(x.net<0?'wr-dn':'wr-up')+'" style="width:'+w+'%"></i></div><span class="val" style="color:'+(x.net<0?'var(--red)':x.net>0?'var(--green)':'var(--sub)')+'">'+money(x.net)+'</span></div>';
     }).join('');
 
     /* review points, all computed from the week's rows */
@@ -10166,16 +10221,17 @@ window.__renderAnSetups=renderBoth;window.__renderAnEmotions=renderEmo;setTimeou
     if(!rows.length){
       host.innerHTML='<div class="wr-empty">'+esc(ev.msg||('No '+(want==='high'?'high-impact':want==='medium'?'high or medium-impact':'')+' events found for next week.'))+'</div>';
     } else {
-      var html='<div class="wr-scroll"><table class="wr-tbl"><thead><tr><th>Time (IST)</th><th>Cur</th><th>Impact</th><th>Event</th><th>Forecast</th><th>Previous</th></tr></thead><tbody>', last='';
+      var html='<div class="wr-evgrid">', last='', open=false;
       rows.forEach(function(x){
-        var dk=istKey(x.t);
-        if(dk!==last){ last=dk; html+='<tr class="wr-dayrow"><td colspan="6">'+esc(fmtDay(dk,{weekday:'long',month:'short',day:'numeric'}))+'</td></tr>'; }
-        var e=x.e;
-        html+='<tr><td>'+istClock(x.t)+'</td><td>'+esc(CCY[e.country]||e.country||'-')+'</td><td><span class="wr-imp">'
+        var dk=istKey(x.t), e=x.e;
+        if(dk!==last){ if(open) html+='</div></section>'; last=dk; open=true;
+          html+='<section class="wr-evday"><div class="wr-evh"><b>'+esc(fmtDay(dk,{weekday:'long'}))+'</b><span>'+esc(fmtDay(dk,{month:'short',day:'numeric'}))+'</span></div><div class="wr-evl">'; }
+        html+='<div class="wr-ev"><span class="tm">'+istClock(x.t)+'</span><span class="cc">'+esc(CCY[e.country]||e.country||'-')+'</span><span class="wr-imp" title="'+(x.l===3?'High':x.l===2?'Medium':'Low')+' impact">'
           +[1,2,3].map(function(n){ return '<i style="background:'+(n<=x.l?impColor(x.l):'rgba(255,255,255,.1)')+'"></i>'; }).join('')
-          +'</span></td><td class="ev">'+esc(e.event||'-')+'</td><td>'+esc(e.estimate==null||e.estimate===''?'-':e.estimate)+'</td><td>'+esc(e.prev==null||e.prev===''?'-':e.prev)+'</td></tr>';
+          +'</span><span class="nm">'+esc(e.event||'-')+'</span><span class="fp"><em>Forecast</em>'+esc(e.estimate==null||e.estimate===''?'-':e.estimate)+'</span><span class="fp"><em>Previous</em>'+esc(e.prev==null||e.prev===''?'-':e.prev)+'</span></div>';
       });
-      host.innerHTML=html+'</tbody></table></div>';
+      if(open) html+='</div></section>';
+      host.innerHTML=html+'</div>';
     }
     note.textContent=ev.loading?'Refreshing...':(ev.loaded&&!ev.msg?(rows.length+' event'+(rows.length===1?'':'s')+' shown'+(ev.src==='forexfactory'?' via Forex Factory (forecast and previous only; updates hourly).':' via Finnhub. Free-tier data may lag or omit some releases.')):'');
   }
