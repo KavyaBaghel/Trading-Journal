@@ -3676,29 +3676,76 @@ window.__mountOpenPos=function(){const o=(window.__openTrades||[]).concat((windo
     </div>
 
     <div class="pr-card" id="ggPropCard">
-      <div class="pr-h"><h2>Prop firm progress</h2><span class="pr-sub" id="prSub">Uses all trades in your data. Add a challenge below to scope it to a phase.</span></div>
-      <div class="pr-plan" id="prPlan">
-        <span class="pr-l">FundingPips plan (5K)</span>
-        <div class="pr-plan-det" id="prPlanDet"></div>
-        <div class="pr-add"><select id="prPlanSel" aria-label="FundingPips plan"></select><select id="prPlanPh" aria-label="Phase"></select><button type="button" class="gg-btn-outline" id="prPlanApply">Fill setup</button></div>
-        <div class="pr-add"><input type="number" id="prPlanSpl" min="0" max="100" step="any" placeholder="Your profit split %" aria-label="Profit split percent"><button type="button" class="gg-btn-outline" id="prPlanSplBtn">Set split</button></div>
-        <small class="gg-field-note" id="prPlanNote">Pick a plan to fill daily loss, max loss and target in Account Settings and in the Challenges form below. Your profit split depends on the payout cycle you chose, so you set it yourself. Nothing is saved until you tap Save setup.</small>
-        <div class="pr-msg" id="prPlanMsg"></div>
+      <div class="pr-head">
+        <div class="pr-badge" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 3l7 3v5c0 4.5-3 8.2-7 10-4-1.8-7-5.5-7-10V6l7-3z"/><path d="M9 12l2 2 4-4"/></svg></div>
+        <div class="pr-titles"><h2>Prop firm progress</h2><span class="pr-sub" id="prSub">Uses all trades in your data. Add a challenge below to scope it to a phase.</span></div>
       </div>
-      <div class="pr-scope" id="prScope" role="group" aria-label="Challenge scope"></div>
-      <div id="ggPropBody"></div>
-      <div class="pr-pay">
-        <span class="pr-l">Challenges</span>
-        <div class="pr-add"><input type="text" id="chName" maxlength="40" placeholder="Name, for example Phase 1" aria-label="Challenge name"><input type="date" id="chStart" aria-label="Challenge start date"><input type="date" id="chEnd" aria-label="Challenge end date, optional"><input type="number" id="chDl" min="0" max="100" step="any" placeholder="Daily loss %" aria-label="Daily loss percent, optional"><input type="number" id="chMd" min="0" max="100" step="any" placeholder="Max loss %" aria-label="Max loss percent, optional"><input type="number" id="chPt" min="0" max="100" step="any" placeholder="Target %" aria-label="Profit target percent, optional"><button type="button" class="gg-btn-outline" id="chAdd">Add challenge</button></div>
-        <small class="gg-field-note">Trades dated from the start through the end date count in that challenge. Leave the end date empty while it is still running. The three percent boxes are optional: while today falls inside a challenge, the app uses its daily loss, max loss and target instead of Account Settings, converted from your initial balance. A box left empty keeps the Account Settings value.</small>
-        <div class="pr-msg" id="chMsg"></div>
-        <div id="chList"></div>
+      <div class="pr-tabs" role="tablist" aria-label="Prop firm sections">
+        <button type="button" class="pr-tab on" role="tab" id="prTabBtn-ov" aria-selected="true" aria-controls="prPanel-ov" data-prtab="ov">Overview</button>
+        <button type="button" class="pr-tab" role="tab" id="prTabBtn-ch" aria-selected="false" aria-controls="prPanel-ch" data-prtab="ch" tabindex="-1">Challenges<span class="pr-count" id="prTabCh">0</span></button>
+        <button type="button" class="pr-tab" role="tab" id="prTabBtn-pay" aria-selected="false" aria-controls="prPanel-pay" data-prtab="pay" tabindex="-1">Payouts<span class="pr-count" id="prTabPay">0</span></button>
       </div>
-      <div class="pr-pay">
-        <span class="pr-l">Payout log</span>
-        <div class="pr-add"><input type="date" id="prDate" aria-label="Payout date"><input type="number" id="prAmt" min="0" step="any" placeholder="Amount ($)" aria-label="Payout amount"><button type="button" class="gg-btn-outline" id="prAdd">Add payout</button></div>
-        <div class="pr-msg" id="prMsg"></div>
-        <div id="prList"></div>
+
+      <div class="pr-panel" role="tabpanel" id="prPanel-ov" aria-labelledby="prTabBtn-ov" data-prpanel="ov">
+        <section class="pr-sec pr-plan" id="prPlan">
+          <div class="pr-sec-h"><span class="pr-l">FundingPips plan (5K)</span></div>
+          <div class="pr-plan-det" id="prPlanDet"></div>
+          <div class="pr-chips" id="prPlanChips" role="radiogroup" aria-label="FundingPips plan"></div>
+          <div class="pr-plan-row">
+            <div class="pr-seg" id="prPhaseSeg" role="radiogroup" aria-label="Phase"></div>
+            <button type="button" class="pr-btn pr-btn-primary" id="prPlanApply">Fill setup</button>
+          </div>
+          <select id="prPlanSel" class="pr-sr" tabindex="-1" aria-hidden="true"></select><select id="prPlanPh" class="pr-sr" tabindex="-1" aria-hidden="true"></select>
+          <div class="pr-split">
+            <div class="pr-f"><label class="pr-fl" for="prPlanSpl">Your profit split %</label><input type="number" id="prPlanSpl" min="0" max="100" step="any" placeholder="For example 80"></div>
+            <button type="button" class="pr-btn" id="prPlanSplBtn">Set split</button>
+          </div>
+          <small class="pr-note" id="prPlanNote">Pick a plan to fill daily loss, max loss and target in Account Settings and in the Challenges form below. Your profit split depends on the payout cycle you chose, so you set it yourself. Nothing is saved until you tap Save setup.</small>
+          <div class="pr-msg" id="prPlanMsg" role="status"></div>
+        </section>
+        <section class="pr-sec">
+          <div class="pr-sec-h"><span class="pr-l">Rules</span><div class="pr-scope" id="prScope" role="group" aria-label="Challenge scope"></div></div>
+          <div id="ggPropBody"></div>
+        </section>
+      </div>
+
+      <div class="pr-panel" role="tabpanel" id="prPanel-ch" aria-labelledby="prTabBtn-ch" data-prpanel="ch" hidden>
+        <section class="pr-sec">
+          <div class="pr-sec-h"><span class="pr-l">New challenge</span></div>
+          <div class="pr-form">
+            <div class="pr-f pr-f-name"><label class="pr-fl" for="chName">Name</label><input type="text" id="chName" maxlength="40" placeholder="Name, for example Phase 1"></div>
+            <div class="pr-f"><label class="pr-fl" for="chStart">Start date</label><input type="date" id="chStart"></div>
+            <div class="pr-f"><label class="pr-fl" for="chEnd">End date <em>optional</em></label><input type="date" id="chEnd"></div>
+            <div class="pr-f pr-f-gap"></div>
+            <div class="pr-f"><label class="pr-fl" for="chDl">Daily loss %</label><input type="number" id="chDl" min="0" max="100" step="any" placeholder="4"></div>
+            <div class="pr-f"><label class="pr-fl" for="chMd">Max loss %</label><input type="number" id="chMd" min="0" max="100" step="any" placeholder="12"></div>
+            <div class="pr-f"><label class="pr-fl" for="chPt">Target %</label><input type="number" id="chPt" min="0" max="100" step="any" placeholder="10"></div>
+            <div class="pr-form-act"><button type="button" class="pr-btn pr-btn-primary" id="chAdd">Add challenge</button></div>
+          </div>
+          <small class="pr-note">Trades dated from the start through the end date count in that challenge. Leave the end date empty while it is still running. The three percent boxes are optional: while today falls inside a challenge, the app uses its daily loss, max loss and target instead of Account Settings, converted from your initial balance. A box left empty keeps the Account Settings value.</small>
+          <div class="pr-msg" id="chMsg" role="status"></div>
+        </section>
+        <section class="pr-sec">
+          <div class="pr-sec-h"><span class="pr-l">Logged challenges</span></div>
+          <div id="chList"></div>
+        </section>
+      </div>
+
+      <div class="pr-panel" role="tabpanel" id="prPanel-pay" aria-labelledby="prTabBtn-pay" data-prpanel="pay" hidden>
+        <div class="pr-paidhero"><span class="pr-l">Paid out so far</span><b id="prPaidBig">$0.00</b></div>
+        <section class="pr-sec">
+          <div class="pr-sec-h"><span class="pr-l">Log a payout</span></div>
+          <div class="pr-form pr-form-pay">
+            <div class="pr-f"><label class="pr-fl" for="prDate">Payout date</label><input type="date" id="prDate"></div>
+            <div class="pr-f"><label class="pr-fl" for="prAmt">Amount ($)</label><input type="number" id="prAmt" min="0" step="any" placeholder="0.00"></div>
+            <div class="pr-form-act"><button type="button" class="pr-btn pr-btn-primary" id="prAdd">Add payout</button></div>
+          </div>
+          <div class="pr-msg" id="prMsg" role="status"></div>
+        </section>
+        <section class="pr-sec">
+          <div class="pr-sec-h"><span class="pr-l">History</span></div>
+          <div id="prList"></div>
+        </section>
       </div>
     </div>
 
@@ -11987,36 +12034,107 @@ initFirebaseAuth().catch(err=>{
 }
 </style>
 <style id="jl-prop-css">
-.pr-card{margin-top:18px;padding:18px;border:1px solid var(--border);border-radius:var(--r-3);background:rgba(255,255,255,.02)}
-.pr-h{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 12px;margin-bottom:12px}
-.pr-h h2{margin:0;font-size:var(--fs-4);font-weight:700;color:var(--text)}
-.pr-sub{color:var(--faint);font-size:var(--fs-2)}
-.pr-row{display:flex;flex-wrap:wrap;justify-content:space-between;gap:4px 12px;padding:10px 0;border-top:1px solid var(--border)}
-.pr-row:first-child{border-top:0}
-.pr-l{display:block;font-size:var(--fs-1);font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--faint)}
-.pr-v{font-size:var(--fs-4);font-weight:700;color:var(--text)}
-.pr-v.ok{color:var(--green)}.pr-v.bad{color:var(--red)}.pr-v.mute{color:var(--faint);font-weight:600}
-.pr-m{flex-basis:100%;color:var(--sub);font-size:var(--fs-2);line-height:1.4}
-.pr-pay{margin-top:6px;padding-top:12px;border-top:1px solid var(--border)}
-.pr-add{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0}
-.pr-add input{flex:1;min-width:130px;background:var(--panel-2);border:1px solid var(--border);border-radius:var(--r-2);color:var(--text);font-family:inherit;font-size:var(--fs-3);padding:9px 11px}
-.pr-add input:focus{outline:none;border-color:var(--accent-2)}
-.pr-msg{color:var(--warn);font-size:var(--fs-2);min-height:16px}
-.pr-pr{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 0;border-top:1px solid var(--border);font-size:var(--fs-3);color:var(--sub)}
-.pr-pr b{color:var(--text)}
-.pr-none{color:var(--faint);font-size:var(--fs-3);padding:6px 0}
-.pr-scope{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 10px}
-.pr-chip{background:var(--panel-2);border:1px solid var(--border);border-radius:999px;color:var(--sub);font-family:inherit;font-size:var(--fs-2);padding:6px 12px;cursor:pointer}
+/* Prop firm progress card: tabs (Overview, Challenges, Payouts), plan chips, rule tiles. */
+.pr-card{position:relative;margin-top:18px;border:1px solid var(--border);border-radius:var(--r-4);background:linear-gradient(160deg,rgba(255,255,255,.045),rgba(255,255,255,0) 45%),var(--panel);overflow:hidden}
+.pr-card::before{content:"";position:absolute;inset:0 0 auto 0;height:150px;background:radial-gradient(60% 100% at 16% 0%,rgba(124,108,240,.15),transparent 70%);pointer-events:none}
+.pr-card>*{position:relative}
+.pr-head{display:flex;align-items:center;gap:14px;padding:20px 22px 0}
+.pr-badge{flex:none;width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;color:var(--accent-2);background:linear-gradient(160deg,rgba(124,108,240,.28),rgba(124,108,240,.08));border:1px solid rgba(179,159,251,.28)}
+.pr-badge svg{width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.pr-titles{min-width:0}
+.pr-card .pr-titles h2{margin:0;font-size:17px;font-weight:650;letter-spacing:-.01em;color:var(--text)}
+.pr-sub{display:block;margin-top:3px;color:var(--faint);font-size:var(--fs-2);line-height:1.45}
+.pr-tabs{display:flex;gap:4px;margin:18px 22px 0;padding:4px;border:1px solid var(--border);border-radius:var(--r-3);background:var(--panel-2)}
+.pr-tab{flex:1 1 0;min-width:0;display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:36px;padding:0 14px;border:1px solid transparent;border-radius:var(--r-2);background:none;color:var(--sub);font:inherit;font-size:var(--fs-3);font-weight:600;cursor:pointer;transition:color .2s,background .2s,border-color .2s}
+.pr-tab:hover{color:var(--text)}
+.pr-tab.on{color:var(--text);background:linear-gradient(160deg,rgba(124,108,240,.22),rgba(124,108,240,.08));border-color:rgba(179,159,251,.3)}
+.pr-count{min-width:20px;height:20px;padding:0 6px;border-radius:var(--r-pill);display:inline-flex;align-items:center;justify-content:center;font-size:var(--fs-1);font-weight:700;color:var(--sub);background:rgba(255,255,255,.07)}
+.pr-tab.on .pr-count{color:var(--text);background:rgba(255,255,255,.12)}
+.pr-panel{padding:18px 22px 22px;animation:prIn .35s cubic-bezier(.16,1,.3,1) both}
+.pr-panel[hidden]{display:none}
+@keyframes prIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.pr-sec+.pr-sec,.pr-paidhero+.pr-sec{margin-top:20px;padding-top:18px;border-top:1px solid var(--border)}
+.pr-paidhero+.pr-sec{margin-top:0;padding-top:0;border-top:0}
+.pr-sec-h{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px 12px;margin-bottom:12px}
+.pr-l{display:block;font-size:var(--fs-1);font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--faint)}
+.pr-sr{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);border:0;white-space:nowrap}
+.pr-plan-det{display:flex;align-items:center;gap:9px;margin:0 0 12px;padding:9px 12px;border:1px solid var(--border);border-radius:var(--r-2);background:rgba(255,255,255,.025);color:var(--sub);font-size:var(--fs-2);line-height:1.45}
+.pr-plan-det::before{content:"";flex:none;width:7px;height:7px;border-radius:50%;background:var(--faint)}
+.pr-plan-det.ok{color:var(--text);border-color:rgba(67,215,135,.28);background:rgba(67,215,135,.06)}
+.pr-plan-det.ok::before{background:var(--green)}
+.pr-chips{display:flex;flex-wrap:wrap;gap:8px}
+.pr-pchip{display:flex;flex-direction:column;align-items:flex-start;gap:2px;min-width:120px;padding:10px 14px;border:1px solid var(--border);border-radius:var(--r-3);background:var(--panel-2);font:inherit;text-align:left;cursor:pointer;transition:border-color .2s,background .2s,transform .2s}
+.pr-pchip b{font-size:var(--fs-3);font-weight:650;color:var(--text)}
+.pr-pchip small{font-size:var(--fs-1);color:var(--faint)}
+.pr-pchip:hover{border-color:var(--border-hi);transform:translateY(-1px)}
+.pr-pchip.on{border-color:rgba(179,159,251,.55);background:linear-gradient(160deg,rgba(124,108,240,.2),rgba(124,108,240,.06));box-shadow:inset 0 0 0 1px rgba(179,159,251,.16)}
+.pr-pchip.on small{color:var(--accent-2)}
+.pr-plan-row{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-top:12px}
+.pr-seg{display:inline-flex;gap:2px;padding:3px;border:1px solid var(--border);border-radius:var(--r-2);background:var(--panel-2)}
+.pr-seg-b{min-height:32px;padding:0 14px;border:0;border-radius:7px;background:none;color:var(--sub);font:inherit;font-size:var(--fs-2);font-weight:600;cursor:pointer;transition:background .2s,color .2s}
+.pr-seg-b:hover{color:var(--text)}
+.pr-seg-b.on{background:rgba(255,255,255,.09);color:var(--text)}
+.pr-seg-b[disabled]{cursor:default}
+.pr-seg-empty{padding:0 12px;color:var(--faint);font-size:var(--fs-2);line-height:32px}
+.pr-plan-row .pr-btn-primary{margin-left:auto}
+.pr-split{display:flex;align-items:flex-end;gap:10px;margin-top:16px;max-width:420px}
+.pr-split .pr-f{flex:1}
+.pr-note{display:block;margin-top:12px;color:var(--faint);font-size:var(--fs-1);line-height:1.55}
+.pr-msg{color:var(--warn);font-size:var(--fs-2);line-height:1.5;min-height:16px;margin-top:6px}
+.pr-btn{display:inline-flex;align-items:center;justify-content:center;min-height:38px;padding:0 16px;border:1px solid var(--border-hi);border-radius:var(--r-2);background:none;color:var(--sub);font:inherit;font-size:var(--fs-3);font-weight:600;cursor:pointer;transition:color .2s,border-color .2s,filter .2s,transform .15s}
+.pr-btn:hover{color:var(--text);border-color:var(--accent-2)}
+.pr-btn:active{transform:scale(.97)}
+.pr-btn-primary{border-color:transparent;color:#fff;background:linear-gradient(135deg,var(--accent),#6a5ae0)}
+.pr-btn-primary:hover{color:#fff;border-color:transparent;filter:brightness(1.12)}
+.pr-btn-sm{min-height:32px;padding:0 12px;font-size:var(--fs-2)}
+.pr-form{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.pr-f{display:flex;flex-direction:column;gap:6px;min-width:0}
+.pr-f-name{grid-column:1/-1}
+.pr-fl{font-size:var(--fs-1);font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--faint)}
+.pr-fl em{font-style:normal;font-weight:500;letter-spacing:0;text-transform:none;opacity:.8}
+.pr-f input{width:100%;min-height:40px;box-sizing:border-box;padding:0 12px;border:1px solid var(--border);border-radius:var(--r-2);background:var(--panel-2);color:var(--text);font:inherit;font-size:var(--fs-3);color-scheme:dark;transition:border-color .2s,box-shadow .2s}
+.pr-f input[type=number]{-moz-appearance:textfield;appearance:textfield}
+.pr-f input::-webkit-outer-spin-button,.pr-f input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+.pr-f input:focus{outline:none;border-color:var(--accent-2);box-shadow:0 0 0 3px rgba(124,108,240,.18)}
+.pr-form-act{grid-column:1/-1;display:flex;justify-content:flex-end}
+.pr-form-pay{grid-template-columns:repeat(2,minmax(0,1fr)) auto;align-items:end}
+.pr-form-pay .pr-form-act{grid-column:auto}
+#ggPropBody{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:10px}
+.pr-row{display:flex;flex-direction:column;gap:7px;padding:14px 16px;border:1px solid var(--border);border-radius:var(--r-3);background:rgba(255,255,255,.025);transition:border-color .2s,background .2s}
+.pr-row:hover{border-color:var(--border-hi);background:rgba(255,255,255,.04)}
+.pr-v{font-size:20px;font-weight:700;letter-spacing:-.01em;line-height:1.2;color:var(--text)}
+.pr-v.ok{color:var(--green)}.pr-v.bad{color:var(--red)}.pr-v.mute{color:var(--faint);font-size:15px;font-weight:600}
+.pr-m{color:var(--sub);font-size:var(--fs-2);line-height:1.5}
+.pr-bar{display:block;height:5px;border-radius:var(--r-pill);background:rgba(255,255,255,.07);overflow:hidden}
+.pr-bar i{display:block;height:100%;border-radius:inherit;background:linear-gradient(90deg,var(--accent),var(--accent-2));transition:width .6s cubic-bezier(.16,1,.3,1)}
+.pr-bar.ok i{background:var(--green)}.pr-bar.bad i{background:var(--red)}
+.pr-scope{display:flex;flex-wrap:wrap;gap:6px}
+.pr-chip{padding:6px 12px;border:1px solid var(--border);border-radius:var(--r-pill);background:var(--panel-2);color:var(--sub);font:inherit;font-size:var(--fs-2);cursor:pointer;transition:border-color .2s,color .2s}
+.pr-chip:hover{color:var(--text)}
 .pr-chip.on{border-color:var(--accent-2);color:var(--text);font-weight:700}
-.pr-chip:focus-visible{outline:2px solid var(--accent-2);outline-offset:2px}
-@media (max-width:640px),(pointer:coarse){.pr-chip{min-height:44px}}
-@media (max-width:640px),(pointer:coarse){.pr-add input,.pr-add .gg-btn-outline,.pr-pr .gg-btn-outline{min-height:44px}}
-.pr-add .gg-btn-outline:focus-visible,.pr-pr .gg-btn-outline:focus-visible,.pr-add input:focus-visible{outline:2px solid var(--accent-2);outline-offset:2px}
-.pr-plan{margin:0 0 12px;padding-bottom:12px;border-bottom:1px solid var(--border)}
-.pr-plan-det{font-size:var(--fs-3);margin:6px 0 2px}
-.pr-add select{flex:1;min-width:130px;background:var(--panel-2);border:1px solid var(--border);border-radius:var(--r-2);color:var(--text);font-family:inherit;font-size:var(--fs-3);padding:9px 11px}
-.pr-add select:focus-visible{outline:2px solid var(--accent-2);outline-offset:2px}
-@media (max-width:640px),(pointer:coarse){.pr-add select{min-height:44px}}
+.pr-paidhero{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:20px;padding:16px 18px;border:1px solid var(--border);border-radius:var(--r-3);background:linear-gradient(160deg,rgba(67,215,135,.08),rgba(67,215,135,0) 60%),rgba(255,255,255,.02)}
+.pr-paidhero b{font-size:26px;font-weight:700;letter-spacing:-.02em;color:var(--text)}
+.pr-item{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 14px;border:1px solid var(--border);border-radius:var(--r-3);background:rgba(255,255,255,.02);transition:border-color .2s,background .2s}
+.pr-item:hover{border-color:var(--border-hi);background:rgba(255,255,255,.04)}
+.pr-item+.pr-item{margin-top:8px}
+.pr-item-main{display:flex;flex-direction:column;gap:6px;min-width:0}
+.pr-item-main b{font-size:var(--fs-4);color:var(--text)}
+.pr-item-sub{color:var(--faint);font-size:var(--fs-2)}
+.pr-tags{display:flex;flex-wrap:wrap;gap:6px}
+.pr-tag{padding:2px 9px;border:1px solid rgba(179,159,251,.2);border-radius:var(--r-pill);background:rgba(124,108,240,.12);color:var(--accent-2);font-size:var(--fs-1);font-weight:600}
+.pr-none{padding:18px;border:1px dashed var(--border-hi);border-radius:var(--r-3);text-align:center;color:var(--faint);font-size:var(--fs-3)}
+.pr-tab:focus-visible,.pr-pchip:focus-visible,.pr-seg-b:focus-visible,.pr-btn:focus-visible,.pr-chip:focus-visible{outline:2px solid var(--accent-2);outline-offset:2px}
+@media (max-width:640px){
+  .pr-head{padding:16px 16px 0}.pr-tabs{margin:16px 16px 0}.pr-panel{padding:16px 16px 18px}
+  .pr-form{grid-template-columns:repeat(2,minmax(0,1fr))}.pr-f-gap{display:none}
+  .pr-form-pay{grid-template-columns:repeat(2,minmax(0,1fr))}.pr-form-pay .pr-form-act{grid-column:1/-1}
+  .pr-form-act .pr-btn,.pr-plan-row .pr-btn-primary{width:100%}.pr-plan-row .pr-btn-primary{margin-left:0}
+  .pr-pchip{flex:1 1 calc(50% - 8px);min-width:0}.pr-tab{gap:5px;padding:0 4px;font-size:var(--fs-2)}.pr-count{min-width:18px;height:18px;padding:0 5px}
+}
+@media (max-width:640px),(pointer:coarse){.pr-btn,.pr-f input,.pr-tab,.pr-chip{min-height:44px}.pr-seg-b{min-height:38px}.pr-btn-sm{min-height:40px}}
+@media (max-width:360px){.pr-count{display:none}}
+@media (prefers-reduced-motion:reduce){.pr-panel{animation:none}.pr-bar i,.pr-pchip,.pr-btn{transition:none}}
+body.rm .pr-panel{animation:none}
 </style>
 <script id="jl-prop-rules">(function(){
 /* Prop firm progress: consistency rule, minimum trading days, profit split and a payout log.
@@ -12041,36 +12159,36 @@ function payoutTotal(list){return Math.round((Array.isArray(list)?list:[]).reduc
 function esc(v){return String(v==null?'':v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
 function money(v){return(v<0?'-$':'$')+Math.abs(v).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})}
 function dayLabel(d){var m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(d||'');if(!m)return d||'';var M=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];return M[+m[2]-1]+' '+(+m[3])+', '+m[1]}
-function row(label,val,cls,meta){return '<div class="pr-row"><span class="pr-l">'+esc(label)+'</span><span class="pr-v '+(cls||'')+'">'+esc(val)+'</span>'+(meta?'<span class="pr-m">'+esc(meta)+'</span>':'')+'</div>'}
+function row(label,val,cls,meta,pct){return '<div class="pr-row"><span class="pr-l">'+esc(label)+'</span><span class="pr-v '+(cls||'')+'">'+esc(val)+'</span>'+((typeof pct==='number'&&isFinite(pct))?'<span class="pr-bar '+(cls||'')+'"><i style="width:'+Math.max(0,Math.min(100,pct)).toFixed(1)+'%"></i></span>':'')+(meta?'<span class="pr-m">'+esc(meta)+'</span>':'')+'</div>'}
 function summaryHtml(st,o,paid){var h='';
   if(!(o.consPct>0))h+=row('Consistency rule','Not set','mute','Set it in Account Settings.');
   else if(st.cons.ok===null)h+=row('Consistency rule','No profit yet','mute','The rule limits your best day to '+o.consPct+'% of total profit.');
-  else h+=row('Consistency rule',st.cons.share.toFixed(1)+'% of profit',st.cons.ok?'ok':'bad',(st.cons.ok?'Within the limit. ':'Over the limit. ')+'Best day '+money(st.best.net)+' on '+dayLabel(st.best.d)+'. At '+o.consPct+'% of '+money(st.net)+' the best day can be up to '+money(st.cons.maxBest)+'.');
+  else h+=row('Consistency rule',st.cons.share.toFixed(1)+'% of profit',st.cons.ok?'ok':'bad',(st.cons.ok?'Within the limit. ':'Over the limit. ')+'Best day '+money(st.best.net)+' on '+dayLabel(st.best.d)+'. At '+o.consPct+'% of '+money(st.net)+' the best day can be up to '+money(st.cons.maxBest)+'.',st.cons.share/o.consPct*100);
   if(!(o.minDays>0))h+=row('Trading days','Not set','mute','Set a minimum in Account Settings.');
-  else h+=row('Trading days',st.minDays.have+' of '+st.minDays.need,st.minDays.ok?'ok':'',st.minDays.ok?'Minimum reached.':st.minDays.left+(st.minDays.left===1?' more trading day needed.':' more trading days needed.'));
+  else h+=row('Trading days',st.minDays.have+' of '+st.minDays.need,st.minDays.ok?'ok':'',st.minDays.ok?'Minimum reached.':st.minDays.left+(st.minDays.left===1?' more trading day needed.':' more trading days needed.'),st.minDays.have/st.minDays.need*100);
   if(!(o.split>0))h+=row('Profit split','Not set','mute','Set the split in Account Settings to see your share.');
   else{var sh=splitShare(st.net,o.split);h+=row('Your share ('+o.split+'%)',money(sh),sh>0?'ok':'mute','Estimated from net profit of '+money(st.net)+'.'+(sh>0?' Paid out so far: '+money(paid)+'. Not yet paid: '+money(Math.max(0,Math.round((sh-paid)*100)/100))+'.':''))}
   h+=row('Paid out so far',money(paid),paid>0?'':'mute','');return h}
-function listHtml(list){return list.length?list.map(function(p){return '<div class="pr-pr"><span><b>'+esc(money(p.amount))+'</b> on '+esc(dayLabel(p.date))+'</span><button type="button" class="gg-btn-outline" data-prdel="'+esc(p.id)+'">Delete</button></div>'}).join(''):'<div class="pr-none">No payouts logged yet.</div>'}
+function listHtml(list){return list.length?list.map(function(p){return '<div class="pr-item"><div class="pr-item-main"><b>'+esc(money(p.amount))+'</b><span class="pr-item-sub">'+esc(dayLabel(p.date))+'</span></div><button type="button" class="pr-btn pr-btn-sm" data-prdel="'+esc(p.id)+'">Delete</button></div>'}).join(''):'<div class="pr-none">No payouts logged yet.</div>'}
 function cleanChallenges(raw){var out=[],seen={},re=/^\d{4}-\d{2}-\d{2}$/;if(!Array.isArray(raw))return out;
   raw.forEach(function(x){if(!x||typeof x!=='object')return;var n=typeof x.name==='string'?x.name.trim().slice(0,40):'',s=typeof x.start==='string'?x.start:'',e=typeof x.end==='string'?x.end:'';
     if(!n||!re.test(s)||(e&&(!re.test(e)||e<s)))return;var id=(typeof x.id==='string'&&x.id)?x.id:'c'+s+'-'+n;if(seen[id])return;seen[id]=1;var o={id:id,name:n,start:s,end:e};['dl','md','pt'].forEach(function(k){var v=Number(x[k]);if(x[k]!==''&&x[k]!=null&&isFinite(v)&&v>0&&v<=100)o[k]=Math.round(v*100)/100});out.push(o)});
   return out.sort(function(a,b){return a.start<b.start?-1:a.start>b.start?1:0})}
 function scopeTrades(trades,ch){var l=Array.isArray(trades)?trades:[];if(!ch)return l;return l.filter(function(t){return t&&t.d&&t.d>=ch.start&&(!ch.end||t.d<=ch.end)})}
 function chipsHtml(list,sel){var h='<button type="button" class="pr-chip'+(sel?'':' on')+'" data-prsc="">All trades</button>';list.forEach(function(c){h+='<button type="button" class="pr-chip'+(sel===c.id?' on':'')+'" data-prsc="'+esc(c.id)+'">'+esc(c.name)+'</button>'});return h}
-function limTxt(c){var p=[];if(c.dl)p.push('daily loss '+c.dl+'%');if(c.md)p.push('max loss '+c.md+'%');if(c.pt)p.push('target '+c.pt+'%');return p.length?' ('+esc(p.join(', '))+')':''}
+function limTxt(c){var p=[];if(c.dl)p.push('Daily loss '+c.dl+'%');if(c.md)p.push('Max loss '+c.md+'%');if(c.pt)p.push('Target '+c.pt+'%');return p.length?'<span class="pr-tags">'+p.map(function(x){return '<span class="pr-tag">'+esc(x)+'</span>'}).join('')+'</span>':''}
 function limitsHtml(info,anySet){if(!anySet)return '';
   if(!info)return row('Limits in use','Account Settings','mute','No running challenge has its own limits today.');
   var p=[];if(info.dl)p.push('daily loss '+info.dl+'%');if(info.md)p.push('max loss '+info.md+'%');if(info.pt)p.push('target '+info.pt+'%');
   return row('Limits in use',info.name,'ok','From this challenge: '+p.join(', ')+'. Anything not listed uses Account Settings.')}
-function chListHtml(list){return list.length?list.map(function(c){return '<div class="pr-pr"><span><b>'+esc(c.name)+'</b> '+esc(dayLabel(c.start))+' to '+(c.end?esc(dayLabel(c.end)):'now')+limTxt(c)+'</span><button type="button" class="gg-btn-outline" data-chdel="'+esc(c.id)+'">Delete</button></div>'}).join(''):'<div class="pr-none">No challenges logged yet.</div>'}
+function chListHtml(list){return list.length?list.map(function(c){return '<div class="pr-item"><div class="pr-item-main"><b>'+esc(c.name)+'</b><span class="pr-item-sub">'+esc(dayLabel(c.start))+' to '+(c.end?esc(dayLabel(c.end)):'now')+'</span>'+limTxt(c)+'</div><button type="button" class="pr-btn pr-btn-sm" data-chdel="'+esc(c.id)+'">Delete</button></div>'}).join(''):'<div class="pr-none">No challenges logged yet.</div>'}
 function subText(ch){return ch?('Uses trades from '+ch.name+', '+dayLabel(ch.start)+' to '+(ch.end?dayLabel(ch.end):'now')+'. Rules come from Account Settings.'):'Uses all trades in your data. Add a challenge below to scope it to a phase.'}
 function lastClosedDay(trades){var m='',re=/^\d{4}-\d{2}-\d{2}$/;(Array.isArray(trades)?trades:[]).forEach(function(t){if(t&&typeof t.d==='string'&&re.test(t.d)&&t.d>m)m=t.d});return m}
 function dayGap(a,b){var x=/^(\d{4})-(\d{2})-(\d{2})$/.exec(a||''),y=/^(\d{4})-(\d{2})-(\d{2})$/.exec(b||'');if(!x||!y)return null;return Math.max(0,Math.round((Date.UTC(+y[1],+y[2]-1,+y[3])-Date.UTC(+x[1],+x[2]-1,+x[3]))/864e5))}
 function inactHtml(trades,today){var last=lastClosedDay(trades),n=last?dayGap(last,today):null;
   if(last&&n===null)return '';
   if(n===null)return row('Days without a closed trade','No closed trades yet','mute','The count starts from your first closed trade. FundingPips closes the account after 30 days in a row with no fully closed trade.');
-  return row('Days without a closed trade','Day '+n+' of 30',n>=30?'bad':'','Last closed trade on '+dayLabel(last)+'. FundingPips closes the account after 30 days in a row with no fully closed trade. An open trade does not reset it.')}
+  return row('Days without a closed trade','Day '+n+' of 30',n>=30?'bad':'','Last closed trade on '+dayLabel(last)+'. FundingPips closes the account after 30 days in a row with no fully closed trade. An open trade does not reset it.',Math.min(100,n/30*100))}
 /*FP-PURE-START*/
 /* FundingPips 5K plans. Only values that the published rule sets agree on are filled; the rest is listed in "skip" so you check it on your dashboard. */
 var FP_PLANS=[
@@ -12108,7 +12226,7 @@ function cmsg(t){var m=$('chMsg');if(m)m.textContent=t||''}
 function selId(){try{return localStorage.getItem(SK)||''}catch(_){return ''}}
 function render(){var b=$('ggPropBody');if(!b)return;if(window.jlApplyChLimits)window.jlApplyChLimits();var list=cleanPayouts(rd()),chs=cleanChallenges(rdC()),sid=selId(),ch=chs.filter(function(c){return c.id===sid})[0]||null;
   b.innerHTML=limitsHtml(window.jlChInfo||null,chs.some(function(c){return c.dl||c.md||c.pt}))+inactHtml(window.__trades||[],typeof window.getTradingDayIST==='function'?window.getTradingDayIST():'')+summaryHtml(propStats(scopeTrades(window.__trades||[],ch),opts()),opts(),payoutTotal(list));var l=$('prList');if(l)l.innerHTML=listHtml(list);
-  var sb=$('prSub');if(sb)sb.textContent=subText(ch);var sc=$('prScope');if(sc)sc.innerHTML=chipsHtml(chs,ch?ch.id:'');var cl=$('chList');if(cl)cl.innerHTML=chListHtml(chs);planRender()}
+  var tc=$('prTabCh');if(tc)tc.textContent=String(chs.length);var tp=$('prTabPay');if(tp)tp.textContent=String(list.length);var pbg=$('prPaidBig');if(pbg)pbg.textContent=money(payoutTotal(list));var sb=$('prSub');if(sb)sb.textContent=subText(ch);var sc=$('prScope');if(sc)sc.innerHTML=chipsHtml(chs,ch?ch.id:'');var cl=$('chList');if(cl)cl.innerHTML=chListHtml(chs);planRender()}
 window.__renderProp=render;
 var card=$('ggPropCard'),armT=0;
 if(card)card.addEventListener('click',function(e){var t=e.target;if(!t.closest)return;
@@ -12135,15 +12253,15 @@ var planTouched=false;
 function pmsg(t){var m=$('prPlanMsg');if(m)m.textContent=t||''}
 function planPhases(key,sel){var p=fpFind(key),ph=$('prPlanPh');if(!ph)return;
   ph.innerHTML=p?p.phases.map(function(x,i){return '<option value="'+i+'">'+esc(x.n)+'</option>'}).join(''):'<option value="">Phase</option>';
-  ph.disabled=!p||p.phases.length<2;if(p&&typeof sel==='number'&&sel>=0)ph.value=String(sel)}
+  ph.disabled=!p||p.phases.length<2;if(p&&typeof sel==='number'&&sel>=0)ph.value=String(sel);syncChips()}
 function planRender(){var sel=$('prPlanSel'),det=$('prPlanDet');if(!sel||!det)return;
   if(!sel.options.length){sel.innerHTML='<option value="">Choose a plan</option>'+FP_PLANS.map(function(p){return '<option value="'+esc(p.key)+'">'+esc(p.name)+'</option>'}).join('');planPhases('')}
   var d=fpDetect(rdA()),t='';
   if(d.s==='none')t='Plan not detected. '+d.why;
   else if(d.s==='multi')t='Detected one of: '+d.keys.map(function(k){return fpFind(k).name}).join(' or ')+'. Set the profit target in Account Settings to tell them apart, or pick the plan below.';
   else{var p=fpFind(d.key);t='Detected: '+p.name+(d.phase>=0&&p.phases.length>1?', '+p.phases[d.phase].n:'')+' (daily loss '+d.dl+'%, max loss '+d.md+'%'+(d.pt>0?', target '+d.pt+'%':'')+').'+(d.ptOk?'':' The profit target differs from the plan.')}
-  det.textContent=t;
-  if(!planTouched&&!sel.value&&d.s==='one'){sel.value=d.key;planPhases(d.key,d.phase)}}
+  det.textContent=t;det.className='pr-plan-det'+(d.s==='one'?' ok':'');
+  if(!planTouched&&!sel.value&&d.s==='one'){sel.value=d.key;planPhases(d.key,d.phase)}syncChips()}
 var cardP=$('ggPropCard');
 if(cardP){
   cardP.addEventListener('change',function(e){if(e.target&&e.target.id==='prPlanSel'){planTouched=true;planPhases(e.target.value);pmsg('')}});
@@ -12160,6 +12278,29 @@ if(cardP){
       if(!isFinite(x)||!(x>0)||x>100){pmsg('Enter a profit split above 0 and up to 100.');return}
       if(typeof window.ggFpFill!=='function'){pmsg('Account Settings is not ready yet. Try again in a moment.');return}
       window.ggFpFill({spl:Math.round(x*100)/100});pmsg('Profit split set to '+(Math.round(x*100)/100)+'%. Tap Save setup to keep it.')}})}
+/* Plan chips, phase toggle and tabs. The two hidden selects stay the source of truth for the plan and phase. */
+function syncChips(){var sel=$('prPlanSel'),ph=$('prPlanPh'),pc=$('prPlanChips'),sg=$('prPhaseSeg');if(!sel||!ph||!pc||!sg)return;
+  if(pc.children.length!==FP_PLANS.length)pc.innerHTML=FP_PLANS.map(function(p){return '<button type="button" class="pr-pchip" role="radio" aria-checked="false" data-prplan="'+esc(p.key)+'"><b>'+esc(p.name)+'</b><small>'+(p.phases.length>1?p.phases.length+' phases':esc(p.phases[0].n))+'</small></button>'}).join('');
+  Array.prototype.forEach.call(pc.children,function(b){var on=b.getAttribute('data-prplan')===sel.value;b.classList.toggle('on',on);b.setAttribute('aria-checked',on?'true':'false')});
+  var p=fpFind(sel.value);
+  if(!p){sg.innerHTML='<span class="pr-seg-empty">Pick a plan</span>';sg.removeAttribute('data-key');return}
+  if(sg.getAttribute('data-key')!==p.key){sg.setAttribute('data-key',p.key);sg.innerHTML=p.phases.map(function(x,i){return '<button type="button" class="pr-seg-b" role="radio" aria-checked="false" data-prph="'+i+'"'+(p.phases.length<2?' disabled':'')+'>'+esc(x.n)+'</button>'}).join('')}
+  Array.prototype.forEach.call(sg.children,function(b){var on=b.getAttribute('data-prph')===(ph.value||'0');b.classList.toggle('on',on);b.setAttribute('aria-checked',on?'true':'false')})}
+var TK='jl_pr_tab_v1';
+function setTab(id,focus){if(!cardP)return;var tabs=Array.prototype.slice.call(cardP.querySelectorAll('[data-prtab]'));
+  if(!tabs.some(function(b){return b.getAttribute('data-prtab')===id}))id='ov';
+  tabs.forEach(function(b){var on=b.getAttribute('data-prtab')===id;b.classList.toggle('on',on);b.setAttribute('aria-selected',on?'true':'false');b.tabIndex=on?0:-1;if(on&&focus)b.focus()});
+  Array.prototype.forEach.call(cardP.querySelectorAll('[data-prpanel]'),function(p){p.hidden=p.getAttribute('data-prpanel')!==id});
+  try{sessionStorage.setItem(TK,id)}catch(_){}}
+if(cardP){
+  cardP.addEventListener('click',function(e){var t=e.target;if(!t.closest)return;
+    var tb=t.closest('[data-prtab]');if(tb){setTab(tb.getAttribute('data-prtab'));return}
+    var pc=t.closest('[data-prplan]');if(pc){var sel=$('prPlanSel');if(sel){sel.value=pc.getAttribute('data-prplan');sel.dispatchEvent(new Event('change',{bubbles:true}));syncChips()}return}
+    var pb=t.closest('[data-prph]');if(pb){var ph=$('prPlanPh');if(ph&&!ph.disabled){ph.value=pb.getAttribute('data-prph');syncChips()}}});
+  cardP.addEventListener('keydown',function(e){var tb=e.target.closest&&e.target.closest('[data-prtab]');if(!tb||['ArrowRight','ArrowLeft','Home','End'].indexOf(e.key)<0)return;
+    var all=Array.prototype.slice.call(cardP.querySelectorAll('[data-prtab]')),i=all.indexOf(tb);
+    i=e.key==='Home'?0:e.key==='End'?all.length-1:(i+(e.key==='ArrowRight'?1:-1)+all.length)%all.length;e.preventDefault();setTab(all[i].getAttribute('data-prtab'),true)});
+  var st='ov';try{st=sessionStorage.getItem(TK)||'ov'}catch(_){}setTab(st)}
 window.addEventListener('storage',function(ev){if(!ev.key||ev.key===PK||ev.key===CK||ev.key===SK)render()});
 setTimeout(render,1500);setInterval(render,30000);render();
 })();</script>
