@@ -10150,33 +10150,33 @@ window.__renderAnSetups=renderBoth;window.__renderAnEmotions=renderEmo;setTimeou
 <style id="jl-weekly-review-github">
 /* Weekly review: premium dark. CSS only, scoped to #weeklyReview. Revert by deleting this block. */
 #weeklyReview{
-  --pr-mint:#6fe0a8;--pr-mint-d:#2f9e6b;--pr-coral:#f2897d;--pr-coral-d:#b5483f;--pr-vio:#a99bff;--pr-line:rgba(255,255,255,.075);--pr-card:linear-gradient(180deg,rgba(255,255,255,.04),rgba(255,255,255,.012));
-  --green:var(--pr-mint);--red:var(--pr-coral);--pos:var(--pr-mint);--neg:var(--pr-coral);--silver:var(--pr-mint);--wr-line:var(--pr-line);
+  --pr-mint:#25f2a0;--pr-mint-d:#00b86b;--pr-coral:#ff5c75;--pr-coral-d:#d11f45;--pr-vio:#b9a4ff;--pr-line:rgba(255,255,255,.09);--pr-card:linear-gradient(180deg,rgba(255,255,255,.04),rgba(255,255,255,.012));
+  --green:var(--pr-mint);--red:var(--pr-coral);--pos:var(--pr-mint);--neg:var(--pr-coral);--silver:var(--pr-mint);--wr-line:var(--pr-line);--warn:#ffc233;--accent-2:#c0aaff;--accent:#8b6cff;
   position:relative;padding:30px 30px 32px;border-radius:30px;border:1px solid var(--pr-line);
-  background:radial-gradient(900px 340px at 8% -4%,rgba(124,108,240,.13),transparent 62%),linear-gradient(180deg,rgba(255,255,255,.022),rgba(255,255,255,.006));
+  background:radial-gradient(900px 340px at 8% -4%,rgba(139,108,255,.26),transparent 62%),linear-gradient(180deg,rgba(255,255,255,.022),rgba(255,255,255,.006));
   box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 40px 80px -50px rgba(0,0,0,.9)}
 #weeklyReview .panel-head{margin-bottom:22px;gap:12px;flex-wrap:wrap}
 #weeklyReview .panel-head h2{font-size:19px;font-weight:650;letter-spacing:-.02em;gap:12px}
-#weeklyReview .panel-head h2::before{display:block;width:34px;height:34px;border-radius:11px;border:1px solid rgba(169,155,255,.28);background-color:rgba(124,108,240,.14);box-shadow:inset 0 1px 0 rgba(255,255,255,.08)}
+#weeklyReview .panel-head h2::before{display:block;width:34px;height:34px;border-radius:11px;border:1px solid rgba(185,164,255,.6);background-color:rgba(139,108,255,.3);box-shadow:inset 0 1px 0 rgba(255,255,255,.08)}
 #weeklyReview .panel-head .hint{font:500 11.5px "IBM Plex Mono",ui-monospace,monospace;color:var(--sub);padding:7px 14px;border-radius:99px;border:1px solid var(--pr-line);background:rgba(255,255,255,.025)}
 
 /* hero */
 #weeklyReview .wr-hero{border-radius:24px;border:1px solid var(--pr-line);overflow:hidden;margin-bottom:16px;
-  background:radial-gradient(620px 260px at 0% 0%,rgba(111,224,168,.11),transparent 70%),var(--pr-card);box-shadow:inset 0 1px 0 rgba(255,255,255,.07)}
-#weeklyReview .wr-hero:has(.wr-net[style*="--red"]){background:radial-gradient(620px 260px at 0% 0%,rgba(242,137,125,.12),transparent 70%),var(--pr-card)}
+  background:radial-gradient(620px 260px at 0% 0%,rgba(37,242,160,.22),transparent 70%),var(--pr-card);box-shadow:inset 0 1px 0 rgba(255,255,255,.07)}
+#weeklyReview .wr-hero:has(.wr-net[style*="--red"]){background:radial-gradient(620px 260px at 0% 0%,rgba(255,92,117,.24),transparent 70%),var(--pr-card)}
 #weeklyReview .wr-hero-main{padding:34px 36px 26px}
 #weeklyReview .wr-lab{font-size:12px;font-weight:550;letter-spacing:.01em;text-transform:none;color:var(--sub)}
 #weeklyReview .wr-net{margin-top:10px;font-size:clamp(46px,6.4vw,68px);font-weight:650;line-height:1;letter-spacing:-.045em;font-variant-numeric:tabular-nums;
-  background:linear-gradient(180deg,#c9ffe3 0%,#6fe0a8 55%,#3bb27a 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent!important;filter:drop-shadow(0 10px 30px rgba(111,224,168,.22))}
-#weeklyReview .wr-net[style*="--red"]{background:linear-gradient(180deg,#ffd3cd 0%,#f2897d 55%,#d4574b 100%);-webkit-background-clip:text;background-clip:text;filter:drop-shadow(0 10px 30px rgba(242,137,125,.2))}
+  background:linear-gradient(180deg,#d9fff0 0%,#25f2a0 50%,#00c97a 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent!important;filter:drop-shadow(0 10px 30px rgba(37,242,160,.5))}
+#weeklyReview .wr-net[style*="--red"]{background:linear-gradient(180deg,#ffd9e0 0%,#ff5c75 50%,#e0264d 100%);-webkit-background-clip:text;background-clip:text;filter:drop-shadow(0 10px 30px rgba(255,92,117,.5))}
 #weeklyReview .wr-net-sub{margin-top:14px;font-size:13.5px;color:var(--sub);max-width:60ch}
 
 /* trade tape */
 #weeklyReview .wr-tape{height:92px;margin-top:30px;gap:4px}
 #weeklyReview .wr-tape .tk{min-width:3px;max-width:9px}
 #weeklyReview .wr-tape .tk i{border-radius:99px;opacity:1}
-#weeklyReview .wr-tape .tk.w i{background:linear-gradient(0deg,var(--pr-mint-d),#9af2c5);box-shadow:0 0 14px -2px rgba(111,224,168,.45)}
-#weeklyReview .wr-tape .tk.l i{background:linear-gradient(180deg,var(--pr-coral-d),#f7a399);opacity:.92;box-shadow:0 0 14px -2px rgba(242,137,125,.35)}
+#weeklyReview .wr-tape .tk.w i{background:linear-gradient(0deg,var(--pr-mint-d),#7dffc8);box-shadow:0 0 14px -2px rgba(37,242,160,.75)}
+#weeklyReview .wr-tape .tk.l i{background:linear-gradient(180deg,var(--pr-coral-d),#ff9db0);opacity:.92;box-shadow:0 0 14px -2px rgba(255,92,117,.65)}
 #weeklyReview .wr-tape .tk.b i{background:rgba(255,255,255,.28)}
 #weeklyReview .wr-tape .tk:hover i{filter:brightness(1.25)}
 #weeklyReview .wr-tape-cap{margin-top:12px;font-size:11.5px;color:var(--faint)}
@@ -10194,7 +10194,7 @@ window.__renderAnSetups=renderBoth;window.__renderAnEmotions=renderEmo;setTimeou
 #weeklyReview .wr-cols{gap:16px}
 #weeklyReview .a-s,#weeklyReview .wr-block{padding:26px 28px;border-radius:24px;border:1px solid var(--pr-line);background:var(--pr-card);box-shadow:inset 0 1px 0 rgba(255,255,255,.06)}
 #weeklyReview .a-s-head{margin-bottom:14px}
-#weeklyReview .a-s-ic{width:34px;height:34px;border-radius:11px;border:1px solid rgba(169,155,255,.28);background:rgba(124,108,240,.14);box-shadow:inset 0 1px 0 rgba(255,255,255,.08)}
+#weeklyReview .a-s-ic{width:34px;height:34px;border-radius:11px;border:1px solid rgba(185,164,255,.6);background:rgba(139,108,255,.3);box-shadow:inset 0 1px 0 rgba(255,255,255,.08)}
 #weeklyReview .a-s-ic svg,#weeklyReview .a-s:hover .a-s-ic svg{stroke:var(--pr-vio)}
 #weeklyReview .a-s h3{font-size:15.5px;font-weight:650;letter-spacing:-.015em}
 #weeklyReview .a-s .sub{margin:2px 0 0 46px;font-size:12.5px;color:var(--faint)}
@@ -10204,8 +10204,8 @@ window.__renderAnSetups=renderBoth;window.__renderAnEmotions=renderEmo;setTimeou
 #weeklyReview .wr-day{grid-template-columns:40px minmax(0,1fr) 84px;margin-bottom:16px;font-size:13.5px}
 #weeklyReview .wr-day b{font:500 12px "IBM Plex Mono",ui-monospace,monospace;color:var(--sub)}
 #weeklyReview .wr-track{height:9px;border-radius:99px;background:rgba(255,255,255,.045);border:0;overflow:hidden}
-#weeklyReview .wr-track i.wr-up{background:linear-gradient(90deg,var(--pr-mint-d),#8cf0bd);opacity:1;box-shadow:0 0 16px rgba(111,224,168,.35)}
-#weeklyReview .wr-track i.wr-dn{background:linear-gradient(90deg,var(--pr-coral-d),#f7a399);opacity:1;box-shadow:0 0 16px rgba(242,137,125,.3)}
+#weeklyReview .wr-track i.wr-up{background:linear-gradient(90deg,var(--pr-mint-d),#6bffbd);opacity:1;box-shadow:0 0 16px rgba(37,242,160,.6)}
+#weeklyReview .wr-track i.wr-dn{background:linear-gradient(90deg,var(--pr-coral-d),#ff9db0);opacity:1;box-shadow:0 0 16px rgba(255,92,117,.55)}
 #weeklyReview .wr-day span.val{font-weight:650;font-variant-numeric:tabular-nums;letter-spacing:-.01em}
 #weeklyReview .wr-day:has(.wr-up) span.val{color:var(--pr-mint)!important}
 #weeklyReview .wr-day:has(.wr-dn) span.val{color:var(--pr-coral)!important}
@@ -10228,6 +10228,8 @@ window.__renderAnSetups=renderBoth;window.__renderAnEmotions=renderEmo;setTimeou
   #weeklyReview .a-s,#weeklyReview .wr-block{padding:20px 18px;border-radius:20px}
   #weeklyReview .wr-tape{height:76px}
 }
+#weeklyReview .a-s-ic svg,#weeklyReview .panel-head h2::before{filter:saturate(1.4)}
+#weeklyReview .wr-kv{text-shadow:0 0 24px rgba(185,164,255,.18)}
 </style>
 <script id="jl-weekly-review">
 /* Weekend weekly review (Saturday and Sunday trading days), shown on Today's Summary and at the top of the Calendar tab (one panel, moved to whichever of the two is open). Trading day and week use the same 06:00 IST / Monday-Sunday rules as the rest of the app.
