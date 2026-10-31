@@ -10250,6 +10250,32 @@ window.__renderAnSetups=renderBoth;window.__renderAnEmotions=renderEmo;setTimeou
 #weeklyReview .wr-track i.wr-dn{background:linear-gradient(90deg,#e11d6a,#fb923c);box-shadow:none}
 @media(max-width:900px){#weeklyReview .wr-tape{height:96px}}
 #weeklyReview .wr-sc polyline{stroke-linecap:round}
+/* hero: win-rate ring, trade chips, day labels */
+#weeklyReview .wr-hero-main{display:grid;grid-template-columns:minmax(0,1fr) auto;column-gap:36px;align-items:start}
+#weeklyReview .wr-hero-main>*{grid-column:1}
+#weeklyReview .wr-hero-main>.wr-tape,#weeklyReview .wr-hero-main>.wr-daylabels{grid-column:1/-1}
+#weeklyReview .wr-ring{grid-column:2;grid-row:1/span 4;align-self:center;position:relative;width:148px;height:148px}
+#weeklyReview .wr-ring svg{width:100%;height:100%;display:block}
+#weeklyReview .wr-ring-c{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+#weeklyReview .wr-ring-c b{font-size:28px;font-weight:650;letter-spacing:-.03em;line-height:1}
+#weeklyReview .wr-ring-c span{margin-top:5px;font-size:11.5px;color:var(--sub)}
+#weeklyReview .wr-chips2{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+#weeklyReview .wr-chip2{display:inline-flex;align-items:center;gap:8px;padding:7px 13px;border-radius:99px;border:1px solid var(--pr-line);background:rgba(255,255,255,.03);font-size:12.5px}
+#weeklyReview .wr-chip2 i{width:7px;height:7px;border-radius:50%;background:var(--pr-vio)}
+#weeklyReview .wr-chip2.g i{background:#22c98a}
+#weeklyReview .wr-chip2.r i{background:#f2547d}
+#weeklyReview .wr-chip2 em{font-style:normal;color:var(--sub)}
+#weeklyReview .wr-chip2 b{font-weight:650;font-variant-numeric:tabular-nums}
+#weeklyReview .wr-chip2.g b{color:#4be0a6}
+#weeklyReview .wr-chip2.r b{color:#ff7d9a}
+#weeklyReview .wr-tape .wr-dv{position:absolute;top:-6px;bottom:-6px;width:0;border-left:1px dashed rgba(255,255,255,.11);pointer-events:none}
+#weeklyReview .wr-tape .tk{z-index:1}
+#weeklyReview .wr-daylabels{position:relative;height:18px;margin-top:12px}
+#weeklyReview .wr-dl2{position:absolute;top:0;font:500 11.5px "IBM Plex Mono",ui-monospace,monospace;color:var(--sub);white-space:nowrap}
+@media(max-width:700px){
+  #weeklyReview .wr-hero-main{grid-template-columns:1fr}
+  #weeklyReview .wr-ring{grid-column:1;grid-row:auto;margin:18px 0 4px;width:120px;height:120px}
+}
 </style>
 <script id="jl-weekly-review">
 /* Weekend weekly review (Saturday and Sunday trading days), shown on Today's Summary and at the top of the Calendar tab (one panel, moved to whichever of the two is open). Trading day and week use the same 06:00 IST / Monday-Sunday rules as the rest of the app.
@@ -10511,11 +10537,28 @@ window.__renderAnSetups=renderBoth;window.__renderAnEmotions=renderEmo;setTimeou
       +kc('Worst day',(worst&&worst!==best)?money(days[worst].net):'-',(worst&&worst!==best)?dayName(worst):'');
     if(weekLim>0){ var wl=Math.max(0,-net), wlr=wl/weekLim;
       kp+=kc('Week loss','$'+wl.toFixed(2),'of $'+weekLim.toFixed(0)+' limit','<div class="wr-prog"><i style="width:'+Math.min(100,Math.round(wlr*100))+'%"></i></div>'); }
-    var hero='<section class="wr-hero"><div class="wr-hero-main"><div class="wr-lab">Net P&amp;L</div>'
+        var hxPn=ordered.map(function(t){ return Number(t.pnl); });
+    var hxBt=hxPn.length?Math.max.apply(null,hxPn):0, hxWt=hxPn.length?Math.min.apply(null,hxPn):0, hxAv=hxPn.length?net/hxPn.length:0;
+    function hxChip(c,l,v){ return '<span class="wr-chip2 '+c+'"><i></i><em>'+l+'</em><b>'+v+'</b></span>'; }
+    var hxChips='<div class="wr-chips2">'+hxChip('g','Best trade',money(hxBt))+hxChip('r','Worst trade',money(hxWt))+hxChip('v','Avg per trade',money(hxAv))+'</div>';
+    var hxTot=W+L+BE, hxR=46, hxCF=2*Math.PI*hxR, hxRing='';
+    if(hxTot){
+      var hxSegs=[[W,'#22c98a'],[L,'#f2547d'],[BE,'#6b7090']], hxOff=0, hxArcs='';
+      hxSegs.forEach(function(s){ if(!s[0]) return; var ln=s[0]/hxTot*hxCF, dl=Math.max(0.1,ln-4);
+        hxArcs+='<circle cx="60" cy="60" r="'+hxR+'" fill="none" stroke="'+s[1]+'" stroke-width="10" stroke-linecap="round" stroke-dasharray="'+dl.toFixed(2)+' '+(hxCF-dl).toFixed(2)+'" stroke-dashoffset="'+(-hxOff-2).toFixed(2)+'" transform="rotate(-90 60 60)"/>'; hxOff+=ln; });
+      hxRing='<div class="wr-ring" role="img" aria-label="Win rate '+(decided?wr+'%':'none')+'"><svg viewBox="0 0 120 120"><circle cx="60" cy="60" r="'+hxR+'" fill="none" stroke="rgba(255,255,255,.06)" stroke-width="10"/>'+hxArcs+'</svg><div class="wr-ring-c"><b>'+(decided?wr+'%':'-')+'</b><span>win rate</span></div></div>';
+    }
+    var hxStarts=[], hxLast=null;
+    ordered.forEach(function(t,i){ if(t.d!==hxLast){ hxStarts.push([t.d,i]); hxLast=t.d; } });
+    var hxDen=Math.max(1,ordered.length-1);
+    var hxLab=hxStarts.map(function(x){ return '<span class="wr-dl2" style="left:'+(x[1]/hxDen*100).toFixed(2)+'%">'+dayName(x[0])+'</span>'; }).join('');
+    var hxDv=hxStarts.slice(1).map(function(x){ return '<span class="wr-dv" style="left:'+((x[1]-.5)/hxDen*100).toFixed(2)+'%"></span>'; }).join('');
+        var hero='<section class="wr-hero"><div class="wr-hero-main"><div class="wr-lab">Net P&amp;L</div>'
       +'<div class="wr-net"'+(net>0?' style="color:var(--green)"':net<0?' style="color:var(--red)"':'')+'>'+money(net)+'</div>'
       +'<div class="wr-net-sub">'+verdict+' &middot; '+n+' trade'+(n===1?'':'s')+' over '+dk.length+' trading day'+(dk.length===1?'':'s')+' &middot; after commission and swap</div>'
-      +'<div class="wr-tape" role="img" aria-label="Every trade this week in order, wins above the line and losses below">'+tape+'</div>'
-      +'<div class="wr-tape-cap"><span>First trade</span><span>Last trade</span></div></div>'
+      +hxChips+hxRing
+      +'<div class="wr-tape" role="img" aria-label="Every trade this week in order, wins above the line and losses below">'+hxDv+tape+'</div>'
+      +'<div class="wr-daylabels">'+hxLab+'</div></div>'
       +'<div class="wr-kpis">'+kp+'</div></section>';
 
     /* daily bars: Mon-Fri always, Sat/Sun only if they have trades */
