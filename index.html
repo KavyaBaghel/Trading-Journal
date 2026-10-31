@@ -10276,6 +10276,34 @@ window.__renderAnSetups=renderBoth;window.__renderAnEmotions=renderEmo;setTimeou
   #weeklyReview .wr-hero-main{grid-template-columns:1fr}
   #weeklyReview .wr-ring{grid-column:1;grid-row:auto;margin:18px 0 4px;width:120px;height:120px}
 }
+/* heatmap + behaviour */
+#weeklyReview .wr-hmchips{margin:2px 0 6px}
+#weeklyReview .wr-heat{gap:6px;min-width:520px}
+#weeklyReview .wr-hh,#weeklyReview .wr-hd{font:500 11px "IBM Plex Mono",ui-monospace,monospace;color:var(--sub)}
+#weeklyReview .wr-hc{height:40px;border-radius:10px;font-size:12.5px;font-weight:650;color:#fff;transition:outline-color .15s}
+#weeklyReview .wr-hc:not([data-t]){background:radial-gradient(circle at center,rgba(255,255,255,.07) 1.5px,transparent 2px),rgba(255,255,255,.018)}
+#weeklyReview .wr-hc[data-t]:hover{outline:1.5px solid rgba(255,255,255,.55);outline-offset:1px}
+#weeklyReview .wr-legend{display:flex;flex-wrap:wrap;align-items:center;gap:10px 22px;font-size:12.5px;color:var(--sub)}
+#weeklyReview .wr-legend .lg{display:inline-flex;align-items:center;gap:10px}
+#weeklyReview .wr-legend .lg em{font-style:normal;color:var(--faint);font-size:12px}
+#weeklyReview .wr-legend .lg-bar{display:block;width:120px;height:8px;border-radius:99px;background:linear-gradient(90deg,#f2547d,rgba(255,255,255,.1) 50%,#22c98a)}
+#weeklyReview .wr-block>.wr-cols{gap:16px;align-items:start}
+#weeklyReview .wr-imp-col{padding:20px 22px;border:1px solid var(--pr-line);border-radius:20px;background:rgba(255,255,255,.022);min-width:0}
+#weeklyReview .wr-imp-col .a-s-head{margin-bottom:6px}
+#weeklyReview .wr-imp2{padding:14px 0;border-top:1px solid var(--pr-line)}
+#weeklyReview .wr-imp2:first-child{border-top:0}
+#weeklyReview .wr-imp2-t{display:flex;align-items:center;gap:10px}
+#weeklyReview .wr-imp2 .nm{flex:1;min-width:0;font-weight:600;font-size:14px}
+#weeklyReview .wr-imp2 .ct{font-size:11.5px;color:var(--sub);padding:2px 10px;border-radius:99px;border:1px solid var(--pr-line);white-space:nowrap}
+#weeklyReview .wr-imp2 b{font-weight:650;font-variant-numeric:tabular-nums}
+#weeklyReview .wr-imp2 b.pos{color:#4be0a6}
+#weeklyReview .wr-imp2 b.neg{color:#ff7d9a}
+#weeklyReview .wr-imp2-bar{height:6px;border-radius:99px;background:rgba(255,255,255,.05);margin-top:10px;overflow:hidden}
+#weeklyReview .wr-imp2-bar i{display:block;height:100%;border-radius:99px;background:#8b8fa8}
+#weeklyReview .wr-imp2-bar i.pos{background:linear-gradient(90deg,#0ea5a4,#4ade80)}
+#weeklyReview .wr-imp2-bar i.neg{background:linear-gradient(90deg,#e11d6a,#fb923c)}
+#weeklyReview .wr-empty2{margin-top:14px;padding:26px 14px;text-align:center;font-size:13px;color:var(--sub);border:1px dashed rgba(255,255,255,.12);border-radius:14px}
+#weeklyReview .wr-block>.wr-cap{margin-top:16px;padding:13px 16px;border-radius:14px;border:1px solid rgba(185,164,255,.2);background:rgba(139,108,255,.07);color:#c4c7d4;font-size:12.5px;line-height:1.55}
 </style>
 <script id="jl-weekly-review">
 /* Weekend weekly review (Saturday and Sunday trading days), shown on Today's Summary and at the top of the Calendar tab (one panel, moved to whichever of the two is open). Trading day and week use the same 06:00 IST / Monday-Sunday rules as the rest of the app.
@@ -10450,13 +10478,21 @@ window.__renderAnSetups=renderBoth;window.__renderAnEmotions=renderEmo;setTimeou
       hours.forEach(function(x){
         var c=cell[d+'|'+x];
         if(!c){ grid+='<span class="wr-hc"></span>'; return; }
-        var f=maxAbs?Math.min(1,Math.abs(c.net)/maxAbs):0, a=(.1+f*.34).toFixed(2), rgb=c.net<0?'240,104,92':c.net>0?'67,215,135':'139,144,163';
+        var f=maxAbs?Math.min(1,Math.abs(c.net)/maxAbs):0, a=(.24+f*.62).toFixed(2), rgb=c.net<0?'242,84,125':c.net>0?'34,201,138':'139,144,163';
         var tip='<div class="th">'+dayName(d)+' '+pad(x)+':00</div><div class="tr"><span>Trades</span><b>'+c.n+'</b></div><div class="tr"><span>Net P&amp;L</span><b>'+money(c.net)+'</b></div>';
-        grid+='<span class="wr-hc" data-t="'+esc(tip)+'" style="background:rgba('+rgb+','+a+');box-shadow:inset 0 0 0 1px rgba('+rgb+',.2)">'+c.n+'</span>';
+        grid+='<span class="wr-hc" data-t="'+esc(tip)+'" style="background:linear-gradient(155deg,rgba('+rgb+','+a+'),rgba('+rgb+','+(a*.5).toFixed(2)+'));box-shadow:inset 0 0 0 1px rgba('+rgb+',.38)">'+c.n+'</span>';
       });
     });
-    return '<section class="a-s wr-block">'+head+'<div class="a-plot wr-hm-wrap">'+grid+'</div></div>'
-      +'<div class="a-read">Number is trades opened that hour. <span style="color:var(--green)">Green</span> is net profit, <span style="color:var(--red)">red</span> is net loss. Brighter means a bigger P&amp;L swing.</div></section>';
+    var hxK=Object.keys(cell), hxBest=null, hxWorst=null, hxBusy=null;
+    hxK.forEach(function(k){ var c=cell[k]; if(!hxBest||c.net>cell[hxBest].net) hxBest=k; if(!hxWorst||c.net<cell[hxWorst].net) hxWorst=k; if(!hxBusy||c.n>cell[hxBusy].n) hxBusy=k; });
+    function hxLbl(k){ var p=k.split('|'); return dayName(p[0])+' '+pad(p[1])+':00'; }
+    function hxc(cl,l,v){ return '<span class="wr-chip2 '+cl+'"><i></i><em>'+l+'</em><b>'+v+'</b></span>'; }
+    var hxCh='<div class="wr-chips2 wr-hmchips">'
+      +(hxBest&&cell[hxBest].net>0?hxc('g','Best hour',hxLbl(hxBest)+' &middot; '+money(cell[hxBest].net)):'')
+      +(hxWorst&&cell[hxWorst].net<0?hxc('r','Worst hour',hxLbl(hxWorst)+' &middot; '+money(cell[hxWorst].net)):'')
+      +(hxBusy?hxc('v','Busiest',hxLbl(hxBusy)+' &middot; '+cell[hxBusy].n+' trades'):'')+'</div>';
+    return '<section class="a-s wr-block">'+head+hxCh+'<div class="a-plot wr-hm-wrap">'+grid+'</div></div>'
+      +'<div class="a-read wr-legend"><span>Number is trades opened that hour.</span><span class="lg"><em>Loss</em><i class="lg-bar"></i><em>Profit</em></span><span>Brighter means a bigger P&amp;L swing.</span></div></section>';
   }
   function impactHtml(rows){
     var J=(window.__getJournals?window.__getJournals():[])||[], em={}, mt={}, eo={}, none=0;
@@ -10471,16 +10507,18 @@ window.__renderAnSetups=renderBoth;window.__renderAnEmotions=renderEmo;setTimeou
     function list(title,o,empty){
       var ks=Object.keys(o).sort(function(a,c){ return o[a].net-o[c].net; }), mx=0;
       ks.forEach(function(k){ mx=Math.max(mx,Math.abs(o[k].net)); });
-      if(!ks.length) return '<div>'+hd(title)+'<div class="wr-empty">'+empty+'</div></div>';
-      return '<div>'+hd(title)+'<table class="wr-mini"><thead><tr><th>Name</th><th>Trades</th><th>P&amp;L</th></tr></thead><tbody>'
-        +ks.map(function(k){ var x=o[k]; return '<tr><td class="ev">'+esc(k)+'</td><td>'+x.n+'</td><td style="color:'+(x.net<0?'var(--red)':x.net>0?'var(--green)':'var(--sub)')+'">'+money(x.net)+'<span class="wr-mb"><i style="width:'+(mx?Math.max(4,Math.round(Math.abs(x.net)/mx*100)):0)+'%;background:'+(x.net<0?'var(--red)':x.net>0?'var(--green)':'var(--sub)')+'"></i></span></td></tr>'; }).join('')+'</tbody></table></div>';
+      if(!ks.length) return '<div class="wr-imp-col">'+hd(title)+'<div class="wr-empty2">'+empty+'</div></div>';
+      return '<div class="wr-imp-col">'+hd(title)+'<div class="wr-imp-list">'+ks.map(function(k){
+        var x=o[k], cl=x.net<0?'neg':x.net>0?'pos':'', w=mx?Math.max(6,Math.round(Math.abs(x.net)/mx*100)):0;
+        return '<div class="wr-imp2"><div class="wr-imp2-t"><span class="nm">'+esc(k)+'</span><span class="ct">'+x.n+' trade'+(x.n===1?'':'s')+'</span><b class="'+cl+'">'+money(x.net)+'</b></div><div class="wr-imp2-bar"><i class="'+cl+'" style="width:'+w+'%"></i></div></div>';
+      }).join('')+'</div></div>';
     }
     return '<div class="wr-block a-s"><div class="wr-cols">'
       +list('MISTAKE IMPACT ON P&amp;L',mt,'No mistake tags saved on this week\'s trades.')
       +list('EMOTION IMPACT ON P&amp;L',eo,'No emotion logged on this week\'s journal entries.')
       +'</div><div class="wr-cap">'+none+' of '+rows.length+' trade'+(rows.length===1?'':'s')+' have no mistake tag or emotion logged, so they are left out above. A trade with two tags counts under both, so totals can add up to more than net P&amp;L.</div></div>';
   }
-  function hd(t){ var s=String(t||''), ttl=s.charAt(0)+s.slice(1).toLowerCase().replace(/\bist\b/g,'IST').replace(/p&amp;l/g,'P&amp;L'); var ic=/EQUITY/.test(s)?'<path d="M3 17l5-6 4 3 8-9"/>':/HEATMAP/.test(s)?'<path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h6v6h-6z"/>':'<path d="M4 19V9M11 19V4M18 19v-7"/>'; return '<div class="a-s-head"><div class="a-s-ttl"><span class="a-s-ic"><svg viewBox="0 0 24 24">'+ic+'</svg></span><h3>'+ttl+'</h3></div></div>'; }
+  function hd(t){ var s=String(t||''), ttl=s.charAt(0)+s.slice(1).toLowerCase().replace(/\bist\b/g,'IST').replace(/p&amp;l/g,'P&amp;L'); var ic=/EQUITY/.test(s)?'<path d="M3 17l5-6 4 3 8-9"/>':/HEATMAP/.test(s)?'<path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h6v6h-6z"/>':/MISTAKE/.test(s)?'<path d="M12 4l9 16H3zM12 10v4M12 17h.01"/>':/EMOTION/.test(s)?'<circle cx="12" cy="12" r="9"/><path d="M8 14c1 1.5 2.5 2 4 2s3-.5 4-2M9 9.5h.01M15 9.5h.01"/>':'<path d="M4 19V9M11 19V4M18 19v-7"/>'; return '<div class="a-s-head"><div class="a-s-ttl"><span class="a-s-ic"><svg viewBox="0 0 24 24">'+ic+'</svg></span><h3>'+ttl+'</h3></div></div>'; }
   function safeBlock(label,fn){
     try{ return fn(); }catch(err){ return '<div class="wr-block a-s">'+hd(label)+'<div class="wr-empty">This section could not load ('+esc(err&&err.message||'error')+').</div></div>'; }
   }
