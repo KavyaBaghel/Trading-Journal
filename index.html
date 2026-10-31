@@ -10343,7 +10343,7 @@ window.__renderAnSetups=renderBoth;window.__renderAnEmotions=renderEmo;setTimeou
     ticks.forEach(function(v){ s+='<line x1="'+pl+'" x2="'+(Wd-pr)+'" y1="'+y(v).toFixed(1)+'" y2="'+y(v).toFixed(1)+'" stroke="rgba(255,255,255,.06)"/><text class="ax" x="'+(pl-6)+'" y="'+(y(v)+3).toFixed(1)+'" text-anchor="end">'+axMoney(v,span)+'</text>'; });
     s+='<line x1="'+pl+'" x2="'+(Wd-pr)+'" y1="'+y(0).toFixed(1)+'" y2="'+y(0).toFixed(1)+'" stroke="rgba(255,255,255,.2)"/>'
       +'<polygon points="'+X(0).toFixed(1)+','+y(0).toFixed(1)+' '+pts+' '+X(n-1).toFixed(1)+','+y(0).toFixed(1)+'" fill="url(#'+gid+')"/>'
-      +'<polyline points="'+pts+'" fill="none" stroke="'+color+'" stroke-width="1.8" stroke-linejoin="round"/>';
+      +'<polyline points="'+pts+'" fill="none" stroke="url(#'+gid+'s)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>';
     for(var i=0;i<n;i+=Math.max(1,Math.round(n/7))) s+='<text class="ax" x="'+X(i).toFixed(1)+'" y="'+(H-6)+'" text-anchor="middle">#'+(i+1)+'</text>';
     s+='<line class="sc-x" y1="'+pt+'" y2="'+(H-pb)+'" stroke="rgba(255,255,255,.25)" style="opacity:0"/><circle class="sc-d" r="4" fill="'+color+'" stroke="#fff" stroke-width="1.5" style="opacity:0"/></svg>';
     charts[id]={arr:arr,Wd:Wd,pl:pl,pr:pr,X:X,y:y,label:label};
