@@ -2202,6 +2202,83 @@
   .aic-w-btn.copied{color:var(--green);border-color:var(--green)}
   .aic-widget.aic-reveal{animation:aicRise 1.15s cubic-bezier(.16,1,.3,1) forwards}
 
+  /* ---------- AI Coach: premium layer (scoped to #view-ai, theme variables only) ---------- */
+  #view-ai .top h1{font-size:32px;letter-spacing:-.03em}
+  #view-ai .aic-snap{gap:16px;margin-bottom:16px}
+  #view-ai .aic-snap-card{padding:20px 22px 20px;border-radius:20px;background:linear-gradient(165deg,rgba(255,255,255,.05),rgba(255,255,255,0) 50%),var(--panel);box-shadow:0 1px 0 rgba(255,255,255,.05) inset,0 24px 44px -30px rgba(0,0,0,.9);transition:transform .45s cubic-bezier(.22,1,.36,1),box-shadow .45s cubic-bezier(.22,1,.36,1),border-color .45s cubic-bezier(.22,1,.36,1)}
+  #view-ai .aic-snap-card::after{content:"";position:absolute;left:0;right:0;top:0;height:2px;background:linear-gradient(90deg,transparent,var(--accent-2),transparent);opacity:.7}
+  #view-ai .aic-snap-card.neg::after{background:linear-gradient(90deg,transparent,var(--red),transparent)}
+  #view-ai .aic-snap-card .l{font-size:10.5px;text-transform:uppercase;letter-spacing:.11em;font-weight:650;color:var(--faint);margin-bottom:12px}
+  #view-ai .aic-snap-card .v{font-family:inherit;font-size:28px;font-weight:760;letter-spacing:-.03em}
+  #view-ai .aic-snap-card .s{font-size:11.5px;margin-top:7px}
+  #view-ai .aic-grid{align-items:stretch;gap:16px;margin-bottom:16px}
+  #view-ai .aic-chat{padding:24px 26px;border-radius:22px;background:radial-gradient(90% 50% at 0% 0%,color-mix(in srgb,var(--accent) 11%,transparent),transparent 65%),linear-gradient(165deg,rgba(255,255,255,.04),rgba(255,255,255,0) 40%),var(--panel);box-shadow:0 1px 0 rgba(255,255,255,.05) inset,0 28px 54px -34px rgba(0,0,0,.95)}
+  #view-ai .aic-thread{flex:1 1 0;min-height:170px;max-height:none;scroll-behavior:smooth;scrollbar-width:thin}
+  #view-ai .aic-msg.ai .aic-bubble{background:linear-gradient(165deg,rgba(255,255,255,.035),rgba(255,255,255,0)),var(--panel-2);border-radius:14px;box-shadow:0 10px 24px -18px rgba(0,0,0,.9)}
+  #view-ai .aic-msg.user .aic-bubble{box-shadow:0 12px 26px -14px color-mix(in srgb,var(--accent) 70%,transparent)}
+  #view-ai .aic-chip{border-radius:99px;padding:8px 14px;transition:transform .3s cubic-bezier(.34,1.56,.64,1),border-color .25s,background .25s,color .25s,box-shadow .3s}
+  #view-ai .aic-chip:hover{box-shadow:0 8px 20px -10px color-mix(in srgb,var(--accent) 80%,transparent)}
+  #view-ai .aic-input-row input{padding:13px 16px;border-radius:13px;transition:border-color .25s,box-shadow .3s}
+  #view-ai .aic-send{border-radius:13px;padding:0 22px;box-shadow:0 10px 22px -12px color-mix(in srgb,var(--accent) 90%,transparent);transition:transform .25s cubic-bezier(.34,1.56,.64,1),box-shadow .3s}
+  #view-ai .aic-rail{gap:16px}
+  #view-ai .aic-card{padding:20px 22px;border-radius:20px;background:linear-gradient(165deg,rgba(255,255,255,.045),rgba(255,255,255,0) 46%),var(--panel);box-shadow:0 1px 0 rgba(255,255,255,.045) inset,0 22px 44px -30px rgba(0,0,0,.9)}
+  #view-ai .aic-card-head .l{font-size:10.5px;text-transform:uppercase;letter-spacing:.11em;font-weight:650;color:var(--faint)}
+  #view-ai .aic-focus-amt{font-family:inherit;font-size:22px;font-weight:750;letter-spacing:-.02em;margin-top:3px}
+  #view-ai .aic-focus-amt.ok{color:var(--green)}
+  #view-ai .aic-card-head .pill{font-size:11px;padding:4px 11px;border-radius:99px;border:1px solid var(--border);background:rgba(255,255,255,.03);color:var(--sub)}
+  #view-ai .aic-sess-row b{font-family:inherit;font-variant-numeric:tabular-nums}
+  #view-ai .aic-rule-edit{align-items:stretch}
+  #view-ai .aic-rule-edit input{flex:1 1 auto;min-width:0;width:auto;padding:10px 12px}
+  #view-ai .aic-rule-edit .gg-btn-outline{flex:none;width:auto;white-space:nowrap}
+  #view-ai .aic-mark{border-radius:11px;padding:11px;transition:transform .25s cubic-bezier(.34,1.56,.64,1),border-color .25s,color .25s,background .25s}
+  #view-ai .aic-mark:hover{transform:translateY(-1px)}
+  #view-ai .aic-report{border-radius:22px;padding:24px 26px;margin-bottom:16px}
+  /* new insight cards */
+  .aic-ins-head{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;margin:30px 2px 14px}
+  .aic-ins-head h2{margin:0;font-size:17px;font-weight:700;letter-spacing:-.015em}
+  .aic-ins-head p{margin:4px 0 0;font-size:12.5px;color:var(--sub)}
+  .aic-ins{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin-bottom:16px}
+  .aic-ins-card{position:relative;overflow:hidden;padding:20px 22px 18px;border-radius:20px;display:flex;flex-direction:column;min-height:218px;background:linear-gradient(165deg,rgba(255,255,255,.045),rgba(255,255,255,0) 46%),var(--panel);box-shadow:0 1px 0 rgba(255,255,255,.045) inset,0 22px 44px -30px rgba(0,0,0,.9);transition:transform .45s cubic-bezier(.22,1,.36,1),box-shadow .45s cubic-bezier(.22,1,.36,1),border-color .45s cubic-bezier(.22,1,.36,1)}
+  .aic-ins-card:hover{transform:translateY(-4px);border-color:var(--border-hi);box-shadow:0 1px 0 rgba(255,255,255,.06) inset,0 30px 56px -30px rgba(0,0,0,.95),0 0 0 1px color-mix(in srgb,var(--accent) 12%,transparent)}
+  .aic-ins-card::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;opacity:0;transition:opacity .5s;background:radial-gradient(260px 120px at 85% 0%,color-mix(in srgb,var(--accent) 14%,transparent),transparent 70%)}
+  .aic-ins-card:hover::after{opacity:1}
+  .aic-ins-k{display:flex;align-items:center;gap:8px;font-size:10.5px;text-transform:uppercase;letter-spacing:.11em;font-weight:650;color:var(--faint);margin-bottom:14px}
+  .aic-ins-k svg{width:14px;height:14px;stroke:var(--accent-2);fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+  .aic-ins-big{font-size:26px;font-weight:760;letter-spacing:-.03em;font-variant-numeric:tabular-nums;line-height:1.1}
+  .aic-ins-big.pos{color:var(--green)}.aic-ins-big.neg{color:var(--red)}
+  .aic-ins-sub{font-size:12px;color:var(--sub);margin-top:5px;line-height:1.5}
+  .aic-ins-sub b{color:var(--text);font-weight:650}
+  .aic-ins-body{margin-top:14px;flex:1}
+  .aic-ins-foot{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:14px;padding-top:12px;border-top:1px solid var(--border);font-size:11px;color:var(--faint)}
+  .aic-ins-ask{background:none;border:1px solid var(--border-hi);color:var(--sub);border-radius:99px;padding:5px 12px;font:inherit;font-size:11.5px;font-weight:600;cursor:pointer;transition:color .25s,border-color .25s,background .25s,transform .3s cubic-bezier(.34,1.56,.64,1)}
+  .aic-ins-ask:hover{color:var(--text);border-color:var(--accent-2);background:color-mix(in srgb,var(--accent) 12%,transparent);transform:translateY(-1px)}
+  .aic-ins-empty{font-size:12.5px;color:var(--faint);line-height:1.55}
+  .aic-spark{display:block;width:100%;height:62px;overflow:visible}
+  .aic-spark path.ln{fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:var(--len,400);stroke-dashoffset:var(--len,400);animation:aicDraw 1.4s cubic-bezier(.22,1,.36,1) .25s forwards}
+  @keyframes aicDraw{to{stroke-dashoffset:0}}
+  .aic-dots{display:flex;flex-wrap:wrap;gap:5px}
+  .aic-dots i{width:15px;height:15px;border-radius:5px;background:rgba(255,255,255,.07);animation:ggFade .5s var(--ease) both}
+  .aic-dots i.w{background:var(--green);box-shadow:0 0 10px -2px color-mix(in srgb,var(--green) 70%,transparent)}
+  .aic-dots i.l{background:var(--red);box-shadow:0 0 10px -2px color-mix(in srgb,var(--red) 70%,transparent)}
+  .aic-pair{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .aic-mini{padding:11px 13px;border-radius:12px;background:var(--panel-2);border:1px solid var(--border)}
+  .aic-mini .a{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--faint);font-weight:650;margin-bottom:5px}
+  .aic-mini .b{font-size:15px;font-weight:720;font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+  .aic-mini .c{font-size:11px;color:var(--faint);margin-top:2px}
+  .aic-wd{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;align-items:end;height:92px}
+  .aic-wd div{display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:6px;height:100%;font-size:10.5px;color:var(--faint);font-weight:600}
+  .aic-wd i{display:block;width:100%;border-radius:7px 7px 3px 3px;min-height:3px;height:var(--h,3%);transform-origin:bottom;animation:aicGrow .9s cubic-bezier(.22,1,.36,1) both}
+  @keyframes aicGrow{from{transform:scaleY(0)}to{transform:scaleY(1)}}
+  .aic-meter{margin-bottom:12px}.aic-meter:last-child{margin-bottom:0}
+  .aic-meter .r{display:flex;justify-content:space-between;font-size:12px;color:var(--sub);margin-bottom:6px}
+  .aic-meter .r b{color:var(--text);font-variant-numeric:tabular-nums}
+  .aic-meter .t{height:6px;border-radius:99px;background:rgba(255,255,255,.07);overflow:hidden}
+  .aic-meter .t i{display:block;height:100%;width:var(--w,0%);border-radius:99px;background:var(--c,var(--accent));animation:aicBarIn 1.1s cubic-bezier(.22,1,.36,1) both}
+  @keyframes aicBarIn{from{width:0}}
+  @media (max-width:1000px){.aic-ins{grid-template-columns:repeat(2,minmax(0,1fr))}}
+  @media (max-width:640px){.aic-ins{grid-template-columns:1fr}#view-ai .aic-snap-card .v{font-size:24px}}
+  @media (prefers-reduced-motion:reduce){.aic-spark path.ln{animation:none;stroke-dashoffset:0}.aic-wd i,.aic-meter .t i,.aic-dots i{animation:none}.aic-ins-card{transition:none}}
+
   /* ---------- User Profile ---------- */
   #view-profile .wrap{max-width:1160px}
   .up-reveal{opacity:0;translate:0 10px;animation:upRise 1.2s cubic-bezier(.16,1,.3,1) forwards}
@@ -3841,6 +3918,9 @@ window.__mountOpenPos=function(){const o=(window.__openTrades||[]).concat((windo
       </div>
     </div>
   </div>
+
+  <div class="aic-ins-head aic-reveal" style="animation-delay:500ms"><div><h2>Edge and discipline</h2><p>Computed only from your logged trades. Cards need at least 8 trades in a bucket before they show a verdict.</p></div></div>
+  <div class="aic-ins" id="aicIns"></div>
 
   <div class="aic-report glass aic-reveal" style="animation-delay:520ms">
     <div class="aic-card-head">
@@ -8115,7 +8195,7 @@ function fillHero(){const s=(id,h)=>{const e=$(id);if(e)e.innerHTML=h};
     countUp($('aicN1'), A.n);
     countUp($('aicN2'), Math.round(A.wr), {suffix:'%'});
     countUp($('aicN3'), Math.abs(A.net), {prefix:A.net<0?'-$':'+$', decimals:2});
-    countUp($('aicN4'), Math.abs(rvNet), {prefix:rvNet<0?'-$':'$', decimals:2, suffix:' flagged'});
+    /* aicN4 text is set below from the real main leak; countUp used to overwrite it with "$0.00 flagged" */
     (function(){ /* snapshot subtext + main leak from the real data (was static demo text) */
       const sub = id => { const e = $(id); return e && e.parentElement.querySelector('.s'); };
       const w = sub('aicN2'); if(w) w.textContent = A.W+'W · '+A.L+'L · '+A.BE+'BE';
@@ -8126,7 +8206,7 @@ function fillHero(){const s=(id,h)=>{const e=$(id);if(e)e.innerHTML=h};
         const wm=ms.length?ms.reduce((a,b)=>b[1]<a[1]?b:a):null;
         const ls=lk.parentElement.querySelector('.s');
         if(wm){ lv.textContent=wm[0]; if(ls) ls.textContent=(wm[1]<0?'−$':'$')+Math.abs(wm[1]).toFixed(2)+' across '+wm[2]+(wm[2]===1?' trade':' trades'); }
-        else lv.textContent = (window.__trades||[]).some(t=>t.rev) ? 'Revenge trade' : 'None flagged';
+        else { lv.textContent = (window.__trades||[]).some(t=>t.rev) ? 'Revenge trade' : 'None flagged'; if(ls) ls.textContent = rvNet<0 ? '\u2212$'+Math.abs(rvNet).toFixed(2)+' flagged' : 'No leak flagged yet'; }
       }
     })();
     animateBars();
@@ -8213,6 +8293,134 @@ function fillHero(){const s=(id,h)=>{const e=$(id);if(e)e.innerHTML=h};
   }
 
   window.__mountAiCoach = mount;
+})();
+</script>
+<script id="jl-aic-insights">
+(function(){
+  var MIN=8, lastSig='';
+  var $=function(id){ return document.getElementById(id); };
+  var esc=function(s){ return String(s==null?'':s).replace(/[&<>"]/g,function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); };
+  var pad=function(n){ return n<10?'0'+n:''+n; };
+  var money=function(v){ return (v<0?'\u2212$':v>0?'+$':'$')+Math.abs(v).toFixed(2); };
+  var cls=function(v){ return v>0?'pos':v<0?'neg':''; };
+  function kind(p){ return typeof window.jlKind==='function'?window.jlKind(p):(p>0?'win':p<0?'loss':'be'); }
+  function rowsOf(trades){
+    return (trades||[]).filter(function(t){ return t&&t.d&&isFinite(Number(t.pnl)); })
+      .map(function(t){ return {d:t.d,t:String(t.t||''),pnl:Number(t.pnl),sl:t.sl,rev:!!t.rev,tags:(t.tags||[]).filter(function(g){ return typeof g==='string'&&g; })}; })
+      .sort(function(a,b){ return (a.d+a.t)<(b.d+b.t)?-1:(a.d+a.t)>(b.d+b.t)?1:0; });
+  }
+  function compute(trades){
+    var R=rowsOf(trades), n=R.length, o={n:n};
+    if(!n) return o;
+    var W=0,L=0,BE=0,gw=0,gl=0;
+    R.forEach(function(r){ var k=kind(r.pnl); r.k=k; if(k==='win'){W++;gw+=r.pnl;} else if(k==='loss'){L++;gl+=-r.pnl;} else BE++; });
+    o.W=W;o.L=L;o.BE=BE;
+    o.aw=W?gw/W:0; o.al=L?gl/L:0;
+    o.payoff=o.al?o.aw/o.al:0;
+    o.need=(o.aw+o.al)?o.al/(o.aw+o.al)*100:0;
+    o.have=(W+L)?W/(W+L)*100:0;
+    var last=R.slice(-20), eq=0; o.form=last.map(function(r){ eq+=r.pnl; return eq; }); o.formNet=eq; o.formW=last.filter(function(r){return r.k==='win';}).length; o.formL=last.filter(function(r){return r.k==='loss';}).length; o.formN=last.length;
+    // streaks over decided trades (break-evens are skipped)
+    var D=R.filter(function(r){ return r.k!=='be'; }), cur=0,curK='',bw=0,bl=0,run=0,runK='';
+    D.forEach(function(r){ if(r.k===runK) run++; else {runK=r.k;run=1;} if(r.k==='win'&&run>bw) bw=run; if(r.k==='loss'&&run>bl) bl=run; });
+    cur=run; curK=runK; o.streak=cur; o.streakK=curK; o.bestWin=bw; o.worstLoss=bl;
+    o.dots=R.slice(-16).map(function(r){ return r.k; });
+    // hour of day
+    var H={}; R.forEach(function(r){ var h=parseInt(r.t.slice(0,2),10); if(!isFinite(h)||h<0||h>23) return; var x=H[h]||(H[h]={h:h,n:0,net:0}); x.n++; x.net+=r.pnl; });
+    var hs=Object.keys(H).map(function(k){ return H[k]; }).filter(function(x){ return x.n>=MIN; });
+    o.hours=hs.length;
+    if(hs.length){ hs.sort(function(a,b){ return b.net-a.net; }); o.bestH=hs[0]; o.worstH=hs[hs.length-1]; if(o.bestH===o.worstH) o.worstH=null; }
+    // weekday
+    var WD=[0,0,0,0,0,0,0], WN=[0,0,0,0,0,0,0];
+    R.forEach(function(r){ var dt=new Date(r.d+'T00:00:00Z'); if(isNaN(dt)) return; var g=(dt.getUTCDay()+6)%7; WD[g]+=r.pnl; WN[g]++; });
+    o.wd=WD; o.wn=WN;
+    // discipline
+    o.noSl=R.filter(function(r){ return r.sl==null; }).length;
+    o.rev=R.filter(function(r){ return r.rev; }).length;
+    o.tagged=R.filter(function(r){ return r.tags.length; }).length;
+    return o;
+  }
+  var IC={
+    form:'<svg viewBox="0 0 24 24"><path d="M3 17l5-6 4 3 8-9"/></svg>',
+    pay:'<svg viewBox="0 0 24 24"><path d="M12 3v18M5 8l7-5 7 5M5 16l7 5 7-5"/></svg>',
+    str:'<svg viewBox="0 0 24 24"><path d="M13 2L4 14h7l-1 8 9-12h-7z"/></svg>',
+    hr:'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>',
+    wd:'<svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>',
+    dis:'<svg viewBox="0 0 24 24"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/><path d="M9 12l2 2 4-4"/></svg>'
+  };
+  function card(i,key,title,inner,foot,ask){
+    return '<div class="aic-ins-card glass aic-reveal" style="animation-delay:'+(540+i*60)+'ms"><div class="aic-ins-k">'+IC[key]+title+'</div>'+inner
+      +'<div class="aic-ins-foot"><span>'+foot+'</span>'+(ask?'<button type="button" class="aic-ins-ask" data-ask="'+esc(ask)+'">Ask coach</button>':'')+'</div></div>';
+  }
+  function hlabel(h){ return pad(h)+':00\u2013'+pad((h+1)%24)+':00'; }
+  function sparkSvg(v){
+    if(v.length<2) return '';
+    var w=240,h=62,mn=Math.min.apply(null,v.concat(0)),mx=Math.max.apply(null,v.concat(0)),rg=(mx-mn)||1;
+    var pts=v.map(function(y,i){ return [i/(v.length-1)*w, h-4-((y-mn)/rg)*(h-8)]; });
+    var d=pts.map(function(p,i){ return (i?'L':'M')+p[0].toFixed(1)+' '+p[1].toFixed(1); }).join(' ');
+    var zero=(h-4-((0-mn)/rg)*(h-8)).toFixed(1), col=v[v.length-1]>=0?'var(--green)':'var(--red)';
+    var len=Math.ceil(pts.reduce(function(s,p,i){ return i?s+Math.hypot(p[0]-pts[i-1][0],p[1]-pts[i-1][1]):0; },0))+4;
+    return '<svg class="aic-spark" viewBox="0 0 '+w+' '+h+'" preserveAspectRatio="none" aria-hidden="true"><line x1="0" x2="'+w+'" y1="'+zero+'" y2="'+zero+'" stroke="rgba(255,255,255,.12)" stroke-dasharray="3 4"/><path class="ln" d="'+d+'" stroke="'+col+'" style="--len:'+len+'"/></svg>';
+  }
+  function render(){
+    var host=$('aicIns'); if(!host) return;
+    var o=compute(window.__trades);
+    var sig=o.n+'|'+(o.form?o.form[o.form.length-1]:0)+'|'+(o.W||0)+'|'+(o.L||0);
+    if(sig===lastSig&&host.children.length) return; lastSig=sig;
+    if(o.n<MIN){ host.innerHTML='<div class="aic-ins-card glass" style="grid-column:1/-1;min-height:0"><div class="aic-ins-empty">Log at least '+MIN+' trades and these cards fill in. Nothing is estimated or made up.</div></div>'; return; }
+    var c=[], i=0;
+    c.push(card(i++,'form','Recent form',
+      '<div class="aic-ins-big '+cls(o.formNet)+'">'+money(o.formNet)+'</div><div class="aic-ins-sub">Last <b>'+o.formN+'</b> trades: <b>'+o.formW+'W</b> / <b>'+o.formL+'L</b></div><div class="aic-ins-body">'+sparkSvg(o.form)+'</div>',
+      'Cumulative P&amp;L','How have my last 20 trades gone and what changed compared with my overall record?'));
+    var gap=o.have-o.need, gapTxt=gap>=0?'above':'below';
+    c.push(card(i++,'pay','Payoff vs break-even',
+      '<div class="aic-ins-big '+(gap>=0?'pos':'neg')+'">'+Math.abs(gap).toFixed(1)+' pts '+gapTxt+'</div><div class="aic-ins-sub">Your win rate must reach <b>'+o.need.toFixed(1)+'%</b> to break even at this payoff. You are at <b>'+o.have.toFixed(1)+'%</b> (break-evens excluded).</div>'
+      +'<div class="aic-ins-body"><div class="aic-pair"><div class="aic-mini"><div class="a">Avg win</div><div class="b" style="color:var(--green)">+$'+o.aw.toFixed(2)+'</div></div><div class="aic-mini"><div class="a">Avg loss</div><div class="b" style="color:var(--red)">\u2212$'+o.al.toFixed(2)+'</div></div></div></div>',
+      'Payoff ratio '+o.payoff.toFixed(2),'Given my average win and average loss, what would fix my edge: win rate, bigger winners or smaller losers?'));
+    var sk=o.streakK==='win'?'win':'loss';
+    c.push(card(i++,'str','Streaks',
+      '<div class="aic-ins-big '+(o.streakK==='win'?'pos':'neg')+'">'+o.streak+' '+sk+(o.streak===1?'':(sk==='win'?'s':'es'))+' in a row</div><div class="aic-ins-sub">Longest win streak <b>'+o.bestWin+'</b>, longest loss streak <b>'+o.worstLoss+'</b></div>'
+      +'<div class="aic-ins-body"><div class="aic-dots">'+o.dots.map(function(k,j){ return '<i class="'+(k==='win'?'w':k==='loss'?'l':'')+'" style="animation-delay:'+(j*30)+'ms"></i>'; }).join('')+'</div></div>',
+      'Last '+o.dots.length+' trades, oldest first','What should I do after a losing streak based on my own log?'));
+    if(o.bestH){
+      var worst=o.worstH&&o.worstH.net<0?o.worstH:null;
+      c.push(card(i++,'hr','Hours (IST)',
+        '<div class="aic-ins-big pos">'+hlabel(o.bestH.h)+'</div><div class="aic-ins-sub">Best hour: <b>'+money(o.bestH.net)+'</b> over <b>'+o.bestH.n+'</b> trades</div>'
+        +'<div class="aic-ins-body">'+(worst?'<div class="aic-mini"><div class="a">Weakest hour</div><div class="b" style="color:var(--red)">'+hlabel(worst.h)+'</div><div class="c">'+money(worst.net)+' over '+worst.n+' trades</div></div>':'<div class="aic-ins-empty">No hour with 8+ trades is losing money.</div>')+'</div>',
+        o.hours+' hours with '+MIN+'+ trades','Which hours of the day should I trade and which should I avoid?'));
+    } else {
+      c.push(card(i++,'hr','Hours (IST)','<div class="aic-ins-empty">No single hour has '+MIN+'+ trades yet, so no verdict is shown.</div>','Needs more trades',''));
+    }
+    var names=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'], span=[0,1,2,3,4].concat(o.wn[5]?[5]:[],o.wn[6]?[6]:[]);
+    var mx=Math.max.apply(null,span.map(function(g){ return Math.abs(o.wd[g]); }).concat(1));
+    var bi=span.slice().sort(function(a,b){ return o.wd[b]-o.wd[a]; });
+    var best=bi[0], wst=bi[bi.length-1];
+    c.push(card(i++,'wd','Weekday edge',
+      '<div class="aic-ins-big '+cls(o.wd[best])+'">'+names[best]+' '+money(o.wd[best])+'</div><div class="aic-ins-sub">Weakest: <b>'+names[wst]+'</b> '+money(o.wd[wst])+'</div>'
+      +'<div class="aic-ins-body"><div class="aic-wd" style="grid-template-columns:repeat('+span.length+',1fr)">'+span.map(function(g,j){ var v=o.wd[g]; return '<div title="'+names[g]+' '+money(v)+' over '+o.wn[g]+' trades"><i style="--h:'+Math.max(4,Math.round(Math.abs(v)/mx*70))+'%;background:'+(v<0?'var(--red)':'var(--green)')+';opacity:'+(g===best||g===wst?1:.55)+';animation-delay:'+(j*70)+'ms"></i>'+names[g]+'</div>'; }).join('')+'</div></div>',
+      'Net P&amp;L per weekday','Which weekdays am I profitable on and what should I change on the bad ones?'));
+    var pct=function(x){ return o.n?Math.round(x/o.n*100):0; };
+    c.push(card(i++,'dis','Discipline',
+      '<div class="aic-ins-big '+(o.noSl?'neg':'pos')+'">'+(o.noSl?pct(o.noSl)+'% without a stop':'Every trade had a stop')+'</div><div class="aic-ins-sub"><b>'+o.noSl+'</b> of '+o.n+' trades have no stop-loss recorded</div>'
+      +'<div class="aic-ins-body"><div class="aic-meter"><div class="r"><span>Stop-loss recorded</span><b>'+(100-pct(o.noSl))+'%</b></div><div class="t"><i style="--w:'+(100-pct(o.noSl))+'%;--c:var(--green)"></i></div></div>'
+      +'<div class="aic-meter"><div class="r"><span>Mistake or emotion tagged</span><b>'+pct(o.tagged)+'%</b></div><div class="t"><i style="--w:'+pct(o.tagged)+'%;--c:var(--accent-2)"></i></div></div>'
+      +'<div class="aic-meter"><div class="r"><span>Flagged as revenge</span><b>'+o.rev+'</b></div><div class="t"><i style="--w:'+pct(o.rev)+'%;--c:var(--red)"></i></div></div></div>',
+      'Share of all trades','Where is my discipline weakest and what is the one habit to fix first?'));
+    host.innerHTML=c.join('');
+  }
+  document.addEventListener('click',function(e){
+    var b=e.target.closest&&e.target.closest('.aic-ins-ask'); if(!b) return;
+    var inp=$('aicInput'), send=$('aicSend'); if(!inp||!send||send.disabled) return;
+    inp.value=b.getAttribute('data-ask')||''; send.click();
+    var ch=document.querySelector('.aic-chat'); if(ch&&ch.scrollIntoView) ch.scrollIntoView({behavior:'smooth',block:'center'});
+  });
+  var orig=window.__mountAiCoach;
+  window.__aicInsights={compute:compute,render:render};
+  window.__mountAiCoach=function(){
+    var r; if(typeof orig==='function') r=orig.apply(this,arguments);
+    try{ var f=$('aicFocAmt'); if(f) f.classList.toggle('ok',/none/i.test(f.textContent||'')); render(); }catch(err){ if(window.console) console.warn('AI Coach cards',err); }
+    return r;
+  };
 })();
 </script>
 <script>
