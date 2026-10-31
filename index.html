@@ -2740,6 +2740,97 @@
     #view-profile .up-card,#view-profile .up-stat,#view-profile .up-hero{transition-duration:.01ms!important}
     #view-profile .up-card:hover,#view-profile .up-stat:hover,.glass:hover{transform:none}
   }
+
+  /* ---------- User Profile: soft premium pass ---------- */
+  #view-profile{--red:#ee9c92;--green:#7fdcb0;--border:rgba(255,255,255,.055);--border-hi:rgba(255,255,255,.1);--soft:rgba(255,255,255,.035);--soft-2:rgba(255,255,255,.06)}
+  #view-profile .wrap{max-width:1120px}
+  #view-profile .top h1{font-family:"Fraunces",serif;font-weight:500;font-size:40px;letter-spacing:-.015em}
+  #view-profile .top p{color:var(--sub)}
+  #view-profile .glass{border-radius:26px;border:1px solid var(--border);
+    background:linear-gradient(160deg,rgba(255,255,255,.05),rgba(255,255,255,.015) 55%),rgba(17,17,25,.72);
+    -webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);box-shadow:0 18px 40px -26px rgba(0,0,0,.65)}
+  #view-profile .glass::before{border-radius:26px;opacity:.3}
+  #view-profile .glass:hover{transform:none;border-color:var(--border-hi);box-shadow:0 22px 48px -26px rgba(0,0,0,.7),0 0 40px -18px rgba(124,108,240,.28)}
+  @media (hover:hover){#view-profile .up-hero:hover{transform:none}}
+
+  /* hero */
+  #view-profile .up-hero{padding:0 0 34px;margin-bottom:20px}
+  #view-profile .up-cover{height:164px;border-bottom:0;
+    background:radial-gradient(520px 240px at 16% 0%,rgba(124,108,240,.38),transparent 68%),
+      radial-gradient(420px 220px at 94% 10%,rgba(94,170,200,.2),transparent 65%),
+      linear-gradient(180deg,rgba(124,108,240,.1),rgba(17,17,25,0) 100%)}
+  #view-profile .up-cover::after{content:"";display:block;height:100%;background:linear-gradient(180deg,transparent 40%,rgba(17,17,25,.55))}
+  #view-profile .up-hero-body{padding:0 36px;margin-top:-34px}
+  #view-profile .up-avatar-wrap::before{animation:none;inset:-6px;padding:1.5px;opacity:.6;
+    background:linear-gradient(145deg,var(--accent-2),rgba(124,108,240,.08) 70%)}
+  #view-profile .up-avatar{box-shadow:0 14px 34px -14px rgba(124,108,240,.7),0 0 0 5px rgba(17,17,25,.9)}
+  #view-profile .up-avatar-badge{animation:none;box-shadow:0 0 0 3px rgba(17,17,25,.9);border:0}
+  #view-profile .up-name{font-size:33px;font-weight:500;letter-spacing:-.015em}
+  #view-profile .up-name-row{margin-bottom:6px;gap:12px}
+  #view-profile .up-phase-chip{font-weight:600;letter-spacing:.01em;border:0;background:rgba(124,108,240,.16);padding:5px 14px}
+  #view-profile .up-bio{font-size:14px;color:var(--sub);font-style:italic;margin-bottom:14px}
+  #view-profile .up-meta{font-size:12px;gap:10px}
+  #view-profile .up-meta-chip{background:var(--soft);border:1px solid var(--border);padding:7px 14px;color:var(--sub)}
+  #view-profile .up-meta-chip:hover{transform:none;border-color:var(--border-hi);color:var(--text)}
+  #view-profile .up-edit{height:38px;padding:0 18px 0 14px;background:var(--soft-2);border:1px solid var(--border-hi);box-shadow:none}
+  #view-profile .up-edit:hover,#view-profile .up-edit.editing{background:rgba(124,108,240,.24);border-color:rgba(179,159,251,.45);transform:none;box-shadow:none}
+  #view-profile .up-settings-menu{border-radius:18px;background:rgba(21,21,31,.96);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);padding:8px}
+  #view-profile .up-settings-menu button{border-radius:12px}
+
+  /* stats */
+  #view-profile .up-stats{gap:14px;margin-bottom:18px}
+  #view-profile .up-stat{padding:20px 22px}
+  #view-profile .up-stat .l{font-size:12.5px;font-weight:500;letter-spacing:0;color:var(--faint);margin-bottom:10px}
+  #view-profile .up-stat .v{font-family:inherit;font-size:25px;font-weight:600;letter-spacing:-.02em}
+
+  /* cards */
+  #view-profile .up-grid{gap:18px;margin-bottom:18px}
+  #view-profile .up-col{gap:18px}
+  #view-profile .up-card{padding:24px 26px}
+  #view-profile .up-card-head{font-family:"Fraunces",serif;font-size:18px;font-weight:500;letter-spacing:-.005em;margin-bottom:18px;gap:9px}
+  #view-profile .up-card-head::before{display:none}
+
+  /* identity + risk */
+  #view-profile .up-tags{gap:10px}
+  #view-profile .up-tag{font-size:13px;color:var(--text);background:rgba(124,108,240,.13);border:0;padding:8px 16px}
+  #view-profile .up-tag:not(.add):hover{transform:none;background:rgba(124,108,240,.2)}
+  #view-profile .up-tag.add{background:none;border:1px dashed var(--border-hi);color:var(--faint)}
+  #view-profile .up-tag.add:hover{transform:none;color:var(--accent-2);border-color:rgba(179,159,251,.5)}
+  #view-profile .up-risk-row,#view-profile .up-sess{font-size:14px;padding:14px 0;border-bottom:1px solid var(--border)}
+  #view-profile .up-risk-row b,#view-profile .up-sess b{font-family:inherit;font-size:13px;font-weight:600;font-variant-numeric:tabular-nums;
+    background:var(--soft-2);padding:5px 14px;border-radius:12px}
+  #view-profile .up-sess b.pos{background:rgba(127,220,176,.1)}
+  #view-profile .up-sess b.neg{background:rgba(238,156,146,.1)}
+
+  /* chart */
+  #view-profile .up-chart{height:150px;gap:22px;padding-top:8px}
+  #view-profile .up-chart-bar{max-width:52px;border-radius:16px 16px 6px 6px;opacity:.9}
+  #view-profile .up-chart-bar[style*="--red"]{background:linear-gradient(180deg,rgba(238,156,146,.9),rgba(238,156,146,.35))!important}
+  #view-profile .up-chart-bar[style*="--green"]{background:linear-gradient(180deg,rgba(127,220,176,.9),rgba(127,220,176,.35))!important}
+  #view-profile .up-chart-col .n{font-family:inherit;font-size:12px;font-weight:500;font-variant-numeric:tabular-nums}
+  #view-profile .up-chart-col .m{font-size:12px;font-weight:500}
+
+  /* achievements */
+  #view-profile .up-badges{gap:12px}
+  #view-profile .up-badge{border-radius:20px;padding:15px 17px;gap:14px;background:var(--soft);border:1px solid var(--border);opacity:.62}
+  #view-profile .up-badge:hover{transform:none;border-color:var(--border-hi)}
+  #view-profile .up-badge.on{opacity:1;background:linear-gradient(135deg,rgba(127,220,176,.12),rgba(127,220,176,.03));border-color:rgba(127,220,176,.2)}
+  #view-profile .up-badge .ic{font-size:18px;width:38px;height:38px;border-radius:13px;display:grid;place-items:center;background:var(--soft-2);flex:none}
+  #view-profile .up-badge.on .ic{background:rgba(127,220,176,.16)}
+  #view-profile .up-badge b{font-size:14px;font-weight:600}
+  #view-profile .up-badge span{font-size:12.5px}
+  #view-profile .up-badge-bar{height:5px;background:var(--soft-2)}
+
+  /* preferences */
+  #view-profile .up-toggle-row{padding:16px 0}
+  #view-profile .up-toggle-row b{font-size:14px;font-weight:600}
+  #view-profile .up-toggle-row span{font-size:12.5px;color:var(--faint)}
+  #view-profile .up-switch{width:44px;height:26px;background:var(--soft-2);border-color:transparent}
+  #view-profile .up-switch::after{width:20px;height:20px;top:3px;left:3px}
+  #view-profile .up-switch.on{background:linear-gradient(135deg,var(--accent),var(--accent-2))}
+  #view-profile .up-switch.on::after{transform:translateX(18px)}
+  @media (max-width:640px){#view-profile .up-hero-body{padding:0 20px}#view-profile .up-card{padding:20px}#view-profile .up-stat .v{font-size:21px}#view-profile .top h1{font-size:32px}}
+
 </style>
 <script>
 (function(){
@@ -4026,11 +4117,11 @@ window.__mountOpenPos=function(){const o=(window.__openTrades||[]).concat((windo
   </div>
 
   <div class="up-stats">
-    <div class="up-stat glass up-reveal" style="animation-delay:110ms"><div class="l">📒 Trades logged</div><div class="v mono" id="upN1">0</div></div>
-    <div class="up-stat glass up-reveal" style="animation-delay:150ms"><div class="l">🎯 Win rate</div><div class="v mono" id="upN2">0%</div></div>
-    <div class="up-stat glass neg up-reveal" style="animation-delay:190ms"><div class="l">💰 Net P&amp;L</div><div class="v mono" id="upN3">$0.00</div></div>
-    <div class="up-stat glass up-reveal" style="animation-delay:230ms"><div class="l">⚖️ Profit factor</div><div class="v mono" id="upN4">0.00</div></div>
-    <div class="up-stat glass neg up-reveal" style="animation-delay:270ms"><div class="l">📉 Max drawdown</div><div class="v mono" id="upN5">$0.00</div></div>
+    <div class="up-stat glass up-reveal" style="animation-delay:110ms"><div class="l"><span class="ic">📒</span><span>Trades logged</span></div><div class="v mono" id="upN1">0</div></div>
+    <div class="up-stat glass up-reveal" style="animation-delay:150ms"><div class="l"><span class="ic">🎯</span><span>Win rate</span></div><div class="v mono" id="upN2">0%</div></div>
+    <div class="up-stat glass neg up-reveal" style="animation-delay:190ms"><div class="l"><span class="ic">💰</span><span>Net P&amp;L</span></div><div class="v mono" id="upN3">$0.00</div></div>
+    <div class="up-stat glass up-reveal" style="animation-delay:230ms"><div class="l"><span class="ic">⚖️</span><span>Profit factor</span></div><div class="v mono" id="upN4">0.00</div></div>
+    <div class="up-stat glass neg up-reveal" style="animation-delay:270ms"><div class="l"><span class="ic">📉</span><span>Max drawdown</span></div><div class="v mono" id="upN5">$0.00</div></div>
   </div>
 
   <div class="up-grid">
