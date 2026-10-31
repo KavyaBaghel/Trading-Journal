@@ -3535,6 +3535,14 @@ window.__mountOpenPos=function(){const o=(window.__openTrades||[]).concat((windo
 
     <div class="pr-card" id="ggPropCard">
       <div class="pr-h"><h2>Prop firm progress</h2><span class="pr-sub" id="prSub">Uses all trades in your data. Add a challenge below to scope it to a phase.</span></div>
+      <div class="pr-plan" id="prPlan">
+        <span class="pr-l">FundingPips plan (5K)</span>
+        <div class="pr-plan-det" id="prPlanDet"></div>
+        <div class="pr-add"><select id="prPlanSel" aria-label="FundingPips plan"></select><select id="prPlanPh" aria-label="Phase"></select><button type="button" class="gg-btn-outline" id="prPlanApply">Fill setup</button></div>
+        <div class="pr-add"><input type="number" id="prPlanSpl" min="0" max="100" step="any" placeholder="Your profit split %" aria-label="Profit split percent"><button type="button" class="gg-btn-outline" id="prPlanSplBtn">Set split</button></div>
+        <small class="gg-field-note" id="prPlanNote">Pick a plan to fill daily loss, max loss and target in Account Settings and in the Challenges form below. Your profit split depends on the payout cycle you chose, so you set it yourself. Nothing is saved until you tap Save setup.</small>
+        <div class="pr-msg" id="prPlanMsg"></div>
+      </div>
       <div class="pr-scope" id="prScope" role="group" aria-label="Challenge scope"></div>
       <div id="ggPropBody"></div>
       <div class="pr-pay">
@@ -4271,6 +4279,20 @@ window.jlApplyChLimits=function(o){
     put('ggMdl', 4); put('ggMdlUnit', '%'); put('ggMdd', 12); put('ggMddUnit', '%'); put('ggPt', ggFpPt); put('ggCns', 0); put('ggMtd', 0); put('ggSpl', 0);
     if(window.__renderDDRing) window.__renderDDRing();
     if(typeof window.jlToast === 'function') window.jlToast({text:'FundingPips Phase ' + (ph === 2 ? '2' : '1') + ' values filled', sub:'Tap Save setup to keep them', duration:4000});
+  };
+
+  // Fills the Account Settings fields from a FundingPips plan (fields only, saving stays with Save setup).
+  window.ggFpFill = function(v){
+    const put = function(id, x){ const e = document.getElementById(id); if(e) e.value = x; };
+    if(v.bal != null){ ggState.bal = v.bal; put('ggBal', v.bal); }
+    if(v.mdl != null){ ggState.mdl = v.mdl; put('ggMdl', v.mdl); put('ggMdlUnit', '%'); }
+    if(v.mdd != null){ ggState.mdd = v.mdd; put('ggMdd', v.mdd); put('ggMddUnit', '%'); }
+    if(v.pt != null){ ggState.pt = v.pt; put('ggPt', v.pt); }
+    if(v.cns != null){ ggState.cns = v.cns; put('ggCns', v.cns); }
+    if(v.mtd != null){ ggState.mtd = v.mtd; put('ggMtd', v.mtd); }
+    if(v.spl != null){ ggState.spl = v.spl; put('ggSpl', v.spl); }
+    if(window.__renderDDRing) window.__renderDDRing();
+    return true;
   };
 
   // hydrate the Account panel + read-only displays from whatever was last saved
@@ -11889,6 +11911,11 @@ initFirebaseAuth().catch(err=>{
 @media (max-width:640px),(pointer:coarse){.pr-chip{min-height:44px}}
 @media (max-width:640px),(pointer:coarse){.pr-add input,.pr-add .gg-btn-outline,.pr-pr .gg-btn-outline{min-height:44px}}
 .pr-add .gg-btn-outline:focus-visible,.pr-pr .gg-btn-outline:focus-visible,.pr-add input:focus-visible{outline:2px solid var(--accent-2);outline-offset:2px}
+.pr-plan{margin:0 0 12px;padding-bottom:12px;border-bottom:1px solid var(--border)}
+.pr-plan-det{font-size:var(--fs-3);margin:6px 0 2px}
+.pr-add select{flex:1;min-width:130px;background:var(--panel-2);border:1px solid var(--border);border-radius:var(--r-2);color:var(--text);font-family:inherit;font-size:var(--fs-3);padding:9px 11px}
+.pr-add select:focus-visible{outline:2px solid var(--accent-2);outline-offset:2px}
+@media (max-width:640px),(pointer:coarse){.pr-add select{min-height:44px}}
 </style>
 <script id="jl-prop-rules">(function(){
 /* Prop firm progress: consistency rule, minimum trading days, profit split and a payout log.
@@ -11943,6 +11970,30 @@ function inactHtml(trades,today){var last=lastClosedDay(trades),n=last?dayGap(la
   if(last&&n===null)return '';
   if(n===null)return row('Days without a closed trade','No closed trades yet','mute','The count starts from your first closed trade. FundingPips closes the account after 30 days in a row with no fully closed trade.');
   return row('Days without a closed trade','Day '+n+' of 30',n>=30?'bad':'','Last closed trade on '+dayLabel(last)+'. FundingPips closes the account after 30 days in a row with no fully closed trade. An open trade does not reset it.')}
+/*FP-PURE-START*/
+/* FundingPips 5K plans. Only values that the published rule sets agree on are filled; the rest is listed in "skip" so you check it on your dashboard. */
+var FP_PLANS=[
+ {key:'2step-flex',name:'2 Step Flex',size:5000,phases:[{n:'Phase 1',dl:4,md:12,pt:10},{n:'Phase 2',dl:4,md:12,pt:6}],fill:{cns:0,mtd:0},skip:''},
+ {key:'2step-pro',name:'2 Step Pro',size:5000,phases:[{n:'Phase 1',dl:3,md:6,pt:6},{n:'Phase 2',dl:3,md:6,pt:6}],fill:{},skip:'consistency rule and minimum trading days (published sources disagree)'},
+ {key:'1step-std',name:'1-Step Standard',size:5000,phases:[{n:'Phase 1',dl:3,md:6,pt:10}],fill:{mtd:3},skip:'consistency rule'},
+ {key:'1step-flex',name:'1-Step Flex',size:5000,phases:[{n:'Phase 1',dl:3,md:12,pt:12}],fill:{mtd:0},skip:'consistency rule'},
+ {key:'zero',name:'Zero (instant funded)',size:5000,phases:[{n:'Master account',dl:3,md:5,pt:0}],fill:{cns:15},skip:'minimum trading days (published sources disagree). Zero\'s 5% loss limit trails your peak equity, while the drawdown buffer here uses a fixed floor from your initial balance'}
+];
+function fpPct(v,u,bal){v=Number(v);if(!isFinite(v)||v<=0)return 0;return u==='$'?(bal>0?Math.round(v/bal*10000)/100:0):v}
+function fpFind(k){for(var i=0;i<FP_PLANS.length;i++)if(FP_PLANS[i].key===k)return FP_PLANS[i];return null}
+function fpDetect(acc){acc=acc&&typeof acc==='object'?acc:{};var bal=Number(acc.balance)||0;
+  if(!(bal>0))return{s:'none',why:'Set your initial balance in Account Settings to detect the plan.'};
+  if(bal!==5000)return{s:'none',why:'This list covers 5K accounts only. Your initial balance is not 5,000.'};
+  var dl=fpPct(acc.maxDailyLossValue,acc.maxDailyLossUnit,bal),md=fpPct(acc.maxDrawdown,acc.maxDrawdownUnit,bal),pt=Number(acc.profitTargetPct)||0;
+  if(!(dl>0&&md>0))return{s:'none',why:'Set daily loss and max drawdown in Account Settings to detect the plan.'};
+  var hits=[];FP_PLANS.forEach(function(p){p.phases.forEach(function(ph,i){if(Math.abs(ph.dl-dl)<.011&&Math.abs(ph.md-md)<.011)hits.push({p:p,i:i})})});
+  if(!hits.length)return{s:'none',why:'Daily loss '+dl+'% and max loss '+md+'% do not match any plan in this list.'};
+  var byPt=hits.filter(function(h){return Math.abs((h.p.phases[h.i].pt||0)-pt)<.011}),use=byPt.length?byPt:hits,keys=[];
+  use.forEach(function(h){if(keys.indexOf(h.p.key)<0)keys.push(h.p.key)});
+  var info={dl:dl,md:md,pt:pt,ptOk:byPt.length>0};
+  if(keys.length>1){info.s='multi';info.keys=keys;return info}
+  var plan=use[0].p,idx=use.map(function(h){return h.i});info.s='one';info.key=plan.key;info.phase=idx.length===1?idx[0]:-1;return info}
+/*FP-PURE-END*/
 /*PR-PURE-END*/
 function $(id){return document.getElementById(id)}
 function rd(){try{return JSON.parse(localStorage.getItem(PK))}catch(_){return null}}
@@ -11956,7 +12007,7 @@ function cmsg(t){var m=$('chMsg');if(m)m.textContent=t||''}
 function selId(){try{return localStorage.getItem(SK)||''}catch(_){return ''}}
 function render(){var b=$('ggPropBody');if(!b)return;if(window.jlApplyChLimits)window.jlApplyChLimits();var list=cleanPayouts(rd()),chs=cleanChallenges(rdC()),sid=selId(),ch=chs.filter(function(c){return c.id===sid})[0]||null;
   b.innerHTML=limitsHtml(window.jlChInfo||null,chs.some(function(c){return c.dl||c.md||c.pt}))+inactHtml(window.__trades||[],typeof window.getTradingDayIST==='function'?window.getTradingDayIST():'')+summaryHtml(propStats(scopeTrades(window.__trades||[],ch),opts()),opts(),payoutTotal(list));var l=$('prList');if(l)l.innerHTML=listHtml(list);
-  var sb=$('prSub');if(sb)sb.textContent=subText(ch);var sc=$('prScope');if(sc)sc.innerHTML=chipsHtml(chs,ch?ch.id:'');var cl=$('chList');if(cl)cl.innerHTML=chListHtml(chs)}
+  var sb=$('prSub');if(sb)sb.textContent=subText(ch);var sc=$('prScope');if(sc)sc.innerHTML=chipsHtml(chs,ch?ch.id:'');var cl=$('chList');if(cl)cl.innerHTML=chListHtml(chs);planRender()}
 window.__renderProp=render;
 var card=$('ggPropCard'),armT=0;
 if(card)card.addEventListener('click',function(e){var t=e.target;if(!t.closest)return;
@@ -11978,6 +12029,36 @@ if(card)card.addEventListener('click',function(e){var t=e.target;if(!t.closest)r
   var del=t.closest('[data-prdel]');if(del){
     if(del.getAttribute('data-arm')!=='1'){del.setAttribute('data-arm','1');del.textContent='Tap again to delete';clearTimeout(armT);armT=setTimeout(render,3000);return}
     clearTimeout(armT);var id=del.getAttribute('data-prdel');wr(cleanPayouts(rd()).filter(function(p){return p.id!==id}));render()}});
+function rdA(){try{return JSON.parse(localStorage.getItem('jlAccountSettings'))}catch(_){return null}}
+var planTouched=false;
+function pmsg(t){var m=$('prPlanMsg');if(m)m.textContent=t||''}
+function planPhases(key,sel){var p=fpFind(key),ph=$('prPlanPh');if(!ph)return;
+  ph.innerHTML=p?p.phases.map(function(x,i){return '<option value="'+i+'">'+esc(x.n)+'</option>'}).join(''):'<option value="">Phase</option>';
+  ph.disabled=!p||p.phases.length<2;if(p&&typeof sel==='number'&&sel>=0)ph.value=String(sel)}
+function planRender(){var sel=$('prPlanSel'),det=$('prPlanDet');if(!sel||!det)return;
+  if(!sel.options.length){sel.innerHTML='<option value="">Choose a plan</option>'+FP_PLANS.map(function(p){return '<option value="'+esc(p.key)+'">'+esc(p.name)+'</option>'}).join('');planPhases('')}
+  var d=fpDetect(rdA()),t='';
+  if(d.s==='none')t='Plan not detected. '+d.why;
+  else if(d.s==='multi')t='Detected one of: '+d.keys.map(function(k){return fpFind(k).name}).join(' or ')+'. Set the profit target in Account Settings to tell them apart, or pick the plan below.';
+  else{var p=fpFind(d.key);t='Detected: '+p.name+(d.phase>=0&&p.phases.length>1?', '+p.phases[d.phase].n:'')+' (daily loss '+d.dl+'%, max loss '+d.md+'%'+(d.pt>0?', target '+d.pt+'%':'')+').'+(d.ptOk?'':' The profit target differs from the plan.')}
+  det.textContent=t;
+  if(!planTouched&&!sel.value&&d.s==='one'){sel.value=d.key;planPhases(d.key,d.phase)}}
+var cardP=$('ggPropCard');
+if(cardP){
+  cardP.addEventListener('change',function(e){if(e.target&&e.target.id==='prPlanSel'){planTouched=true;planPhases(e.target.value);pmsg('')}});
+  cardP.addEventListener('click',function(e){var t=e.target;if(!t.closest)return;
+    if(t.closest('#prPlanApply')){var p=fpFind(($('prPlanSel')||{}).value);if(!p){pmsg('Pick a plan first.');return}
+      var ph=p.phases[Number(($('prPlanPh')||{}).value)||0];
+      if(typeof window.ggFpFill!=='function'){pmsg('Account Settings is not ready yet. Try again in a moment.');return}
+      var v={bal:p.size,mdl:ph.dl,mdd:ph.md,pt:ph.pt||0};Object.keys(p.fill).forEach(function(k){v[k]=p.fill[k]});window.ggFpFill(v);
+      var nm=$('chName'),dl=$('chDl'),md=$('chMd'),pt=$('chPt');
+      if(nm)nm.value=(p.name+' '+ph.n).slice(0,40);if(dl)dl.value=ph.dl;if(md)md.value=ph.md;if(pt)pt.value=ph.pt>0?ph.pt:'';
+      pmsg('Filled '+p.name+', '+ph.n+' in Account Settings (initial balance 5,000) and in the Challenges form. Add a start date there and tap Add challenge. Tap Save setup to keep the Account Settings values.'+(p.skip?' Not filled: '+p.skip+'. Check your FundingPips dashboard.':''));
+      if(typeof window.jlToast==='function')window.jlToast({text:p.name+' '+ph.n+' values filled',sub:'Tap Save setup to keep them',duration:4000});return}
+    if(t.closest('#prPlanSplBtn')){var x=Number(($('prPlanSpl')||{}).value);
+      if(!isFinite(x)||!(x>0)||x>100){pmsg('Enter a profit split above 0 and up to 100.');return}
+      if(typeof window.ggFpFill!=='function'){pmsg('Account Settings is not ready yet. Try again in a moment.');return}
+      window.ggFpFill({spl:Math.round(x*100)/100});pmsg('Profit split set to '+(Math.round(x*100)/100)+'%. Tap Save setup to keep it.')}})}
 window.addEventListener('storage',function(ev){if(!ev.key||ev.key===PK||ev.key===CK||ev.key===SK)render()});
 setTimeout(render,1500);setInterval(render,30000);render();
 })();</script>
