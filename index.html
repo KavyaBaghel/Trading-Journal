@@ -10249,6 +10249,7 @@ window.__renderAnSetups=renderBoth;window.__renderAnEmotions=renderEmo;setTimeou
 #weeklyReview .wr-track i.wr-up{background:linear-gradient(90deg,#0ea5a4,#4ade80);box-shadow:none}
 #weeklyReview .wr-track i.wr-dn{background:linear-gradient(90deg,#e11d6a,#fb923c);box-shadow:none}
 @media(max-width:900px){#weeklyReview .wr-tape{height:96px}}
+#weeklyReview .wr-sc polyline{stroke-linecap:round}
 </style>
 <script id="jl-weekly-review">
 /* Weekend weekly review (Saturday and Sunday trading days), shown on Today's Summary and at the top of the Calendar tab (one panel, moved to whichever of the two is open). Trading day and week use the same 06:00 IST / Monday-Sunday rules as the rest of the app.
@@ -10315,7 +10316,7 @@ window.__renderAnSetups=renderBoth;window.__renderAnEmotions=renderEmo;setTimeou
   }
   function tileHtml(l,v,s,col){ return '<div class="wr-tile"><div class="l">'+l+'</div><div class="v"'+(col?' style="color:'+col+'"':'')+'>'+v+'</div>'+(s?'<div class="s">'+s+'</div>':'')+'</div>'; }
   /* ---------- chart + heatmap cards: same plot language as the Analytics tab, each one in its own card ---------- */
-  var CG='#c7cbd6', CR='#c7cbd6', charts={};
+  var CG='#2ee6a6', CR='#fb7185', charts={};
   var IC_EQ='<path d="M3 17l5-6 4 3 8-9"/>', IC_DD='<path d="M3 6h18M3 12c3 4 6-4 9 0s6 4 9 0"/>', IC_HM='<rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/>';
   function cardHead(ic,title,sub){ return '<div class="a-s-head"><div class="a-s-ttl"><span class="a-s-ic"><svg viewBox="0 0 24 24">'+ic+'</svg></span><h3>'+title+'</h3></div></div>'+(sub?'<div class="sub">'+sub+'</div>':''); }
   function axMoney(v,span){ var a=Math.abs(v); if(a<0.005) return '$0'; return (v<0?'-':'+')+'$'+a.toFixed(span>=40?0:1); }
@@ -10331,7 +10332,14 @@ window.__renderAnSetups=renderBoth;window.__renderAnEmotions=renderEmo;setTimeou
     function X(i){ return pl+i*(Wd-pl-pr)/Math.max(1,n-1); }
     var pts=arr.map(function(v,i){ return X(i).toFixed(1)+','+y(v).toFixed(1); }).join(' ');
     var gid='wrg-'+id, ticks=span>0?[hi,(hi+lo)/2,lo]:[0], s='';
-    s+='<svg class="a-cs wr-sc" data-c="'+id+'" viewBox="0 0 '+Wd+' '+H+'" role="img" aria-label="'+esc(aria)+'"><defs><linearGradient id="'+gid+'" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="'+color+'" stop-opacity="'+(up?'.42':'.05')+'"/><stop offset="1" stop-color="'+color+'" stop-opacity="'+(up?'.05':'.42')+'"/></linearGradient></defs>';
+    var zr=Math.max(0,Math.min(1,(y(0)-pt)/(H-pt-pb))).toFixed(3), y1=pt, y2=H-pb;
+    var GRAD='<linearGradient id="'+gid+'" gradientUnits="userSpaceOnUse" x1="0" x2="0" y1="'+y1+'" y2="'+y2+'">'
+      +'<stop offset="0" stop-color="#2ee6a6" stop-opacity=".5"/><stop offset="'+zr+'" stop-color="#2ee6a6" stop-opacity=".04"/>'
+      +'<stop offset="'+zr+'" stop-color="#fb7185" stop-opacity=".04"/><stop offset="1" stop-color="#e11d48" stop-opacity=".55"/></linearGradient>'
+      +'<linearGradient id="'+gid+'s" gradientUnits="userSpaceOnUse" x1="0" x2="0" y1="'+y1+'" y2="'+y2+'">'
+      +'<stop offset="0" stop-color="#7cf5c8"/><stop offset="'+zr+'" stop-color="#19c98b"/>'
+      +'<stop offset="'+zr+'" stop-color="#fb7185"/><stop offset="1" stop-color="#e11d48"/></linearGradient>';
+    s+='<svg class="a-cs wr-sc" data-c="'+id+'" viewBox="0 0 '+Wd+' '+H+'" role="img" aria-label="'+esc(aria)+'"><defs>'+GRAD+'</defs>';
     ticks.forEach(function(v){ s+='<line x1="'+pl+'" x2="'+(Wd-pr)+'" y1="'+y(v).toFixed(1)+'" y2="'+y(v).toFixed(1)+'" stroke="rgba(255,255,255,.06)"/><text class="ax" x="'+(pl-6)+'" y="'+(y(v)+3).toFixed(1)+'" text-anchor="end">'+axMoney(v,span)+'</text>'; });
     s+='<line x1="'+pl+'" x2="'+(Wd-pr)+'" y1="'+y(0).toFixed(1)+'" y2="'+y(0).toFixed(1)+'" stroke="rgba(255,255,255,.2)"/>'
       +'<polygon points="'+X(0).toFixed(1)+','+y(0).toFixed(1)+' '+pts+' '+X(n-1).toFixed(1)+','+y(0).toFixed(1)+'" fill="url(#'+gid+')"/>'
