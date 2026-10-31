@@ -4109,52 +4109,98 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'&&cur){shut();return}
 document.addEventListener('input',e=>{if(cur&&RUN[cur.dataset.tool]&&cur.contains(e.target))RUN[cur.dataset.tool]()});
 })();</script>
 <style id="mkCss">
-#view-market .mk-bar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;margin-bottom:16px}
-#view-market .mk-chips{display:flex;flex-wrap:wrap;gap:8px}
-#view-market .mk-chip{background:var(--panel);border:1px solid var(--border);color:var(--sub);font:600 12.5px inherit;font-family:inherit;padding:7px 14px;border-radius:999px;cursor:pointer;transition:.2s var(--ease)}
-#view-market .mk-chip:hover{border-color:var(--border-hi);color:var(--text)}
-#view-market .mk-chip.on{background:rgba(124,108,240,.18);border-color:rgba(124,108,240,.45);color:#c9c0ff}
-#view-market .mk-status{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--sub);background:var(--panel);border:1px solid var(--border);padding:7px 13px;border-radius:999px}
-#view-market .mk-status i{width:7px;height:7px;border-radius:50%;background:var(--faint)}
+#view-market{--mk-hi:var(--red,#ef4444);--mk-md:var(--accent-2,#f5a524);--mk-lo:var(--green,#27a644);--mk-pr:var(--primary,#494fdf)}
+#view-market .mk-bar{display:flex;flex-wrap:wrap;align-items:center;gap:12px 14px;padding:12px 14px;margin-bottom:14px;border-radius:16px}
+#view-market .mk-chips{display:flex;flex-wrap:wrap;gap:4px;align-items:center}
+#view-market .mk-chips[data-group=range],#view-market .mk-chips[data-group=impact]{background:rgba(255,255,255,.035);border:1px solid var(--border);border-radius:12px;padding:3px;flex-wrap:nowrap}
+#view-market .mk-chip{background:transparent;border:1px solid transparent;color:var(--sub);font-family:inherit;font-weight:600;font-size:12.5px;padding:7px 14px;border-radius:9px;cursor:pointer;transition:.2s var(--ease);display:inline-flex;align-items:center;gap:7px;white-space:nowrap}
+#view-market .mk-chip:hover{color:var(--text);background:rgba(255,255,255,.05)}
+#view-market .mk-chip.on{background:var(--mk-pr);color:#fff;box-shadow:0 4px 14px -4px rgba(73,79,223,.75)}
+#view-market #mkImpactChips .mk-chip::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--faint)}
+#view-market #mkImpactChips [data-val=high]::before{background:var(--mk-hi)}
+#view-market #mkImpactChips [data-val=medium]::before{background:var(--mk-md)}
+#view-market #mkImpactChips [data-val=low]::before{background:var(--mk-lo)}
+#view-market #mkCcyChips{order:5;flex:1 1 100%;gap:6px;border-top:1px solid var(--border);padding-top:12px}
+#view-market #mkCcyChips::before{content:"Currency";font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);font-weight:700;margin-right:8px}
+#view-market #mkCcyChips .mk-chip{border-color:var(--border);border-radius:999px;padding:6px 13px;font-size:12px;background:var(--panel)}
+#view-market #mkCcyChips .mk-chip:hover{border-color:var(--border-hi)}
+#view-market #mkCcyChips .mk-chip.on{background:rgba(73,79,223,.2);border-color:rgba(73,79,223,.6);color:#c9ccff;box-shadow:none}
+#view-market .mk-status{margin-left:auto;display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--sub);background:var(--panel);border:1px solid var(--border);padding:7px 13px;border-radius:999px;cursor:pointer;font-family:inherit}
+#view-market .mk-status i{width:7px;height:7px;border-radius:50%;background:var(--faint);box-shadow:0 0 0 3px rgba(255,255,255,.05)}
+#view-market .mk-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-bottom:16px}
+#view-market .mk-st{padding:14px 16px;border-radius:14px;background:var(--panel);border:1px solid var(--border);min-width:0;transition:.2s var(--ease)}
+#view-market .mk-st:hover{border-color:var(--border-hi);transform:translateY(-2px)}
+#view-market .mk-st small{display:block;font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);font-weight:700;margin-bottom:6px}
+#view-market .mk-st b{display:block;font-size:22px;letter-spacing:-.02em;font-variant-numeric:tabular-nums;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#view-market .mk-st span{display:block;font-size:12px;color:var(--sub);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#view-market .mk-st.hot b{color:var(--mk-hi)}
 #view-market .mk-grid{display:grid;grid-template-columns:minmax(0,1.7fr) minmax(0,1fr);gap:16px;align-items:start}
-#view-market .mk-card{padding:18px 20px}
+#view-market .mk-card{padding:18px 20px;position:relative;overflow:hidden}
+#view-market .mk-card::before{content:"";position:absolute;top:0;left:12%;right:12%;height:1px;background:linear-gradient(90deg,transparent,rgba(73,79,223,.6),transparent)}
 #view-market .mk-card h3{margin:0 0 14px;font-size:15px;display:flex;justify-content:space-between;align-items:center}
 #view-market .mk-card h3 small{font-weight:600;font-size:11.5px;color:var(--faint)}
-#view-market .mk-scroll{overflow-x:auto}
-#view-market .mk-tbl{width:100%;min-width:560px;border-collapse:collapse;font-size:13px}
-#view-market .mk-tbl th{text-align:left;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--faint);font-weight:700;padding:0 10px 10px}
-#view-market .mk-tbl td{padding:12px 10px;border-top:1px solid var(--border)}
-#view-market .mk-tbl tbody tr{transition:background .2s var(--ease)}
-#view-market .mk-tbl tbody tr:hover{background:rgba(255,255,255,.03)}
-#view-market .mk-day td{border-top:0;padding:16px 10px 6px;font-size:11.5px;font-weight:700;letter-spacing:.05em;color:var(--sub)}
+#view-market .mk-scroll{overflow:auto;max-height:640px;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.18) transparent}
+#view-market .mk-tbl{width:100%;min-width:600px;border-collapse:separate;border-spacing:0;font-size:13px}
+#view-market .mk-tbl th{position:sticky;top:0;z-index:2;background:var(--panel-2,#121218);text-align:left;font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);font-weight:700;padding:9px 10px;border-bottom:1px solid var(--border)}
+#view-market .mk-tbl td{padding:11px 10px;border-bottom:1px solid rgba(255,255,255,.045);vertical-align:middle}
+#view-market .mk-tbl tbody tr.mk-r{transition:background .2s var(--ease)}
+#view-market .mk-tbl tbody tr.mk-r:hover{background:rgba(255,255,255,.035)}
+#view-market .mk-r td:first-child{box-shadow:inset 3px 0 0 transparent}
+#view-market .mk-r.lv3 td:first-child{box-shadow:inset 3px 0 0 var(--mk-hi)}
+#view-market .mk-r.lv2 td:first-child{box-shadow:inset 3px 0 0 var(--mk-md)}
+#view-market .mk-r.lv1 td:first-child{box-shadow:inset 3px 0 0 var(--mk-lo)}
+#view-market .mk-r.past{opacity:.5}
+#view-market .mk-r.next{background:rgba(73,79,223,.09)}
+#view-market .mk-r .ev{font-weight:600;line-height:1.35}
+#view-market .mk-t,#view-market .mk-v{font-variant-numeric:tabular-nums;white-space:nowrap}
+#view-market .mk-t{color:var(--sub)}
+#view-market .mk-v{color:var(--sub)}
+#view-market .mk-v.act{color:var(--text);font-weight:700}
+#view-market .mk-v.nil{color:var(--faint);font-weight:400}
+#view-market .mk-ccy{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.04em;padding:3px 8px;border-radius:7px;background:rgba(255,255,255,.06);color:var(--text)}
+#view-market .mk-day td{position:sticky;top:33px;z-index:1;background:var(--panel-2,#121218);padding:10px 10px 8px;border-bottom:1px solid var(--border);font-size:11.5px;font-weight:700;letter-spacing:.04em;color:var(--sub)}
+#view-market .mk-day em{font-style:normal;font-size:10px;letter-spacing:.06em;text-transform:uppercase;margin-left:8px;padding:2px 7px;border-radius:6px;background:rgba(73,79,223,.22);color:#c9ccff}
+#view-market .mk-day small{float:right;font-weight:600;color:var(--faint)}
+#view-market .mk-imp{display:inline-flex;gap:3px;align-items:flex-end}
+#view-market .mk-imp i{width:5px;border-radius:2px;background:rgba(255,255,255,.1)}
+#view-market .mk-imp i:nth-child(1){height:8px}#view-market .mk-imp i:nth-child(2){height:12px}#view-market .mk-imp i:nth-child(3){height:16px}
+#view-market .mk-empty{display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center;padding:48px 16px}
+#view-market .mk-empty-ic{width:46px;height:46px;border-radius:14px;display:grid;place-items:center;background:rgba(73,79,223,.14);border:1px solid rgba(73,79,223,.3);color:#c9ccff;font-size:20px}
+#view-market .mk-empty b{font-size:14px}
+#view-market .mk-empty p{margin:0;font-size:12.5px;color:var(--faint);max-width:320px}
+#view-market .mk-empty .mk-chip{margin-top:6px;border-color:var(--border);background:var(--panel)}
 #view-market .mk-sk{display:block;height:10px;border-radius:6px;background:linear-gradient(90deg,rgba(255,255,255,.05),rgba(255,255,255,.11),rgba(255,255,255,.05));background-size:200% 100%;animation:mkSh 1.8s linear infinite}
-#view-market .mk-imp{display:inline-flex;gap:3px}
-#view-market .mk-imp i{width:6px;height:14px;border-radius:2px;background:rgba(255,255,255,.1)}
 #view-market .mk-side{display:flex;flex-direction:column;gap:16px}
-#view-market .mk-key{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-#view-market .mk-k{background:var(--panel-2);border:1px solid var(--border);border-radius:12px;padding:12px 13px;transition:.2s var(--ease)}
+#view-market .mk-key{display:flex;flex-direction:column;gap:8px}
+#view-market .mk-k{display:flex;align-items:center;gap:12px;background:var(--panel-2);border:1px solid var(--border);border-radius:12px;padding:11px 13px;transition:.2s var(--ease);box-shadow:inset 3px 0 0 var(--faint)}
+#view-market .mk-k.lv3{box-shadow:inset 3px 0 0 var(--mk-hi)}
+#view-market .mk-k.lv2{box-shadow:inset 3px 0 0 var(--mk-md)}
 #view-market .mk-k:hover{border-color:var(--border-hi);transform:translateY(-2px)}
-#view-market .mk-k b{display:block;font-size:13.5px;margin-bottom:9px}
+#view-market .mk-kb{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px}
+#view-market .mk-kb b{font-size:13px;line-height:1.3;overflow-wrap:anywhere}
 #view-market .mk-k span{font-size:11.5px;color:var(--faint)}
-#view-market .mk-news{display:flex;flex-direction:column;gap:10px;max-height:360px;overflow-y:auto;padding-right:6px;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.18) transparent}
-#view-market .mk-n{background:var(--panel-2);border:1px solid var(--border);border-radius:12px;padding:13px;display:flex;flex-direction:column;gap:9px;transition:.2s var(--ease)}
-#view-market .mk-n:hover{border-color:var(--border-hi)}
-#view-market .mk-n{min-width:0}
-#view-market .mk-nm{color:var(--faint);font-size:11px}
-#view-market .mk-nh{color:var(--text);text-decoration:none;font-weight:600;font-size:13px;line-height:1.4;overflow-wrap:anywhere}
+#view-market .mk-cd{font-style:normal;font-size:11px;font-weight:700;white-space:nowrap;padding:4px 9px;border-radius:999px;background:rgba(73,79,223,.2);color:#c9ccff}
+#view-market .mk-news{display:flex;flex-direction:column;gap:8px;max-height:420px;overflow-y:auto;padding-right:6px;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.18) transparent}
+#view-market .mk-n{background:var(--panel-2);border:1px solid var(--border);border-radius:12px;padding:12px 13px;display:flex;flex-direction:column;gap:8px;transition:.2s var(--ease);min-width:0}
+#view-market .mk-n:hover{border-color:rgba(73,79,223,.55);background:rgba(73,79,223,.06)}
+#view-market .mk-nm{display:flex;align-items:center;gap:8px;color:var(--faint);font-size:11px}
+#view-market .mk-av{width:20px;height:20px;border-radius:6px;display:grid;place-items:center;font-style:normal;font-size:10.5px;font-weight:800;background:rgba(73,79,223,.22);color:#c9ccff}
+#view-market .mk-nh{color:var(--text);text-decoration:none;font-weight:600;font-size:13px;line-height:1.4;overflow-wrap:anywhere;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
 #view-market a.mk-nh:hover{text-decoration:underline}
-#view-market .mk-retry{align-self:flex-start;padding:5px 12px}
-#view-market .mk-note{margin:14px 0 0;font-size:12px;color:var(--faint)}
+#view-market .mk-retry{align-self:flex-start;padding:5px 12px;border-color:var(--border)}
+#view-market .mk-note{margin:12px 0 0;font-size:12px;color:var(--faint)}
 @keyframes mkSh{to{background-position:-200% 0}}
-@media(max-width:900px){#view-market .mk-grid{grid-template-columns:minmax(0,1fr)}}
-@media(prefers-reduced-motion:reduce){#view-market .mk-sk{animation:none}}
+@media(max-width:900px){#view-market .mk-grid{grid-template-columns:minmax(0,1fr)}#view-market .mk-stats{grid-template-columns:1fr 1fr 1fr}}
+@media(max-width:640px){#view-market .mk-stats{grid-template-columns:1fr}#view-market .mk-status{margin-left:0}#view-market .mk-chips[data-group=range],#view-market .mk-chips[data-group=impact]{overflow-x:auto;max-width:100%}#view-market #mkCcyChips{flex-wrap:nowrap;overflow-x:auto}}
+@media(prefers-reduced-motion:reduce){#view-market .mk-sk{animation:none}#view-market .mk-k,#view-market .mk-st{transition:none}}
 </style>
 <div class="view" id="view-market" hidden><div class="wrap">
 <div class="top"><div><h1>Market</h1><p>Upcoming economic events and market news.</p></div></div>
-<div class="mk-bar"><div class="mk-chips" id="mkRangeChips" data-group="range"><button type="button" class="mk-chip" data-val="today">Today</button><button type="button" class="mk-chip on" data-val="week">This week</button><button type="button" class="mk-chip" data-val="next">Next week</button></div><div class="mk-chips" id="mkImpactChips" data-group="impact"><button type="button" class="mk-chip" data-val="all">All</button><button type="button" class="mk-chip on" data-val="high">High</button><button type="button" class="mk-chip" data-val="medium">Medium</button><button type="button" class="mk-chip" data-val="low">Low</button></div><div class="mk-chips" id="mkCcyChips" data-group="ccy"><button type="button" class="mk-chip on" data-val="USD">USD</button><button type="button" class="mk-chip" data-val="EUR">EUR</button><button type="button" class="mk-chip" data-val="GBP">GBP</button><button type="button" class="mk-chip" data-val="JPY">JPY</button><button type="button" class="mk-chip" data-val="CAD">CAD</button><button type="button" class="mk-chip" data-val="AUD">AUD</button><button type="button" class="mk-chip" data-val="CHF">CHF</button><button type="button" class="mk-chip" data-val="NZD">NZD</button><button type="button" class="mk-chip" data-val="all">All</button></div><button type="button" class="mk-status" id="mkStatus" style="cursor:pointer;background:none"><i></i>Not connected</button></div>
+<div class="mk-bar glass"><div class="mk-chips" id="mkRangeChips" data-group="range"><button type="button" class="mk-chip" data-val="today">Today</button><button type="button" class="mk-chip on" data-val="week">This week</button><button type="button" class="mk-chip" data-val="next">Next week</button></div><div class="mk-chips" id="mkImpactChips" data-group="impact"><button type="button" class="mk-chip" data-val="all">All</button><button type="button" class="mk-chip on" data-val="high">High</button><button type="button" class="mk-chip" data-val="medium">Medium</button><button type="button" class="mk-chip" data-val="low">Low</button></div><div class="mk-chips" id="mkCcyChips" data-group="ccy"><button type="button" class="mk-chip on" data-val="USD">USD</button><button type="button" class="mk-chip" data-val="EUR">EUR</button><button type="button" class="mk-chip" data-val="GBP">GBP</button><button type="button" class="mk-chip" data-val="JPY">JPY</button><button type="button" class="mk-chip" data-val="CAD">CAD</button><button type="button" class="mk-chip" data-val="AUD">AUD</button><button type="button" class="mk-chip" data-val="CHF">CHF</button><button type="button" class="mk-chip" data-val="NZD">NZD</button><button type="button" class="mk-chip" data-val="all">All</button></div><button type="button" class="mk-status" id="mkStatus"><i></i>Not connected</button></div>
+<div class="mk-stats" id="mkStats"></div>
 <div class="mk-grid">
 <section class="glass mk-card"><h3>Economic calendar <small>Times in your local timezone</small></h3><div class="mk-scroll"><table class="mk-tbl"><thead><tr><th>Time</th><th>Cur</th><th>Impact</th><th>Event</th><th>Actual</th><th>Forecast</th><th>Previous</th></tr></thead><tbody id="mkCalBody"><tr class="mk-day"><td colspan="7">DAY, DATE</td></tr><tr><td><span class="mk-sk" style="width:44px"></span></td><td><span class="mk-sk" style="width:32px"></span></td><td><span class="mk-imp"><i></i><i></i><i></i></span></td><td><span class="mk-sk" style="width:80%"></span></td><td><span class="mk-sk" style="width:38px"></span></td><td><span class="mk-sk" style="width:38px"></span></td><td><span class="mk-sk" style="width:38px"></span></td></tr></tbody></table></div><p class="mk-note" id="mkCalNote">Loading calendar…</p></section>
-<div class="mk-side"><section class="glass mk-card"><h3>Key events <small>Next up (High + Medium)</small></h3><div class="mk-key" id="mkKeyEvents"><div class="mk-k"><b>FOMC</b><span>Date: --</span><br><span>Time: --</span></div><div class="mk-k"><b>CPI</b><span>Date: --</span><br><span>Time: --</span></div><div class="mk-k"><b>NFP</b><span>Date: --</span><br><span>Time: --</span></div><div class="mk-k"><b>Interest rate decision</b><span>Date: --</span><br><span>Time: --</span></div></div></section>
+<div class="mk-side"><section class="glass mk-card"><h3>Key events <small>Next up (High + Medium)</small></h3><div class="mk-key" id="mkKeyEvents"><div class="mk-k"><span class="mk-sk" style="width:60%"></span></div><div class="mk-k"><span class="mk-sk" style="width:48%"></span></div><div class="mk-k"><span class="mk-sk" style="width:55%"></span></div></div></section>
 <section class="glass mk-card"><h3>Market news <small>Latest</small></h3><div class="mk-news" id="mkNewsList"><div class="mk-n"><span class="mk-sk" style="width:35%"></span><span class="mk-sk" style="width:95%"></span><span class="mk-sk" style="width:70%"></span></div></div></section></div>
 </div></div></div>
 <div class="view" id="view-upload" hidden><div class="wrap">
@@ -9343,6 +9389,10 @@ window.__renderAnSetups=renderBoth;window.__renderAnEmotions=renderEmo;setTimeou
 (function(){
   const $=id=>document.getElementById(id);
   let cal=[], news=[], loaded=false, loading=false, calMsg='', calSrc='', newsMsg='';
+  let lastRows=[];
+  const cd=t=>{const ms=t-Date.now(); if(ms<=0) return 'now'; const m=Math.round(ms/60000); if(m<60) return 'in '+m+'m'; const h=Math.floor(m/60); if(h<48) return 'in '+h+'h '+(m%60)+'m'; return 'in '+Math.round(h/24)+'d';};
+  const dayTag=t=>{const n=new Date(), k=t.toDateString(); if(k===n.toDateString()) return 'Today'; n.setDate(n.getDate()+1); return k===n.toDateString()?'Tomorrow':'';};
+  const hm=t=>t.toLocaleTimeString(undefined,{hour:'2-digit',minute:'2-digit'});
   const CCY_MAP={US:'USD',EU:'EUR',GB:'GBP',UK:'GBP',JP:'JPY',CA:'CAD',AU:'AUD',CN:'CNY',CH:'CHF',NZ:'NZD',DE:'EUR',FR:'EUR',IT:'EUR',ES:'EUR'};
   const impLvl=s=>{s=(s||'').toLowerCase();return s.indexOf('high')>-1?3:s.indexOf('med')>-1?2:s.indexOf('low')>-1?1:0};
   const impColor=l=>l===3?'var(--red)':l===2?'var(--accent-2)':l===1?'var(--green)':'rgba(255,255,255,.12)';
@@ -9381,18 +9431,22 @@ window.__renderAnSetups=renderBoth;window.__renderAnEmotions=renderEmo;setTimeou
     }).sort((a,b)=>tm(a)-tm(b));
     const body=$('mkCalBody'), note=$('mkCalNote');
     if(!body) return;
+    lastRows=rows;
     if(!rows.length){
-      body.innerHTML='<tr><td colspan="7" style="color:var(--faint)">'+esc(calMsg||'No events match these filters.')+'</td></tr>';
+      body.innerHTML='<tr><td colspan="7"><div class="mk-empty"><div class="mk-empty-ic">&#9684;</div><b>'+(calMsg?'Calendar unavailable':'No events match these filters')+'</b><p>'+esc(calMsg||'Try a wider range or a lower impact level.')+'</p>'+(calMsg?'':'<button type="button" class="mk-chip mk-widen">Show all impact levels</button>')+'</div></td></tr>';
+      const wb=body.querySelector('.mk-widen');
+      if(wb) wb.onclick=function(){const c=$('mkImpactChips'), x=c&&c.querySelector('[data-val="all"]'); if(x) x.click();};
     } else {
-      let lastDay='', html='';
+      const counts={}; rows.forEach(e=>{const k=tm(e).toDateString(); counts[k]=(counts[k]||0)+1;});
+      const nowMs=Date.now(); let lastDay='', html='', marked=false;
+      const val=(x,c)=>{const s=(x==null||x==='')?'\u2014':x; return '<td class="mk-v '+c+(s==='\u2014'?' nil':'')+'">'+esc(s)+'</td>';};
       rows.forEach(e=>{
-        const t=tm(e);
-        const dayKey=t.toDateString();
-        if(dayKey!==lastDay){ lastDay=dayKey; html+='<tr class="mk-day"><td colspan="7">'+t.toLocaleDateString(undefined,{weekday:'long',month:'short',day:'numeric'})+'</td></tr>'; }
-        const lvl=impLvl(e.impact);
-        html+='<tr><td>'+t.toLocaleTimeString(undefined,{hour:'2-digit',minute:'2-digit'})+'</td><td>'+esc(CCY_MAP[e.country]||e.country||'—')+'</td>'
-          +'<td><span class="mk-imp">'+[1,2,3].map(n=>'<i style="background:'+(n<=lvl?impColor(lvl):'rgba(255,255,255,.1)')+'"></i>').join('')+'</span></td>'
-          +'<td>'+esc(e.event||'—')+'</td><td>'+esc(e.actual??'—')+'</td><td>'+esc(e.estimate??'—')+'</td><td>'+esc(e.prev??'—')+'</td></tr>';
+        const t=tm(e), dayKey=t.toDateString(), lvl=impLvl(e.impact), past=t.getTime()<nowMs;
+        if(dayKey!==lastDay){ lastDay=dayKey; const tg=dayTag(t); html+='<tr class="mk-day"><td colspan="7">'+t.toLocaleDateString(undefined,{weekday:'long',month:'short',day:'numeric'})+(tg?'<em>'+tg+'</em>':'')+'<small>'+counts[dayKey]+' event'+(counts[dayKey]===1?'':'s')+'</small></td></tr>'; }
+        let cls='mk-r lv'+lvl+(past?' past':''); if(!past&&!marked&&lvl>=2){ cls+=' next'; marked=true; }
+        html+='<tr class="'+cls+'"><td class="mk-t">'+hm(t)+'</td><td><span class="mk-ccy">'+esc(CCY_MAP[e.country]||e.country||'\u2014')+'</span></td>'
+          +'<td><span class="mk-imp" title="'+['','Low','Medium','High'][lvl]+' impact">'+[1,2,3].map(n=>'<i style="background:'+(n<=lvl?impColor(lvl):'rgba(255,255,255,.1)')+'"></i>').join('')+'</span></td>'
+          +'<td class="ev">'+esc(e.event||'\u2014')+'</td>'+val(e.actual,'act')+val(e.estimate,'')+val(e.prev,'')+'</tr>';
       });
       body.innerHTML=html;
     }
@@ -9404,10 +9458,17 @@ window.__renderAnSetups=renderBoth;window.__renderAnEmotions=renderEmo;setTimeou
     const now=new Date(), ccy=state().ccy;
     const upcoming=cal.filter(e=>tm(e)>=now && impLvl(e.impact)>=2 && (ccy==='all' || (CCY_MAP[e.country]||e.country)===ccy))
       .sort((a,b)=>tm(a)-tm(b)).slice(0,4);
+    const st=$('mkStats');
+    if(st){
+      const hi=lastRows.filter(e=>impLvl(e.impact)===3).length, nx=upcoming[0];
+      st.innerHTML='<div class="mk-st"><small>Events shown</small><b>'+lastRows.length+'</b><span>'+(ccy==='all'?'All currencies':esc(ccy))+'</span></div>'
+        +'<div class="mk-st'+(hi?' hot':'')+'"><small>High impact</small><b>'+hi+'</b><span>'+(hi?'Watch your risk around these':'Nothing major in range')+'</span></div>'
+        +'<div class="mk-st"><small>Next big event</small><b>'+(nx?cd(tm(nx)):'\u2014')+'</b><span>'+(nx?esc(nx.event||'Event'):'None scheduled')+'</span></div>';
+    }
     if(!upcoming.length){ host.innerHTML='<div class="mk-k"><span>No high/medium-impact '+(ccy==='all'?'':esc(ccy)+' ')+'events found in range.</span></div>'; return; }
     host.innerHTML=upcoming.map(e=>{
-      const t=tm(e);
-      return '<div class="mk-k"><b>'+esc(e.event||'Event')+'</b><span>Date: '+t.toLocaleDateString(undefined,{month:'short',day:'numeric'})+'</span><br><span>Time: '+t.toLocaleTimeString(undefined,{hour:'2-digit',minute:'2-digit'})+'</span></div>';
+      const t=tm(e), lvl=impLvl(e.impact);
+      return '<div class="mk-k lv'+lvl+'"><span class="mk-ccy">'+esc(CCY_MAP[e.country]||e.country||'\u2014')+'</span><div class="mk-kb"><b>'+esc(e.event||'Event')+'</b><span>'+t.toLocaleDateString(undefined,{weekday:'short',month:'short',day:'numeric'})+' \u00b7 '+hm(t)+'</span></div><em class="mk-cd">'+cd(t)+'</em></div>';
     }).join('');
   }
   function ago(sec){
@@ -9430,7 +9491,7 @@ window.__renderAnSetups=renderBoth;window.__renderAnEmotions=renderEmo;setTimeou
     host.innerHTML=list.map(n=>{
       const t=n.datetime?ago(n.datetime):'';
       const url=safeUrl(n.url), head=esc(String(n.headline).trim());
-      const meta='<span class="mk-nm">'+esc(n.source||'News')+(t?' · '+esc(t):'')+'</span>';
+      const meta='<span class="mk-nm"><i class="mk-av">'+esc(String(n.source||'N').trim().charAt(0).toUpperCase()||'N')+'</i>'+esc(n.source||'News')+(t?' · '+esc(t):'')+'</span>';
       return '<div class="mk-n">'+meta+(url==='#'?'<span class="mk-nh">'+head+'</span>':'<a class="mk-nh" href="'+esc(url)+'" target="_blank" rel="noopener noreferrer">'+head+'</a>')+'</div>';
     }).join('');
   }
@@ -9478,6 +9539,7 @@ window.__renderAnSetups=renderBoth;window.__renderAnEmotions=renderEmo;setTimeou
     });
     return best?{event:best.e.event||'News event',ccy:(CCY_MAP[best.e.country]||best.e.country||''),mins:Math.max(1,Math.ceil((best.t-now)/60000))}:null;
   };
+  setInterval(function(){ try{ renderKeyEvents(); }catch(_){} },60000);
   function wireChips(){
     ['mkRangeChips','mkImpactChips','mkCcyChips'].forEach(id=>{
       const host=$(id); if(!host||host.dataset.wired) return; host.dataset.wired='1';
