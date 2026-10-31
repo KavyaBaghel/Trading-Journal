@@ -2996,11 +2996,15 @@ window.jlLiveBalance=function(Z){
     recs.forEach(function(r,i){if(seenId[r.id]){r.id=r.id+'-p'+(r.position||('n'+i))}seenId[r.id]=1});
     var rp=replaceBridge(recs),added=merge(rp.fresh),up=refreshMatched(rp.matched);
     localStorage.setItem('jlOpenPositions',JSON.stringify(R.open||[]));return {added:added,total:recs.length,replaced:rp.replaced,removed:rp.removed,skipped:rp.skipped,relinked:rp.relinked+up.relinked,updated:up.updated}};
-  window.jlSaveSyncTrades=function(list){var have={};rd(TK[0]).forEach(function(t){if(t&&typeof t==='object'&&!BR.test(String(t.id))&&t.position)have[String(t.position)]=1});
+  /* Backfill: a synced trade already in storage never gets re-added, so copy a newly read SL onto it (never overwrites an SL that is already set). */
+  function backfillSl(all){var by={};(all||[]).forEach(function(r){if(r&&r.pos&&r.sl>0)by[String(r.pos)]=r.sl});if(!Object.keys(by).length)return 0;var n=0;
+    TK.forEach(function(k){var a=rd(k),hit=false;a.forEach(function(t){if(!t||typeof t!=='object'||t.sl>0)return;var p=t.position||((/^mt5-(\d+)$/.exec(String(t.id||''))||[])[1]);if(p&&by[String(p)]){t.sl=by[String(p)];hit=true;if(k===TK[0])n++}});
+      if(hit)localStorage.setItem(k,JSON.stringify(a))});return n}
+  window.jlSaveSyncTrades=function(list){var slFilled=backfillSl(list);var have={};rd(TK[0]).forEach(function(t){if(t&&typeof t==='object'&&!BR.test(String(t.id))&&t.position)have[String(t.position)]=1});
     var all=list||[],recs=all.map(toLive).filter(function(r){return !(r.position&&have[String(r.position)])}),seenId={};
     recs.forEach(function(r,i){if(seenId[r.id]){r.id=r.id+'-p'+(r.position||('n'+i))}seenId[r.id]=1});
     var rp=replaceBridge(recs),added=merge(rp.fresh);
-    return {added:added,total:all.length,known:all.length-recs.length,replaced:rp.replaced,removed:rp.removed,skipped:rp.skipped}};
+    return {added:added,total:all.length,known:all.length-recs.length,replaced:rp.replaced,removed:rp.removed,skipped:rp.skipped,slFilled:slFilled}};
   function ago(ts){var d=Date.now()-ts;if(!(d>=0))return 'just now';var m=Math.floor(d/60000);if(m<1)return 'just now';if(m<60)return m+'m ago';var h=Math.floor(m/60);if(h<24)return h+'h ago';return Math.floor(h/24)+'d ago'}
   function last(){var s=rdo(SS),t=s&&s.lastSynced?Date.parse(s.lastSynced):NaN;return isFinite(t)?t:null}
   function T(id,txt){var e=document.getElementById(id);if(e)e.textContent=txt}
@@ -3015,13 +3019,13 @@ window.jlLiveBalance=function(Z){
     function done(){window.__jlSyncBusy=false;btn.disabled=false;btn.textContent='\u27f3 Sync balance'}
     window.__jlSyncBusy=true;window.__jlSyncMsg='';btn.disabled=true;btn.textContent='Syncing\u2026';msg('Connecting to MT5 bridge\u2026');
     var ac=typeof AbortController==='function'?new AbortController():null,to=ac&&setTimeout(function(){ac.abort()},45000);
-    fetch('http://localhost:8787/api/sync-broker',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({platform:'mt5',days:3}),cache:'no-store',signal:ac?ac.signal:undefined})
+    fetch('http://localhost:8787/api/sync-broker',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({platform:'mt5',days:7}),cache:'no-store',signal:ac?ac.signal:undefined})
     .then(function(r){return r.json()}).then(function(d){if(to)clearTimeout(to);
       if(d&&d.error){msg('MT5 error: '+d.error);done();return}
       /* Sync reads the balance and adds recent trades. Trade times come from the bridge's openTime (MT5 server clock, same as a report), and a position already in the journal is never added twice. */
       var bal=d&&typeof d.account_balance==='number'&&isFinite(d.account_balance)?d.account_balance:null;
       if(bal==null){msg('Bridge connected, but MT5 returned no balance.');done();return}
-       var imp=null;try{imp=window.jlSaveSyncTrades((Array.isArray(d.trades)?d.trades:[]).map(function(t){if(!t||!t.openTime)return null;var p=String(t.openTime).split(' ');if(p.length<2)return null;return {d:p[0],t:p[1],side:t.side,en:t.openPrice,ex:t.closePrice,pnl:typeof t.profit==='number'?t.profit:t.pnl,cost:r2((t.commission||0)+(t.swap||0)),lot:t.volume,sym:t.symbol,pos:String(t.id||'').replace(/\D/g,''),hold:typeof t.holdSec==='number'?t.holdSec:null,sl:null,why:(t.reason==='TP'||t.reason==='SL')?t.reason:''}}).filter(Boolean))}catch(e){imp=null}
+       var imp=null;try{imp=window.jlSaveSyncTrades((Array.isArray(d.trades)?d.trades:[]).map(function(t){if(!t||!t.openTime)return null;var p=String(t.openTime).split(' ');if(p.length<2)return null;return {d:p[0],t:p[1],side:t.side,en:t.openPrice,ex:t.closePrice,pnl:typeof t.profit==='number'?t.profit:t.pnl,cost:r2((t.commission||0)+(t.swap||0)),lot:t.volume,sym:t.symbol,pos:String(t.id||'').replace(/\D/g,''),hold:typeof t.holdSec==='number'?t.holdSec:null,sl:(typeof t.sl==='number'&&t.sl>0)?t.sl:null,why:(t.reason==='TP'||t.reason==='SL')?t.reason:''}}).filter(Boolean))}catch(e){imp=null}
       var c=rdo(CK);if(c){c.mt5CurrentBalance=bal;c.mt5BalanceSource='mt5';c.mt5BalanceTimestamp=Date.now();localStorage.setItem(CK,JSON.stringify(c))}
       localStorage.setItem(SS,JSON.stringify({platform:'mt5',days:30,lastSynced:new Date().toISOString()}));
       window.__jlSyncMsg=(c?'Synced, balance updated':'Synced, balance read (save Account Settings to keep it)')+(imp?(imp.added?', '+imp.added+' new trade'+(imp.added===1?'':'s'):', no new trades'):'');
