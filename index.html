@@ -3364,8 +3364,8 @@ window.jlLiveBalance=function(Z){
     <div class="panel-head"><h2>Weekly review</h2><span class="hint" id="wrRange"></span></div>
     <div id="wrStats"></div>
     <div class="panel-head wr-prep-head"><h2>Next week prep</h2><span class="hint" id="wrNextRange"></span></div>
-    <div id="wrRule"></div>
-    <div class="wr-mnote" id="wrMonNote"><label for="wrMonText">NOTE FOR MONDAY</label><textarea id="wrMonText" rows="3" maxlength="1000" placeholder="Write your plan, key levels or reminders for Monday..."></textarea><div class="wr-mnote-f"><span id="wrMonSt">Saved on this device</span><span id="wrMonCt">0/1000</span></div></div>
+    <div class="wr-prep-grid"><div id="wrRule"></div>
+    <div class="wr-mnote" id="wrMonNote"><label for="wrMonText">Note for Monday</label><textarea id="wrMonText" rows="3" maxlength="1000" placeholder="Write your plan, key levels or reminders for Monday..."></textarea><div class="wr-mnote-f"><span id="wrMonSt">Saved on this device</span><span id="wrMonCt">0/1000</span></div></div></div>
     <div class="wr-bar">
       <div class="a-tabs wr-chips" id="wrImpactChips" role="group" aria-label="News impact">
         <button type="button" class="wr-chip a-tab on" data-val="high" aria-pressed="true">High</button>
@@ -10304,6 +10304,55 @@ window.__renderAnSetups=renderBoth;window.__renderAnEmotions=renderEmo;setTimeou
 #weeklyReview .wr-imp2-bar i.neg{background:linear-gradient(90deg,#e11d6a,#fb923c)}
 #weeklyReview .wr-empty2{margin-top:14px;padding:26px 14px;text-align:center;font-size:13px;color:var(--sub);border:1px dashed rgba(255,255,255,.12);border-radius:14px}
 #weeklyReview .wr-block>.wr-cap{margin-top:16px;padding:13px 16px;border-radius:14px;border:1px solid rgba(185,164,255,.2);background:rgba(139,108,255,.07);color:#c4c7d4;font-size:12.5px;line-height:1.55}
+/* next week prep */
+#weeklyReview .wr-prep-head{margin-top:36px;padding-top:30px}
+#weeklyReview .wr-prep-head h2::before{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23b9a4ff' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='5' width='18' height='16' rx='3'/%3E%3Cpath d='M3 10h18M8 3v4M16 3v4'/%3E%3C/svg%3E");background-size:17px;background-repeat:no-repeat;background-position:center}
+#weeklyReview .wr-prep-grid{display:grid;grid-template-columns:minmax(0,.85fr) minmax(0,1.5fr);gap:16px;align-items:stretch}
+#weeklyReview .wr-prep-grid>#wrRule{display:flex}
+#weeklyReview .wr-rule{flex:1;position:relative;overflow:hidden;margin:0;padding:22px 24px 22px 28px;border-radius:22px;border:1px solid rgba(185,164,255,.24);background:linear-gradient(160deg,rgba(139,108,255,.16),rgba(139,108,255,.025) 70%)}
+#weeklyReview .wr-rule::before{content:"";position:absolute;left:0;top:18px;bottom:18px;width:3px;border-radius:0 4px 4px 0;background:linear-gradient(180deg,#b9a4ff,#22d3ee)}
+#weeklyReview .wr-rule .l{display:flex;align-items:center;gap:9px;margin:0;font-size:12.5px;font-weight:650;letter-spacing:0;color:#c0aaff}
+#weeklyReview .wr-rule .l::before{content:"";width:16px;height:16px;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23c0aaff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 21V4M5 5h11l-2 4 2 4H5'/%3E%3C/svg%3E") center/contain no-repeat}
+#weeklyReview .wr-rule .t{margin-top:12px;font-size:16px;line-height:1.55;font-weight:550;color:var(--text)}
+#weeklyReview .wr-rule .t.none{font-size:13.5px;font-weight:400;line-height:1.6;color:var(--sub)}
+#weeklyReview .wr-mnote{margin:0;padding:20px 22px 14px;border-radius:22px;border:1px solid var(--pr-line);background:linear-gradient(180deg,rgba(255,255,255,.035),rgba(255,255,255,.012));box-shadow:inset 0 1px 0 rgba(255,255,255,.05)}
+#weeklyReview .wr-mnote:focus-within{border-color:rgba(185,164,255,.6);box-shadow:0 0 0 4px rgba(139,108,255,.16)}
+#weeklyReview .wr-mnote label{display:flex;align-items:center;gap:9px;margin-bottom:12px;font-size:12.5px;font-weight:650;letter-spacing:0;color:#c0aaff}
+#weeklyReview .wr-mnote label::before{content:"";width:15px;height:15px;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23c0aaff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 20l4-1 11-11-3-3L5 16zM14 6l3 3'/%3E%3C/svg%3E") center/contain no-repeat}
+#weeklyReview .wr-mnote textarea{min-height:104px;font-size:14.5px;line-height:1.6}
+#weeklyReview .wr-mnote-f{align-items:center;margin-top:12px;padding-top:12px;font-size:12px}
+#weeklyReview .wr-mnote-f span:first-child{display:inline-flex;align-items:center;gap:7px}
+#weeklyReview .wr-mnote-f span:first-child::before{content:"";width:6px;height:6px;border-radius:50%;background:#22c98a}
+#weeklyReview .wr-mnote-f span:last-child{padding:2px 10px;border-radius:99px;border:1px solid var(--pr-line);font-variant-numeric:tabular-nums}
+#weeklyReview .wr-bar{justify-content:space-between;margin:22px 0 16px}
+#weeklyReview .wr-refresh{margin-left:0;display:inline-flex;align-items:center;gap:8px;padding:9px 16px 9px 14px;border-radius:99px;border:1px solid var(--pr-line);background:rgba(255,255,255,.03);font-weight:600}
+#weeklyReview .wr-refresh::before{content:"";width:14px;height:14px;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23c4c7d4' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 11a8 8 0 10-2.3 5.7M20 5v6h-6'/%3E%3C/svg%3E") center/contain no-repeat}
+#weeklyReview .wr-refresh:hover{border-color:rgba(185,164,255,.5);background:rgba(139,108,255,.1)}
+#wrEvents .wr-empty{padding:34px 20px;text-align:center;font-size:13.5px;color:var(--sub);border:1px dashed rgba(255,255,255,.13);border-radius:22px;background:rgba(255,255,255,.015)}
+#wrEvents .wr-empty::before{content:"";display:block;width:46px;height:46px;margin:0 auto 14px;border-radius:15px;border:1px solid rgba(185,164,255,.3);background:rgba(139,108,255,.14) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23b9a4ff' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='5' width='18' height='16' rx='3'/%3E%3Cpath d='M3 10h18M8 3v4M16 3v4'/%3E%3C/svg%3E") center/21px no-repeat}
+#weeklyReview .wr-evgrid{display:grid;gap:14px}
+#weeklyReview .wr-evday{border:1px solid var(--pr-line);border-radius:20px;overflow:hidden;background:rgba(255,255,255,.018)}
+#weeklyReview .wr-evh{display:flex;justify-content:space-between;align-items:center;padding:12px 18px;background:rgba(255,255,255,.035);border-bottom:1px solid var(--pr-line)}
+#weeklyReview .wr-evh b{font-size:14px;font-weight:650}
+#weeklyReview .wr-evh span{font:500 11.5px "IBM Plex Mono",ui-monospace,monospace;color:var(--sub)}
+#weeklyReview .wr-ev{display:grid;grid-template-columns:52px 46px 34px minmax(0,1fr) auto auto;gap:14px;align-items:center;padding:13px 18px;border-top:1px solid var(--pr-line);font-size:13.5px}
+#weeklyReview .wr-evl>.wr-ev:first-child{border-top:0}
+#weeklyReview .wr-ev .tm{font:500 12.5px "IBM Plex Mono",ui-monospace,monospace;color:var(--sub)}
+#weeklyReview .wr-ev .cc{justify-self:start;padding:2px 8px;border-radius:8px;border:1px solid var(--pr-line);background:rgba(255,255,255,.04);font:600 11.5px "IBM Plex Mono",ui-monospace,monospace}
+#weeklyReview .wr-ev .nm{font-weight:550;color:var(--text)}
+#weeklyReview .wr-ev .fp{display:flex;flex-direction:column;align-items:flex-end;min-width:68px;font-weight:600;font-variant-numeric:tabular-nums}
+#weeklyReview .wr-ev .fp em{font-style:normal;font-size:10.5px;font-weight:500;color:var(--faint)}
+#weeklyReview .wr-imp i{width:5px;height:14px;border-radius:3px;background:rgba(255,255,255,.14)}
+#weeklyReview .wr-imp i.on.l3{background:#f2547d}
+#weeklyReview .wr-imp i.on.l2{background:#fbbf24}
+#weeklyReview .wr-imp i.on.l1{background:#4ade80}
+#wrNote{margin-top:16px;font-size:12px;color:var(--faint)}
+#wrNote:empty{display:none}
+@media(max-width:900px){
+  #weeklyReview .wr-prep-grid{grid-template-columns:1fr}
+  #weeklyReview .wr-ev{grid-template-columns:48px 44px 34px minmax(0,1fr)}
+  #weeklyReview .wr-ev .fp{grid-column:span 2;align-items:flex-start}
+}
 </style>
 <script id="jl-weekly-review">
 /* Weekend weekly review (Saturday and Sunday trading days), shown on Today's Summary and at the top of the Calendar tab (one panel, moved to whichever of the two is open). Trading day and week use the same 06:00 IST / Monday-Sunday rules as the rest of the app.
@@ -10640,7 +10689,7 @@ window.__renderAnSetups=renderBoth;window.__renderAnEmotions=renderEmo;setTimeou
     try{ var o=JSON.parse(localStorage.getItem(RULE_KEY)||'null'); if(o&&typeof o==='object'&&!Array.isArray(o)) m=o; }catch(e){}
     function activeDay(d){ var dt=parseKey(d); do{ dt.setUTCDate(dt.getUTCDate()+1); }while(dt.getUTCDay()===0||dt.getUTCDay()===6); return isoKey(dt); }
     Object.keys(m).forEach(function(d){ if(typeof m[d]==='string'&&m[d]&&activeDay(d)>t&&d>pend) pend=d; });
-    return '<div class="wr-rule"><div class="l">YOUR RULE FOR MONDAY</div>'+(pend?'<div class="t">'+esc(m[pend])+'</div>':'<div class="t none">No rule saved yet. Add one in Tomorrow\'s rule below.</div>')+'</div>';
+    return '<div class="wr-rule"><div class="l">Your rule for Monday</div>'+(pend?'<div class="t">'+esc(m[pend])+'</div>':'<div class="t none">No rule saved yet. Add one in Tomorrow\'s rule below.</div>')+'</div>';
   }
 
   /* ---------- upcoming events ---------- */
@@ -10670,7 +10719,7 @@ window.__renderAnSetups=renderBoth;window.__renderAnEmotions=renderEmo;setTimeou
         if(dk!==last){ if(open) html+='</div></section>'; last=dk; open=true;
           html+='<section class="wr-evday"><div class="wr-evh"><b>'+esc(fmtDay(dk,{weekday:'long'}))+'</b><span>'+esc(fmtDay(dk,{month:'short',day:'numeric'}))+'</span></div><div class="wr-evl">'; }
         html+='<div class="wr-ev"><span class="tm">'+istClock(x.t)+'</span><span class="cc">'+esc(CCY[e.country]||e.country||'-')+'</span><span class="wr-imp" title="'+(x.l===3?'High':x.l===2?'Medium':'Low')+' impact">'
-          +[1,2,3].map(function(n){ return '<i style="background:'+(n<=x.l?'rgba(255,255,255,.85)':'rgba(255,255,255,.14)')+'"></i>'; }).join('')
+          +[1,2,3].map(function(n){ return '<i class="'+(n<=x.l?'on l'+x.l:'')+'"></i>'; }).join('')
           +'</span><span class="nm">'+esc(e.event||'-')+'</span><span class="fp"><em>Forecast</em>'+esc(e.estimate==null||e.estimate===''?'-':e.estimate)+'</span><span class="fp"><em>Previous</em>'+esc(e.prev==null||e.prev===''?'-':e.prev)+'</span></div>';
       });
       if(open) html+='</div></section>';
