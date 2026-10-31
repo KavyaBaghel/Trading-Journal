@@ -9643,6 +9643,68 @@ window.__renderAnSetups=renderBoth;window.__renderAnEmotions=renderEmo;setTimeou
 #weeklyReview .wr-hc{height:34px;border-radius:6px;background:rgba(255,255,255,.025);display:grid;place-items:center;font-size:10px;font-weight:700;color:#fff;overflow:visible;position:relative;cursor:default;transition:transform .28s cubic-bezier(.22,.61,.36,1)}
 #weeklyReview .wr-hc[data-t]:hover{transform:scale(1.18);z-index:2}
 @media(max-width:900px){#weeklyReview .wr-an>.wr-tiles{grid-template-columns:repeat(2,minmax(0,1fr))}}
+/* Weekly review: premium layer (additive, scoped to #weeklyReview, theme variables only) */
+#weeklyReview{position:relative;background:radial-gradient(120% 60% at 0% 0%,color-mix(in srgb,var(--accent) 9%,transparent),transparent 60%),linear-gradient(180deg,rgba(255,255,255,.022),rgba(255,255,255,.008));border-radius:24px;padding:26px 28px;box-shadow:0 1px 0 rgba(255,255,255,.05) inset,0 30px 60px -36px rgba(0,0,0,.85)}
+#weeklyReview::before{content:"";position:absolute;left:28px;right:28px;top:0;height:1px;background:linear-gradient(90deg,transparent,color-mix(in srgb,var(--accent-2) 55%,transparent),transparent);pointer-events:none}
+#weeklyReview .a-s,#weeklyReview .wr-block{position:relative;border-radius:20px;padding:24px 26px;background:linear-gradient(165deg,rgba(255,255,255,.045),rgba(255,255,255,0) 46%),var(--panel);box-shadow:0 1px 0 rgba(255,255,255,.045) inset,0 22px 44px -30px rgba(0,0,0,.9);transition:border-color .35s var(--ease),box-shadow .35s var(--ease)}
+#weeklyReview .a-s:hover,#weeklyReview .wr-block:hover{border-color:var(--border-hi);box-shadow:0 1px 0 rgba(255,255,255,.06) inset,0 26px 50px -30px rgba(0,0,0,.95),0 0 0 1px color-mix(in srgb,var(--accent) 10%,transparent)}
+#weeklyReview .a-s-ttl h3,#weeklyReview .wr-sub{font-size:14px;font-weight:650;letter-spacing:-.005em;color:var(--text)}
+#weeklyReview .a-s-ic{width:30px;height:30px;border-radius:9px;display:inline-grid;place-items:center;background:linear-gradient(160deg,color-mix(in srgb,var(--accent) 22%,transparent),rgba(255,255,255,.02));border:1px solid color-mix(in srgb,var(--accent) 30%,var(--border));box-shadow:0 0 18px -6px color-mix(in srgb,var(--accent) 60%,transparent)}
+#weeklyReview .a-s-ic svg{stroke:var(--accent-2)}
+/* KPI tiles */
+#weeklyReview .wr-tiles{border-radius:18px;box-shadow:0 1px 0 rgba(255,255,255,.05) inset,0 18px 40px -30px rgba(0,0,0,.9)}
+#weeklyReview .wr-tiles>.wr-tile{padding:18px 20px;background:linear-gradient(165deg,rgba(255,255,255,.04),rgba(255,255,255,0) 55%),var(--panel)}
+#weeklyReview .wr-tiles>.wr-tile .l{font-size:10.5px;text-transform:uppercase;letter-spacing:.11em;font-weight:650;color:var(--faint);margin-bottom:9px}
+#weeklyReview .wr-tiles>.wr-tile .v{font-size:23px;font-weight:760;letter-spacing:-.025em;font-variant-numeric:tabular-nums}
+#wrStats>.wr-tiles>.wr-tile:first-child{background:radial-gradient(90% 140% at 0% 0%,color-mix(in srgb,var(--accent) 20%,transparent),transparent 62%),var(--panel)}
+#wrStats>.wr-tiles>.wr-tile:first-child .v{font-size:32px;letter-spacing:-.035em}
+#weeklyReview .wr-tile:has(.v[style*="--green"]) .v{text-shadow:0 0 26px color-mix(in srgb,var(--green) 40%,transparent)}
+#weeklyReview .wr-tile:has(.v[style*="--red"]) .v{text-shadow:0 0 26px color-mix(in srgb,var(--red) 40%,transparent)}
+/* Tables: Session, Pair, Mistake, Emotion */
+#weeklyReview .wr-mini{border-collapse:separate;border-spacing:0}
+#weeklyReview .wr-mini th{font-size:10.5px;text-transform:uppercase;letter-spacing:.11em;font-weight:650;color:var(--faint);padding:0 12px 10px 0;border-bottom:1px solid var(--border)}
+#weeklyReview .wr-mini td{padding:12px 12px 12px 0;border-top:0;border-bottom:1px solid color-mix(in srgb,var(--border) 60%,transparent);font-size:13px}
+#weeklyReview .wr-mini tbody tr:last-child td{border-bottom:0}
+#weeklyReview .wr-mini th:nth-child(n+2),#weeklyReview .wr-mini td:nth-child(n+2){text-align:right}
+#weeklyReview .wr-mini th:last-child,#weeklyReview .wr-mini td:last-child{padding-right:0}
+#weeklyReview .wr-mini td.ev{font-weight:600;color:var(--text)}
+#weeklyReview .wr-mini td[style*="--green"]{font-weight:700}
+#weeklyReview .wr-mini td[style*="--red"]{font-weight:700}
+#weeklyReview .wr-mini tbody tr{transition:background .25s var(--ease)}
+#weeklyReview .wr-mini tbody tr:hover td{background:color-mix(in srgb,var(--accent) 6%,transparent)}
+#weeklyReview .wr-block>.wr-cols{gap:0}
+#weeklyReview .wr-block>.wr-cols>div{padding:0 22px}
+#weeklyReview .wr-block>.wr-cols>div:first-child{padding-left:0}
+#weeklyReview .wr-block>.wr-cols>div:last-child{padding-right:0}
+#weeklyReview .wr-block>.wr-cols>div+div{border-left:1px solid var(--border)}
+#weeklyReview .wr-block>.wr-cols .wr-sub{margin-bottom:14px}
+#weeklyReview .wr-cap{font-size:11.5px;color:var(--faint);padding-top:14px;margin:16px 0 0;border-top:1px solid var(--border)}
+#weeklyReview .wr-empty{font-size:13px;color:var(--faint);padding:14px 0;line-height:1.5}
+/* Heatmap */
+#weeklyReview .wr-hh{font:600 9px "IBM Plex Mono",monospace;letter-spacing:.02em;color:var(--faint)}
+#weeklyReview .wr-hd{font:650 10.5px "IBM Plex Mono",monospace;letter-spacing:.06em;text-transform:uppercase;color:var(--sub)}
+#weeklyReview .wr-hc{height:36px;border-radius:8px;background:rgba(255,255,255,.02);box-shadow:inset 0 0 0 1px rgba(255,255,255,.03);transition:transform .25s cubic-bezier(.34,1.56,.64,1),box-shadow .25s var(--ease),filter .25s var(--ease)}
+#weeklyReview .wr-hc[data-t]{font-size:11px;font-weight:750;text-shadow:0 1px 2px rgba(0,0,0,.5);cursor:pointer}
+#weeklyReview .wr-hc[data-t]:hover{transform:scale(1.14);filter:brightness(1.25) saturate(1.1);box-shadow:0 8px 22px -6px rgba(0,0,0,.8),0 0 0 1px rgba(255,255,255,.28)}
+#weeklyReview .a-read{font-size:11.5px;color:var(--faint);margin-top:16px;padding-top:14px;border-top:1px solid var(--border);line-height:1.5}
+/* Next week prep */
+#weeklyReview .wr-rule{position:relative;overflow:hidden;padding:16px 20px 16px 22px;border-radius:14px;border:1px solid color-mix(in srgb,var(--accent) 28%,var(--border));border-left:3px solid var(--accent);background:linear-gradient(100deg,color-mix(in srgb,var(--accent) 13%,transparent),rgba(255,255,255,0) 70%),var(--panel-2);box-shadow:0 14px 30px -24px color-mix(in srgb,var(--accent) 70%,transparent)}
+#weeklyReview .wr-rule .l{font-size:10.5px;text-transform:uppercase;letter-spacing:.13em;font-weight:700;color:var(--accent-2);margin-bottom:7px}
+#weeklyReview .wr-rule .t{font-size:14.5px;font-weight:550;letter-spacing:-.005em}
+#weeklyReview .wr-chips{display:inline-flex;gap:2px;padding:3px;border-radius:12px;background:var(--panel-2);border:1px solid var(--border)}
+#weeklyReview .wr-chip{border:0;border-radius:9px;padding:7px 15px;font-size:12.5px;font-weight:600;color:var(--sub);background:transparent;cursor:pointer;transition:color .25s var(--ease),background .25s var(--ease),box-shadow .25s var(--ease)}
+#weeklyReview .wr-chip:hover{color:var(--text)}
+#weeklyReview .wr-chip.on{color:#fff;background:linear-gradient(160deg,var(--accent-2),var(--accent));box-shadow:0 6px 18px -6px color-mix(in srgb,var(--accent) 80%,transparent),inset 0 1px 0 rgba(255,255,255,.25)}
+#weeklyReview .wr-refresh{border-radius:11px;border:1px solid var(--border-hi);background:linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,.015));color:var(--text);font-weight:600;cursor:pointer;transition:border-color .25s var(--ease),transform .25s var(--ease),background .25s var(--ease)}
+#weeklyReview .wr-refresh:hover{border-color:color-mix(in srgb,var(--accent) 55%,transparent);background:color-mix(in srgb,var(--accent) 10%,transparent);transform:translateY(-1px)}
+#weeklyReview .wr-tbl th{font-size:10.5px;text-transform:uppercase;letter-spacing:.11em;color:var(--faint);padding:8px 12px 10px}
+#weeklyReview .wr-tbl td{padding:11px 12px;border-top:1px solid color-mix(in srgb,var(--border) 60%,transparent)}
+#weeklyReview .wr-tbl tbody tr:not(.wr-dayrow){transition:background .25s var(--ease)}
+#weeklyReview .wr-tbl tbody tr:not(.wr-dayrow):hover td{background:color-mix(in srgb,var(--accent) 6%,transparent)}
+#weeklyReview .wr-tbl tr.wr-dayrow td{background:color-mix(in srgb,var(--accent) 8%,var(--panel-2));font-size:12px;letter-spacing:.04em;color:var(--accent-2)}
+#weeklyReview .wr-imp i{width:4px;height:13px;border-radius:3px}
+#weeklyReview .panel-head .hint{padding:4px 11px;border-radius:99px;border:1px solid var(--border);background:rgba(255,255,255,.02);font-size:11.5px;color:var(--sub)}
+@media(max-width:900px){#weeklyReview{padding:18px 16px;border-radius:20px}#weeklyReview .a-s,#weeklyReview .wr-block{padding:18px}#weeklyReview .wr-block>.wr-cols>div{padding:0}#weeklyReview .wr-block>.wr-cols>div+div{border-left:0;border-top:1px solid var(--border);padding-top:18px;margin-top:18px}#wrStats>.wr-tiles>.wr-tile:first-child .v{font-size:28px}}
 </style>
 <script id="jl-weekly-review">
 /* Weekend weekly review (Saturday and Sunday trading days), shown on Today's Summary and at the top of the Calendar tab (one panel, moved to whichever of the two is open). Trading day and week use the same 06:00 IST / Monday-Sunday rules as the rest of the app.
@@ -9818,12 +9880,12 @@ window.__renderAnSetups=renderBoth;window.__renderAnEmotions=renderEmo;setTimeou
       +'<div class="a-read">Number is trades opened that hour. <span style="color:var(--green)">Green</span> is net profit, <span style="color:var(--red)">red</span> is net loss. Brighter means a bigger P&amp;L swing.</div></section>';
   }
   function impactHtml(rows){
-    var J=(window.__getJournals?window.__getJournals():[])||[], em={}, mt={}, eo={}, none=0;
+    var J=(window.__getJournals?window.__getJournals():[])||[], em={}, mt={}, eo={}, allPos={}, tagPos={};
     J.forEach(function(e){ if(e&&e.key&&e.emotion) em[e.key]=e.emotion; });
     rows.forEach(function(t){
       var p=Number(t.pnl), k=t.d+' '+t.t+' '+t.side+' '+t.en+' '+t.pnl, e=em[k];
       var tg=(t.tags||[]).filter(function(g){ return typeof g==='string'&&g; });
-      if(!tg.length&&!e) none++;
+      var pk=posKey(t); allPos[pk]=1; if(tg.length||e) tagPos[pk]=1;
       tg.forEach(function(g){ var x=mt[g]||(mt[g]={n:0,net:0}); x.n++; x.net+=p; });
       if(e){ var y=eo[e]||(eo[e]={n:0,net:0}); y.n++; y.net+=p; }
     });
@@ -9833,10 +9895,11 @@ window.__renderAnSetups=renderBoth;window.__renderAnEmotions=renderEmo;setTimeou
       return '<div>'+hd(title)+'<table class="wr-mini"><thead><tr><th>Name</th><th>Trades</th><th>P&amp;L</th></tr></thead><tbody>'
         +ks.map(function(k){ var x=o[k]; return '<tr><td class="ev">'+esc(k)+'</td><td>'+x.n+'</td><td style="color:'+(x.net<0?'var(--red)':x.net>0?'var(--green)':'var(--sub)')+'">'+money(x.net)+'</td></tr>'; }).join('')+'</tbody></table></div>';
     }
+    var tot=Object.keys(allPos).length, none=tot-Object.keys(tagPos).length;
     return '<div class="wr-block a-s"><div class="wr-cols">'
       +list('MISTAKE IMPACT ON P&amp;L',mt,'No mistake tags saved on this week\'s trades.')
       +list('EMOTION IMPACT ON P&amp;L',eo,'No emotion logged on this week\'s journal entries.')
-      +'</div><div class="wr-cap">'+none+' of '+rows.length+' trade'+(rows.length===1?'':'s')+' have no mistake tag or emotion logged, so they are left out above. A trade with two tags counts under both, so totals can add up to more than net P&amp;L.</div></div>';
+      +'</div><div class="wr-cap">'+none+' of '+tot+' trade'+(tot===1?'':'s')+' have no mistake tag or emotion logged, so they are left out above. A trade with two tags counts under both, so totals can add up to more than net P&amp;L.</div></div>';
   }
   function hd(t){ var s=String(t||''), ttl=s.charAt(0)+s.slice(1).toLowerCase().replace(/\bist\b/g,'IST').replace(/p&amp;l/g,'P&amp;L'); var ic=/EQUITY/.test(s)?'<path d="M3 17l5-6 4 3 8-9"/>':/HEATMAP/.test(s)?'<path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h6v6h-6z"/>':'<path d="M4 19V9M11 19V4M18 19v-7"/>'; return '<div class="a-s-head"><div class="a-s-ttl"><span class="a-s-ic"><svg viewBox="0 0 24 24">'+ic+'</svg></span><h3>'+ttl+'</h3></div></div>'; }
   function safeBlock(label,fn){
