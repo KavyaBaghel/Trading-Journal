@@ -3513,7 +3513,7 @@ window.jlLiveBalance=function(Z){
 (function(){const e=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 window.__mountOpenPos=function(){const o=(window.__openTrades||[]).concat((window.__trades||[]).filter(t=>t.ex==null||t.ex==='')),b=document.getElementById('tOpenBody');document.getElementById('tOpenCnt').textContent=o.length;
  b.innerHTML=o.length?'<table><thead><tr><th>Date</th><th>Time</th><th>Side</th><th>Session</th><th>Lot</th><th>Entry</th></tr></thead><tbody>'+o.map(t=>'<tr><td>'+e(t.d)+'</td><td>'+e(t.t)+'</td><td>'+e(t.side)+'</td><td>'+e(t.ses||'')+'</td><td>'+e(t.lot==null?'':t.lot)+'</td><td>'+e(t.en)+'</td></tr>').join('')+'</tbody></table>':'<p>No open positions in your uploaded data. Import a CSV in Upload Data that includes open trades. Not live: it only knows what you uploaded.</p>'}})();</script>
-<div class="t-bar"><div class="a-tabs" data-g="ses" role="group" aria-label="Session"></div><div class="a-tabs" data-g="res" role="group" aria-label="Result"></div><div class="a-tabs" data-g="merge" role="group" aria-label="Grouping"><button class="a-tab" aria-pressed="false" title="Combine fills opened together into one trade">Merge paired fills</button></div></div>
+<div class="t-bar"><div class="a-tabs" data-g="ses" role="group" aria-label="Session"></div><div class="a-tabs" data-g="res" role="group" aria-label="Result"></div><div class="a-tabs" data-g="rec" role="group" aria-label="Recent trades"></div><div class="a-tabs" data-g="merge" role="group" aria-label="Grouping"><button class="a-tab" aria-pressed="false" title="Combine fills opened together into one trade">Merge paired fills</button></div></div>
 <div id="tDays"></div><div id="tMore"></div>
 </div></div>
 <div class="view" id="view-journal" hidden><div class="wrap">
@@ -6042,7 +6042,7 @@ $('dateStrT').textContent=new Date().toLocaleDateString('en-US',{weekday:'short'
 // each tab keeping its own copy that could drift out of sync.
 const SC={'London':'#c7cbd6','New York':'#43d787','Asia':'#b39ffb'};
 const T=window.__trades||[];
-const f={ses:'All',res:'All',merge:false,n:25};
+const f={ses:'All',res:'All',rec:'All',merge:false,n:25};
 const money=v=>(v<0?'-$':'+$')+Math.abs(v).toFixed(2);
 const kind=p=>window.jlKind(p);
 const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -6086,7 +6086,7 @@ const WHY={SL:['Stop loss','t-sl'],TP:['Target','t-tp'],User:['Manual','']};
 const why=s=>s?s.split('/').map(w=>'<span class="t-chip '+((WHY[w]||[])[1]||'')+'">'+((WHY[w]||[])[0]||w)+'</span>').join(''):'<span class="t-chip">Exit unknown</span>';
 const COLS='<colgroup><col style="width:8%"><col style="width:14%"><col style="width:10%"><col style="width:15%"><col style="width:8%"><col style="width:8%"><col style="width:8%"><col style="width:11%"><col style="width:9%"><col style="width:9%"></colgroup>';
 const HEAD='<thead><tr><th>Time IST</th><th>Trade</th><th>Session</th><th>Entry / exit</th><th>Stops</th><th>Size</th><th>Closed by</th><th>P&amp;L</th><th>Tags</th><th>Review</th></tr></thead>';
-const TABS={ses:[['All','All sessions'],['London','London'],['New York','New York'],['Asia','Asia']],res:[['All','All results'],['win','Wins'],['loss','Losses'],['be','Break-even']]};
+const TABS={ses:[['All','All sessions'],['London','London'],['New York','New York'],['Asia','Asia']],res:[['All','All results'],['win','Wins'],['loss','Losses'],['be','Break-even']],rec:[['All','All trades'],['10','Last 10'],['25','Last 25'],['50','Last 50'],['100','Last 100']]};
 
 function group(a){const o=[];a.forEach(x=>{const g=o[o.length-1];
   if(g&&g.d===x.d&&g.side===x.side&&Math.abs(g.en-x.en)<.5&&Math.abs(sec(g.t)-sec(x.t))<=120){g.fills++;g.pnl+=x.pnl;g.lot+=x.lot;g.exs.push(x.ex);if(!g.whys.includes(x.why))g.whys.push(x.why)}
@@ -6131,7 +6131,8 @@ function render(){
   window.__qlM=qlMap();
   let a=f.merge?group(T):T;
   a=a.filter(x=>(f.ses==='All'||x.ses===f.ses)&&(f.res==='All'||kind(x.pnl)===f.res));
-  $('tSub').textContent=jlN(T.length,'trade')+' loaded'+(window.__imported?' · from '+window.__imported:'');
+  if(f.rec!=='All'){const keep=new Set(a.slice().sort((p,q)=>p.d+p.t<q.d+q.t?1:-1).slice(0,+f.rec));a=a.filter(x=>keep.has(x))}
+  $('tSub').textContent=jlN(T.length,'trade')+' loaded'+(f.rec!=='All'?' \u00b7 showing latest '+a.length:'')+(window.__imported?' · from '+window.__imported:'');
   kpis(a);
   if(!a.length){$('tDays').innerHTML='<div class="a-s t-empty"><b>No trades match these filters</b><span>Try another session or result.</span><button class="btn-ghost" id="tClear">Clear filters</button></div>';$('tMore').innerHTML='';return}
   const journals=window.__getJournals?window.__getJournals():[];
@@ -6147,7 +6148,7 @@ function tabs(){document.querySelectorAll('#view-trades .a-tabs[data-g]').forEac
   g.innerHTML=TABS[k].map(t=>'<button class="a-tab'+(f[k]===t[0]?' on':'')+'" data-v="'+t[0]+'" aria-pressed="'+(f[k]===t[0])+'">'+t[1]+'</button>').join('')})}
 $('view-trades').addEventListener('click',e=>{
   if(e.target.closest('#tMoreBtn')){f.n+=25;render();return}
-  if(e.target.closest('#tClear')){f.ses=f.res='All';f.n=25;tabs();render();return}
+  if(e.target.closest('#tClear')){f.ses=f.res=f.rec='All';f.n=25;tabs();render();return}
   const qlB=e.target.closest('.t-ql-edit,.t-ql-del');
   if(qlB){const fn=qlB.classList.contains('t-ql-edit')?window.qlEditTrade:window.qlDeleteTrade;if(typeof fn==='function')fn(qlB.getAttribute('data-qlid'),qlB);return}
   const openBtn=e.target.closest('.t-expand-open');
