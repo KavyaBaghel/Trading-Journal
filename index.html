@@ -827,10 +827,7 @@ window.jlLiveBalance=function(Z){
 <div class="a-kp" id="tKP"></div>
 <section class="a-s" id="tOpen" style="margin:0 0 16px"><div class="a-s-head"><div class="a-s-ttl"><span class="a-s-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3v18h18M7 14l4-4 3 3 5-6"/></svg></span><h3>Open positions</h3></div><span class="pill" id="tOpenCnt">0</span></div><div id="tOpenBody"></div></section>
 <link rel="stylesheet" href="css/trades-open.css"/>
-<script>window.jlN=function(n,w,p){return n+' '+(n===1?w:(p||w+'s'))};
-(function(){const e=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-window.__mountOpenPos=function(){const o=(window.__openTrades||[]).concat((window.__trades||[]).filter(t=>t.ex==null||t.ex==='')),b=document.getElementById('tOpenBody');document.getElementById('tOpenCnt').textContent=o.length;
- b.innerHTML=o.length?'<table><thead><tr><th>Date</th><th>Time</th><th>Side</th><th>Session</th><th>Lot</th><th>Entry</th></tr></thead><tbody>'+o.map(t=>'<tr><td>'+e(t.d)+'</td><td>'+e(t.t)+'</td><td>'+e(t.side)+'</td><td>'+e(t.ses||'')+'</td><td>'+e(t.lot==null?'':t.lot)+'</td><td>'+e(t.en)+'</td></tr>').join('')+'</tbody></table>':'<p>No open positions in your uploaded data. Import a CSV in Upload Data that includes open trades. Not live: it only knows what you uploaded.</p>'}})();</script>
+<script src="js/trades-open-positions.js"></script>
 <div class="t-bar"><div class="a-tabs" data-g="ses" role="group" aria-label="Session"></div><div class="a-tabs" data-g="res" role="group" aria-label="Result"></div><div class="a-tabs" data-g="rec" role="group" aria-label="Recent trades"></div><div class="a-tabs" data-g="merge" role="group" aria-label="Grouping"><button class="a-tab" aria-pressed="false" title="Combine fills opened together into one trade">Merge paired fills</button></div></div>
 <div id="tDays"></div><div id="tMore"></div>
 </div></div>
