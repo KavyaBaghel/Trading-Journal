@@ -1,0 +1,63 @@
+/* Trades + Journal headline stat tiles (scoped to #tKP / #jKP so the Analytics strip is untouched) */
+#tKP,#jKP{display:grid;grid-template-columns:repeat(auto-fit,minmax(172px,1fr));gap:12px;background:transparent!important;border:0!important;border-radius:0!important;overflow:visible!important;margin-bottom:18px}
+#tKP>div,#jKP>div{--kc:rgba(124,108,240,.30);--kd:var(--accent,#7c6cf0);position:relative;overflow:hidden;isolation:isolate;padding:16px 18px 15px;border-radius:16px!important;border:1px solid var(--border)!important;background:linear-gradient(155deg,rgba(255,255,255,.045),rgba(255,255,255,0) 52%),var(--panel)!important;box-shadow:0 10px 28px -18px rgba(0,0,0,.8);transition:transform 1s cubic-bezier(.25,.1,.25,1),border-color 1s ease,box-shadow 1s ease!important;will-change:transform}
+#tKP>div:hover,#jKP>div:hover{transform:translateY(-1px);border-color:var(--border-hi,rgba(255,255,255,.18))!important;box-shadow:0 16px 34px -16px rgba(0,0,0,.9),0 0 0 1px rgba(255,255,255,.03)}
+#tKP>div::before,#jKP>div::before{display:none!important}
+#tKP>div::after,#jKP>div::after{content:"";position:absolute;z-index:-1;right:-34px;top:-44px;width:150px;height:150px;border-radius:50%;background:radial-gradient(circle,var(--kc),transparent 68%);opacity:.55;transition:opacity 1.2s ease,transform 1.4s ease!important;pointer-events:none}
+#tKP>div:hover::after,#jKP>div:hover::after{opacity:.8;transform:scale(1.08)}
+#tKP>div:has(b[style*="--red"]),#jKP>div:has(b[style*="--red"]){--kc:rgba(239,68,68,.34);--kd:var(--red)}
+#tKP>div:has(b[style*="--green"]),#jKP>div:has(b[style*="--green"]){--kc:rgba(39,166,68,.32);--kd:var(--green)}
+#tKP>div:has(b[style*="--amber"]),#jKP>div:has(b[style*="--amber"]){--kc:rgba(86,170,255,.30);--kd:var(--amber)}
+#tKP span,#jKP span{display:flex;align-items:center;gap:7px;font-size:10.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--faint)}
+#tKP span::before,#jKP span::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--kd);box-shadow:0 0 0 3px color-mix(in srgb,var(--kd) 20%,transparent);flex:none}
+#tKP b,#jKP b{font-size:26px!important;font-weight:760;letter-spacing:-.03em;line-height:1.1;margin:10px 0 6px!important;white-space:nowrap}
+#tKP small,#jKP small{display:block;font-size:11.5px;line-height:1.4;color:var(--sub)}
+@media(max-width:640px){#tKP,#jKP{grid-template-columns:1fr 1fr}#tKP b,#jKP b{font-size:22px!important}}
+@media(prefers-reduced-motion:reduce){#tKP>div:hover,#jKP>div:hover{transform:none}}
+
+/* ===== Journal re-themed to match the Analytics tab (final override, ID-scoped to #view-journal; CSS only) ===== */
+/* headline numbers: the same joined strip as the Analytics KPIs (accent bar on top, red/green by value) */
+#view-journal #jKP{display:grid!important;grid-template-columns:repeat(auto-fit,minmax(150px,1fr))!important;gap:1px!important;background:var(--border)!important;border:1px solid var(--border)!important;border-radius:16px!important;overflow:hidden!important;margin-bottom:14px!important}
+#view-journal #jKP>div{position:relative;overflow:hidden;isolation:auto;padding:15px 16px!important;border-radius:0!important;border:0!important;background:var(--panel)!important;box-shadow:none!important;transform:none!important;transition:background .3s cubic-bezier(.22,.61,.36,1)}
+#view-journal #jKP>div:hover{background:#15151f!important;transform:none!important;box-shadow:none!important;border-color:transparent!important}
+#view-journal #jKP>div::before{display:block!important;content:"";position:absolute;left:0;top:0;right:0;height:2.5px;background:var(--accent);opacity:.85;transform:scaleX(0);transform-origin:0 50%;animation:kpBarIn .85s cubic-bezier(.16,1,.3,1) forwards}
+#view-journal #jKP>div:has(b[style*="--red"])::before{background:var(--red)}
+#view-journal #jKP>div:has(b[style*="--green"])::before{background:var(--green)}
+#view-journal #jKP>div:nth-child(2)::before{animation-delay:.09s}
+#view-journal #jKP>div:nth-child(3)::before{animation-delay:.16s}
+#view-journal #jKP>div:nth-child(4)::before{animation-delay:.23s}
+#view-journal #jKP>div:nth-child(5)::before{animation-delay:.30s}
+#view-journal #jKP>div::after{display:none!important}
+#view-journal #jKP span{display:block;font-size:11px;font-weight:600;letter-spacing:0;text-transform:none;color:var(--sub)}
+#view-journal #jKP span::before{display:none!important}
+#view-journal #jKP b{font-size:20px!important;font-weight:750;line-height:1.2;letter-spacing:-.02em;margin:5px 0 3px!important;white-space:normal}
+#view-journal #jKP small{font-size:11px;line-height:1.4;color:var(--faint)}
+@media(max-width:640px){#view-journal #jKP{grid-template-columns:repeat(auto-fit,minmax(150px,1fr))!important}#view-journal #jKP b{font-size:18px!important}}
+@media(prefers-reduced-motion:reduce){#view-journal #jKP>div::before{animation-duration:.01ms}}
+/* in-card section headers: the Analytics icon tile (neutral surface, accent on hover) instead of the purple gradient tile */
+#view-journal .j-sh{grid-template-columns:28px minmax(0,1fr)}
+#view-journal .j-sh-ic{width:28px;height:28px;border-radius:8px;background:var(--panel-2);border:1px solid var(--border)}
+#view-journal .j-sh-ic svg{width:14px;height:14px;stroke:var(--sub);stroke-width:1.8}
+#view-journal .a-s:hover .j-sh-ic{border-color:var(--border-hi)}
+#view-journal .a-s:hover .j-sh-ic svg{stroke:var(--accent-2)}
+#view-journal .j-sh h4{font-size:14px;font-weight:650}
+
+/* ===== Trades re-themed to match the Analytics tab (final override, ID-scoped to #view-trades; CSS only) ===== */
+#view-trades #tKP{display:grid!important;grid-template-columns:repeat(auto-fit,minmax(150px,1fr))!important;gap:1px!important;background:var(--border)!important;border:1px solid var(--border)!important;border-radius:16px!important;overflow:hidden!important;margin-bottom:14px!important}
+#view-trades #tKP>div{position:relative;overflow:hidden;isolation:auto;padding:15px 16px!important;border-radius:0!important;border:0!important;background:var(--panel)!important;box-shadow:none!important;transform:none!important;transition:background .3s cubic-bezier(.22,.61,.36,1)}
+#view-trades #tKP>div:hover{background:#15151f!important;transform:none!important;box-shadow:none!important;border-color:transparent!important}
+#view-trades #tKP>div::before{display:block!important;content:"";position:absolute;left:0;top:0;right:0;height:2.5px;background:var(--accent);opacity:.85;transform:scaleX(0);transform-origin:0 50%;animation:kpBarIn .85s cubic-bezier(.16,1,.3,1) forwards}
+#view-trades #tKP>div:has(b[style*="--red"])::before{background:var(--red)}
+#view-trades #tKP>div:has(b[style*="--green"])::before{background:var(--green)}
+#view-trades #tKP>div:nth-child(2)::before{animation-delay:.09s}
+#view-trades #tKP>div:nth-child(3)::before{animation-delay:.16s}
+#view-trades #tKP>div:nth-child(4)::before{animation-delay:.23s}
+#view-trades #tKP>div:nth-child(5)::before{animation-delay:.30s}
+#view-trades #tKP>div:nth-child(6)::before{animation-delay:.37s}
+#view-trades #tKP>div::after{display:none!important}
+#view-trades #tKP span{display:block;font-size:11px;font-weight:600;letter-spacing:0;text-transform:none;color:var(--sub)}
+#view-trades #tKP span::before{display:none!important}
+#view-trades #tKP b{font-size:20px!important;font-weight:750;line-height:1.2;letter-spacing:-.02em;margin:5px 0 3px!important;white-space:normal}
+#view-trades #tKP small{font-size:11px;line-height:1.4;color:var(--faint)}
+@media(max-width:640px){#view-trades #tKP{grid-template-columns:repeat(auto-fit,minmax(150px,1fr))!important}#view-trades #tKP b{font-size:18px!important}}
+@media(prefers-reduced-motion:reduce){#view-trades #tKP>div::before{animation-duration:.01ms}}
