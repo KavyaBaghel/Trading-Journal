@@ -82,7 +82,7 @@ def run(root, shots=None):
         pg.add_init_script(init)
         pg.clock.set_fixed_time(datetime.datetime(2026, 10, 30, 10, 0, 0))
         pg.goto("http://127.0.0.1:%d/index.html" % port, wait_until="load"); time.sleep(4)
-        res["load"]["globals"] = pg.evaluate("()=>({trades:Array.isArray(window.__trades)?window.__trades.length:typeof window.__trades,user:window.currentUser&&window.currentUser.uid,patched:!!window.__journallStoragePatched})")
+        res["load"]["globals"] = pg.evaluate("()=>({trades:Array.isArray(window.__trades)?window.__trades.length:typeof window.__trades,user:window.currentUser&&window.currentUser.uid,patched:!!window.__journallStoragePatched,keys:!!(window.JL_KEYS&&window.JL_KEYS.keys&&window.JL_KEYS.keys.JL_PREFS==='jlPrefs')})")
         navs = pg.evaluate("()=>[...document.querySelectorAll('[data-view]')].map(e=>e.getAttribute('data-view')).filter((v,i,a)=>a.indexOf(v)===i)")
         res["load"]["navs"] = navs; res["load"]["errors"] = log.get("load", [])
         for v in navs:
@@ -112,6 +112,7 @@ def main():
     fails = []; g = r["load"]["globals"]
     if g["trades"] != 40: fails.append("window.__trades should have 40 rows, got %r" % (g["trades"],))
     if g["user"] != "test_uid": fails.append("signed-in user missing (currentUser=%r): the auth module did not start" % (g["user"],))
+    if not g["keys"]: fails.append("window.JL_KEYS registry missing or wrong")
     if not g["patched"]: fails.append("localStorage patch not active: cloud sync would not run")
     if len(r["load"]["navs"]) < 10: fails.append("only %d tabs found" % len(r["load"]["navs"]))
     for t, d in r["tabs"].items():
