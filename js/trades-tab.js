@@ -14,7 +14,7 @@ const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;'
 // function of trade fields, not stateful data worth sharing via window.
 const trKey=t=>t.d+' '+t.t+' '+t.side+' '+t.en+' '+t.pnl;
 /* Quick Log trades (ids starting ql-) get Edit in the expanded row; map their live key to the stored id */
-const qlMap=()=>{const m={};try{(JSON.parse(localStorage.getItem('viztrade_trading_page_trades')||'[]')||[]).forEach(t=>{if(t&&/^ql-/.test(String(t.id)))m[window.JLAdapter.liveKey(t)]=t.id})}catch(_){console.debug('[journall] ignored error in trades-tab.js:', _);}return m};
+const qlMap=()=>{const m={};try{(JSON.parse(localStorage.getItem(JL_KEYS.keys.VIZTRADE_TRADING_PAGE_TRADES)||'[]')||[]).forEach(t=>{if(t&&/^ql-/.test(String(t.id)))m[window.JLAdapter.liveKey(t)]=t.id})}catch(_){console.debug('[journall] ignored error in trades-tab.js:', _);}return m};
 const col=k=>k==='win'?'var(--green)':k==='loss'?'var(--red)':'var(--faint)';
 const sec=t=>{const p=t.split(':');return +p[0]*3600+ +p[1]*60+ +p[2]};
 

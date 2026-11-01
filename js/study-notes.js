@@ -1,7 +1,7 @@
 (function(){
 /* Study notes in the AI Coach tab: a playbook of setups plus free notes.
    Keys start with journall_, so the existing cloud save picks them up. Setup names feed the Setup field in the Journal tab. */
-var PBK='journall_playbook_v1',NK='journall_study_notes_v1';
+var PBK=JL_KEYS.keys.JOURNALL_PLAYBOOK_V1,NK=JL_KEYS.keys.JOURNALL_STUDY_NOTES_V1;
 /*PB-PURE-START*/
 function esc(v){return String(v==null?'':v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;')}
 function uid(p){return p+Date.now().toString(36)+Math.random().toString(36).slice(2,6)}

@@ -1,5 +1,5 @@
 (function(){
-  var KEY='krishna_tomorrow_rule', KEEP=30;
+  var KEY=JL_KEYS.keys.KRISHNA_TOMORROW_RULE, KEEP=30;
   var inp=document.getElementById('ruleInput'), btn=document.getElementById('ruleSave'),
       val=document.getElementById('focusVal'), meta=document.getElementById('focusMeta');
   if(!inp||!btn||!val||!meta) return;
