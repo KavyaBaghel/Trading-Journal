@@ -179,11 +179,29 @@ async function handleMarket(request, env, cors, ctx) {
 
   // status 0 = Finnhub could not be reached at all.
   const finnhub = async (path, params) => {
+    // Short edge cache so repeated client polls do not each hit Finnhub (news 2 min, calendar 10 min).
+    const key = new Request(`https://journall.invalid/finnhub/${path}?${new URLSearchParams(params)}`);
+    const ttl = path === "news" ? 120 : 600;
+    try {
+      const hit = await caches.default.match(key);
+      if (hit) {
+        const cached = await hit.json().catch(() => null);
+        if (cached !== null) return { status: 200, data: cached };
+      }
+    } catch (error) { /* fall through to a live call */ }
     try {
       const response = await fetch(`https://finnhub.io/api/v1/${path}?${new URLSearchParams(params)}`, {
         headers: { "X-Finnhub-Token": apiKey, "Accept": "application/json" }
       });
       const data = await response.json().catch(() => null);
+      if (response.status === 200 && data !== null) {
+        try {
+          const put = caches.default.put(key, new Response(JSON.stringify(data), {
+            headers: { "content-type": "application/json", "cache-control": `public, max-age=${ttl}` }
+          }));
+          if (ctx && ctx.waitUntil) ctx.waitUntil(put); else await put;
+        } catch (error) { /* caching is best effort */ }
+      }
       return { status: response.status, data };
     } catch (error) {
       return { status: 0, data: null };
