@@ -103,19 +103,7 @@ document.addEventListener('visibilitychange',function(){
 <div id="firebaseGateMessage" class="jl-message">Checking website sign-in...</div>
 <p class="jl-footnote">By continuing, you agree to Journall's Terms and Privacy Policy.</p>
 </div>
-<script>
-/* Current balance: use the last MT5 sync (within 24h) when there is one, else starting balance + imported net P&L. */
-window.jlLiveBalance=function(Z){
-  var start=(Z&&Z.start)||0,base=start+((Z&&Z.net)||0);
-  try{
-    var c=JSON.parse(localStorage.getItem('journall_account_config_v1')||'null');
-    var v=c&&c.mt5BalanceSource==='mt5'?Number(c.mt5CurrentBalance):NaN;
-    var age=c?Date.now()-Number(c.mt5BalanceTimestamp||0):Infinity;
-    if(start>0&&isFinite(v)&&v>0&&age>=0&&age<86400000)return v;
-  }catch(e){}
-  return base;
-};
-</script>
+<script src="js/live-balance.js"></script>
 <script id="jl-adapter">
 /* Journall data adapter: live storage <-> new design. No DOM, no network. */
 (function(root){
