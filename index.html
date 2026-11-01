@@ -2830,6 +2830,77 @@
   #view-profile .up-switch.on::after{transform:translateX(18px)}
   @media (max-width:640px){#view-profile .up-hero-body{padding:0 20px}#view-profile .up-card{padding:20px}#view-profile .up-stat .v{font-size:21px}#view-profile .top h1{font-size:32px}}
 
+  /* ===== User Profile re-themed to match the Analytics tab (final override, ID-scoped) ===== */
+  #view-profile.view{--red:#f0685c;--green:#43d787;--border:rgba(255,255,255,.075);--border-hi:rgba(255,255,255,.14)}
+  #view-profile.view .wrap{max-width:1160px}
+  #view-profile.view .top{margin-bottom:26px}
+  #view-profile.view .top h1{font-family:Inter,sans-serif;font-size:28px;font-weight:750;letter-spacing:-.02em;margin:0 0 5px}
+  #view-profile.view .top p{font-size:13.5px;color:var(--sub)}
+  #view-profile.view .a-h{margin:30px 0 14px}
+  /* hero */
+  #view-profile.view .up-hero{border-radius:18px;padding:0 0 26px;margin-bottom:14px}
+  #view-profile.view .up-hero::before{border-radius:18px;opacity:1}
+  #view-profile.view .up-name{font-size:28px;font-weight:750;letter-spacing:-.02em;line-height:1.1}
+  #view-profile.view .up-bio{font-style:normal;font-size:13.5px}
+  #view-profile.view .up-phase-chip{font-size:11px;font-weight:650;letter-spacing:.01em;text-transform:none;color:var(--accent-2);background:rgba(124,108,240,.12);border:1px solid rgba(124,108,240,.3);padding:4px 11px}
+  #view-profile.view .up-meta-chip{font-size:11px;font-weight:600;letter-spacing:.03em;color:var(--sub);background:var(--panel-2);border:1px solid var(--border);padding:4px 11px}
+  #view-profile.view .up-settings-menu button .ic{display:inline-grid;place-items:center}
+  #view-profile.view .up-settings-menu button .ic svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+  /* lifetime numbers: same strip as Analytics KPIs */
+  #view-profile.view .up-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:1px;margin:0 0 14px;background:var(--border);border:1px solid var(--border);border-radius:16px;overflow:hidden}
+  #view-profile.view .up-stat{position:relative;overflow:hidden;padding:15px 16px;border-radius:0;background:var(--panel);border:0;box-shadow:none;transform:none}
+  #view-profile.view .up-stat:hover{background:#15151f;transform:none;box-shadow:none}
+  #view-profile.view .up-stat::before{border-radius:0}
+  #view-profile.view .up-stat::after{display:none}
+  #view-profile.view .up-stat.neg::before{background:var(--red)}
+  #view-profile.view .up-stat .l{display:flex;align-items:center;gap:7px;font-size:11px;font-weight:600;letter-spacing:.01em;text-transform:none;color:var(--sub);margin:0}
+  #view-profile.view .up-stat .l .ic{display:inline-flex}
+  #view-profile.view .up-stat .l svg{width:13px;height:13px;flex:none;stroke:var(--faint);fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+  #view-profile.view .up-stat .v{font-size:20px;font-weight:750;line-height:1.2;margin:5px 0 0;letter-spacing:-.02em}
+  /* cards: same surface and heading pattern as Analytics */
+  #view-profile.view .up-grid{gap:14px;margin-bottom:14px}
+  #view-profile.view .up-col{gap:14px}
+  #view-profile.view .up-card{padding:22px 24px;margin:0;border-radius:18px;overflow:visible}
+  #view-profile.view .up-card::after{display:none}
+  #view-profile.view .up-card-head{display:block;font-family:Inter,sans-serif;font-size:14.5px;font-weight:650;letter-spacing:0;text-transform:none;color:var(--text);margin:0}
+  #view-profile.view .up-card-head::before{display:none}
+  #view-profile.view .up-card>.sub{margin:2px 0 16px 38px}
+  /* rows */
+  #view-profile.view .up-risk-row,#view-profile.view .up-sess{font-size:12.5px;padding:11px 0;border-bottom:1px solid var(--border)}
+  #view-profile.view .up-risk-row:last-child,#view-profile.view .up-sess:last-child,#view-profile.view .up-toggle-row:last-child{border-bottom:none;padding-bottom:0}
+  #view-profile.view .up-risk-row b,#view-profile.view .up-sess b{font-size:12px;font-weight:650;padding:3px 10px;border-radius:8px;background:var(--panel-2);border:1px solid var(--border);color:var(--text)}
+  #view-profile.view .up-sess b.pos{color:var(--green);background:rgba(67,215,135,.08);border-color:rgba(67,215,135,.25)}
+  #view-profile.view .up-sess b.neg{color:var(--red);background:rgba(240,104,92,.08);border-color:rgba(240,104,92,.25)}
+  /* tags */
+  #view-profile.view .up-tags{gap:8px}
+  #view-profile.view .up-tag:not(.add){font-size:12px;font-weight:600;color:var(--text);background:rgba(124,108,240,.1);border:1px solid rgba(124,108,240,.28);padding:6px 12px}
+  #view-profile.view .up-tag.add{font-size:12px;font-weight:600;background:none;border:1px dashed var(--border-hi);color:var(--faint);padding:6px 12px}
+  /* monthly chart */
+  #view-profile.view .up-chart{height:150px;gap:18px;padding-top:8px}
+  #view-profile.view .up-chart-bar{max-width:56px;border-radius:9px 9px 4px 4px;opacity:1;box-shadow:0 10px 26px -14px rgba(0,0,0,.8)}
+  #view-profile.view .up-chart-bar[style*="--red"]{background:linear-gradient(180deg,#e8888c,var(--red))!important}
+  #view-profile.view .up-chart-bar[style*="--green"]{background:linear-gradient(180deg,#7fe0a8,var(--green))!important}
+  #view-profile.view .up-chart-col .m{font-size:10.5px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--faint)}
+  #view-profile.view .up-chart-col .n{font-size:11px;font-weight:600;color:var(--sub)}
+  /* achievements */
+  #view-profile.view .up-badges{gap:10px}
+  #view-profile.view .up-badge{align-items:center;gap:13px;padding:12px 14px;border-radius:12px;background:var(--panel-2);border:1px dashed var(--border-hi);box-shadow:none}
+  #view-profile.view .up-badge:hover{border-color:var(--border-hi);box-shadow:none}
+  #view-profile.view .up-badge.on{background:rgba(67,215,135,.06);border:1px solid rgba(67,215,135,.35);box-shadow:none}
+  #view-profile.view .up-badge .ic{flex:none;width:34px;height:34px;border-radius:10px;display:grid;place-items:center;background:var(--panel);border:1px solid var(--border);color:var(--faint);font-size:0}
+  #view-profile.view .up-badge.on .ic{background:rgba(67,215,135,.14);border-color:rgba(67,215,135,.3);color:var(--green)}
+  #view-profile.view .up-badge .ic svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+  #view-profile.view .up-badge b{font-size:12.5px;font-weight:650}
+  #view-profile.view .up-badge>div span{font-size:11.5px}
+  #view-profile.view .up-badge-bar{height:4px;background:rgba(255,255,255,.07)}
+  /* preferences */
+  #view-profile.view .up-toggle-row{padding:13px 0;border-bottom:1px solid var(--border)}
+  #view-profile.view .up-toggle-row b{font-size:12.5px;font-weight:650}
+  #view-profile.view .up-toggle-row span{font-size:11.5px;color:var(--sub)}
+  #view-profile.view .up-switch{background:var(--panel-2);border:1px solid var(--border-hi)}
+  #view-profile.view .up-switch.on{background:linear-gradient(135deg,var(--accent),#6a5ae0);border-color:transparent}
+  @media (max-width:640px){#view-profile.view .up-card{padding:18px}#view-profile.view .up-name{font-size:24px}#view-profile.view .up-stat .v{font-size:18px}}
+
 </style>
 <script>
 (function(){
@@ -4082,7 +4153,7 @@ window.__mountOpenPos=function(){const o=(window.__openTrades||[]).concat((windo
 
   <div class="top up-reveal" style="animation-delay:0ms">
     <div>
-      <div class="eyebrow"><span class="pill">Trader profile</span><span class="date mono" id="dateStrU"></span></div>
+      <div class="eyebrow"><span class="date mono" id="dateStrU"></span></div>
       <h1>User Profile</h1>
       <p>Your identity, lifetime numbers, and how Journall should treat you.</p>
     </div>
@@ -4097,7 +4168,7 @@ window.__mountOpenPos=function(){const o=(window.__openTrades||[]).concat((windo
         <div>
           <div class="up-name-row"><span class="up-name" id="upName" data-user-name contenteditable="true" spellcheck="false" title="Click to edit your name"></span><span class="up-phase-chip" id="upPhaseChip">Not set</span></div>
           <div class="up-bio" id="upBio" contenteditable="true" spellcheck="false"></div>
-          <div class="up-meta"><span class="up-meta-chip" id="upMemberChip" hidden></span><span class="up-meta-chip" id="upJournalStreakChip">🔥 Loading…</span></div>
+          <div class="up-meta"><span class="up-meta-chip" id="upMemberChip" hidden></span><span class="up-meta-chip" id="upJournalStreakChip">Loading…</span></div>
         </div>
       </div>
       <div class="up-settings-wrap">
@@ -4106,8 +4177,8 @@ window.__mountOpenPos=function(){const o=(window.__openTrades||[]).concat((windo
           <span>Edit profile</span>
         </button>
         <div class="up-settings-menu" id="upSettingsMenu">
-          <button type="button" data-act="avatar"><span class="ic">🖼️</span> Change profile photo</button>
-          <button type="button" data-act="cover"><span class="ic">🌆</span> Change banner</button>
+          <button type="button" data-act="avatar"><span class="ic"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="1.6"/><path d="m21 16-5-5-9 9"/></svg></span> Change profile photo</button>
+          <button type="button" data-act="cover"><span class="ic"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="9" rx="2"/><path d="M3 18h18"/></svg></span> Change banner</button>
         </div>
         <input type="file" id="upAvatarInput" accept="image/*" hidden>
         <input type="file" id="upCoverInput" accept="image/*" hidden>
@@ -4115,53 +4186,55 @@ window.__mountOpenPos=function(){const o=(window.__openTrades||[]).concat((windo
     </div>
   </div>
 
-  <div class="up-stats">
-    <div class="up-stat glass up-reveal" style="animation-delay:110ms"><div class="l"><span class="ic">📒</span><span>Trades logged</span></div><div class="v mono" id="upN1">0</div></div>
-    <div class="up-stat glass up-reveal" style="animation-delay:150ms"><div class="l"><span class="ic">🎯</span><span>Win rate</span></div><div class="v mono" id="upN2">0%</div></div>
-    <div class="up-stat glass neg up-reveal" style="animation-delay:190ms"><div class="l"><span class="ic">💰</span><span>Net P&amp;L</span></div><div class="v mono" id="upN3">$0.00</div></div>
-    <div class="up-stat glass up-reveal" style="animation-delay:230ms"><div class="l"><span class="ic">⚖️</span><span>Profit factor</span></div><div class="v mono" id="upN4">0.00</div></div>
-    <div class="up-stat glass neg up-reveal" style="animation-delay:270ms"><div class="l"><span class="ic">📉</span><span>Max drawdown</span></div><div class="v mono" id="upN5">$0.00</div></div>
+  <div class="a-h"><div class="a-h-t"><span class="a-h-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19V9M11 19V4M18 19v-7"/></svg></span><h2>Lifetime numbers</h2></div><p>Your all-time results from every logged trade.</p></div>
+  <div class="up-stats a-kp">
+    <div class="up-stat up-reveal" style="animation-delay:110ms"><div class="l"><span class="ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h11a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3z"/><path d="M5 17a3 3 0 0 1 3-3h11"/></svg></span><span>Trades logged</span></div><div class="v mono" id="upN1">0</div></div>
+    <div class="up-stat up-reveal" style="animation-delay:150ms"><div class="l"><span class="ic"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg></span><span>Win rate</span></div><div class="v mono" id="upN2">0%</div></div>
+    <div class="up-stat neg up-reveal" style="animation-delay:190ms"><div class="l"><span class="ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v18M16 7.5c0-1.7-1.8-2.5-4-2.5s-4 1-4 2.6c0 3.8 8 2 8 6 0 1.7-1.8 2.9-4 2.9s-4-1-4-2.7"/></svg></span><span>Net P&amp;L</span></div><div class="v mono" id="upN3">$0.00</div></div>
+    <div class="up-stat up-reveal" style="animation-delay:230ms"><div class="l"><span class="ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v16M6 20h12M5 8h14M5 8l-2.5 6a3 3 0 0 0 5 0zM19 8l-2.5 6a3 3 0 0 0 5 0z"/></svg></span><span>Profit factor</span></div><div class="v mono" id="upN4">0.00</div></div>
+    <div class="up-stat neg up-reveal" style="animation-delay:270ms"><div class="l"><span class="ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7l6 6 4-4 8 8M21 11v6h-6"/></svg></span><span>Max drawdown</span></div><div class="v mono" id="upN5">$0.00</div></div>
   </div>
 
+  <div class="a-h"><div class="a-h-t"><span class="a-h-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg></span><h2>Profile and record</h2></div><p>Your trading identity, risk limits, session results, monthly trend and milestones.</p></div>
   <div class="up-grid">
     <div class="up-col">
-      <div class="up-card glass up-reveal" style="animation-delay:310ms">
-        <div class="up-card-head">🧭 Trading identity</div>
+      <div class="up-card a-s up-reveal" style="animation-delay:310ms">
+        <div class="a-s-head"><div class="a-s-ttl"><span class="a-s-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="m15.5 8.5-2 5-5 2 2-5z"/></svg></span><h3 class="up-card-head">Trading identity</h3></div></div><div class="sub">Tags that describe how you trade.</div>
         <div class="up-tags" id="upTags">
                     <button class="up-tag add" id="upTagAdd" type="button">+ Add</button>
         </div>
       </div>
-      <div class="up-card glass up-reveal" style="animation-delay:350ms">
-        <div class="up-card-head">🛡️ Risk profile</div>
+      <div class="up-card a-s up-reveal" style="animation-delay:350ms">
+        <div class="a-s-head"><div class="a-s-ttl"><span class="a-s-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 4 6v6c0 4.5 3.2 7.6 8 9 4.8-1.4 8-4.5 8-9V6z"/><path d="m9 12 2 2 4-4"/></svg></span><h3 class="up-card-head">Risk profile</h3></div></div><div class="sub">Limits taken from your Account Settings.</div>
         <div class="up-risk-row"><span>Daily loss limit</span><b id="upRiskLoss">Not set</b></div>
         <div class="up-risk-row"><span>Trade limit / day</span><b id="upRiskTrades">Not set</b></div>
                 <div class="up-risk-row"><span>Minimum reward:risk</span><b id="upRiskRR">Not set</b></div>
       </div>
-      <div class="up-card glass up-reveal" style="animation-delay:390ms">
-        <div class="up-card-head">🕒 Session record</div>
+      <div class="up-card a-s up-reveal" style="animation-delay:390ms">
+        <div class="a-s-head"><div class="a-s-ttl"><span class="a-s-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg></span><h3 class="up-card-head">Session record</h3></div></div><div class="sub">Net result by trading session.</div>
         <div id="upSessRows"><div class="up-sess"><span>Loading…</span><b>—</b></div></div>
       </div>
     </div>
 
     <div class="up-col">
-      <div class="up-card glass up-reveal" style="animation-delay:310ms">
-        <div class="up-card-head">📈 Monthly trend — 2026</div>
+      <div class="up-card a-s up-reveal" style="animation-delay:310ms">
+        <div class="a-s-head"><div class="a-s-ttl"><span class="a-s-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3v18h18M7 14l4-4 3 3 5-6"/></svg></span><h3 class="up-card-head">Monthly trend</h3></div></div><div class="sub">Net P&amp;L for each month with trades.</div>
         <div class="up-chart" id="upChart"></div>
       </div>
-      <div class="up-card glass up-reveal" style="animation-delay:350ms">
-        <div class="up-card-head">🏆 Achievements</div>
+      <div class="up-card a-s up-reveal" style="animation-delay:350ms">
+        <div class="a-s-head"><div class="a-s-ttl"><span class="a-s-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0z"/><path d="M17 5h3v2a3 3 0 0 1-3 3M7 5H4v2a3 3 0 0 0 3 3"/></svg></span><h3 class="up-card-head">Achievements</h3></div></div><div class="sub">Real progress against each milestone.</div>
         <div class="up-badges">
-          <div class="up-badge" id="upBadgeTrades"><span class="ic" id="upBadgeTradesIcon">🔒</span><div><b>700+ trades logged</b><span id="upBadgeTradesSub">Consistency milestone</span></div></div>
-          <div class="up-badge" id="upBadgeStreak"><span class="ic" id="upBadgeStreakIcon">🔒</span><div><b>30-day journal streak</b><span id="upBadgeStreakSub">0 / 30 days</span><div class="up-badge-bar"><i data-target="0"></i></div></div></div>
-          <div class="up-badge" id="upBadgeGreenMonth"><span class="ic" id="upBadgeGreenMonthIcon">🔒</span><div><b>First green month</b><span id="upBadgeGreenMonthSub">Not tracked yet</span></div></div>
-          <div class="up-badge" id="upBadgeRevenge"><span class="ic" id="upBadgeRevengeIcon">🔒</span><div><b>Zero revenge trades, 7 days</b><span id="upBadgeRevengeSub">Not tracked yet</span></div></div>
+          <div class="up-badge" id="upBadgeTrades"><span class="ic" id="upBadgeTradesIcon"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></span><div><b>700+ trades logged</b><span id="upBadgeTradesSub">Consistency milestone</span></div></div>
+          <div class="up-badge" id="upBadgeStreak"><span class="ic" id="upBadgeStreakIcon"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></span><div><b>30-day journal streak</b><span id="upBadgeStreakSub">0 / 30 days</span><div class="up-badge-bar"><i data-target="0"></i></div></div></div>
+          <div class="up-badge" id="upBadgeGreenMonth"><span class="ic" id="upBadgeGreenMonthIcon"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></span><div><b>First green month</b><span id="upBadgeGreenMonthSub">Not tracked yet</span></div></div>
+          <div class="up-badge" id="upBadgeRevenge"><span class="ic" id="upBadgeRevengeIcon"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></span><div><b>Zero revenge trades, 7 days</b><span id="upBadgeRevengeSub">Not tracked yet</span></div></div>
         </div>
       </div>
     </div>
   </div>
 
-  <div class="up-card glass up-reveal" style="animation-delay:430ms">
-    <div class="up-card-head">⚙️ Preferences</div>
+  <div class="up-card a-s up-reveal" style="animation-delay:430ms">
+    <div class="a-s-head"><div class="a-s-ttl"><span class="a-s-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2"/><circle cx="8" cy="17" r="2"/></svg></span><h3 class="up-card-head">Preferences</h3></div></div><div class="sub">How Journall reminds and warns you.</div>
     <div class="up-toggle-row"><div><b>Daily rule reminders</b><span>Before your first trade, remind you on Today's Summary if the last trading day broke a rule</span></div><button class="up-switch on" data-k="reminders" type="button"></button></div>
     <div class="up-toggle-row"><div><b>Risk warnings</b><span>Show a warning on Today's Summary at 80% of your daily loss limit, or 1 trade before the max</span></div><button class="up-switch on" data-k="risk" type="button"></button></div>
     <div class="up-toggle-row"><div><b>Reduce motion</b><span>Turn off animated entrances and transitions across the app</span></div><button class="up-switch" data-k="motion" type="button"></button></div>
@@ -8543,7 +8616,7 @@ function fillHero(){const s=(id,h)=>{const e=$(id);if(e)e.innerHTML=h};
     const host = $('upChart'); if(!host) return;
     const months = computeMonthlyTrend();
     const head = host.parentElement && host.parentElement.querySelector('.up-card-head');
-    if(head){ const ys = [...new Set(months.map(m=>m.y))]; head.textContent = '\ud83d\udcc8 Monthly trend \u2014 ' + (ys.length===1 ? ys[0] : 'last '+months.length+' months'); }
+    if(head){ const ys = [...new Set(months.map(m=>m.y))]; head.textContent = 'Monthly trend \u2014 ' + (ys.length===1 ? ys[0] : 'last '+months.length+' months'); }
     const max = Math.max(1, ...months.map(m=> m.has ? Math.abs(m.net) : 0));
     host.innerHTML = months.map(m=>{
       if(!m.has) return '<div class="up-chart-col" style="opacity:.4"><div class="up-chart-bar" data-target="4" style="background:rgba(255,255,255,.14)"></div><span class="n">No trades</span><span class="m">'+m.m+'</span></div>';
@@ -8588,6 +8661,8 @@ function fillHero(){const s=(id,h)=>{const e=$(id);if(e)e.innerHTML=h};
     return {days: Math.max(0,days), hasRevenge: lastRevengeIdx!==-1};
   }
 
+  const UP_ICO={lock:'<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>',ok:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>'};
+
   function renderBadges(months){
     const stats = computeProfileStats();
 
@@ -8595,14 +8670,14 @@ function fillHero(){const s=(id,h)=>{const e=$(id);if(e)e.innerHTML=h};
     const tradesTarget = 700;
     const tOn = stats.n >= tradesTarget;
     $('upBadgeTrades').classList.toggle('on', tOn);
-    $('upBadgeTradesIcon').textContent = tOn ? '✅' : '🔒';
+    $('upBadgeTradesIcon').innerHTML = tOn ? UP_ICO.ok : UP_ICO.lock;
     $('upBadgeTradesSub').textContent = tOn ? 'Consistency milestone, unlocked' : (stats.n+' / '+tradesTarget+' trades logged');
 
     // 30-day journal streak
     const js = computeJournalStreak();
     const jTarget = 30, jOn = js.streak >= jTarget;
     $('upBadgeStreak').classList.toggle('on', jOn);
-    $('upBadgeStreakIcon').textContent = jOn ? '✅' : '🔒';
+    $('upBadgeStreakIcon').innerHTML = jOn ? UP_ICO.ok : UP_ICO.lock;
     $('upBadgeStreakSub').textContent = js.entries===0 ? 'No journal entries yet' : (js.streak+' / '+jTarget+' days');
     const streakBar = document.querySelector('#upBadgeStreak .up-badge-bar i');
     if(streakBar){ streakBar.dataset.target = String(Math.min(100, Math.round(js.streak/jTarget*100))); requestAnimationFrame(()=> streakBar.style.width = streakBar.dataset.target+'%'); }
@@ -8612,7 +8687,7 @@ function fillHero(){const s=(id,h)=>{const e=$(id);if(e)e.innerHTML=h};
     const green = tracked.find(m=>m.net>0);
     const gOn = !!green;
     $('upBadgeGreenMonth').classList.toggle('on', gOn);
-    $('upBadgeGreenMonthIcon').textContent = gOn ? '✅' : '🔒';
+    $('upBadgeGreenMonthIcon').innerHTML = gOn ? UP_ICO.ok : UP_ICO.lock;
     if(gOn){
       $('upBadgeGreenMonthSub').textContent = 'Unlocked — '+green.m+', +$'+green.net.toFixed(2);
     } else if(tracked.length){
@@ -8626,7 +8701,7 @@ function fillHero(){const s=(id,h)=>{const e=$(id);if(e)e.innerHTML=h};
     const rv = computeRevengeFreeStreak();
     const rTarget = 7;
     $('upBadgeRevenge').classList.toggle('on', rv.days>=rTarget);
-    $('upBadgeRevengeIcon').textContent = rv.days>=rTarget ? '✅' : '🔒';
+    $('upBadgeRevengeIcon').innerHTML = rv.days>=rTarget ? UP_ICO.ok : UP_ICO.lock;
     if(rv.days===0 && !rv.hasRevenge){
       $('upBadgeRevengeSub').textContent = 'Not tracked yet';
     } else if(!rv.hasRevenge){
@@ -8772,7 +8847,7 @@ function fillHero(){const s=(id,h)=>{const e=$(id);if(e)e.innerHTML=h};
 
     const js = computeJournalStreak();
     const streakChip = $('upJournalStreakChip');
-    if(streakChip) streakChip.textContent = js.entries===0 ? '🔥 No journal entries yet' : ('🔥 '+js.streak+'-day journal streak');
+    if(streakChip) streakChip.textContent = js.entries===0 ? 'No journal entries yet' : (js.streak+'-day journal streak');
 
     // ---------- editable bio (click straight into the text) ----------
     const bio = $('upBio');
