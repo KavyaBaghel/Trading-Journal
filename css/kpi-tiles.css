@@ -125,3 +125,29 @@
 #view-settings .gg-goal-bar i{background:var(--accent)!important;box-shadow:none!important}
 #view-settings .gg-goal-card:has(.gg-goal-badge.on) .gg-goal-bar i{background:var(--green)!important}
 #view-settings .gg-goal-card:has(.gg-goal-badge.behind) .gg-goal-bar i{background:var(--red)!important}
+
+/* ===== AI Coach re-themed to match the Analytics tab (final override, scoped to #view-ai; CSS only) ===== */
+/* snapshot numbers: the same joined strip as the Analytics KPIs (accent bar on top, red when the value is red) */
+#view-ai .aic-snap{display:grid!important;grid-template-columns:repeat(auto-fit,minmax(150px,1fr))!important;gap:1px!important;background:var(--border)!important;border:1px solid var(--border)!important;border-radius:16px!important;overflow:hidden!important;margin-bottom:14px!important}
+#view-ai .aic-snap-card{position:relative;overflow:hidden;padding:15px 16px!important;border:0!important;border-radius:0!important;background:var(--panel)!important;box-shadow:none!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important;transition:background .3s cubic-bezier(.22,.61,.36,1)!important}
+#view-ai .aic-snap-card:hover{background:#15151f!important;transform:none!important;box-shadow:none!important}
+#view-ai .aic-snap-card::before{content:"";position:absolute;left:0;top:0;right:0;height:2.5px;background:var(--accent);opacity:.85;transform:scaleX(0);transform-origin:0 50%;animation:kpBarIn .85s cubic-bezier(.16,1,.3,1) forwards}
+#view-ai .aic-snap-card.neg::before{background:var(--red)}
+#view-ai .aic-snap-card:nth-child(2)::before{animation-delay:.09s}
+#view-ai .aic-snap-card:nth-child(3)::before{animation-delay:.16s}
+#view-ai .aic-snap-card:nth-child(4)::before{animation-delay:.23s}
+#view-ai .aic-snap-card .l{letter-spacing:0;margin-bottom:5px}
+#view-ai .aic-snap-card .l svg{display:none}
+#view-ai .aic-snap-card .v{font-size:20px;line-height:1.2}
+@media(prefers-reduced-motion:reduce){#view-ai .aic-snap-card::before{animation-duration:.01ms}}
+/* cards: the Analytics card surface and 18px corners */
+#view-ai .aic-chat,#view-ai .aic-card,#view-ai .aic-report,#view-ai .aic-widget{border-radius:18px!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important;box-shadow:none!important;background:linear-gradient(160deg,rgba(255,255,255,.035),rgba(255,255,255,0) 42%),var(--panel)!important}
+#view-ai .aic-chat:hover,#view-ai .aic-card:hover,#view-ai .aic-report:hover,#view-ai .aic-widget:hover{border-color:var(--border-hi)!important}
+/* card headers: the Analytics icon tile + sentence-case title */
+#view-ai .aic-card-head .l{gap:10px;font-size:14px;font-weight:650;letter-spacing:0;color:var(--text)}
+#view-ai .aic-card-head .l svg{width:28px;height:28px;padding:7px;box-sizing:border-box;border-radius:8px;background:var(--panel-2);border:1px solid var(--border);stroke:var(--sub);stroke-width:1.8}
+#view-ai .aic-card:hover .aic-card-head .l svg{border-color:var(--border-hi);stroke:var(--accent-2)}
+/* assistant avatar: an inline icon instead of a text glyph */
+#view-ai .aic-avatar svg{width:15px;height:15px}
+#view-ai .aic-avatar.sm svg{width:12px;height:12px}
+#view-ai .aic-w-eyebrow{letter-spacing:0;font-size:11.5px}
