@@ -6334,38 +6334,7 @@ window.addEventListener('storage',function(ev){if(!ev.key||ev.key===KEY)render()
 document.addEventListener('visibilitychange',function(){if(!document.hidden)render()});
 setTimeout(render,1500);render();
 })();</script>
-<style id="jl-study-notes-css">
-#pbRoot .pb-tabs{display:flex;gap:4px;padding:3px;border-radius:var(--r-2);background:var(--panel-2);border:1px solid var(--border)}
-#pbRoot .pb-tab{background:none;border:0;color:var(--sub);font:inherit;font-size:var(--fs-3);font-weight:600;padding:6px 14px;border-radius:var(--r-1);cursor:pointer}
-#pbRoot .pb-tab.on{background:rgba(124,108,240,.18);color:var(--text)}
-#pbRoot .pb-bar{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}
-#pbRoot .pb-in{flex:1;min-width:160px;width:100%;background:var(--panel-2);border:1px solid var(--border);border-radius:var(--r-2);color:var(--text);font-family:inherit;font-size:var(--fs-3);padding:10px 12px}
-#pbRoot .pb-bar .pb-in{width:auto}
-#pbRoot .pb-in:focus{outline:none;border-color:var(--accent-2);box-shadow:0 0 0 3px rgba(124,108,240,.15)}
-#pbRoot .pb-hint{color:var(--faint);font-size:var(--fs-2);margin:-4px 0 12px}
-#pbRoot .pb-msg{color:var(--warn);font-size:var(--fs-2);min-height:16px;margin-bottom:6px}
-#pbRoot .pb-un{display:flex;flex-wrap:wrap;align-items:center;gap:6px 8px;margin-bottom:12px}
-#pbRoot .pb-un-t{font-size:var(--fs-1);font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--faint);width:100%}
-#pbRoot .pb-chip{background:rgba(255,255,255,.05);border:1px solid var(--border-hi);color:var(--sub);border-radius:var(--r-pill);font:inherit;font-size:var(--fs-2);padding:4px 11px;cursor:pointer}
-#pbRoot .pb-chip:hover{color:var(--text)}
-
-#pbRoot .pb-item>summary{justify-content:space-between;gap:4px 12px}
-
-#pbRoot .pb-item>summary b{font-size:var(--fs-4);overflow-wrap:anywhere}
-#pbRoot .pb-stat{font-size:var(--fs-2);color:var(--faint)}
-#pbRoot .pb-stat .pos{color:var(--green)}
-#pbRoot .pb-stat .neg{color:var(--red)}
-#pbRoot .pb-body{padding:2px 14px 14px;display:grid;gap:12px}
-#pbRoot .pb-body label{display:block}
-#pbRoot .pb-l{margin-bottom:5px}
-#pbRoot .pn-ta{min-height:140px}
-#pbRoot .pb-foot{display:flex;justify-content:flex-end}
-#pbRoot .pb-none{color:var(--faint);font-size:var(--fs-3);padding:8px 2px}
-.j-setrules{margin-top:8px;padding:10px 12px;border:1px solid var(--border);border-radius:var(--r-2);background:var(--panel-2);display:grid;gap:8px}
-.j-setrules[hidden]{display:none}
-.j-setrules .jsr-l{display:block;font-size:var(--fs-1);font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--faint);margin-bottom:3px}
-.j-setrules p{margin:0;font-size:var(--fs-3);color:var(--sub);line-height:1.45;white-space:pre-wrap}
-</style>
+<link rel="stylesheet" href="css/study-notes.css"/>
 <script id="jl-study-notes">(function(){
 /* Study notes in the AI Coach tab: a playbook of setups plus free notes.
    Keys start with journall_, so the existing cloud save picks them up. Setup names feed the Setup field in the Journal tab. */
