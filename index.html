@@ -310,6 +310,13 @@
   #view-profile.view .up-switch.on{background:linear-gradient(135deg,var(--accent),#6a5ae0);border-color:transparent}
   @media (max-width:640px){#view-profile.view .up-card{padding:18px}#view-profile.view .up-name{font-size:24px}#view-profile.view .up-stat .v{font-size:18px}}
 
+  /* ===== Today's Summary: Analytics-style panel headings (final override) ===== */
+  #view-summary .panel{padding:22px 24px}
+  #view-summary .panel-head .a-s-ttl,#view-summary .tbl-head .a-s-ttl{display:flex;align-items:center;gap:10px}
+  #view-summary .panel:hover .a-s-ic{border-color:var(--border-hi)}
+  #view-summary .panel:hover .a-s-ic svg{stroke:var(--accent-2)}
+  #view-summary .panel .a-s-ttl h2{margin:0;font-size:14.5px;font-weight:650}
+
 </style>
 <script>
 (function(){
@@ -814,7 +821,7 @@ window.jlLiveBalance=function(Z){
   <div class="top aic-reveal" style="animation-delay:0ms">
     <div>
       <div class="eyebrow">
-        <span class="streak" id="streakBadge">🔥 1-day streak</span>
+        <span class="streak" id="streakBadge">1-day streak</span>
         <span class="streak-nudge" id="streakNudge" hidden></span>
         <span class="date mono" id="dateStr"></span>
       </div>
@@ -934,7 +941,7 @@ window.jlLiveBalance=function(Z){
 
   <div class="split">
     <div class="panel glass">
-      <div class="panel-head"><h2>Setup scan</h2><span class="hint" id="chkHint">0 / 0 complete</span></div>
+      <div class="panel-head"><div class="a-s-ttl"><span class="a-s-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="m8.5 12.5 2.5 2.5 4.5-5"/></svg></span><h2>Setup scan</h2></div><span class="hint" id="chkHint">0 / 0 complete</span></div>
       <div class="progress" id="chkBarWrap"><i id="chkBar" style="width:0%"></i></div>
       <ul class="checklist" id="checklist"></ul>
       <div class="chk-foot"><a href="#psychology" id="chkEditLink">Edit setup scan in Psychology tab</a><button type="button" id="chkReset">Reset today</button></div>
@@ -945,7 +952,7 @@ window.jlLiveBalance=function(Z){
       </div>
     </div>
     <div class="panel glass">
-      <div class="panel-head"><h2>Today AI notes</h2><span class="hint" id="notesHint"></span></div>
+      <div class="panel-head"><div class="a-s-ttl"><span class="a-s-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/></svg></span><h2>Today AI notes</h2></div><span class="hint" id="notesHint"></span></div>
       <div id="notesPanel">
         <div class="notes-empty">
           <div class="t">No insights yet</div>
@@ -957,7 +964,7 @@ window.jlLiveBalance=function(Z){
 
   <div class="split">
     <div class="panel glass">
-      <div class="panel-head"><h2>Today equity curve</h2><span class="hint" id="curveHint"></span></div>
+      <div class="panel-head"><div class="a-s-ttl"><span class="a-s-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3v18h18M7 14l4-4 3 3 5-6"/></svg></span><h2>Today equity curve</h2></div><span class="hint" id="curveHint"></span></div>
       <div id="curvePanel">
         <div class="curve-empty">
           <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="var(--faint)" stroke-width="1.5"><path d="M3 17l6-6 4 4 8-8"/></svg>
@@ -966,7 +973,7 @@ window.jlLiveBalance=function(Z){
       </div>
     </div>
     <div class="panel glass">
-      <div class="panel-head"><h2>Risk / reward — today</h2><span class="hint">Session view</span></div>
+      <div class="panel-head"><div class="a-s-ttl"><span class="a-s-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v16M6 20h12M5 8h14M5 8l-2.5 6a3 3 0 0 0 5 0zM19 8l-2.5 6a3 3 0 0 0 5 0z"/></svg></span><h2>Risk / reward — today</h2></div><span class="hint">Session view</span></div>
       <div class="rr-grid">
         <div class="rr-tile"><div class="l">AVG WIN / AVG LOSS</div><div class="v" id="avgWL">—</div></div>
         <div class="rr-tile"><div class="l">TRADES TO TARGET</div><div class="v" id="toTarget">—</div></div>
@@ -979,13 +986,13 @@ window.jlLiveBalance=function(Z){
   </div>
 
   <div class="panel glass" style="margin-bottom:14px" id="djPanel">
-    <div class="panel-head"><h2>Daily journal</h2><span class="hint" id="djHint"></span></div>
+    <div class="panel-head"><div class="a-s-ttl"><span class="a-s-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h11a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3z"/><path d="M5 17a3 3 0 0 1 3-3h11"/></svg></span><h2>Daily journal</h2></div><span class="hint" id="djHint"></span></div>
     <div class="dj-grid"><div class="dj-col" id="djPre"></div><div class="dj-col" id="djPost"></div></div>
   </div>
 
   <div class="panel glass" style="margin-bottom:14px">
     <div class="panel-head">
-      <h2>Post Session Review</h2>
+      <div class="a-s-ttl"><span class="a-s-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/></svg></span><h2>Post Session Review</h2></div>
       <span class="pill">AI end-of-day coach</span>
     </div>
     <div style="display:flex;gap:10px;margin-bottom:14px">
@@ -1003,7 +1010,7 @@ window.jlLiveBalance=function(Z){
 
   <div class="panel glass">
     <div class="tbl-head">
-      <h2 style="margin:0">Today's trades</h2>
+      <div class="a-s-ttl"><span class="a-s-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 6h13M8 12h13M8 18h13M3.5 6h.01M3.5 12h.01M3.5 18h.01"/></svg></span><h2 style="margin:0">Today's trades</h2></div>
       <span class="pill" id="tradesPill">0 trades</span>
     </div>
     <div style="overflow-x:auto">
@@ -2652,7 +2659,7 @@ window.jlApplyChLimits=function(o){
         }
         data.lastDate = todayKey;
       }
-      badge.textContent = '🔥 ' + data.count + '-day streak';
+      badge.textContent = data.count + '-day streak';
       localStorage.setItem('jlStreak', JSON.stringify(data));
     }catch(e){ /* localStorage unavailable — leave the static baseline badge as-is */ }
   })();
