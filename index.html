@@ -3678,7 +3678,7 @@ const SEED=[];
 let J;try{J=JSON.parse(localStorage.getItem(DK))}catch(e){}
 if(!Array.isArray(J))J=SEED;
 const save=()=>{try{localStorage.setItem(DK,JSON.stringify(J))}catch(e){}window.__jlDirty=true};
-let cur,filt='All',jf='All',qs='',urls={};
+let cur,filt='All',jf='All',qs='',urls={},jShown=30;
 const blank=()=>{cur={idx:-1,free:false,q:[null,null,null],tags:[],conf:[],emotion:'',id:null,shot:'',shots:[],rec:''}};blank();
 const msg=t=>{$('jMsg').textContent=t};
 /* Setup combobox: hidden #jSetup keeps .value get/set working for the rest of this block */
@@ -3844,7 +3844,7 @@ function qlKeys(){const m={},lk={};try{(JSON.parse(localStorage.getItem('viztrad
   T.forEach(t=>{const id=t&&t._lk!=null?lk[t._lk]:null;if(id)m[key(t)]=id});return m}
 function renderList(){qlByKey=qlKeys();const s=qs.toLowerCase(),a=J.filter(e=>(jf==='All'||(e.pnl==null?'note':kind(e.pnl))===jf)&&(!s||JSON.stringify(e).toLowerCase().includes(s)));
   $('jCnt').textContent=J.length+(J.length===1?' entry':' entries');
-  $('jList').innerHTML=a.length?a.map(ecard).join(''):'<div class="j-none">No journals match. Save a trade journal or clear the search.</div>'}
+  $('jList').innerHTML=a.length?a.slice(0,jShown).map(ecard).join('')+(a.length>jShown?'<div style="text-align:center;margin:14px 0"><button type="button" class="gg-btn-solid" id="jMore">Show '+Math.min(30,a.length-jShown)+' more ('+(a.length-jShown)+' left)</button></div>':''):'<div class="j-none">No journals match. Save a trade journal or clear the search.</div>'}
 function jKP(){const d=T.filter(t=>t.j).length,left=T.length-d,pct=T.length?d/T.length*100:0,
   breaks=J.reduce((s,e)=>s+(e.tags?e.tags.length:0),0),
   answered=J.filter(e=>e.q&&e.q.some(v=>v)),
@@ -3893,10 +3893,10 @@ $('view-journal').addEventListener('click',e=>{const b=e.target.closest('button'
         onAction:()=>{if(J.some(y=>y.id===x.id))return;J.splice(Math.min(i,J.length),0,x);save();sync();window.jlToast({icon:'check',text:'Journal restored',duration:2200,progress:false})}})});
     return}
   if(pid==='jFilt'){filt=d.v;seg(b);fillSel();return}
-  if(pid==='jRes'){jf=d.v;seg(b);renderList();return}
+  if(pid==='jRes'){jf=d.v;jShown=30;seg(b);renderList();return}
   ({jSave:saveJ,jDraft:drSaveBtn,jDrResume:drResume,jDrDiscard:drDiscard,jNext:()=>step(1),jPrev:()=>step(-1),jCheck:check,jClear:()=>{drDelFor(read());blank();fields(null);paint();msg('')},jImpB:()=>$('jImpFile').click(),
    jExp:()=>{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(J,null,2)],{type:'application/json'}));a.download='journall-journals.json';a.click();URL.revokeObjectURL(a.href)}})[b.id]?.()});
-{let jST;$('jSrch').addEventListener('input',e=>{qs=e.target.value;clearTimeout(jST);jST=setTimeout(renderList,150)})}
+{let jST;$('jSrch').addEventListener('input',e=>{qs=e.target.value;jShown=30;clearTimeout(jST);jST=setTimeout(renderList,150)});$('jList').addEventListener('click',e=>{if(e.target.closest&&e.target.closest('#jMore')){jShown+=30;renderList()}})}
 /* Quick Log trade delete: keep this page's in-memory journals in step, so a later save cannot write a deleted journal back (and flip its deletion record). Nothing is saved here. */
 const qlHold={},qlJid=v=>String(v).replace(/^[Lj]/,'');
 window.addEventListener('ql-journal-removed',ev=>{const w=qlJid(ev.detail&&ev.detail.id),i=J.findIndex(x=>x&&qlJid(x.id)===w);if(i<0)return;
