@@ -8,7 +8,7 @@ Journall is a local PWA-style desktop app. It uses a PowerShell local server and
 
 | File | Purpose |
 | --- | --- |
-| `index.html` | Main app. Contains HTML, CSS, and JavaScript. |
+| `index.html` | Main app markup plus one inline `type="module"` auth/cloud-sync block. Styles are in `css/`, scripts in `js/` (51 files). See `docs/ARCHITECTURE.md`. |
 | `package.json` | Makes the folder detectable as an app/project and exposes run scripts. |
 | `CLAUDE.md` | Claude-readable guide for understanding and editing the app. |
 | `AGENTS.md` | Agent-readable safety and project instructions. |
@@ -23,7 +23,9 @@ Journall is a local PWA-style desktop app. It uses a PowerShell local server and
 | `assets/icon-512.png` | PWA icon. |
 | `assets/app-icon.ico` | Windows shortcut icon. |
 
-## Main JavaScript Areas In `index.html`
+## Main JavaScript Areas
+
+> Historical map. These areas used to live inside `index.html`; most of that code now lives in `js/`. Search the repo for the names below, and see `docs/ARCHITECTURE.md` for the file layout and load order.
 
 | Area | What To Search |
 | --- | --- |
