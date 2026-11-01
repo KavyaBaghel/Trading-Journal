@@ -3801,7 +3801,7 @@ function fillSel(){
 let jCbOpen=false;
 function jCbSet(open){jCbOpen=open;$('jCb').dataset.open=open?'1':'0';$('jSelPop').hidden=!open;$('jSelBtn').setAttribute('aria-expanded',open);if(open){$('jSelSearch').value='';fillSel();setTimeout(()=>$('jSelSearch').focus(),0)}}
 $('jSelBtn').addEventListener('click',e=>{e.stopPropagation();jCbSet(!jCbOpen)});
-$('jSelSearch').addEventListener('input',fillSel);
+{let jSelT;$('jSelSearch').addEventListener('input',()=>{clearTimeout(jSelT);jSelT=setTimeout(fillSel,120)})}
 $('jSelList').addEventListener('click',e=>{const o=e.target.closest('.j-cb-opt');if(!o)return;const v=o.dataset.v;jCbSet(false);pick(v==='free'?-2:+v)});
 document.addEventListener('click',e=>{if(jCbOpen&&!$('jCb').contains(e.target))jCbSet(false)});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&jCbOpen)jCbSet(false)});
@@ -3981,7 +3981,7 @@ $('view-journal').addEventListener('click',e=>{const b=e.target.closest('button'
   if(pid==='jRes'){jf=d.v;seg(b);renderList();return}
   ({jSave:saveJ,jDraft:drSaveBtn,jDrResume:drResume,jDrDiscard:drDiscard,jNext:()=>step(1),jPrev:()=>step(-1),jCheck:check,jClear:()=>{drDelFor(read());blank();fields(null);paint();msg('')},jImpB:()=>$('jImpFile').click(),
    jExp:()=>{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(J,null,2)],{type:'application/json'}));a.download='journall-journals.json';a.click();URL.revokeObjectURL(a.href)}})[b.id]?.()});
-$('jSrch').addEventListener('input',e=>{qs=e.target.value;renderList()});
+{let jST;$('jSrch').addEventListener('input',e=>{qs=e.target.value;clearTimeout(jST);jST=setTimeout(renderList,150)})}
 /* Quick Log trade delete: keep this page's in-memory journals in step, so a later save cannot write a deleted journal back (and flip its deletion record). Nothing is saved here. */
 const qlHold={},qlJid=v=>String(v).replace(/^[Lj]/,'');
 window.addEventListener('ql-journal-removed',ev=>{const w=qlJid(ev.detail&&ev.detail.id),i=J.findIndex(x=>x&&qlJid(x.id)===w);if(i<0)return;
@@ -6707,7 +6707,7 @@ if(root){
       if(d.getAttribute('data-arm')!=='1'){d.setAttribute('data-arm','1');d.textContent='Tap again to delete';clearTimeout(armT);armT=setTimeout(function(){render(true)},3000);return}
       clearTimeout(armT);delItem(d.getAttribute('data-del'),!!d.closest('.pn-item'))}});
   root.addEventListener('input',function(e){var t=e.target,f=t.getAttribute&&t.getAttribute('data-f');
-    if(t.id==='pbSearch'){q=t.value;renderNotes();return}
+    if(t.id==='pbSearch'){q=t.value;clearTimeout(window.__pbT);window.__pbT=setTimeout(renderNotes,150);return}
     if(!f)return;var it=t.closest('.pb-item');if(!it)return;var id=it.getAttribute('data-id');
     if(it.classList.contains('pn-item')){var n=NT.filter(function(x){return x.id===id})[0];if(!n)return;n[f]=t.value;n.u=Date.now();wr(NK,NT);
       if(f==='title')it.querySelector('summary b').textContent=t.value.trim()||'Untitled note';it.querySelector('.pb-stat').textContent=noteDate(n.u)}
