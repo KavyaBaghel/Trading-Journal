@@ -6,6 +6,6 @@ window.jlLiveBalance=function(Z){
     var v=c&&c.mt5BalanceSource==='mt5'?Number(c.mt5CurrentBalance):NaN;
     var age=c?Date.now()-Number(c.mt5BalanceTimestamp||0):Infinity;
     if(start>0&&isFinite(v)&&v>0&&age>=0&&age<86400000)return v;
-  }catch(e){}
+  }catch(e){console.debug('[journall] ignored error in live-balance.js:', e);}
   return base;
 };

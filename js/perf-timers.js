@@ -15,6 +15,6 @@ window.clearInterval=function(id){delete reg[id];delete held[id];return ci.call(
 document.addEventListener('visibilitychange',function(){
   if(document.hidden)return;
   var ids=Object.keys(held);held={};
-  ids.forEach(function(id){var r=reg[id];if(r){try{r.fn.apply(window,r.args)}catch(e){}}})
+  ids.forEach(function(id){var r=reg[id];if(r){try{r.fn.apply(window,r.args)}catch(e){console.debug('[journall] ignored error in perf-timers.js:', e);}}})
 })
 })();

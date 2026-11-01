@@ -185,7 +185,7 @@
   const SYNC_BUDGET = 800000;
   const IMG_OK = /^data:image\/(jpeg|png|webp|gif);base64,[A-Za-z0-9+\/=]+$/;
   const storedImg = (kind)=>{
-    try{ for(const k of [DEV_KEY[kind], SYNC_KEY[kind], LEGACY_KEY[kind]]){ const u = localStorage.getItem(k); if(u && IMG_OK.test(u)) return u; } }catch(err){}
+    try{ for(const k of [DEV_KEY[kind], SYNC_KEY[kind], LEGACY_KEY[kind]]){ const u = localStorage.getItem(k); if(u && IMG_OK.test(u)) return u; } }catch(err){console.debug('[journall] ignored error in profile-tab.js:', err);}
     return '';
   };
   const paintProfileImg = (kind, url)=>{
@@ -232,16 +232,16 @@
     let where = 'none';
     const bytes = window.jlSyncedStateBytes ? window.jlSyncedStateBytes(SYNC_KEY[kind], url) : Infinity;
     if(bytes <= SYNC_BUDGET){
-      try{ localStorage.setItem(SYNC_KEY[kind], url); localStorage.removeItem(DEV_KEY[kind]); where = 'cloud'; }catch(err){}
+      try{ localStorage.setItem(SYNC_KEY[kind], url); localStorage.removeItem(DEV_KEY[kind]); where = 'cloud'; }catch(err){console.debug('[journall] ignored error in profile-tab.js:', err);}
     }
     if(where === 'none'){
-      try{ localStorage.setItem(DEV_KEY[kind], url); where = 'device'; }catch(err){}
+      try{ localStorage.setItem(DEV_KEY[kind], url); where = 'device'; }catch(err){console.debug('[journall] ignored error in profile-tab.js:', err);}
     }
     paintProfileImg(kind, url);
     return where;
   };
   window.jlProfileImgFromFile = (file, kind)=>{
-    const toast = (o)=>{ try{ if(window.jlToast) window.jlToast(o); }catch(err){} };
+    const toast = (o)=>{ try{ if(window.jlToast) window.jlToast(o); }catch(err){console.debug('[journall] ignored error in profile-tab.js:', err);} };
     const u = URL.createObjectURL(file);
     return loadImg(u).then(img=>{
       const where = commitImg(kind, encodeImg(img, kind));
@@ -264,7 +264,7 @@
         loadImg(old).then(img=>{
           if(commitImg(kind, encodeImg(img, kind)) !== 'none') localStorage.removeItem(LEGACY_KEY[kind]);
         }).catch(()=>{});
-      }catch(err){}
+      }catch(err){console.debug('[journall] ignored error in profile-tab.js:', err);}
     });
   };
   if(document.readyState === 'complete') setTimeout(migrateLegacyImgs, 0);
@@ -276,7 +276,7 @@
     nameEl.addEventListener('input', ()=>{ const t = nameEl.textContent.replace(/\s+/g,' ').slice(0,40); const live = t.trim(); if(live) applyName(live); });
     nameEl.addEventListener('blur', ()=>{
       const v = nameEl.textContent.replace(/\s+/g,' ').trim().slice(0,40) || loadName();
-      try{ if(window.jlSaveUserName) window.jlSaveUserName(v); }catch(e){}
+      try{ if(window.jlSaveUserName) window.jlSaveUserName(v); }catch(e){console.debug('[journall] ignored error in profile-tab.js:', e);}
       nameEl.textContent = v; applyName(v);
     });
   }
@@ -374,7 +374,7 @@
   (function(){
     const PK='journall_profile_v1', CK='journall_account_config_v1';
     const rd=()=>{try{const v=JSON.parse(localStorage.getItem(PK)||'{}');return v&&typeof v==='object'?v:{}}catch(e){return {}}};
-    const wr=o=>{try{localStorage.setItem(PK,JSON.stringify(o))}catch(e){}};
+    const wr=o=>{try{localStorage.setItem(PK,JSON.stringify(o))}catch(e){console.debug('[journall] ignored error in profile-tab.js:', e);}};
     const st=document.createElement('style'); st.textContent='.up-bio:empty::before{content:attr(data-ph);color:var(--faint)}'; document.head.appendChild(st);
     const bio=$('upBio'), host=$('upTags'), add=$('upTagAdd'), saved=rd();
     if(bio){ bio.dataset.ph='Add a short bio'; bio.textContent=saved.bio||'';

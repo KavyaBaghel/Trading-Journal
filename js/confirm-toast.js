@@ -50,7 +50,7 @@ window.jlConfirm=function(o){
       if(done)return;done=true;closeOpen=null;
       document.removeEventListener('keydown',onKey,true);
       scrim.classList.add('out');setTimeout(function(){scrim.remove()},170);
-      try{if(prev&&prev.isConnected)prev.focus({preventScroll:true})}catch(_){}
+      try{if(prev&&prev.isConnected)prev.focus({preventScroll:true})}catch(_){console.debug('[journall] ignored error in confirm-toast.js:', _);}
       resolve(v===false&&inp?null:v);
     }
     function submit(){
@@ -118,7 +118,7 @@ window.jlToast=function(o){
   t.addEventListener('focusin',hold);t.addEventListener('focusout',release);
   if(btn)btn.addEventListener('click',function(){
     if(gone)return;dismiss();
-    try{if(o.onAction)o.onAction()}catch(_){}
+    try{if(o.onAction)o.onAction()}catch(_){console.debug('[journall] ignored error in confirm-toast.js:', _);}
   });
   arm();
   return {dismiss:dismiss};

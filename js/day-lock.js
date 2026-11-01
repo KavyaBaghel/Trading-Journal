@@ -6,7 +6,7 @@
   var LOSS_KEY = 'jlDayLockLosses', UNLOCK_KEY = 'jlDayLockUnlocked', LOG_KEY = 'jlDayLockOverrides', PEEK_KEY = 'jlDayLockPeekUntil';
   var PHRASE = 'BREAK RULE';
   function get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
-  function set(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
+  function set(k, v) { try { localStorage.setItem(k, v); } catch (e) {console.debug('[journall] ignored error in day-lock.js:', e);} }
   function maxLosses() { var raw = get(LOSS_KEY), n = Number(raw); return raw !== null && isFinite(n) ? n : 1; }
   function dayKey() { return typeof window.getTradingDayIST === 'function' ? window.getTradingDayIST() : new Date().toISOString().slice(0, 10); }
   function kind(p) { return typeof window.jlKind === 'function' ? window.jlKind(p) : (p < 0 ? 'loss' : p > 0 ? 'win' : 'be'); }
@@ -28,7 +28,7 @@
           sameDirLimit: Number(window.jlSameDirLossLimit) || 0
         }, kind);
         if (r && r.tripped) (r.why || []).forEach(function (w) { why.push(w); });
-      } catch (e) {}
+      } catch (e) {console.debug('[journall] ignored error in day-lock.js:', e);}
     }
     return why;
   }
@@ -53,7 +53,7 @@
     inp.addEventListener('input', function () { okBtn.disabled = inp.value.trim().toUpperCase() !== PHRASE; });
     box.querySelector('#jlDlPeek').addEventListener('click', function () { set(PEEK_KEY, String(Date.now() + 600000)); paint(); });
     okBtn.addEventListener('click', function () {
-      var log = []; try { log = JSON.parse(get(LOG_KEY) || '[]'); } catch (e) {}
+      var log = []; try { log = JSON.parse(get(LOG_KEY) || '[]'); } catch (e) {console.debug('[journall] ignored error in day-lock.js:', e);}
       log.push({ day: dayKey(), at: new Date().toISOString(), why: reasons() }); set(LOG_KEY, JSON.stringify(log.slice(-200)));
       set(UNLOCK_KEY, dayKey()); inp.value = ''; okBtn.disabled = true; paint();
     });

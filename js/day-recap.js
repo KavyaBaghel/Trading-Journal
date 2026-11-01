@@ -171,7 +171,7 @@
     if(broken.length) notes.push(['var(--red)','Daily rule broken',broken.join(' and ').replace(/^./,function(m){ return m.toUpperCase(); })+'.']);
 
     var jn=jRows.filter(Boolean).length;
-    var qlLk={};try{(JSON.parse(localStorage.getItem('viztrade_trading_page_trades')||'[]')||[]).forEach(function(q){if(q&&/^ql-/.test(String(q.id)))qlLk[window.JLAdapter.liveKey(q)]=q.id})}catch(_){}
+    var qlLk={};try{(JSON.parse(localStorage.getItem('viztrade_trading_page_trades')||'[]')||[]).forEach(function(q){if(q&&/^ql-/.test(String(q.id)))qlLk[window.JLAdapter.liveKey(q)]=q.id})}catch(_){console.debug('[journall] ignored error in day-recap.js:', _);}
     var hasQl=rows.some(function(t){ return t._lk!=null&&!!qlLk[t._lk]; });
     var rowsHtml=rows.map(function(t){
       var p=Number(t.pnl), idx=(window.__trades||[]).indexOf(t), qid=t._lk!=null?qlLk[t._lk]:null;
@@ -224,7 +224,7 @@
     var tr=e.target.closest('tr[data-i]'); if(!tr) return;
     var idx=+tr.dataset.i;
     if(window.__route) window.__route('journal');
-    try{ history.replaceState(null,'','#journal'); }catch(_){}
+    try{ history.replaceState(null,'','#journal'); }catch(_){console.debug('[journall] ignored error in day-recap.js:', _);}
     if(window.__jPick) window.__jPick(idx);
   });
 })();

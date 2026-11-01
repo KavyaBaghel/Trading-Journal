@@ -30,7 +30,7 @@ function saveRule(){var i=$('aicRuleIn');if(!i)return;var v=clean(i.value).slice
 var sv=$('aicRuleSave'),cl=$('aicRuleClear'),mk=$('aicMark'),inp=$('aicRuleIn');
 if(sv)sv.addEventListener('click',saveRule);
 if(inp)inp.addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();saveRule()}});
-if(cl)cl.addEventListener('click',function(){try{localStorage.removeItem(RK)}catch(_){}paint()});
+if(cl)cl.addEventListener('click',function(){try{localStorage.removeItem(RK)}catch(_){console.debug('[journall] ignored error in ai-coach-fixes.js:', _);}paint()});
 if(mk)mk.addEventListener('click',function(){var on=focusOn(rd(FK),today());wr(FK,{day:today(),on:!on});paint()});
 var view=$('view-ai');
 if(view&&typeof MutationObserver==='function')new MutationObserver(function(){if(!view.hidden)paint()}).observe(view,{attributes:true,attributeFilter:['hidden']});

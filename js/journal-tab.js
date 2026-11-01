@@ -9,9 +9,9 @@ const TAGS=['No Patience','Revenge Trade','Overtrading','Moved SL','No SL','FOMO
 const EMOTIONS=['Calm','Confident','FOMO','Fear','Greed','Anxious','Frustrated','Revenge'];
 const PH={shot:'No screenshot attached',rec:'No recording attached'};
 const SEED=[];
-let J;try{J=JSON.parse(localStorage.getItem(DK))}catch(e){}
+let J;try{J=JSON.parse(localStorage.getItem(DK))}catch(e){console.debug('[journall] ignored error in journal-tab.js:', e);}
 if(!Array.isArray(J))J=SEED;
-const save=()=>{try{localStorage.setItem(DK,JSON.stringify(J))}catch(e){}window.__jlDirty=true};
+const save=()=>{try{localStorage.setItem(DK,JSON.stringify(J))}catch(e){console.debug('[journall] ignored error in journal-tab.js:', e);}window.__jlDirty=true};
 let cur,filt='All',jf='All',qs='',urls={},jShown=30;
 const blank=()=>{cur={idx:-1,free:false,q:[null,null,null],tags:[],conf:[],emotion:'',id:null,shot:'',shots:[],rec:''}};blank();
 const msg=t=>{$('jMsg').textContent=t};
@@ -89,7 +89,7 @@ const shWrite=m=>{try{localStorage.setItem(SHK,JSON.stringify(m));return true}ca
 const shFor=id=>(shRead()[shId(id)]||[]).slice();
 function shSave(id){const m=shRead(),k=shId(id),l=(cur.shots||[]).slice();if(!l.length&&!(k in m))return true;m[k]=l;return shWrite(m)}
 function shClear(id){const m=shRead(),k=shId(id);if(m[k]&&m[k].length){m[k]=[];shWrite(m)}}
-function shSynced(){let n=0;try{for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(!k||k==='krishna_journal_form_draft'||k==='krishna_psychology_form_draft')continue;if(k==='theme'||k==='selectedDate'||['viz','viztrade','krishna','journall'].some(p=>k.indexOf(p)===0))n+=k.length+(localStorage.getItem(k)||'').length}}catch(_){}return n}
+function shSynced(){let n=0;try{for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(!k||k==='krishna_journal_form_draft'||k==='krishna_psychology_form_draft')continue;if(k==='theme'||k==='selectedDate'||['viz','viztrade','krishna','journall'].some(p=>k.indexOf(p)===0))n+=k.length+(localStorage.getItem(k)||'').length}}catch(_){console.debug('[journall] ignored error in journal-tab.js:', _);}return n}
 function shShrink(file){return new Promise((res,rej)=>{const url=URL.createObjectURL(file),im=new Image();
   im.onload=()=>{URL.revokeObjectURL(url);try{
     for(const side of [560,480,400,320,260]){const sc=Math.min(1,side/Math.max(im.naturalWidth,im.naturalHeight)),w=Math.max(1,Math.round(im.naturalWidth*sc)),h=Math.max(1,Math.round(im.naturalHeight*sc)),cv=document.createElement('canvas');cv.width=w;cv.height=h;const g=cv.getContext('2d');g.fillStyle='#fff';g.fillRect(0,0,w,h);g.drawImage(im,0,0,w,h);
@@ -114,8 +114,8 @@ $('jShotBox').addEventListener('click',e=>{const x=e.target.closest('[data-shx]'
 function resetAtt(){if(urls.rec){URL.revokeObjectURL(urls.rec);urls.rec=null}$('jRecBox').textContent=cur.rec?cur.rec+' (attach again to preview)':PH.rec;shPaint()}
 function fields(e){e=e||{};$('jMis').value=e.mistake||'';$('jBef').value=e.before||'';$('jAft').value=e.after||'';$('jImp').value=e.improve||'';$('jDate').value=e.date||(window.getTradingDayIST?window.getTradingDayIST():new Date().toISOString().slice(0,10));$('jSetup').value=e.setup||''}
 /*CF-START*/
-const CFK='journall_confluence_list_v1';let CF=[];try{const v=JSON.parse(localStorage.getItem(CFK));if(Array.isArray(v))CF=v.filter(x=>typeof x==='string'&&x.trim()).map(x=>x.trim())}catch(e){}
-let cfEdit=false;const cfSave=()=>{try{localStorage.setItem(CFK,JSON.stringify(CF))}catch(e){}};
+const CFK='journall_confluence_list_v1';let CF=[];try{const v=JSON.parse(localStorage.getItem(CFK));if(Array.isArray(v))CF=v.filter(x=>typeof x==='string'&&x.trim()).map(x=>x.trim())}catch(e){console.debug('[journall] ignored error in journal-tab.js:', e);}
+let cfEdit=false;const cfSave=()=>{try{localStorage.setItem(CFK,JSON.stringify(CF))}catch(e){console.debug('[journall] ignored error in journal-tab.js:', e);}};
 function conf(){const w=$('jConf');if(!w)return;const all=CF.concat((cur.conf||[]).filter(x=>!CF.includes(x)));
   w.innerHTML=all.length?all.map(t=>{const on=cur.conf.includes(t),inList=CF.includes(t);return '<button type="button" class="j-tg cf'+(on?' on':'')+'" data-cf="'+esc(t)+'" aria-pressed="'+on+'">'+esc(t)+(cfEdit&&inList?'<span class="cf-x" data-cfx="'+esc(t)+'" role="button" aria-label="Remove '+esc(t)+' from list">×</span>':'')+'</button>'}).join(''):'<span class="j-cf-empty">No confluences yet. Add your first one below.</span>';
   $('jConfMg').setAttribute('aria-pressed',cfEdit);$('jConfMg').textContent=cfEdit?'Done':'Edit list'}
@@ -174,7 +174,7 @@ function ecard(e){(window.__jlShareE=window.__jlShareE||{})[e.id]=e;const k=e.pn
     (chips?'<div class="jv-chips">'+chips+'</div>':'')+(notes?'<div class="jv-notes">'+notes+'</div>':'')+
     '<div class="jv-foot">'+(e.pnl==null?'':'<button type="button" class="btn-ghost j-sm" data-share="'+esc(e.id)+'">Share</button>')+'<button type="button" class="btn-ghost j-sm" data-ed="'+esc(e.id)+'">Edit</button><button type="button" class="btn-ghost j-sm" data-del="'+esc(e.id)+'">Delete</button>'+(qlByKey[e.key]?'<button type="button" class="btn-ghost j-sm" data-qled="'+esc(qlByKey[e.key])+'">Edit trade</button><button type="button" class="btn-ghost j-sm j-ql-del" data-qldel="'+esc(qlByKey[e.key])+'">Delete trade</button>':'')+'</div></article>'}
 var qlByKey={};
-function qlKeys(){const m={},lk={};try{(JSON.parse(localStorage.getItem('viztrade_trading_page_trades')||'[]')||[]).forEach(t=>{if(t&&/^ql-/.test(String(t.id)))lk[window.JLAdapter.liveKey(t)]=t.id})}catch(_){}
+function qlKeys(){const m={},lk={};try{(JSON.parse(localStorage.getItem('viztrade_trading_page_trades')||'[]')||[]).forEach(t=>{if(t&&/^ql-/.test(String(t.id)))lk[window.JLAdapter.liveKey(t)]=t.id})}catch(_){console.debug('[journall] ignored error in journal-tab.js:', _);}
   T.forEach(t=>{const id=t&&t._lk!=null?lk[t._lk]:null;if(id)m[key(t)]=id});return m}
 function renderList(){qlByKey=qlKeys();const s=qs.toLowerCase(),a=J.filter(e=>(jf==='All'||(e.pnl==null?'note':kind(e.pnl))===jf)&&(!s||JSON.stringify(e).toLowerCase().includes(s)));
   $('jCnt').textContent=J.length+(J.length===1?' entry':' entries');
@@ -266,7 +266,7 @@ const drMatches=(d,e,free)=>!!d&&((!!d.id&&d.id===e.id)||(d.e.key===e.key&&!!d.f
 const drRead=()=>{try{const d=JSON.parse(localStorage.getItem(DRK));return d&&typeof d==='object'&&d.e&&typeof d.e==='object'?d:null}catch(_){return null}};
 const drWrite=d=>{try{localStorage.setItem(DRK,JSON.stringify(d));return true}catch(_){return false}};
 let drTimer=null;
-function drDel(){clearTimeout(drTimer);try{localStorage.removeItem(DRK)}catch(_){}drRender()}
+function drDel(){clearTimeout(drTimer);try{localStorage.removeItem(DRK)}catch(_){console.debug('[journall] ignored error in journal-tab.js:', _);}drRender()}
 function drDelFor(e){const d=drRead();if(drMatches(d,e,cur.free))drDel()}
 function drCapture(){if(cur.idx<0&&!cur.free)return false;const e=read();
   if(!drHasContent(e)||drSame(e,J.find(x=>x.id===cur.id)))return false;

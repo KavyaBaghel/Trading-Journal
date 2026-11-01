@@ -102,7 +102,7 @@
   function chars(l){return(Array.isArray(l)?l:[]).reduce(function(n,x){return n+(typeof x==='string'?x.length:0)},0)}
   function shotsTotal(m){return Object.keys(m).reduce(function(n,k){return n+chars(m[k])},0)}
   function syncedSize(){var n=0;try{for(var i=0;i<localStorage.length;i++){var k=localStorage.key(i);if(!k||k==='krishna_journal_form_draft'||k==='krishna_psychology_form_draft')continue;
-    if(k==='theme'||k==='selectedDate'||['viz','viztrade','krishna','journall'].some(function(p){return k.indexOf(p)===0}))n+=k.length+(localStorage.getItem(k)||'').length}}catch(e){}return n}
+    if(k==='theme'||k==='selectedDate'||['viz','viztrade','krishna','journall'].some(function(p){return k.indexOf(p)===0}))n+=k.length+(localStorage.getItem(k)||'').length}}catch(e){console.debug('[journall] ignored error in quick-log.js:', e);}return n}
   function shrink(file){return new Promise(function(res,rej){var url=URL.createObjectURL(file),im=new Image();
     im.onload=function(){URL.revokeObjectURL(url);try{
       var sides=[560,480,400,320,260],qs=[.5,.4,.3];
@@ -175,7 +175,7 @@
     opener=document.activeElement;scrim.hidden=false;fab.style.visibility='hidden';
     var f=scrim.querySelector('#qlDir button');if(f)f.focus();
   }
-  function close(){if(!scrim)return;scrim.hidden=true;fab.style.visibility='';try{(opener&&opener.focus?opener:fab).focus()}catch(e){}}
+  function close(){if(!scrim)return;scrim.hidden=true;fab.style.visibility='';try{(opener&&opener.focus?opener:fab).focus()}catch(e){console.debug('[journall] ignored error in quick-log.js:', e);}}
   async function onFile(e){
     var f=(e.target.files||[])[0];e.target.value='';if(!f)return;
     if(!/^image\//.test(f.type)){msg('Only image files can be attached.',true);return}
@@ -195,7 +195,7 @@
       if(r.journal){snap(KJ);var J=rd(KJ);J.push(r.journal);localStorage.setItem(KJ,JSON.stringify(J));wrote.push(KJ)}
       return true;
     }catch(e){
-      wrote.forEach(function(k){try{if(prev[k]==null)localStorage.removeItem(k);else localStorage.setItem(k,prev[k])}catch(_){}});
+      wrote.forEach(function(k){try{if(prev[k]==null)localStorage.removeItem(k);else localStorage.setItem(k,prev[k])}catch(_){console.debug('[journall] ignored error in quick-log.js:', _);}});
       return false;
     }
   }
@@ -216,10 +216,10 @@
     if(!commit(r)){busy=false;$('qlSave').disabled=false;msg('Could not save. Your browser storage may be full. Nothing was changed.',true);return}
     close();
     if(typeof window.jlToast==='function')window.jlToast({icon:'check',text:'Trade logged',sub:'Updating the page',duration:2400});
-    setTimeout(function(){try{location.reload()}catch(e){}},2500);
+    setTimeout(function(){try{location.reload()}catch(e){console.debug('[journall] ignored error in quick-log.js:', e);}},2500);
   }
   function toast(o){if(typeof window.jlToast==='function')window.jlToast(o)}
-  function qlEv(n,id,en){try{window.dispatchEvent(new CustomEvent(n,{detail:{id:id,entry:en?JSON.parse(JSON.stringify(en)):null}}))}catch(e){}}
+  function qlEv(n,id,en){try{window.dispatchEvent(new CustomEvent(n,{detail:{id:id,entry:en?JSON.parse(JSON.stringify(en)):null}}))}catch(e){console.debug('[journall] ignored error in quick-log.js:', e);}}
   var KJT='journall_deleted_journals';
   function rdObj(k){try{var v=JSON.parse(localStorage.getItem(k)||'null');return v&&typeof v==='object'&&!Array.isArray(v)?v:{}}catch(e){return{}}}
   function findQl(id){
@@ -271,13 +271,13 @@
         if(JSON.stringify(m[kk]||[])!==JSON.stringify(want)){snap(KS);m[kk]=want;localStorage.setItem(KS,JSON.stringify(m))}
       }
     }catch(e){
-      Object.keys(prev).forEach(function(k){try{if(prev[k]==null)localStorage.removeItem(k);else localStorage.setItem(k,prev[k])}catch(_){}});
+      Object.keys(prev).forEach(function(k){try{if(prev[k]==null)localStorage.removeItem(k);else localStorage.setItem(k,prev[k])}catch(_){console.debug('[journall] ignored error in quick-log.js:', _);}});
       busy=false;$('qlSave').disabled=false;msg('Could not save. Your browser storage may be full. Nothing was changed.',true);return;
     }
     if(editCtx.jid!=null&&r.dropJournal)qlEv('ql-journal-removed',editCtx.jid);else if(r.journal)qlEv('ql-journal-changed',r.journal.id,r.journal);
     close();
     toast({icon:'check',text:'Trade updated',sub:'Updating the page',duration:2400});
-    setTimeout(function(){try{location.reload()}catch(e){}},2500);
+    setTimeout(function(){try{location.reload()}catch(e){console.debug('[journall] ignored error in quick-log.js:', e);}},2500);
   }
   window.qlEditTrade=editTrade;
   var KTT='journall_deleted_trades',delBusy=false;
@@ -305,7 +305,7 @@
         var m=rdShots();saved=(m[jk]||[]).slice();if(saved.length){snap(KS);m[jk]=[];localStorage.setItem(KS,JSON.stringify(m))}
       }
     }catch(e){
-      Object.keys(prev).forEach(function(k){try{if(prev[k]==null)localStorage.removeItem(k);else localStorage.setItem(k,prev[k])}catch(_){}});
+      Object.keys(prev).forEach(function(k){try{if(prev[k]==null)localStorage.removeItem(k);else localStorage.setItem(k,prev[k])}catch(_){console.debug('[journall] ignored error in quick-log.js:', _);}});
       toast({icon:'trash',text:'Could not delete. Nothing was changed.',duration:3600,progress:false});return;
     }
     delBusy=true;var undone=false;
@@ -321,10 +321,10 @@
           if(saved.length){var m2=rdShots();m2[jk]=saved;localStorage.setItem(KS,JSON.stringify(m2))}
           qlEv('ql-journal-restored',oj.id);
         }
-      }catch(e){}
+      }catch(e){console.debug('[journall] ignored error in quick-log.js:', e);}
       delBusy=false;toast({icon:'check',text:'Trade restored',duration:2200,progress:false});
     }});
-    setTimeout(function(){if(!undone){try{location.reload()}catch(e){}}},5400);
+    setTimeout(function(){if(!undone){try{location.reload()}catch(e){console.debug('[journall] ignored error in quick-log.js:', e);}}},5400);
   }
   window.qlDeleteTrade=deleteTrade;
   fab.addEventListener('click',open);

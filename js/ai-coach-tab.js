@@ -38,7 +38,7 @@
   const escH=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
   const ruleNow=()=>{try{return window.jlTodayRule?window.jlTodayRule():null}catch(e){return null}};
   const ruleLine=()=>{const r=ruleNow();return r&&r.text?r.text:'No rule set yet. Add one in the Today\'s one rule card.'};
-  const setupRows=()=>{let J=[];try{J=window.__getJournals?window.__getJournals():[]}catch(e){}const g={};
+  const setupRows=()=>{let J=[];try{J=window.__getJournals?window.__getJournals():[]}catch(e){console.debug('[journall] ignored error in ai-coach-tab.js:', e);}const g={};
     J.forEach(j=>{if(!j||j.pnl==null||j.pnl===''||!isFinite(j.pnl))return;const k=String(j.setup||'').trim();if(!k)return;const o=g[k]=g[k]||{n:0,net:0};o.n++;o.net+=Number(j.pnl)});
     return Object.entries(g).sort((x,y)=>y[1].n-x[1].n||x[0].localeCompare(y[0])).slice(0,8)};
   const ANSWERS = {

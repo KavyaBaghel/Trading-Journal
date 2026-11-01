@@ -48,7 +48,7 @@ function weakNow(){
   try{
     if(typeof window.jlWeakTimes!=='function')return{warn:false,parts:[]};
     var off=null;
-    try{var s=JSON.parse(localStorage.getItem('jlAccountSettings')||'null');if(s&&s.brokerUtcOffset!==''&&s.brokerUtcOffset!=null&&isFinite(Number(s.brokerUtcOffset)))off=Number(s.brokerUtcOffset)}catch(e){}
+    try{var s=JSON.parse(localStorage.getItem('jlAccountSettings')||'null');if(s&&s.brokerUtcOffset!==''&&s.brokerUtcOffset!=null&&isFinite(Number(s.brokerUtcOffset)))off=Number(s.brokerUtcOffset)}catch(e){console.debug('[journall] ignored error in circuit-breaker.js:', e);}
     return weakNowEval(window.jlWeakTimes(window.__trades||[],3,off),Date.now());
   }catch(e){return{warn:false,parts:[]}}
 }
@@ -95,10 +95,10 @@ function paint(){
 (function(){var xb=document.getElementById('jlCircuitX');if(!xb)return;xb.addEventListener('click',function(){
   if(xb.dataset.mode==='cb'){
     if(!window.confirm('Hide this "Circuit breaker tripped" banner until the 06:00 IST reset? It comes back if another rule trips. Nothing is blocked either way.'))return;
-    try{localStorage.setItem(CB_KEY,JSON.stringify({day:cbCur.day,sig:cbCur.sig}))}catch(e){}
+    try{localStorage.setItem(CB_KEY,JSON.stringify({day:cbCur.day,sig:cbCur.sig}))}catch(e){console.debug('[journall] ignored error in circuit-breaker.js:', e);}
   }else{
     if(!window.confirm('Snooze this "Weak time to trade" warning for 6 hours?'))return;
-    try{localStorage.setItem(SNZ_KEY,String(Date.now()+SNZ_MS))}catch(e){}
+    try{localStorage.setItem(SNZ_KEY,String(Date.now()+SNZ_MS))}catch(e){console.debug('[journall] ignored error in circuit-breaker.js:', e);}
   }
   paint();
 })})();

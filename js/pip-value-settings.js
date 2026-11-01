@@ -2,7 +2,7 @@
 /* Pip value and price per pip are the person's own numbers, saved on this device (journall_ prefix, so they sync). Nothing is assumed. */
 const PK='journall_tools_pip_v1';
 function pipGet(){try{const o=JSON.parse(localStorage.getItem(PK));return{pv:Number(o&&o.pv)>0?Number(o.pv):0,ps:Number(o&&o.ps)>0?Number(o.ps):0}}catch(e){return{pv:0,ps:0}}}
-function pipSet(pv,ps){try{localStorage.setItem(PK,JSON.stringify({pv:pv>0?pv:0,ps:ps>0?ps:0}))}catch(e){}}
+function pipSet(pv,ps){try{localStorage.setItem(PK,JSON.stringify({pv:pv>0?pv:0,ps:ps>0?ps:0}))}catch(e){console.debug('[journall] ignored error in pip-value-settings.js:', e);}}
 function pipFill(){const p=pipGet();[['tlPv','pv'],['tlPs','ps'],['ppPv','pv'],['ppPs','ps']].forEach(a=>{const e=$(a[0]);if(e&&document.activeElement!==e)e.value=p[a[1]]>0?p[a[1]]:''})}
 window.jlPip={get:pipGet,set:pipSet,fill:pipFill};
 document.addEventListener('input',e=>{const id=e.target&&e.target.id;if(id==='tlPv'||id==='tlPs'||id==='ppPv'||id==='ppPs'){const a=id.slice(0,2)==='tl'?'tl':'pp';pipSet(+($(a+'Pv')||{}).value||0,+($(a+'Ps')||{}).value||0);pipFill()}});

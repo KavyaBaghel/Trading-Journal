@@ -469,7 +469,7 @@
       if (isShown()) start(); else stop();
     } catch (err) {
       // cosmetics must never break sign-in
-      try { stop(); } catch (ignore) { /* nothing more to do */ }
+      try { stop(); } catch (ignore) { /* nothing more to do */ console.debug('[journall] ignored error in loading-screen.js:', ignore);}
     }
   }
 
@@ -482,7 +482,7 @@
       if (running) {
         var r = root.getBoundingClientRect();
         if (Math.round(r.width) !== gridW || Math.round(r.height) !== gridH) {
-          try { buildGrid(); } catch (err) { /* ignore */ }
+          try { buildGrid(); } catch (err) { /* ignore */ console.debug('[journall] ignored error in loading-screen.js:', err);}
         }
       }
     });

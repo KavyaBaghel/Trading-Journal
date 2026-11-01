@@ -17,7 +17,7 @@
       if (!deferredInstallPrompt) return;
       installBtn.hidden = true;
       deferredInstallPrompt.prompt();
-      try { await deferredInstallPrompt.userChoice; } catch (_) {}
+      try { await deferredInstallPrompt.userChoice; } catch (_) {console.debug('[journall] ignored error in pwa-install.js:', _);}
       deferredInstallPrompt = null;
     });
   }
@@ -128,7 +128,7 @@ window.triggerJournalSignOut = function(){
     try {
       btn.click();
       return; // Hand over to the async signout handler
-    } catch(e) {}
+    } catch(e) {console.debug('[journall] ignored error in pwa-install.js:', e);}
   }
   setTimeout(() => { location.reload(); }, 500);
 };
