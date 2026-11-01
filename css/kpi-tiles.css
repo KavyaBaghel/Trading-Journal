@@ -165,3 +165,23 @@
 /* drop zone icon is an inline icon now */
 #view-upload .ud-drop-ic svg{display:block;margin:0 auto}
 #view-upload .ud-step-n{border-radius:8px}
+
+/* ===== Trade Tools re-themed to match the Analytics tab (final override; CSS only; panes move to <body> when open, so scoped like tools.css) ===== */
+:is(#view-tools,.tl-pane) .glass{border-radius:18px!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important;box-shadow:none!important;background:linear-gradient(160deg,rgba(255,255,255,.035),rgba(255,255,255,0) 42%),var(--panel)!important}
+:is(#view-tools,.tl-pane) .tl-card h3{font-size:14.5px;font-weight:650}
+/* tool cards: icon tile + pill row, Analytics hover */
+:is(#view-tools,.tl-pane) .tl-cardbtn:hover{transform:translateY(-3px);border-color:var(--border-hi)!important}
+:is(#view-tools,.tl-pane) .tl-cardbtn h3{font-size:14.5px;font-weight:650;margin:10px 0 0}
+:is(#view-tools,.tl-pane) .tl-top{display:flex;align-items:center;justify-content:space-between;gap:10px}
+:is(#view-tools,.tl-pane) .tl-cardbtn:hover .a-s-ic{border-color:var(--border-hi)}
+:is(#view-tools,.tl-pane) .tl-cardbtn:hover .a-s-ic svg{stroke:var(--accent-2)}
+:is(#view-tools,.tl-pane) .tl-pill{align-self:auto;font-size:11px;font-weight:600;letter-spacing:0;background:var(--panel-2);border:1px solid var(--border);color:var(--sub)}
+/* results: the same joined strip as the Analytics KPIs (accent bar on top) */
+:is(#view-tools,.tl-pane) .tl-out{grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:1px;background:var(--border);border:1px solid var(--border);border-radius:16px;overflow:hidden}
+:is(#view-tools,.tl-pane) .tl-out div{position:relative;overflow:hidden;padding:15px 16px;border-radius:0;background:var(--panel)}
+:is(#view-tools,.tl-pane) .tl-out div::before{content:"";position:absolute;left:0;top:0;right:0;height:2.5px;background:var(--accent);opacity:.85;transform:scaleX(0);transform-origin:0 50%;animation:kpBarIn .85s cubic-bezier(.16,1,.3,1) forwards}
+:is(#view-tools,.tl-pane) .tl-out div:nth-child(2)::before{animation-delay:.09s}
+:is(#view-tools,.tl-pane) .tl-out div:nth-child(3)::before{animation-delay:.16s}
+:is(#view-tools,.tl-pane) .tl-out span{font-size:11px;font-weight:600;color:var(--sub)}
+:is(#view-tools,.tl-pane) .tl-out b{display:block;font-size:20px;font-weight:750;letter-spacing:-.02em;line-height:1.2;margin-top:5px}
+@media(prefers-reduced-motion:reduce){:is(#view-tools,.tl-pane) .tl-out div::before{animation-duration:.01ms}}
