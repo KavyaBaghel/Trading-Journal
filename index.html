@@ -595,7 +595,7 @@ window.jlLiveBalance=function(Z){
         <circle class="ring-val" id="ringPnl" cx="44" cy="44" r="38" stroke="var(--green)" style="--off:239"/>
       </svg>
       <div>
-        <div class="ring-label">TODAY P&amp;L</div>
+        <div class="ring-label">Today P&amp;L</div>
         <div class="ring-num" id="pnlNum">$0.00</div>
         <div class="ring-sub" id="pnlSub">Weekly target not set</div>
         <div class="ring-detail" id="pnlDetail"></div>
@@ -607,7 +607,7 @@ window.jlLiveBalance=function(Z){
         <circle class="ring-val" id="ringLoss" cx="44" cy="44" r="38" stroke="var(--green)" style="--off:239"/>
       </svg>
       <div>
-        <div class="ring-label">DAILY LOSS USED</div>
+        <div class="ring-label">Daily loss used</div>
         <div class="ring-num" id="lossNum">$0 / $20</div>
         <div class="ring-sub" id="lossSub">Full room left</div>
         <div class="ring-detail" id="lossDetail"></div>
@@ -619,7 +619,7 @@ window.jlLiveBalance=function(Z){
         <circle class="ring-val" id="ringTrades" cx="44" cy="44" r="38" stroke="var(--accent-2)" style="--off:239"/>
       </svg>
       <div>
-        <div class="ring-label">TODAY'S TRADES</div>
+        <div class="ring-label">Today's trades</div>
         <div class="ring-num" id="tradesNum">0 / 8</div>
         <div class="ring-sub" id="tradesSub">0 rule breaks</div>
         <div class="ring-detail" id="tradesDetail"></div>
@@ -629,7 +629,7 @@ window.jlLiveBalance=function(Z){
 
   <div class="session glass" id="sessionCard">
     <div class="session-top">
-      <div class="l">MARKET SESSION</div>
+      <div class="l">Market session</div>
       <div class="now-txt mono" id="nowTxt">--</div>
     </div>
     <div class="sess-body" id="sessBody"></div>
@@ -638,25 +638,25 @@ window.jlLiveBalance=function(Z){
 
   <div class="row4" id="summaryRow4">
     <div class="card glass">
-      <div class="card-head"><span class="l">BEST NEXT ACTION</span>
+      <div class="card-head"><span class="l">Best next action</span>
         <svg viewBox="0 0 24 24"><path d="M13 2 3 14h7l-1 8 11-14h-7l1-6z"/></svg></div>
       <div class="v" id="bestAction">Wait for A+ setup</div>
       <div class="meta" id="bestActionMeta">No trades logged yet today</div>
     </div>
     <div class="card glass">
-      <div class="card-head"><span class="l">STATUS</span>
+      <div class="card-head"><span class="l">Status</span>
         <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/></svg></div>
       <div class="v"><span class="status-dot" id="statusDot"></span><span id="statusVal">Safe to trade</span></div>
       <div class="meta" id="statusMeta">Since 06:00 IST reset</div>
     </div>
     <div class="card glass">
-      <div class="card-head"><span class="l">SUGGESTED RISK / TRADE</span>
+      <div class="card-head"><span class="l">Suggested risk / trade</span>
         <svg viewBox="0 0 24 24"><path d="M12 2 2 7v6c0 5 4 8.5 10 9 6-.5 10-4 10-9V7z"/></svg></div>
       <div class="v" id="riskVal">$20.00</div>
       <div class="meta" id="riskMeta">Based on $701.92 remaining target</div>
     </div>
     <div class="card glass">
-      <div class="card-head"><span class="l">TODAY'S FOCUS</span>
+      <div class="card-head"><span class="l">Today's focus</span>
         <svg viewBox="0 0 24 24"><path d="M4 4h16v16H4z"/><path d="M8 9h8M8 13h5"/></svg></div>
       <div class="v" id="focusVal" style="color:var(--faint);font-weight:500">No saved rule</div>
       <div class="meta" id="focusMeta">Set one below after review</div>
@@ -670,7 +670,7 @@ window.jlLiveBalance=function(Z){
       <ul class="checklist" id="checklist"></ul>
       <div class="chk-foot"><a href="#psychology" id="chkEditLink">Edit setup scan in Psychology tab</a><button type="button" id="chkReset">Reset today</button></div>
       <div class="rule-box">
-        <div class="l">TOMORROW'S RULE</div>
+        <div class="l">Tomorrow's rule</div>
         <input type="text" id="ruleInput" maxlength="200" autocomplete="off" placeholder="e.g. Only trade the London open">
         <button type="button" class="btn-primary j-sm" id="ruleSave" style="margin-top:10px">Save rule</button>
       </div>
@@ -699,12 +699,12 @@ window.jlLiveBalance=function(Z){
     <div class="panel glass">
       <div class="panel-head"><div class="a-s-ttl"><span class="a-s-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v16M6 20h12M5 8h14M5 8l-2.5 6a3 3 0 0 0 5 0zM19 8l-2.5 6a3 3 0 0 0 5 0z"/></svg></span><h2>Risk / reward — today</h2></div><span class="hint">Session view</span></div>
       <div class="rr-grid">
-        <div class="rr-tile"><div class="l">AVG WIN / AVG LOSS</div><div class="v" id="avgWL">—</div></div>
-        <div class="rr-tile"><div class="l">TRADES TO TARGET</div><div class="v" id="toTarget">—</div></div>
-        <div class="rr-tile"><div class="l">PROFIT FACTOR</div><div class="v" id="pfactor">—</div></div>
-        <div class="rr-tile"><div class="l">EXPECTANCY / TRADE</div><div class="v" id="expectancy">—</div></div>
-        <div class="rr-tile"><div class="l">MOOD</div><div class="v" id="mood">—</div></div>
-        <div class="rr-tile"><div class="l">WIN STREAK</div><div class="v" id="streak">—</div></div>
+        <div class="rr-tile"><div class="l">Avg win / avg loss</div><div class="v" id="avgWL">—</div></div>
+        <div class="rr-tile"><div class="l">Trades to target</div><div class="v" id="toTarget">—</div></div>
+        <div class="rr-tile"><div class="l">Profit factor</div><div class="v" id="pfactor">—</div></div>
+        <div class="rr-tile"><div class="l">Expectancy / trade</div><div class="v" id="expectancy">—</div></div>
+        <div class="rr-tile"><div class="l">Mood</div><div class="v" id="mood">—</div></div>
+        <div class="rr-tile"><div class="l">Win streak</div><div class="v" id="streak">—</div></div>
       </div>
     </div>
   </div>
@@ -739,7 +739,7 @@ window.jlLiveBalance=function(Z){
     </div>
     <div style="overflow-x:auto">
     <table>
-      <thead><tr><th style="width:32px"></th><th>TIME</th><th>SYMBOL</th><th>SIDE</th><th>SESSION</th><th>ENTRY</th><th>EXIT</th><th>DURATION</th><th>P&amp;L</th><th>REASON</th></tr></thead>
+      <thead><tr><th style="width:32px"></th><th>Time</th><th>Symbol</th><th>Side</th><th>Session</th><th>Entry</th><th>Exit</th><th>Duration</th><th>P&amp;L</th><th>Reason</th></tr></thead>
       <tbody id="tradesBody"><tr><td colspan="10">No trades found for today. Upload today's export.</td></tr></tbody>
     </table>
     </div>
@@ -7691,15 +7691,15 @@ window.__renderAnSetups=renderBoth;window.__renderAnEmotions=renderEmo;setTimeou
         notes.map(function(n){ return '<div class="note-item"><div class="note-dot" style="background:'+n[0]+'"></div><div><div class="t">'+n[1]+'</div><div class="s">'+esc(n[2])+'</div></div></div>'; }).join('')+'</div>'+
       '<div class="panel glass"><div class="panel-head"><div class="a-s-ttl"><span class="a-s-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3v18h18M7 14l4-4 3 3 5-6"/></svg></span><h2>Day equity curve</h2></div><span class="hint">Hover a point for detail</span></div>'+curveHtml(rows)+'</div></div>'+
       '<div class="panel glass" style="margin-bottom:14px"><div class="panel-head"><div class="a-s-ttl"><span class="a-s-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v16M6 20h12M5 8h14M5 8l-2.5 6a3 3 0 0 0 5 0zM19 8l-2.5 6a3 3 0 0 0 5 0z"/></svg></span><h2>Risk / reward — this day</h2></div><span class="hint">Session view</span></div><div class="rr-grid">'+
-        '<div class="rr-tile"><div class="l">AVG WIN / AVG LOSS</div><div class="v">$'+avgWin.toFixed(2)+' / $'+avgLoss.toFixed(2)+'</div></div>'+
+        '<div class="rr-tile"><div class="l">Avg win / avg loss</div><div class="v">$'+avgWin.toFixed(2)+' / $'+avgLoss.toFixed(2)+'</div></div>'+
         '<div class="rr-tile"><div class="l">OF DAILY TARGET</div><div class="v">'+(hasTg?pct+'%':'—')+'</div></div>'+
-        '<div class="rr-tile"><div class="l">PROFIT FACTOR</div><div class="v">'+pf+'</div></div>'+
-        '<div class="rr-tile"><div class="l">EXPECTANCY / TRADE</div><div class="v">'+(exp>=0?'+$':'-$')+Math.abs(exp).toFixed(2)+'</div></div>'+
-        '<div class="rr-tile"><div class="l">MOOD</div><div class="v">'+esc(mood)+'</div></div>'+
+        '<div class="rr-tile"><div class="l">Profit factor</div><div class="v">'+pf+'</div></div>'+
+        '<div class="rr-tile"><div class="l">Expectancy / trade</div><div class="v">'+(exp>=0?'+$':'-$')+Math.abs(exp).toFixed(2)+'</div></div>'+
+        '<div class="rr-tile"><div class="l">Mood</div><div class="v">'+esc(mood)+'</div></div>'+
         '<div class="rr-tile"><div class="l">ENDING STREAK</div><div class="v">'+streak+'</div></div>'+
       '</div></div>'+
       '<div class="panel glass rc-sim" id="rcSim">'+simHtml(key)+'</div>'+(function(){var h=typeof window.jlDjView==='function'?window.jlDjView(key):'';return h?'<div class="panel glass" id="rcDj">'+h+'</div>':''})()+
-      '<div class="panel glass"><div class="tbl-head"><h2 style="margin:0">Trades this day</h2><span class="pill">'+plural(rows.length,'trade')+'</span></div><div style="overflow-x:auto"><table><thead><tr><th style="width:32px"></th><th>TIME</th><th>SYMBOL</th><th>SIDE</th><th>SESSION</th><th>ENTRY</th><th>EXIT</th><th>DURATION</th><th>P&amp;L</th><th>REASON</th>'+(hasQl?'<th></th>':'')+'</tr></thead><tbody>'+rowsHtml+'</tbody></table></div></div>';
+      '<div class="panel glass"><div class="tbl-head"><h2 style="margin:0">Trades this day</h2><span class="pill">'+plural(rows.length,'trade')+'</span></div><div style="overflow-x:auto"><table><thead><tr><th style="width:32px"></th><th>Time</th><th>Symbol</th><th>Side</th><th>Session</th><th>Entry</th><th>Exit</th><th>Duration</th><th>P&amp;L</th><th>Reason</th>'+(hasQl?'<th></th>':'')+'</tr></thead><tbody>'+rowsHtml+'</tbody></table></div></div>';
   }
   function show(){
     document.querySelectorAll('.view').forEach(function(s){ s.hidden=s.id!=='view-recap'; });
