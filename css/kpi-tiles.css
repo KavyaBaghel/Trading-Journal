@@ -151,3 +151,17 @@
 #view-ai .aic-avatar svg{width:15px;height:15px}
 #view-ai .aic-avatar.sm svg{width:12px;height:12px}
 #view-ai .aic-w-eyebrow{letter-spacing:0;font-size:11.5px}
+
+/* ===== Upload Data re-themed to match the Analytics tab (final override, scoped to #view-upload; CSS only) ===== */
+#view-upload .glass{border-radius:18px!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important;box-shadow:none!important;background:linear-gradient(160deg,rgba(255,255,255,.035),rgba(255,255,255,0) 42%),var(--panel)!important}
+#view-upload .glass:hover{border-color:var(--border-hi)!important}
+/* card headers: the Analytics icon tile + title */
+#view-upload .up-card-head{font-family:inherit;font-size:14.5px;font-weight:650;letter-spacing:0;gap:10px;margin-bottom:14px}
+#view-upload .up-card-head::before{display:none}
+#view-upload .up-card:hover .up-card-head .a-s-ic{border-color:var(--border-hi)}
+#view-upload .up-card:hover .up-card-head .a-s-ic svg{stroke:var(--accent-2)}
+/* connection status strip */
+#view-upload .ud-status-title{font-size:14.5px;font-weight:650}
+/* drop zone icon is an inline icon now */
+#view-upload .ud-drop-ic svg{display:block;margin:0 auto}
+#view-upload .ud-step-n{border-radius:8px}
