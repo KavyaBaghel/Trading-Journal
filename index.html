@@ -5937,13 +5937,7 @@ function fillHero(){const s=(id,h)=>{const e=$(id);if(e)e.innerHTML=h};
   window.__mountUserProfile = mount;
 })();
 </script>
-<style>
-  #view-analytics .wrap.an-none > :not(.top):not(.an-empty-card){display:none!important}
-  .an-empty-card{padding:38px 28px;text-align:center;margin-top:14px}
-  .an-empty-card h3{font-size:17px;font-weight:650;margin:0 0 8px}
-  .an-empty-card p{font-size:13px;color:var(--sub);margin:0 auto 18px;max-width:440px;line-height:1.5}
-  .an-empty-card a{display:inline-block;padding:9px 18px;border-radius:10px;font-size:13px;font-weight:650;color:#fff;text-decoration:none;background:linear-gradient(135deg,var(--accent),#6a5ae0)}
-</style>
+<link rel="stylesheet" href="css/analytics-empty.css"/>
 <script>(function(){const A=window.__A,w=document.querySelector('#view-analytics .wrap');
 if(A&&w&&!A.n){w.classList.add('an-none');const c=document.createElement('section');c.className='a-s an-empty-card';
 c.innerHTML='<h3>No trades to analyse yet</h3><p>Upload your broker export and your stats, charts and takeaways will appear here.</p><a href="#upload">Go to Upload Data</a>';
