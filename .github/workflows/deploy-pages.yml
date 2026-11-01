@@ -28,7 +28,7 @@ jobs:
       - name: Configure Pages
         uses: actions/configure-pages@v5
 
-      - name: Build optimized site (bundle CSS)
+      - name: Build optimized site (bundle CSS and JS)
         id: build
         continue-on-error: true
         run: |
@@ -37,6 +37,12 @@ jobs:
           mkdir dist
           rsync -a --exclude='.git' --exclude='.github' --exclude='node_modules' --exclude='dist' ./ dist/
           node scripts/build-site.mjs dist
+          cp dist/index.html /tmp/index.css-only.html
+          if ! node scripts/bundle-js.mjs dist; then
+            echo "JS bundling failed; keeping CSS-only build"
+            cp /tmp/index.css-only.html dist/index.html
+            rm -f dist/js/bundle-*.js
+          fi
 
       - name: Upload optimized site
         if: steps.build.outcome == 'success'
