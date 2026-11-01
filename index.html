@@ -6189,23 +6189,7 @@ document.addEventListener('click',function(ev){var b=ev.target&&ev.target.closes
 window.jlShareModel=shareModel;window.jlShareOpen=open;
 })();</script>
 
-<style id="jl-daily-journal-css">
-#djPanel .dj-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
-@media(max-width:900px){#djPanel .dj-grid{grid-template-columns:1fr}}
-#djPanel .dj-col{display:flex;flex-direction:column;gap:14px;min-width:0}
-#djPanel .dj-h{font-size:var(--fs-2);font-weight:700;letter-spacing:.04em;color:var(--text);margin:0}
-#djPanel .dj-l{font-size:var(--fs-1);font-weight:600;letter-spacing:.02em;color:var(--sub);margin:0 0 6px;text-transform:uppercase}
-#djPanel .dj-chips{display:flex;flex-wrap:wrap;gap:6px}
-#djPanel .dj-chip{appearance:none;border:1px solid var(--border);background:var(--panel-2);color:var(--sub);border-radius:var(--r-pill);padding:6px 13px;font:600 var(--fs-2) Inter,sans-serif;cursor:pointer;transition:border-color .2s,color .2s,background .2s}
-#djPanel .dj-chip:hover{color:var(--text);border-color:var(--border-hi)}
-#djPanel .dj-chip[aria-pressed="true"]{color:var(--text);border-color:var(--accent-2);background:rgba(255,255,255,.04)}
-#djPanel .dj-chip:focus-visible{outline:2px solid var(--accent-2);outline-offset:2px}
-#djPanel .dj-ta{width:100%;min-height:64px;resize:vertical;line-height:1.5;background:var(--panel-2);border:1px solid var(--border);border-radius:var(--r-2);padding:10px 12px;color:var(--text);font:var(--fs-4) Inter,sans-serif}
-#djPanel .dj-ta:hover{border-color:var(--border-hi)}
-#djPanel .dj-ta:focus{outline:2px solid var(--accent-2);outline-offset:1px;border-color:transparent}
-#djPanel .dj-rate{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-@media(max-width:480px){#djPanel .dj-rate{grid-template-columns:1fr}}
-</style>
+<link rel="stylesheet" href="css/daily-journal.css"/>
 <script id="jl-daily-journal">(function(){
 /* Daily journal: one entry per IST trading day (06:00 reset), a "before" part and an "after" part.
    Stored as one object under krishna_daily_journal ({day:{pre:{...},post:{...}}}) so it syncs with the rest of the app.
