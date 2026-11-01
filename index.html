@@ -1406,53 +1406,7 @@ window.__mountOpenPos=function(){const o=(window.__openTrades||[]).concat((windo
 <div class="tl-pane" data-tool="st" hidden><button type="button" class="tl-back">Close &times;</button>
 <section class="glass tl-card"><h3>Losing streak odds</h3><div class="tl-row"><label>Win rate (%)<input id="stWr" type="number" step="any" value=""></label><label>Next trades<input id="stN" type="number" step="any" value=""></label><label>Losing streak of<input id="stK" type="number" step="any" value=""></label></div><div id="stOut" class="tl-out"></div><div id="stNote" class="tl-note"></div></section></div>
 </div></div>
-<style>
-:is(#view-tools,.tl-pane) .tl-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.2fr);gap:16px}
-@media(max-width:900px){:is(#view-tools,.tl-pane) .tl-grid{grid-template-columns:1fr}}
-:is(#view-tools,.tl-pane) .tl-card{padding:20px;display:flex;flex-direction:column;gap:14px}
-:is(#view-tools,.tl-pane) .tl-card h3{margin:0;font-size:15px}
-:is(#view-tools,.tl-pane) label{display:flex;flex-direction:column;gap:6px;font-size:12.5px;color:var(--sub);flex:1}
-:is(#view-tools,.tl-pane) input,:is(#view-tools,.tl-pane) select{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:10px 12px;color:var(--text);font:600 15px inherit;font-family:inherit}
-:is(#view-tools,.tl-pane) input:focus-visible,:is(#view-tools,.tl-pane) select:focus-visible{outline:2px solid var(--accent-2,#7c6cf0);outline-offset:1px}
-:is(#view-tools,.tl-pane) small{color:var(--faint);font-size:11.5px}
-:is(#view-tools,.tl-pane) .tl-row{display:flex;gap:12px}
-:is(#view-tools,.tl-pane) .tl-verdict{font-size:22px;font-weight:750;padding:12px 14px;border-radius:12px}
-:is(#view-tools,.tl-pane) .tl-verdict.ok{background:rgba(67,215,135,.12);color:var(--green)}
-:is(#view-tools,.tl-pane) .tl-verdict.no{background:rgba(240,104,92,.12);color:var(--red)}
-:is(#view-tools,.tl-pane) .tl-out{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
-:is(#view-tools,.tl-pane) .tl-out div{padding:10px 12px;border-radius:10px;background:rgba(255,255,255,.04)}
-:is(#view-tools,.tl-pane) .tl-out span{display:block;font-size:11.5px;color:var(--faint)}
-:is(#view-tools,.tl-pane) .tl-out b{font-size:16px}
-:is(#view-tools,.tl-pane) .tl-checks{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px;font-size:13px}
-:is(#view-tools,.tl-pane) .tl-checks li{padding-left:22px;position:relative;color:var(--sub)}
-:is(#view-tools,.tl-pane) .tl-checks li::before{content:"";position:absolute;left:4px;top:6px;width:9px;height:9px;border-radius:50%;background:var(--c)}
-:is(#view-tools,.tl-pane) .tl-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:16px}
-:is(#view-tools,.tl-pane) .tl-cardbtn{text-align:left;padding:20px;color:var(--text);font:inherit;cursor:pointer;display:flex;flex-direction:column;gap:8px;position:relative;transition:transform .15s,border-color .15s}
-:is(#view-tools,.tl-pane) .tl-cardbtn:hover{transform:translateY(-2px);border-color:rgba(124,108,240,.6)}
-:is(#view-tools,.tl-pane) .tl-cardbtn:focus-visible,:is(#view-tools,.tl-pane) .tl-back:focus-visible{outline:2px solid #7c6cf0;outline-offset:2px}
-:is(#view-tools,.tl-pane) .tl-cardbtn h3{margin:8px 0 0;font-size:16px}:is(#view-tools,.tl-pane) .tl-cardbtn p{margin:0;color:var(--sub);font-size:13px;flex:1}
-:is(#view-tools,.tl-pane) .tl-cardbtn em{font-style:normal;font-weight:650;font-size:13px;padding-top:10px;border-top:1px solid rgba(255,255,255,.08)}
-:is(#view-tools,.tl-pane) .tl-pill{align-self:flex-end;font-size:11px;font-weight:700;letter-spacing:.05em;padding:3px 9px;border-radius:999px;background:rgba(124,108,240,.18);color:#b3a9ff}
-:is(#view-tools,.tl-pane) .tl-back{background:none;border:0;color:var(--sub);font:600 13px inherit;font-family:inherit;cursor:pointer;padding:0 0 12px}
-:is(#view-tools,.tl-pane) .tl-pane .tl-card{max-width:760px}:is(#view-tools,.tl-pane) .tl-note{color:var(--sub);font-size:13.5px}
-:is(#view-tools,.tl-pane) .mh-list{display:flex;flex-direction:column;gap:8px}
-:is(#view-tools,.tl-pane) .mh-r{display:grid;grid-template-columns:1.2fr 1.2fr 1fr auto;gap:10px;align-items:center;padding:10px 12px;border-radius:10px;background:rgba(255,255,255,.04);font-size:13.5px}
-:is(#view-tools,.tl-pane) .mh-r em{font-style:normal;font-weight:700;font-size:12px;padding:3px 10px;border-radius:999px}
-:is(#view-tools,.tl-pane) .mh-r em.on{background:rgba(67,215,135,.14);color:var(--green)}:is(#view-tools,.tl-pane) .mh-r em.off{background:rgba(255,255,255,.06);color:var(--faint)}
-:is(#view-tools,.tl-pane) .tl-verdict.wait{background:rgba(255,255,255,.05);color:var(--sub)}
-
-.tl-pane:not([hidden]){position:fixed;inset:0;z-index:200;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(6,6,12,.5);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);animation:tlBg .22s ease both}
-.tl-pane .tl-modal{width:min(760px,100%);max-height:calc(100vh - 40px);max-height:calc(100dvh - 40px);overflow:auto;display:flex;flex-direction:column;animation:tlPop .3s cubic-bezier(.2,.9,.3,1.1) both}
-.tl-pane[data-tool="size"] .tl-modal{width:min(980px,100%)}
-.tl-pane .tl-card{background:#14141f}
-.tl-pane .tl-modal{padding:4px}.tl-pane .tl-back:focus-visible{outline:2px solid #7c6cf0;outline-offset:1px}
-.tl-pane .tl-back{align-self:flex-end;margin-bottom:10px;padding:7px 14px;border-radius:999px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);color:var(--text);font:600 13px inherit;font-family:inherit;cursor:pointer}
-.tl-pane.closing{animation:tlBgOut .2s ease both}.tl-pane.closing .tl-modal{animation:tlPopOut .2s ease both}
-@keyframes tlBg{from{opacity:0}to{opacity:1}}@keyframes tlBgOut{to{opacity:0}}
-@keyframes tlPop{from{opacity:0;transform:translateY(18px) scale(.96)}to{opacity:1;transform:none}}
-@keyframes tlPopOut{to{opacity:0;transform:translateY(10px) scale(.97)}}
-@media(prefers-reduced-motion:reduce){.tl-pane,.tl-pane .tl-modal{animation:none!important}}
-</style>
+<link rel="stylesheet" href="css/tools.css"/>
 <script>(function(){const $=id=>document.getElementById(id);
 /* Pip value and price per pip are the person's own numbers, saved on this device (journall_ prefix, so they sync). Nothing is assumed. */
 const PK='journall_tools_pip_v1';
