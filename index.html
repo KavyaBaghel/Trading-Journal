@@ -895,10 +895,10 @@ document.addEventListener('visibilitychange',function(){
     <div class="psy-side-card glass up-reveal" style="animation-delay:80ms">
       <div class="psy-side-head"><span class="psy-side-ic"><svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></span><h3>The 6-stage ritual</h3></div>
       <div class="psy-list">
-        <div class="psy-list-item"><b>1 · Mind Check</b><span>Six honest questions before you're allowed near a chart.</span></div>
-        <div class="psy-list-item"><b>2 · Setup Scan</b><span>Confirm a valid setup is actually forming — no forcing it.</span></div>
+        <div class="psy-list-item"><b>1 · Mind check</b><span>Six honest questions before you're allowed near a chart.</span></div>
+        <div class="psy-list-item"><b>2 · Setup scan</b><span>Confirm a valid setup is actually forming — no forcing it.</span></div>
         <div class="psy-list-item"><b>3 · Checklist</b><span>News, risk, entry and exit plan all signed off before the trigger.</span></div>
-        <div class="psy-list-item"><b>4 · Live Trade</b><span>Three hard rules while the position is open — no SL/TP tinkering.</span></div>
+        <div class="psy-list-item"><b>4 · Live trade</b><span>Three hard rules while the position is open — no SL/TP tinkering.</span></div>
         <div class="psy-list-item"><b>5 · Debrief</b><span>Screenshot it, feel it, write it down while it's fresh.</span></div>
         <div class="psy-list-item"><b>6 · Cooldown</b><span>Mandatory pause. No re-entry on impulse, ever.</span></div>
       </div>
@@ -4282,7 +4282,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'){if(mpOpen)closeMont
 <script>
 // ===================== Psychology Command Room (mounted into #psyHost, shares the app's design system) =====================
 (function(){
-  const STEPS = ["Mind Check","Setup Scan","Checklist","Live Trade","Debrief","Cooldown"];
+  const STEPS = ["Mind check","Setup scan","Checklist","Live trade","Debrief","Cooldown"];
   const CRUMB = ["mind","setup","checklist","live trade","journal"];
   const progressAnim = {}; // remembers each progress bar's last rendered % so re-renders animate smoothly instead of snapping
 
@@ -4849,7 +4849,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'){if(mpOpen)closeMont
     if(state.mindEditing){
       return `
         <div class="a-s-head">
-          <div class="a-s-ttl"><span class="a-s-ic">${rowIcon('sleep')}</span><h3>Mind Stability Check</h3></div>
+          <div class="a-s-ttl"><span class="a-s-ic">${rowIcon('sleep')}</span><h3>Mind stability check</h3></div>
           <span class="pill">editing</span>
         </div>
         <div class="sub" style="margin:4px 0 16px">Add, edit, or remove your own mind-check rules.</div>
@@ -4870,7 +4870,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'){if(mpOpen)closeMont
     const count = MIND_ITEMS.filter(i=>state.mind[i.k]).length;
     return `
       <div class="a-s-head">
-        <div class="a-s-ttl"><span class="a-s-ic">${rowIcon('sleep')}</span><h3>Mind Stability Check</h3></div>
+        <div class="a-s-ttl"><span class="a-s-ic">${rowIcon('sleep')}</span><h3>Mind stability check</h3></div>
         <div style="display:flex;gap:7px;align-items:center">
           <span class="pill">all ${MIND_ITEMS.length} required</span>
           <div class="psy-icon-btn" data-act="mind-edit-toggle">${editIcon()}</div>
@@ -4887,7 +4887,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'){if(mpOpen)closeMont
         </div>`).join("")}
       <div class="psy-actions">
         <button class="btn-ghost" data-act="reset-mind">Reset checks</button>
-        <button class="btn-primary" data-act="goto" data-n="2" ${(mindDone() && !cooling)?"":"disabled"}>Go to Setup Scan${arrowIcon()}</button>
+        <button class="btn-primary" data-act="goto" data-n="2" ${(mindDone() && !cooling)?"":"disabled"}>Go to setup scan${arrowIcon()}</button>
       </div>`;
   }
 
@@ -4895,7 +4895,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'){if(mpOpen)closeMont
     if(state.setupEditing){
       return `
         <div class="a-s-head">
-          <div class="a-s-ttl"><span class="a-s-ic">${rowIcon('entry')}</span><h3>Setup Scan</h3></div>
+          <div class="a-s-ttl"><span class="a-s-ic">${rowIcon('entry')}</span><h3>Setup scan</h3></div>
           <span class="pill">editing</span>
         </div>
         <div class="sub" style="margin:4px 0 16px">Add, edit, or remove the exact steps you check to confirm your setup has formed.</div>
@@ -4914,7 +4914,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'){if(mpOpen)closeMont
     const done = setupDone();
     return `
       <div class="a-s-head">
-        <div class="a-s-ttl"><span class="a-s-ic">${rowIcon('entry')}</span><h3>Setup Scan</h3></div>
+        <div class="a-s-ttl"><span class="a-s-ic">${rowIcon('entry')}</span><h3>Setup scan</h3></div>
         <div style="display:flex;gap:7px;align-items:center">
           <span class="pill">all ${SETUP_REQS.length} required</span>
           <div class="psy-icon-btn" data-act="setup-edit-toggle">${editIcon()}</div>
@@ -4939,7 +4939,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'){if(mpOpen)closeMont
     if(state.checklistEditing){
       return `
         <div class="a-s-head">
-          <div class="a-s-ttl"><span class="a-s-ic">${rowIcon('rulesmet')}</span><h3>Pre-Trade Checklist</h3></div>
+          <div class="a-s-ttl"><span class="a-s-ic">${rowIcon('rulesmet')}</span><h3>Pre-trade checklist</h3></div>
           <span class="pill">editing</span>
         </div>
         <div class="sub" style="margin:4px 0 16px">Add, edit, or remove the exact checks that gate your entry. Make it your own.</div>
@@ -4961,7 +4961,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'){if(mpOpen)closeMont
     const done = checklistDone();
     return `
       <div class="a-s-head">
-        <div class="a-s-ttl"><span class="a-s-ic">${rowIcon('rulesmet')}</span><h3>Pre-Trade Checklist</h3></div>
+        <div class="a-s-ttl"><span class="a-s-ic">${rowIcon('rulesmet')}</span><h3>Pre-trade checklist</h3></div>
         <div style="display:flex;gap:7px;align-items:center">
           <span class="pill">final gate</span>
           <div class="psy-icon-btn" data-act="checklist-edit-toggle">${editIcon()}</div>
@@ -4983,7 +4983,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'){if(mpOpen)closeMont
       <div class="psy-actions">
         <button class="btn-ghost" data-act="reset-checklist">Reset</button>
         <button class="btn-ghost" data-act="goto" data-n="2">Back</button>
-        <button class="btn-primary" data-act="goto" data-n="4" ${done?"":"disabled"}>Proceed to Live Trade${arrowIcon()}</button>
+        <button class="btn-primary" data-act="goto" data-n="4" ${done?"":"disabled"}>Proceed to live trade${arrowIcon()}</button>
       </div>`;
   }
 
@@ -4991,7 +4991,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'){if(mpOpen)closeMont
     if(state.liveEditing){
       return `
         <div class="a-s-head">
-          <div class="a-s-ttl"><span class="a-s-ic">${rowIcon('live1')}</span><h3>Live Trade Rules</h3></div>
+          <div class="a-s-ttl"><span class="a-s-ic">${rowIcon('live1')}</span><h3>Live trade rules</h3></div>
           <span class="pill">editing</span>
         </div>
         <div class="sub" style="margin:4px 0 16px">Write the exact rules you follow while a trade is live.</div>
@@ -5011,7 +5011,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'){if(mpOpen)closeMont
     }
     return `
       <div class="a-s-head">
-        <div class="a-s-ttl"><span class="a-s-ic">${rowIcon('live1')}</span><h3>Live Trade Rules</h3></div>
+        <div class="a-s-ttl"><span class="a-s-ic">${rowIcon('live1')}</span><h3>Live trade rules</h3></div>
         <div style="display:flex;gap:7px;align-items:center">
           <span class="pill">during execution</span>
           <div class="psy-icon-btn" data-act="live-edit-toggle">${editIcon()}</div>
@@ -5021,7 +5021,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'){if(mpOpen)closeMont
       ${LIVE_RULES.map(r=>`<div class="psy-info"><span class="ic">${rowIcon(r.k)}</span><div><b>${r.t}</b><span>${r.d}</span></div></div>`).join("")}
       <div class="psy-actions">
         <button class="btn-ghost" data-act="goto" data-n="3">Back</button>
-        <button class="btn-primary" data-act="goto" data-n="5">Continue to After Trade${arrowIcon()}</button>
+        <button class="btn-primary" data-act="goto" data-n="5">Continue to after trade${arrowIcon()}</button>
       </div>`;
   }
 
@@ -5029,7 +5029,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'){if(mpOpen)closeMont
     if(state.debriefEditing){
       return `
         <div class="a-s-head">
-          <div class="a-s-ttl"><span class="a-s-ic">${rowIcon('d1')}</span><h3>After Trade</h3></div>
+          <div class="a-s-ttl"><span class="a-s-ic">${rowIcon('d1')}</span><h3>After trade</h3></div>
           <span class="pill">editing</span>
         </div>
         <div class="sub" style="margin:4px 0 16px">Write the exact steps you follow right after a trade closes.</div>
@@ -5050,7 +5050,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'){if(mpOpen)closeMont
     const esc = s => String(s==null?"":s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
     return `
       <div class="a-s-head">
-        <div class="a-s-ttl"><span class="a-s-ic">${rowIcon('d1')}</span><h3>After Trade</h3></div>
+        <div class="a-s-ttl"><span class="a-s-ic">${rowIcon('d1')}</span><h3>After trade</h3></div>
         <div style="display:flex;gap:7px;align-items:center">
           <span class="pill">mandatory pause</span>
           <div class="psy-icon-btn" data-act="debrief-edit-toggle">${editIcon()}</div>
@@ -5058,7 +5058,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'){if(mpOpen)closeMont
       </div>
       <div class="sub" style="margin:4px 0 6px">A mandatory pause before the next decision.</div>
       ${DEBRIEF_ITEMS.map(r=>`<div class="psy-info"><span class="ic">${rowIcon(r.k)}</span><div><b>${esc(r.t)}</b><span>${esc(r.d)}</span></div></div>`).join("")}
-      <button class="btn-primary psy-full" style="margin-top:14px" data-act="complete-debrief">Complete Live Trade</button>
+      <button class="btn-primary psy-full" style="margin-top:14px" data-act="complete-debrief">Complete live trade</button>
       <div class="psy-actions">
         <button class="btn-ghost" data-act="goto" data-n="4">Back</button>
         <a href="https://kavyabaghel.github.io/Trading-Journal" target="_blank" style="flex:1;min-width:120px;text-decoration:none;display:block"><button class="btn-ghost" type="button" style="width:100%">Open Journal</button></a>
@@ -5098,7 +5098,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'){if(mpOpen)closeMont
           ${COOLDOWN_OPTIONS_MIN.map(m=>`<button class="btn-ghost" data-act="pick-cooldown" data-min="${m}">${m} min</button>`).join("")}
         </div>
         <div class="psy-info"><span class="ic">${rowIcon('d2')}</span><div><b>Step away from the screen.</b><span>Close the chart. Don't watch price during the pause.</span></div></div>
-        <div class="psy-info"><span class="ic">${rowIcon('d3')}</span><div><b>No re-entry on impulse.</b><span>The next trade only starts after a fresh Mind Check.</span></div></div>
+        <div class="psy-info"><span class="ic">${rowIcon('d3')}</span><div><b>No re-entry on impulse.</b><span>The next trade only starts after a fresh mind check.</span></div></div>
         <div class="psy-actions">
           <button class="btn-ghost" data-act="goto" data-n="5">Back</button>
         </div>`;
@@ -5114,13 +5114,13 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'){if(mpOpen)closeMont
       </div>
       <div class="sub" style="margin:4px 0 6px">Trade logged. Step away for ${mins} minute${mins===1?"":"s"} before you're clear to plan the next one.</div>
       ${active
-        ? `<div class="psy-note alert">⏸ Cooldown active — ${formatRemaining(remaining)} left. No back-to-back trades.</div>`
+        ? `<div class="psy-note alert">Cooldown active — ${formatRemaining(remaining)} left. No back-to-back trades.</div>`
         : `<div class="psy-note ok">Cooldown complete. You're clear to start the next trade whenever you're ready.</div>`}
       <div class="psy-info"><span class="ic">${rowIcon('d2')}</span><div><b>Step away from the screen.</b><span>Close the chart. Don't watch price during the pause.</span></div></div>
-      <div class="psy-info"><span class="ic">${rowIcon('d3')}</span><div><b>No re-entry on impulse.</b><span>The next trade only starts after a fresh Mind Check.</span></div></div>
+      <div class="psy-info"><span class="ic">${rowIcon('d3')}</span><div><b>No re-entry on impulse.</b><span>The next trade only starts after a fresh mind check.</span></div></div>
       <div class="psy-actions">
         <button class="btn-ghost" data-act="goto" data-n="5">Back</button>
-        <button class="btn-primary psy-full" data-act="start-next-trade" ${done?"":"disabled"}>${done ? "Start next trade" : `⏸ Pause ${mins}m cooldown`}${arrowIcon()}</button>
+        <button class="btn-primary psy-full" data-act="start-next-trade" ${done?"":"disabled"}>${done ? "Start next trade" : `Pause ${mins}m cooldown`}${arrowIcon()}</button>
       </div>`;
   }
 
@@ -5152,7 +5152,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'){if(mpOpen)closeMont
           <div class="eyebrow">
             <span class="streak">${STEPS[state.step-1]}</span>
           </div>
-          <h1>Psychology Command Room</h1>
+          <h1>Psychology command room</h1>
           <p>Runs fully on this device · trade review</p>
         </div>
       </div>
