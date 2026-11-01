@@ -320,6 +320,13 @@
   /* ===== Calendar: Analytics-style chart headings (final override) ===== */
   #view-calendar .cal-eq-top .l,#view-calendar .cal-yr-chart-top .l{display:inline-flex;align-items:center;gap:10px;font-size:14.5px;font-weight:650;letter-spacing:0;text-transform:none;color:var(--text)}
 
+  /* ===== Day recap: Analytics-style panel headings (final override) ===== */
+  #view-recap .panel{padding:22px 24px}
+  #view-recap .panel-head .a-s-ttl{display:flex;align-items:center;gap:10px}
+  #view-recap .panel:hover .a-s-ic{border-color:var(--border-hi)}
+  #view-recap .panel:hover .a-s-ic svg{stroke:var(--accent-2)}
+  #view-recap .panel .a-s-ttl h2{margin:0;font-size:14.5px;font-weight:650}
+
 </style>
 <script>
 (function(){
@@ -989,7 +996,7 @@ window.jlLiveBalance=function(Z){
   </div>
 
   <div class="panel glass" style="margin-bottom:14px" id="djPanel">
-    <div class="panel-head"><div class="a-s-ttl"><span class="a-s-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h11a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3z"/><path d="M5 17a3 3 0 0 1 3-3h11"/></svg></span><h2>Daily journal</h2></div><span class="hint" id="djHint"></span></div>
+    <div class="panel-head"><div class="a-s-ttl"><span class="a-s-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h11a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3z"/><path d="M5 17a3 3 0 0 1 3-3h11"/></svg></span><div class="a-s-ttl"><span class="a-s-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h11a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3z"/><path d="M5 17a3 3 0 0 1 3-3h11"/></svg></span><h2>Daily journal</h2></div></div><span class="hint" id="djHint"></span></div>
     <div class="dj-grid"><div class="dj-col" id="djPre"></div><div class="dj-col" id="djPost"></div></div>
   </div>
 
@@ -6801,7 +6808,7 @@ function dhTags(e){var t=[],a=e.pre||{},b=e.post||{};
 function readMap(){try{var o=JSON.parse(localStorage.getItem(KEY)||'{}');return(o&&typeof o==='object'&&!Array.isArray(o))?o:{}}catch(_){return{}}}
 window.jlDjView=function(day){
   var map=readMap(),e=dhEntry(map[day]);if(!e)return '';
-  return '<div class="panel-head"><h2>Daily journal</h2><span class="hint">Read only</span></div>'+dhBody(e);
+  return '<div class="panel-head"><div class="a-s-ttl"><span class="a-s-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h11a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3z"/><path d="M5 17a3 3 0 0 1 3-3h11"/></svg></span><h2>Daily journal</h2></div><span class="hint">Read only</span></div>'+dhBody(e);
 };
 var STEP=30,shown=STEP;
 function today(){return typeof window.getTradingDayIST==='function'?window.getTradingDayIST():''}
@@ -8436,7 +8443,7 @@ button,input,textarea,select{font-family:inherit}
     var r=simEval(rows,o,kind);
     var label=simP==='day'?key:simP==='week'?rg.lo+' to '+rg.hi:simP==='month'?key.slice(0,7):'Every logged trade';
     var chips='<div class="rc-sim-chips" role="group" aria-label="Period">'+P.map(function(x){ return '<button type="button" class="rc-sim-chip" data-simp="'+x[0]+'" aria-pressed="'+(x[0]===simP)+'">'+x[1]+'</button>'; }).join('')+'</div>';
-    var head='<div class="panel-head"><h2>What if I had followed my rules?</h2><span class="hint">'+esc(label)+'</span></div>';
+    var head='<div class="panel-head"><div class="a-s-ttl"><span class="a-s-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/></svg></span><h2>What if I had followed my rules?</h2></div><span class="hint">'+esc(label)+'</span></div>';
     if(!r.total) return head+chips+'<div class="rc-empty">No trades in this period.</div>';
     var diff=Math.round((r.simNet-r.actualNet)*100)/100;
     var dcol=diff>0?'var(--green)':diff<0?'var(--red)':'';
@@ -8566,10 +8573,10 @@ button,input,textarea,select{font-family:inherit}
         card('WORST TRADE',esc(worst.sym)+' '+money(Number(worst.pnl)),String(worst.t).slice(0,5)+' · '+(worst.side==='BUY'?'Long':'Short'),Number(worst.pnl)<0?'var(--red)':'')+
         card('FEELING',mood,jn+' of '+plural(rows.length,'trade')+' journaled')+
       '</div>'+
-      '<div class="split"><div class="panel glass"><div class="panel-head"><h2>Day notes</h2><span class="hint">'+plural(notes.length,'insight')+'</span></div>'+
+      '<div class="split"><div class="panel glass"><div class="panel-head"><div class="a-s-ttl"><span class="a-s-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/></svg></span><h2>Day notes</h2></div><span class="hint">'+plural(notes.length,'insight')+'</span></div>'+
         notes.map(function(n){ return '<div class="note-item"><div class="note-dot" style="background:'+n[0]+'"></div><div><div class="t">'+n[1]+'</div><div class="s">'+esc(n[2])+'</div></div></div>'; }).join('')+'</div>'+
-      '<div class="panel glass"><div class="panel-head"><h2>Day equity curve</h2><span class="hint">Hover a point for detail</span></div>'+curveHtml(rows)+'</div></div>'+
-      '<div class="panel glass" style="margin-bottom:14px"><div class="panel-head"><h2>Risk / reward — this day</h2><span class="hint">Session view</span></div><div class="rr-grid">'+
+      '<div class="panel glass"><div class="panel-head"><div class="a-s-ttl"><span class="a-s-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3v18h18M7 14l4-4 3 3 5-6"/></svg></span><h2>Day equity curve</h2></div><span class="hint">Hover a point for detail</span></div>'+curveHtml(rows)+'</div></div>'+
+      '<div class="panel glass" style="margin-bottom:14px"><div class="panel-head"><div class="a-s-ttl"><span class="a-s-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v16M6 20h12M5 8h14M5 8l-2.5 6a3 3 0 0 0 5 0zM19 8l-2.5 6a3 3 0 0 0 5 0z"/></svg></span><h2>Risk / reward — this day</h2></div><span class="hint">Session view</span></div><div class="rr-grid">'+
         '<div class="rr-tile"><div class="l">AVG WIN / AVG LOSS</div><div class="v">$'+avgWin.toFixed(2)+' / $'+avgLoss.toFixed(2)+'</div></div>'+
         '<div class="rr-tile"><div class="l">OF DAILY TARGET</div><div class="v">'+(hasTg?pct+'%':'—')+'</div></div>'+
         '<div class="rr-tile"><div class="l">PROFIT FACTOR</div><div class="v">'+pf+'</div></div>'+
