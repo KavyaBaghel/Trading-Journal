@@ -43,19 +43,7 @@ document.addEventListener('visibilitychange',function(){
   ids.forEach(function(id){var r=reg[id];if(r){try{r.fn.apply(window,r.args)}catch(e){}}})
 })
 })();</script>
-<script>
-(function(){
-  if(!window.matchMedia||!matchMedia('(hover:hover)').matches)return;
-  var raf=0,el=null,x=0,y=0;
-  document.addEventListener('pointermove',function(e){
-    if(e.pointerType!=='mouse')return;
-    var c=e.target.closest?e.target.closest('#view-profile .up-card'):null;
-    if(!c)return;
-    el=c;var r=c.getBoundingClientRect();x=e.clientX-r.left;y=e.clientY-r.top;
-    if(!raf)raf=requestAnimationFrame(function(){raf=0;el.style.setProperty('--mx',x+'px');el.style.setProperty('--my',y+'px')});
-  },{passive:true});
-})();
-</script>
+<script src="js/profile-card-spotlight.js"></script>
 <style id="jl-guard-css">
 /* ID-scoped guard: keeps the design's global rules (*, html, body, table) off the sign-in gate. Refined by the pixel-diff (Step 3.8). */
 #firebaseAuthBar,#firebaseAuthGate,#firebaseAuthLoading,#firebaseAuthBar *,#firebaseAuthGate *,#firebaseAuthLoading *{box-sizing:border-box}
