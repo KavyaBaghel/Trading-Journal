@@ -36,7 +36,7 @@ function drawCard(cv,m,dollars){
   var bg=c.createLinearGradient(0,0,W,H);bg.addColorStop(0,'#0f1322');bg.addColorStop(1,'#080a10');c.fillStyle=bg;c.fillRect(0,0,W,H);
   var gl=c.createRadialGradient(W-120,80,0,W-120,80,620);gl.addColorStop(0,kc+'40');gl.addColorStop(1,'rgba(0,0,0,0)');c.fillStyle=gl;c.fillRect(0,0,W,H);
   c.textBaseline='alphabetic';c.textAlign='left';c.fillStyle='#e8ebf4';c.font='700 30px '+FONT;
-  try{c.letterSpacing='6px'}catch(e){}c.fillText('JOURNALL',P,112);try{c.letterSpacing='0px'}catch(e){}
+  try{c.letterSpacing='6px'}catch(e){console.debug('[journall] ignored error in share-card.js:', e);}c.fillText('JOURNALL',P,112);try{c.letterSpacing='0px'}catch(e){console.debug('[journall] ignored error in share-card.js:', e);}
   c.textAlign='right';c.fillStyle='#8b93a7';c.font='500 30px '+FONT;c.fillText(m.date,W-P,112);c.textAlign='left';
   c.fillStyle='#ffffff';c.font='800 96px '+FONT;var sym=m.sym||'Trade';c.fillText(sym,P,260);
   var sw=c.measureText(sym).width,x=P+sw+28;
@@ -75,7 +75,7 @@ function open(e,btn){
   cur=shareModel(e,findTrade(e),{kindFn:typeof window.jlKind==='function'?window.jlKind:null,balance:window.jlStartBalance,gradeFn:window.jGrade});
   $('jlsDol').checked=false;paint();box.hidden=false;$('jlsX').focus();
 }
-function close(){if(box)box.hidden=true;if(opener&&opener.focus){try{opener.focus()}catch(e){}}}
+function close(){if(box)box.hidden=true;if(opener&&opener.focus){try{opener.focus()}catch(e){console.debug('[journall] ignored error in share-card.js:', e);}}}
 function blobOf(cb){cv.toBlob(function(b){cb(b)},'image/png')}
 function fname(){var s=(cur&&cur.sym||'trade').replace(/[^A-Za-z0-9]+/g,'');return 'journall-'+s+'-'+(cur&&cur.date?cur.date.replace(/\s+/g,'-'):'card')+'.png'}
 function download(){blobOf(function(b){if(!b){$('jlsMsg').textContent='Could not create the image.';return}var a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=fname();document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(a.href)},2000);$('jlsMsg').textContent='Image downloaded.'})}

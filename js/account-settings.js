@@ -17,7 +17,7 @@
   const ACC_KEY = 'jlAccountSettings';
   function ggLoadAccount(){
     let s = null;
-    try{ s = JSON.parse(localStorage.getItem(ACC_KEY)); }catch(e){}
+    try{ s = JSON.parse(localStorage.getItem(ACC_KEY)); }catch(e){console.debug('[journall] ignored error in account-settings.js:', e);}
     const a = Object.assign({balance:0, phase:'', type:'', revWindowMin:0, profitTargetPct:0, maxDailyLossUSD:0, maxDailyLossUnit:'$', maxWeeklyLossUSD:0, maxWeeklyLossUnit:'$', maxTradesPerDay:0, dayProfitTarget:0, dayProfitTargetUnit:'%', weeklyProfitTarget:0, weeklyProfitTargetUnit:'%', riskPerTrade:0, minRr:0, lotSize:0, maxConsecLosses:0, maxRevengeTrades:0, sameDirLossPct:0, fridayCutoff:'', consistencyPct:0, minTradingDays:0, profitSplit:0, brokerUtcOffset:'', tradeDuringNews:'', maxDrawdown:0, maxDrawdownUnit:'%', deadline:''}, s||{});
     if(a.maxDailyLossValue == null) a.maxDailyLossValue = Number(a.maxDailyLossUSD) || 0;
     if(a.maxWeeklyLossValue == null) a.maxWeeklyLossValue = Number(a.maxWeeklyLossUSD) || 0;
@@ -212,7 +212,7 @@
       maxDrawdownUnit: ggMddUnitEl ? ggMddUnitEl.value : (ggAccount.maxDrawdownUnit || '%'),
       deadline: ggDeadlineEl ? ggDeadlineEl.value : (ggAccount.deadline || '')
     };
-    try{ localStorage.setItem(ACC_KEY, JSON.stringify(ggAccount)); }catch(e){}
+    try{ localStorage.setItem(ACC_KEY, JSON.stringify(ggAccount)); }catch(e){console.debug('[journall] ignored error in account-settings.js:', e);}
     window.jlRevWindowMin = Number(ggAccount.revWindowMin) || 0;
     window.jlProfitTargetUSD = Number(ggAccount.balance) * (Number(ggAccount.profitTargetPct)||0) / 100;
     window.jlDailyLossLimit = Number(ggAccount.maxDailyLossUSD) || 0; window.jlWeeklyLossLimit = Number(ggAccount.maxWeeklyLossUSD) || 0;
@@ -304,7 +304,7 @@
   ];
   const GG_KEY = 'jlGoals2';
   let ggGoals = [];
-  try{ ggGoals = JSON.parse(localStorage.getItem(GG_KEY)) || null; }catch(e){}
+  try{ ggGoals = JSON.parse(localStorage.getItem(GG_KEY)) || null; }catch(e){console.debug('[journall] ignored error in account-settings.js:', e);}
   if(!ggGoals){
     ggGoals = [
       {id:1, typeId:'winrate', title:'Maintain win rate', target:40, current:0, unit:'%', deadline:'', createdAt:Date.now()-12*86400000},
@@ -312,7 +312,7 @@
       {id:3, typeId:'volume', title:'Journal trades', target:100, current:0, unit:'trades', deadline:'', createdAt:Date.now()-20*86400000}
     ];
   }
-  const ggSaveGoals = ()=>{ try{ localStorage.setItem(GG_KEY, JSON.stringify(ggGoals)); }catch(e){} };
+  const ggSaveGoals = ()=>{ try{ localStorage.setItem(GG_KEY, JSON.stringify(ggGoals)); }catch(e){console.debug('[journall] ignored error in account-settings.js:', e);} };
   const ggType = id => GG_TYPES.find(t=>t.id===id) || GG_TYPES[GG_TYPES.length-1];
 
   function ggGoalStatus(g){

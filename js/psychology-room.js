@@ -24,7 +24,7 @@
   function liveDesc(d){
     d=String(d==null?'':d);
     const fm=v=>String(Math.round(v*100)/100);
-    let acc={};try{acc=JSON.parse(localStorage.getItem('jlAccountSettings')||'null')||{}}catch(e){}
+    let acc={};try{acc=JSON.parse(localStorage.getItem('jlAccountSettings')||'null')||{}}catch(e){console.debug('[journall] ignored error in psychology-room.js:', e);}
     const lot=Number(window.jlLotSize)||0,tr=Number(window.jlMaxTradesPerDay)||0,mcl=Number(window.jlMaxConsecLosses)||0,wl=Number(window.jlWeeklyLossLimit)||0;
     const bal=Number(window.jlStartBalance)||Number(acc.balance)||0,rp=Number(acc.riskPerTrade)||0,risk=bal>0&&rp>0?bal*rp/100:0;
     if(lot>0) d=d.replace(/Lot is \d*\.?\d+/,'Lot is '+fm(lot));
@@ -34,7 +34,7 @@
     if(risk>0) d=d.replace(/risk is about \$\d*\.?\d+/,'risk is about $'+fm(risk));
     return d;
   }
-  window.__psyRerender=function(){ try{ render(); }catch(e){} };
+  window.__psyRerender=function(){ try{ render(); }catch(e){console.debug('[journall] ignored error in psychology-room.js:', e);} };
   let SETUP_REQS = SETUP_DEFAULTS.map(r=>({...r}));
 
   let CHECKLIST_ITEMS = CHECKLIST_DEFAULTS.map(r=>({...r}));
@@ -51,15 +51,15 @@
   const memoryStore = {};
   const STORAGE = (typeof window !== 'undefined' && window.storage) ? window.storage : {
     async get(key){
-      if(PERSIST_KEYS.indexOf(key) > -1){ try{ const v = localStorage.getItem(LS_PREFIX + key); if(v !== null) return {key, value: v}; }catch(e){} }
+      if(PERSIST_KEYS.indexOf(key) > -1){ try{ const v = localStorage.getItem(LS_PREFIX + key); if(v !== null) return {key, value: v}; }catch(e){console.debug('[journall] ignored error in psychology-room.js:', e);} }
       return (key in memoryStore) ? {key, value: memoryStore[key]} : null;
     },
     async set(key, value){
-      if(PERSIST_KEYS.indexOf(key) > -1){ try{ localStorage.setItem(LS_PREFIX + key, value); }catch(e){} }
+      if(PERSIST_KEYS.indexOf(key) > -1){ try{ localStorage.setItem(LS_PREFIX + key, value); }catch(e){console.debug('[journall] ignored error in psychology-room.js:', e);} }
       memoryStore[key] = value; return {key, value};
     },
     async delete(key){
-      if(PERSIST_KEYS.indexOf(key) > -1){ try{ localStorage.removeItem(LS_PREFIX + key); }catch(e){} }
+      if(PERSIST_KEYS.indexOf(key) > -1){ try{ localStorage.removeItem(LS_PREFIX + key); }catch(e){console.debug('[journall] ignored error in psychology-room.js:', e);} }
       delete memoryStore[key]; return {key, deleted:true};
     },
     async list(){ return {keys: Object.keys(memoryStore)}; }
@@ -112,35 +112,35 @@
         const parsed = JSON.parse(req.value);
         if(Array.isArray(parsed) && parsed.length) SETUP_REQS = parsed;
       }
-    }catch(e){}
+    }catch(e){console.debug('[journall] ignored error in psychology-room.js:', e);}
     try{
       const m = await STORAGE.get('mind:items', false);
       if(m && m.value){
         const parsed = JSON.parse(m.value);
         if(Array.isArray(parsed) && parsed.length) MIND_ITEMS = parsed;
       }
-    }catch(e){}
+    }catch(e){console.debug('[journall] ignored error in psychology-room.js:', e);}
     try{
       const c = await STORAGE.get('checklist:items', false);
       if(c && c.value){
         const parsed = JSON.parse(c.value);
         if(Array.isArray(parsed) && parsed.length) CHECKLIST_ITEMS = parsed;
       }
-    }catch(e){}
+    }catch(e){console.debug('[journall] ignored error in psychology-room.js:', e);}
     try{
       const l = await STORAGE.get('live:rules', false);
       if(l && l.value){
         const parsed = JSON.parse(l.value);
         if(Array.isArray(parsed) && parsed.length) LIVE_RULES = parsed;
       }
-    }catch(e){}
+    }catch(e){console.debug('[journall] ignored error in psychology-room.js:', e);}
     try{
       const d = await STORAGE.get('debrief:items', false);
       if(d && d.value){
         const parsed = JSON.parse(d.value);
         if(Array.isArray(parsed) && parsed.length) DEBRIEF_ITEMS = parsed;
       }
-    }catch(e){}
+    }catch(e){console.debug('[journall] ignored error in psychology-room.js:', e);}
     try{
       const c = await STORAGE.get('cooldown:options', false);
       if(c && c.value){
@@ -148,22 +148,22 @@
         if(Array.isArray(parsed) && parsed.length) COOLDOWN_OPTIONS_MIN = parsed.map(Number).filter(n=>n>0);
         if(!COOLDOWN_OPTIONS_MIN.length) COOLDOWN_OPTIONS_MIN = COOLDOWN_DEFAULT_MIN.slice();
       }
-    }catch(e){}
+    }catch(e){console.debug('[journall] ignored error in psychology-room.js:', e);}
     try{
       const s = await STORAGE.get('session:current', false);
       if(s && s.value) Object.assign(state, JSON.parse(s.value));
-    }catch(e){}
+    }catch(e){console.debug('[journall] ignored error in psychology-room.js:', e);}
     syncSetupState();
     syncMindState();
     syncChecklistState();
     try{
       const r = await STORAGE.get('reminder:last', false);
       if(r && r.value) state.reminder = JSON.parse(r.value);
-    }catch(e){}
+    }catch(e){console.debug('[journall] ignored error in psychology-room.js:', e);}
     try{
       const t = await STORAGE.get('trade:lastCompletedAt', false);
       if(t && t.value) state.lastTradeCompletedAt = Number(t.value);
-    }catch(e){}
+    }catch(e){console.debug('[journall] ignored error in psychology-room.js:', e);}
     render();
     if(!cooldownTimer){
       cooldownTimer = setInterval(()=>{
@@ -174,7 +174,7 @@
   }
 
   async function saveState(){
-    try{ await STORAGE.set('session:current', JSON.stringify(state), false); }catch(e){}
+    try{ await STORAGE.set('session:current', JSON.stringify(state), false); }catch(e){console.debug('[journall] ignored error in psychology-room.js:', e);}
   }
 
   function icon(){
@@ -301,12 +301,12 @@
   async function saveRequirements(){
     SETUP_REQS = SETUP_REQS.filter(r=>r.t && r.t.trim().length>0);
     if(SETUP_REQS.length===0) SETUP_REQS = SETUP_DEFAULTS.map(r=>({...r}));
-    try{ await STORAGE.set('setup:requirements', JSON.stringify(SETUP_REQS), false); }catch(e){}
+    try{ await STORAGE.set('setup:requirements', JSON.stringify(SETUP_REQS), false); }catch(e){console.debug('[journall] ignored error in psychology-room.js:', e);}
     syncSetupState();
     state.setupEditing = false;
     saveState();
     render();
-    try{ if(typeof window.__renderOvChecklist === 'function') window.__renderOvChecklist(); }catch(e){} // keep Today's Summary setup scan in sync
+    try{ if(typeof window.__renderOvChecklist === 'function') window.__renderOvChecklist(); }catch(e){console.debug('[journall] ignored error in psychology-room.js:', e);} // keep Today's Summary setup scan in sync
   }
   async function cancelEditRequirements(){
     try{
@@ -317,7 +317,7 @@
       } else {
         SETUP_REQS = SETUP_DEFAULTS.map(r=>({...r}));
       }
-    }catch(e){}
+    }catch(e){console.debug('[journall] ignored error in psychology-room.js:', e);}
     syncSetupState();
     state.setupEditing = false;
     render();
@@ -340,11 +340,11 @@
   async function saveMindItems(){
     MIND_ITEMS = MIND_ITEMS.filter(r=>r.t && r.t.trim().length>0);
     if(MIND_ITEMS.length===0) MIND_ITEMS = MIND_DEFAULTS.map(r=>({...r}));
-    try{ await STORAGE.set('mind:items', JSON.stringify(MIND_ITEMS), false); }catch(e){}
+    try{ await STORAGE.set('mind:items', JSON.stringify(MIND_ITEMS), false); }catch(e){console.debug('[journall] ignored error in psychology-room.js:', e);}
     syncMindState();
     state.mindEditing = false;
     saveState();
-    render();    try{ if(typeof window.__renderOvChecklist === 'function') window.__renderOvChecklist(); }catch(e){}
+    render();    try{ if(typeof window.__renderOvChecklist === 'function') window.__renderOvChecklist(); }catch(e){console.debug('[journall] ignored error in psychology-room.js:', e);}
   }
   async function cancelEditMindItems(){
     try{
@@ -355,7 +355,7 @@
       } else {
         MIND_ITEMS = MIND_DEFAULTS.map(r=>({...r}));
       }
-    }catch(e){}
+    }catch(e){console.debug('[journall] ignored error in psychology-room.js:', e);}
     syncMindState();
     state.mindEditing = false;
     render();
@@ -370,12 +370,12 @@
   async function saveChecklistItems(){
     CHECKLIST_ITEMS = CHECKLIST_ITEMS.filter(r=>r.t && r.t.trim().length>0);
     if(CHECKLIST_ITEMS.length===0) CHECKLIST_ITEMS = CHECKLIST_DEFAULTS.map(r=>({...r}));
-    try{ await STORAGE.set('checklist:items', JSON.stringify(CHECKLIST_ITEMS), false); }catch(e){}
+    try{ await STORAGE.set('checklist:items', JSON.stringify(CHECKLIST_ITEMS), false); }catch(e){console.debug('[journall] ignored error in psychology-room.js:', e);}
     syncChecklistState();
     state.checklistEditing = false;
     saveState();
     render();
-    try{ if(typeof window.__renderOvChecklist === 'function') window.__renderOvChecklist(); }catch(e){} // keep Today's Summary checklist in sync
+    try{ if(typeof window.__renderOvChecklist === 'function') window.__renderOvChecklist(); }catch(e){console.debug('[journall] ignored error in psychology-room.js:', e);} // keep Today's Summary checklist in sync
   }
   async function cancelEditChecklistItems(){
     try{
@@ -386,7 +386,7 @@
       } else {
         CHECKLIST_ITEMS = CHECKLIST_DEFAULTS.map(r=>({...r}));
       }
-    }catch(e){}
+    }catch(e){console.debug('[journall] ignored error in psychology-room.js:', e);}
     syncChecklistState();
     state.checklistEditing = false;
     render();
@@ -401,7 +401,7 @@
   async function saveLiveRules(){
     LIVE_RULES = LIVE_RULES.filter(r=>r.t && r.t.trim().length>0);
     if(LIVE_RULES.length===0) LIVE_RULES = LIVE_DEFAULTS.map(r=>({...r}));
-    try{ await STORAGE.set('live:rules', JSON.stringify(LIVE_RULES), false); }catch(e){}
+    try{ await STORAGE.set('live:rules', JSON.stringify(LIVE_RULES), false); }catch(e){console.debug('[journall] ignored error in psychology-room.js:', e);}
     state.liveEditing = false;
     saveState();
     render();
@@ -415,7 +415,7 @@
       } else {
         LIVE_RULES = LIVE_DEFAULTS.map(r=>({...r}));
       }
-    }catch(e){}
+    }catch(e){console.debug('[journall] ignored error in psychology-room.js:', e);}
     state.liveEditing = false;
     render();
   }
@@ -429,7 +429,7 @@
   async function saveDebriefItems(){
     DEBRIEF_ITEMS = DEBRIEF_ITEMS.filter(r=>r.t && r.t.trim().length>0);
     if(DEBRIEF_ITEMS.length===0) DEBRIEF_ITEMS = DEBRIEF_DEFAULTS.map(r=>({...r}));
-    try{ await STORAGE.set('debrief:items', JSON.stringify(DEBRIEF_ITEMS), false); }catch(e){}
+    try{ await STORAGE.set('debrief:items', JSON.stringify(DEBRIEF_ITEMS), false); }catch(e){console.debug('[journall] ignored error in psychology-room.js:', e);}
     state.debriefEditing = false;
     saveState();
     render();
@@ -443,7 +443,7 @@
       } else {
         DEBRIEF_ITEMS = DEBRIEF_DEFAULTS.map(r=>({...r}));
       }
-    }catch(e){}
+    }catch(e){console.debug('[journall] ignored error in psychology-room.js:', e);}
     state.debriefEditing = false;
     render();
   }
@@ -462,7 +462,7 @@
     const vals = COOLDOWN_DRAFT.map(v=>Math.round(Number(v))).filter(n=>isFinite(n) && n>=1 && n<=240);
     const uniq = Array.from(new Set(vals)).sort((a,b)=>a-b);
     COOLDOWN_OPTIONS_MIN = uniq.length ? uniq : COOLDOWN_DEFAULT_MIN.slice();
-    try{ await STORAGE.set('cooldown:options', JSON.stringify(COOLDOWN_OPTIONS_MIN), false); }catch(e){}
+    try{ await STORAGE.set('cooldown:options', JSON.stringify(COOLDOWN_OPTIONS_MIN), false); }catch(e){console.debug('[journall] ignored error in psychology-room.js:', e);}
     state.cooldownEditing = false;
     render();
   }
@@ -504,15 +504,15 @@
     const note = (el ? el.value : (state.debriefNote||"")).trim();
     if(note){
       const reminder = {text: note, date: new Date().toISOString()};
-      try{ await STORAGE.set('reminder:last', JSON.stringify(reminder), false); }catch(e){}
+      try{ await STORAGE.set('reminder:last', JSON.stringify(reminder), false); }catch(e){console.debug('[journall] ignored error in psychology-room.js:', e);}
     }
     const completedAt = Date.now();
-    try{ await STORAGE.set('trade:lastCompletedAt', String(completedAt), false); }catch(e){}
+    try{ await STORAGE.set('trade:lastCompletedAt', String(completedAt), false); }catch(e){console.debug('[journall] ignored error in psychology-room.js:', e);}
     if(note){
       try{
         const r = await STORAGE.get('reminder:last', false);
         if(r && r.value) state.reminder = JSON.parse(r.value);
-      }catch(e){}
+      }catch(e){console.debug('[journall] ignored error in psychology-room.js:', e);}
     }
     // trade is logged — move to the mandatory cooldown step before resetting for the next trade
     state.lastTradeCompletedAt = completedAt;

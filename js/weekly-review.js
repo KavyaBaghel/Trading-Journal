@@ -16,7 +16,7 @@
   function money(v){ return (v<0?'-$':'+$')+Math.abs(v).toFixed(2); }
   /* Preview switch: open the app with ?weekendPreview=1 to see this panel on a weekday (as of the most recent Saturday, so it shows last week's real trades). ?weekendPreview=0 or the Exit preview button turns it off. */
   var PREV_KEY='jl_weekend_preview';
-  try{ var pm=/[?&]weekendPreview=([^&#]*)/.exec(location.search||''); if(pm){ if(pm[1]==='1'||pm[1]==='on') localStorage.setItem(PREV_KEY,'1'); else if(pm[1]==='0'||pm[1]==='off') localStorage.removeItem(PREV_KEY); } }catch(e){}
+  try{ var pm=/[?&]weekendPreview=([^&#]*)/.exec(location.search||''); if(pm){ if(pm[1]==='1'||pm[1]==='on') localStorage.setItem(PREV_KEY,'1'); else if(pm[1]==='0'||pm[1]==='off') localStorage.removeItem(PREV_KEY); } }catch(e){console.debug('[journall] ignored error in weekly-review.js:', e);}
   function previewOn(){ try{ return localStorage.getItem(PREV_KEY)==='1'; }catch(e){ return false; } }
   function realToday(){ return typeof window.getTradingDayIST==='function' ? window.getTradingDayIST() : ''; }
   function realWeekend(){ var k=realToday(); if(!k) return false; var w=parseKey(k).getUTCDay(); return w===6||w===0; }
@@ -28,7 +28,7 @@
     if(!el){
       el=document.createElement('div'); el.id='wrPreview'; el.className='wr-preview';
       var head=root.querySelector('.panel-head'); head.parentNode.insertBefore(el,head.nextSibling);
-      el.addEventListener('click',function(e){ if(e.target.closest('button')){ try{ localStorage.removeItem(PREV_KEY); }catch(x){} tick(); } });
+      el.addEventListener('click',function(e){ if(e.target.closest('button')){ try{ localStorage.removeItem(PREV_KEY); }catch(x){console.debug('[journall] ignored error in weekly-review.js:', x);} tick(); } });
     }
     el.innerHTML='<span>Preview mode. Showing the panel as it will look on '+esc(fmtDay(today(),{weekday:'long',month:'short',day:'numeric'}))+'. This is not live.</span><button type="button" class="btn-ghost wr-exit">Exit preview</button>';
   }
@@ -329,7 +329,7 @@
   /* ---------- rule saved for Monday ---------- */
   function ruleHtml(){
     var t=today(), m={}, pend='';
-    try{ var o=JSON.parse(localStorage.getItem(RULE_KEY)||'null'); if(o&&typeof o==='object'&&!Array.isArray(o)) m=o; }catch(e){}
+    try{ var o=JSON.parse(localStorage.getItem(RULE_KEY)||'null'); if(o&&typeof o==='object'&&!Array.isArray(o)) m=o; }catch(e){console.debug('[journall] ignored error in weekly-review.js:', e);}
     function activeDay(d){ var dt=parseKey(d); do{ dt.setUTCDate(dt.getUTCDate()+1); }while(dt.getUTCDay()===0||dt.getUTCDay()===6); return isoKey(dt); }
     Object.keys(m).forEach(function(d){ if(typeof m[d]==='string'&&m[d]&&activeDay(d)>t&&d>pend) pend=d; });
     return '<div class="wr-rule"><div class="l">Your rule for Monday</div>'+(pend?'<div class="t">'+esc(m[pend])+'</div>':'<div class="t none">No rule saved yet. Add one in Tomorrow\'s rule below.</div>')+'</div>';
@@ -448,7 +448,7 @@
   function monSync(){
     var k=today(), ta=$('wrMonText'); if(!k||!ta) return;
     var key=MON_PFX+bounds(k).nm; if(key===monKey) return;
-    monKey=key; var v=''; try{ v=localStorage.getItem(key)||''; }catch(e){}
+    monKey=key; var v=''; try{ v=localStorage.getItem(key)||''; }catch(e){console.debug('[journall] ignored error in weekly-review.js:', e);}
     if(document.activeElement!==ta) ta.value=v;
     monCount();
   }
@@ -462,7 +462,7 @@
         catch(e){ if(st) st.textContent='Could not save (browser storage blocked)'; }
       },400);
     });
-    ta.addEventListener('blur',function(){ clearTimeout(monTimer); try{ if(monKey){ if(ta.value) localStorage.setItem(monKey,ta.value); else localStorage.removeItem(monKey); if(st) st.textContent='Saved on this device'; } }catch(e){} });
+    ta.addEventListener('blur',function(){ clearTimeout(monTimer); try{ if(monKey){ if(ta.value) localStorage.setItem(monKey,ta.value); else localStorage.removeItem(monKey); if(st) st.textContent='Saved on this device'; } }catch(e){console.debug('[journall] ignored error in weekly-review.js:', e);} });
   })();
   function tick(){
     var wk=isWeekend();
@@ -485,7 +485,7 @@
   $('wrRefresh').addEventListener('click',function(){ ev.fails=0; fetchEvents(true); });
   document.addEventListener('visibilitychange',function(){ if(!document.hidden) tick(); });
   window.addEventListener('hashchange',tick);
-  try{ var calView=$('view-calendar'); if(calView) new MutationObserver(function(){ tick(); }).observe(calView,{attributes:true,attributeFilter:['hidden']}); }catch(e){}
+  try{ var calView=$('view-calendar'); if(calView) new MutationObserver(function(){ tick(); }).observe(calView,{attributes:true,attributeFilter:['hidden']}); }catch(e){console.debug('[journall] ignored error in weekly-review.js:', e);}
   window.addEventListener('storage',function(e){ if(e.key===RULE_KEY) tick(); });
   setInterval(tick,30000); setTimeout(tick,1500); setTimeout(tick,5000); tick();
 })();

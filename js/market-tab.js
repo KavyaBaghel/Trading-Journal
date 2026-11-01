@@ -151,7 +151,7 @@
     });
     return best?{event:best.e.event||'News event',ccy:(CCY_MAP[best.e.country]||best.e.country||''),mins:Math.max(1,Math.ceil((best.t-now)/60000))}:null;
   };
-  setInterval(function(){ try{ renderKeyEvents(); }catch(_){} },60000);
+  setInterval(function(){ try{ renderKeyEvents(); }catch(_){console.debug('[journall] ignored error in market-tab.js:', _);} },60000);
   function wireChips(){
     ['mkRangeChips','mkImpactChips','mkCcyChips'].forEach(id=>{
       const host=$(id); if(!host||host.dataset.wired) return; host.dataset.wired='1';

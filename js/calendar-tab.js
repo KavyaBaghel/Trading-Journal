@@ -390,7 +390,7 @@ $('dpList').addEventListener('click',e=>{
   const idx=+b.dataset.i;
   closeDayPanel();
   if(window.__route)window.__route('journal');
-  try{history.replaceState(null,'','#journal')}catch(_){}
+  try{history.replaceState(null,'','#journal')}catch(_){console.debug('[journall] ignored error in calendar-tab.js:', _);}
   if(window.__jPick)window.__jPick(idx);
 });
 

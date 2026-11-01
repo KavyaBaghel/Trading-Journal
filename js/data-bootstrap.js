@@ -11,6 +11,6 @@
     var imp=JLAdapter.buildImport(all);imp.open=rd('jlOpenPositions');window.__jlImp=imp;
     if(imp.closed.length||imp.open.length){var slim={file:imp.file,closed:imp.closed,open:imp.open};localStorage.setItem('jlImport',JSON.stringify(slim))}
     else localStorage.removeItem('jlImport');
-  }catch(e){window.__jlImp={file:'',closed:[],open:[],_lk:{}};try{localStorage.removeItem('jlImport')}catch(_){}
+  }catch(e){window.__jlImp={file:'',closed:[],open:[],_lk:{}};try{localStorage.removeItem('jlImport')}catch(_){console.debug('[journall] ignored error in data-bootstrap.js:', _);}
     console.error('[Journall] live data bootstrap failed',e)}
 })();

@@ -8,7 +8,7 @@
       u.searchParams.delete('email');
       history.replaceState(null, '', u.pathname + u.search + u.hash);
     }
-  }catch(e){}
+  }catch(e){console.debug('[journall] ignored error in email-form-guard.js:', e);}
 
   var form = document.getElementById('jlEmailForm');
   if(form){

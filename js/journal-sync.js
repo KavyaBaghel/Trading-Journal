@@ -23,11 +23,11 @@
   function lid(id){id=String(id);var c=id.charAt(0);return(c==='L'||c==='j')?id.slice(1):id}
   var F=['key','date','time','sym','side','pnl','setup','mistake','before','after','improve','emotion'];
   function same(a,b){for(var i=0;i<F.length;i++)if(a[F[i]]!==b[F[i]])return false;return JSON.stringify(a.q)===JSON.stringify(b.q)&&JSON.stringify(a.tags)===JSON.stringify(b.tags)&&JSON.stringify(a.conf||[])===JSON.stringify(b.conf||[])}
-  try{var _l=rd(LK),_u=window.__jlUniqIds(_l);if(_u!==_l)localStorage.setItem(LK,JSON.stringify(_u))}catch(_){}
+  try{var _l=rd(LK),_u=window.__jlUniqIds(_l);if(_u!==_l)localStorage.setItem(LK,JSON.stringify(_u))}catch(_){console.debug('[journall] ignored error in journal-sync.js:', _);}
   try{
     var des=rd(LK).filter(function(e){return e&&typeof e==='object'&&e.id!=null}).map(function(e){return A.journalToDesign(e,imp)});
     if(des.length)localStorage.setItem('jlJournals',JSON.stringify(des));else localStorage.removeItem('jlJournals');
-  }catch(e){try{localStorage.removeItem('jlJournals')}catch(_){}console.error('[Journall] journal bootstrap failed',e)}
+  }catch(e){try{localStorage.removeItem('jlJournals')}catch(_){console.debug('[journall] ignored error in journal-sync.js:', _);}console.error('[Journall] journal bootstrap failed',e)}
   function writeBack(v,oldV){
     try{
       var J=JSON.parse(v);if(!Array.isArray(J))return;
@@ -39,12 +39,12 @@
       /* deletions: remember them so cloud sync cannot bring a deleted journal back from another device (d:1 deleted, d:0 restored) */
       try{
         var TKD='journall_deleted_journals',tomb={},ts=Date.now(),tch=false,newIds={},oldL=[];
-        try{var tv=JSON.parse(localStorage.getItem(TKD)||'null');if(tv&&typeof tv==='object'&&!Array.isArray(tv))tomb=tv}catch(_){}
-        try{var ov=JSON.parse(oldV||'null');if(Array.isArray(ov))oldL=ov}catch(_){}
+        try{var tv=JSON.parse(localStorage.getItem(TKD)||'null');if(tv&&typeof tv==='object'&&!Array.isArray(tv))tomb=tv}catch(_){console.debug('[journall] ignored error in journal-sync.js:', _);}
+        try{var ov=JSON.parse(oldV||'null');if(Array.isArray(ov))oldL=ov}catch(_){console.debug('[journall] ignored error in journal-sync.js:', _);}
         J.forEach(function(d){if(d&&d.id!=null){var k=lid(d.id);newIds[k]=1;if(tomb[k]&&tomb[k].d===1){tomb[k]={t:ts,d:0};tch=true}}});
         oldL.forEach(function(d){if(!d||d.id==null)return;var k=lid(d.id);if(!newIds[k]&&!(tomb[k]&&tomb[k].d===1)){tomb[k]={t:ts,d:1};tch=true}});
         if(tch)localStorage.setItem(TKD,JSON.stringify(tomb));
-      }catch(_){}
+      }catch(_){console.debug('[journall] ignored error in journal-sync.js:', _);}
       var next=JSON.stringify(out);
       if(next!==JSON.stringify(rd(LK)))localStorage.setItem(LK,next);
     }catch(e){console.error('[Journall] journal write-back failed',e)}

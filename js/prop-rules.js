@@ -92,7 +92,7 @@ function render(){var b=$('ggPropBody');if(!b)return;if(window.jlApplyChLimits)w
 window.__renderProp=render;
 var card=$('ggPropCard'),armT=0;
 if(card)card.addEventListener('click',function(e){var t=e.target;if(!t.closest)return;
-  var scb=t.closest('[data-prsc]');if(scb){try{localStorage.setItem(SK,scb.getAttribute('data-prsc')||'')}catch(_){}render();return}
+  var scb=t.closest('[data-prsc]');if(scb){try{localStorage.setItem(SK,scb.getAttribute('data-prsc')||'')}catch(_){console.debug('[journall] ignored error in prop-rules.js:', _);}render();return}
   if(t.closest('#chAdd')){var cn=($('chName').value||'').trim(),cs=$('chStart').value,ce=$('chEnd').value,cre=/^\d{4}-\d{2}-\d{2}$/,lm={},bad=false;
     [['dl','chDl'],['md','chMd'],['pt','chPt']].forEach(function(k){var el=$(k[1]),v=el?String(el.value||'').trim():'';if(!v)return;var x=Number(v);if(!isFinite(x)||!(x>0)||x>100)bad=true;else lm[k[0]]=Math.round(x*100)/100});
     if(!cn||!cre.test(cs)){cmsg('Enter a name and a start date.');return}
@@ -102,7 +102,7 @@ if(card)card.addEventListener('click',function(e){var t=e.target;if(!t.closest)r
     if(wrC(cleanChallenges(cl))){$('chName').value='';$('chStart').value='';$('chEnd').value='';['chDl','chMd','chPt'].forEach(function(k){var el=$(k);if(el)el.value=''});cmsg('');render()}return}
   var cdel=t.closest('[data-chdel]');if(cdel){
     if(cdel.getAttribute('data-arm')!=='1'){cdel.setAttribute('data-arm','1');cdel.textContent='Tap again to delete';clearTimeout(armT);armT=setTimeout(render,3000);return}
-    clearTimeout(armT);var cid=cdel.getAttribute('data-chdel');if(wrC(cleanChallenges(rdC()).filter(function(c){return c.id!==cid}))){if(selId()===cid){try{localStorage.setItem(SK,'')}catch(_){}}render()}return}
+    clearTimeout(armT);var cid=cdel.getAttribute('data-chdel');if(wrC(cleanChallenges(rdC()).filter(function(c){return c.id!==cid}))){if(selId()===cid){try{localStorage.setItem(SK,'')}catch(_){console.debug('[journall] ignored error in prop-rules.js:', _);}}render()}return}
   if(t.closest('#prAdd')){var d=$('prDate').value,a=Number($('prAmt').value);
     if(!/^\d{4}-\d{2}-\d{2}$/.test(d)||!(a>0)){msg('Pick a date and enter an amount above zero.');return}
     var list=cleanPayouts(rd());list.push({id:'p'+Date.now().toString(36)+Math.random().toString(36).slice(2,6),date:d,amount:Math.round(a*100)/100});
@@ -153,7 +153,7 @@ function setTab(id,focus){if(!cardP)return;var tabs=Array.prototype.slice.call(c
   if(!tabs.some(function(b){return b.getAttribute('data-prtab')===id}))id='ov';
   tabs.forEach(function(b){var on=b.getAttribute('data-prtab')===id;b.classList.toggle('on',on);b.setAttribute('aria-selected',on?'true':'false');b.tabIndex=on?0:-1;if(on&&focus)b.focus()});
   Array.prototype.forEach.call(cardP.querySelectorAll('[data-prpanel]'),function(p){p.hidden=p.getAttribute('data-prpanel')!==id});
-  try{sessionStorage.setItem(TK,id)}catch(_){}}
+  try{sessionStorage.setItem(TK,id)}catch(_){console.debug('[journall] ignored error in prop-rules.js:', _);}}
 if(cardP){
   cardP.addEventListener('click',function(e){var t=e.target;if(!t.closest)return;
     var tb=t.closest('[data-prtab]');if(tb){setTab(tb.getAttribute('data-prtab'));return}
@@ -162,7 +162,7 @@ if(cardP){
   cardP.addEventListener('keydown',function(e){var tb=e.target.closest&&e.target.closest('[data-prtab]');if(!tb||['ArrowRight','ArrowLeft','Home','End'].indexOf(e.key)<0)return;
     var all=Array.prototype.slice.call(cardP.querySelectorAll('[data-prtab]')),i=all.indexOf(tb);
     i=e.key==='Home'?0:e.key==='End'?all.length-1:(i+(e.key==='ArrowRight'?1:-1)+all.length)%all.length;e.preventDefault();setTab(all[i].getAttribute('data-prtab'),true)});
-  var st='ov';try{st=sessionStorage.getItem(TK)||'ov'}catch(_){}setTab(st)}
+  var st='ov';try{st=sessionStorage.getItem(TK)||'ov'}catch(_){console.debug('[journall] ignored error in prop-rules.js:', _);}setTab(st)}
 window.addEventListener('storage',function(ev){if(!ev.key||ev.key===PK||ev.key===CK||ev.key===SK)render()});
 setTimeout(render,1500);setInterval(render,30000);render();
 })();
