@@ -476,7 +476,7 @@ async function loadCloudState(){
 
   // Unsubscribe old listener if applicable
   if (typeof unsubscribeCloudSync === 'function') {
-    try { unsubscribeCloudSync(); } catch(e) {}
+    try { unsubscribeCloudSync(); } catch(e) { console.debug('[journall] ignored error in auth-module.js:', e); }
   }
 
   // Connect real-time Firestore synchronization listener
@@ -671,7 +671,7 @@ async function initFirebaseAuth(){
       window.setAuthStatus('Logging out securely...');
 
       if (typeof unsubscribeCloudSync === 'function') {
-        try { unsubscribeCloudSync(); } catch(e) {}
+        try { unsubscribeCloudSync(); } catch(e) { console.debug('[journall] ignored error in auth-module.js:', e); }
         unsubscribeCloudSync = null;
       }
       window.currentUser = null;
