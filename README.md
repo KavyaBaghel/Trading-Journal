@@ -65,7 +65,7 @@ http://127.0.0.1:8787/index.html
 
 ## Website Deployment
 
-Journall can be hosted as a static website because the main app lives in `index.html`. Local use keeps data on the laptop. Public website use can require Google sign-in and sync each user's journal data to Firestore.
+Journall can be hosted as a static website because the app is `index.html` plus the `js/` and `css/` folders (about 52 scripts and 20 stylesheets, loaded in a fixed order). See `docs/ARCHITECTURE.md` for the layout, load order and storage rules. Local use keeps data on the laptop. Public website use can require Google sign-in and sync each user's journal data to Firestore.
 
 ### GitHub Pages
 

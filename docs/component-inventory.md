@@ -1,3 +1,5 @@
+> **Out of date.** This file describes the UI before the redesign and the split of `index.html` into `js/` and `css/`. On `main` @ `bfc121c`, it lists 11 pages keyed by `data-tab` values (including Reports, Widgets and Goals); the app now has 12 tabs and the old `data-tab` markup is gone from `index.html`. Use it only as history. Current layout: `docs/ARCHITECTURE.md`.
+
 # component-inventory.md
 
 ## Purpose

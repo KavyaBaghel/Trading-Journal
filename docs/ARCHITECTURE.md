@@ -61,6 +61,9 @@ It does **not** test behaviour: load order, login, tabs and storage still need a
 
 Row 1 is the first script that runs. `Line` is the line in `index.html`.
 
+`js/app-config.js` (exposes `window.JL_CONFIG`, the local bridge URL and the public site URL) loads right after `js/profile-card-spotlight.js`, as a new row 3. Every row below it moves down by one and its line number by one.
+The Worker URL stays in `firebase-config.js`.
+
 | # | Line | In | File |
 | --- | --- | --- | --- |
 | 1 | 26 | head | `js/perf-timers.js` |
