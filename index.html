@@ -825,7 +825,7 @@ window.jlLiveBalance=function(Z){
 <div class="top aic-reveal" style="animation-delay:0ms"><div><div class="eyebrow"><span class="date mono" id="dateStrT"></span></div><h1>Trades</h1><p id="tSub"></p></div><div class="top-right"><div class="who"><span class="dot"></span><span data-user-name></span></div></div></div>
 <div class="a-kp" id="tKP"></div>
 <section class="a-s" id="tOpen" style="margin:0 0 16px"><div class="a-s-head"><div class="a-s-ttl"><span class="a-s-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3v18h18M7 14l4-4 3 3 5-6"/></svg></span><h3>Open positions</h3></div><span class="pill" id="tOpenCnt">0</span></div><div id="tOpenBody"></div></section>
-<style>#tOpenBody{overflow-x:auto;margin-top:10px}#tOpenBody table{width:100%;border-collapse:collapse;font-size:13px}#tOpenBody th{text-align:left;color:var(--faint);font-weight:600;padding:6px 8px}#tOpenBody td{padding:8px;border-top:1px solid rgba(255,255,255,.06);color:var(--sub);white-space:nowrap}#tOpenBody p{margin:0;color:var(--faint);font-size:13px}</style>
+<link rel="stylesheet" href="css/trades-open.css"/>
 <script>window.jlN=function(n,w,p){return n+' '+(n===1?w:(p||w+'s'))};
 (function(){const e=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 window.__mountOpenPos=function(){const o=(window.__openTrades||[]).concat((window.__trades||[]).filter(t=>t.ex==null||t.ex==='')),b=document.getElementById('tOpenBody');document.getElementById('tOpenCnt').textContent=o.length;
