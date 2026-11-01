@@ -226,7 +226,7 @@
     band.style.left = pct(o.start); band.style.width = pct(o.end-o.start); band.style.height = rowsH+'px';
     band.style.pointerEvents = 'auto';
     band.addEventListener('mouseenter', e=>showTip(e,
-      '<div class="th">🟣 '+o.label+'</div><div class="tsub">'+o.sub+'</div><div class="tr" style="margin-top:6px"><span>Window</span><b>'+String(o.start).padStart(2,'0')+':00–'+String(o.end).padStart(2,'0')+':00 UTC</b></div>'));
+      '<div class="th">'+o.label+'</div><div class="tsub">'+o.sub+'</div><div class="tr" style="margin-top:6px"><span>Window</span><b>'+String(o.start).padStart(2,'0')+':00–'+String(o.end).padStart(2,'0')+':00 UTC</b></div>'));
     band.addEventListener('mousemove', e=>showTip(e, ttip.innerHTML));
     band.addEventListener('mouseleave', hideTip);
     overlay.appendChild(band);
