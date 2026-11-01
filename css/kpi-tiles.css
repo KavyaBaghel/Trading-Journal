@@ -86,3 +86,14 @@
 #view-calendar #cKP small,#view-calendar #cYKP small{font-size:11px;line-height:1.4;color:var(--faint)}
 @media(max-width:640px){#view-calendar #cKP b,#view-calendar #cYKP b{font-size:18px}}
 @media(prefers-reduced-motion:reduce){#view-calendar #cKP>div::before,#view-calendar #cYKP>div::before{animation-duration:.01ms}}
+
+/* ===== Day recap re-themed to match the Analytics tab (final override, ID-scoped to #view-recap; CSS only) ===== */
+#view-recap .cal-top{display:block;margin-bottom:26px}
+#view-recap .cal-top h1{font-size:28px;font-weight:750;letter-spacing:-.02em;margin:10px 0 5px}
+#view-recap .cal-top p{font-size:13.5px;color:var(--sub);margin:0}
+#view-recap .rc-back{display:inline-flex;align-items:center;gap:8px;margin:0 0 18px;padding:7px 12px;border-radius:10px;background:var(--panel-2);border:1px solid var(--border);color:var(--sub);font:600 12px Inter,sans-serif;cursor:pointer;transition:border-color .3s cubic-bezier(.22,.61,.36,1),color .3s cubic-bezier(.22,.61,.36,1)}
+#view-recap .rc-back:hover{border-color:var(--border-hi);color:var(--text)}
+#view-recap .rc-back:focus-visible{outline:2px solid var(--accent-2);outline-offset:2px}
+#view-recap .rc-back svg{width:14px;height:14px;flex:none;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+#view-recap .rc-back kbd{font:600 10.5px Inter,sans-serif;padding:1px 6px;border-radius:5px;border:1px solid var(--border-hi);color:var(--faint);background:transparent}
+#view-recap .rc-empty{text-align:center;padding:36px 20px;font-size:13px;color:var(--sub)}
