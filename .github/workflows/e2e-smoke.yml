@@ -1,0 +1,53 @@
+name: Browser smoke test
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout this change
+        uses: actions/checkout@v4
+
+      - name: Checkout the base branch for comparison
+        if: github.event_name == 'pull_request'
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.base_ref }}
+          path: base
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install Playwright and Chromium
+        run: |
+          pip install playwright
+          playwright install --with-deps chromium
+
+      - name: Run on the base branch
+        if: github.event_name == 'pull_request'
+        run: python tests/e2e/smoke.py --root base --out base.json || true
+
+      - name: Run on this change
+        run: |
+          if [ -f base.json ]; then
+            python tests/e2e/smoke.py --root . --out pr.json --baseline base.json --shots shots
+          else
+            python tests/e2e/smoke.py --root . --out pr.json --shots shots
+          fi
+
+      - name: Keep screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: smoke-screenshots
+          path: shots
+          if-no-files-found: ignore
