@@ -998,7 +998,7 @@
   <div class="top up-reveal" style="animation-delay:0ms">
     <div>
       <div class="eyebrow"><span class="pill">Broker &amp; import</span><span class="date mono" id="dateStrUp"></span></div>
-      <h1>Upload Data</h1>
+      <h1>Upload data</h1>
       <p>Sync your MT5 balance and recent trades, or import a broker report.</p>
     </div>
     <div class="top-right"><div class="who"><span class="dot"></span><span data-user-name></span></div></div>
@@ -1012,22 +1012,22 @@
         <div class="ud-status-sub">MT5 bridge · <b id="udSyncTxt">not synced yet</b></div>
       </div>
     </div>
-    <button class="gg-btn-solid" id="udSyncBtn" style="width:auto;padding:10px 18px">⟳ Sync balance</button>
+    <button class="gg-btn-solid" id="udSyncBtn" style="width:auto;padding:10px 18px">Sync balance</button>
   </div>
 
   <div class="up-grid">
     <div class="up-col">
       <div class="up-card glass up-reveal" style="animation-delay:110ms">
-        <div class="up-card-head">🔌 Broker connection</div>
+        <div class="up-card-head"><span class="a-s-ic"><svg viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/></svg></span>Broker connection</div>
         <div class="up-risk-row"><span>Broker</span><b>MetaTrader 5</b></div>
         <div class="up-risk-row"><span>Bridge</span><b>Local, localhost:8787</b></div>
         <div class="up-risk-row"><span>Last synced</span><b id="udLastSync">—</b></div>
       </div>
 
       <div class="up-card glass up-reveal" style="animation-delay:150ms">
-        <div class="up-card-head">📥 Import from CSV or HTML</div>
+        <div class="up-card-head"><span class="a-s-ic"><svg viewBox="0 0 24 24"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></svg></span>Import from CSV or HTML</div>
         <div class="ud-drop" id="udDrop" tabindex="0" role="button">
-          <div class="ud-drop-ic">⇪</div>
+          <div class="ud-drop-ic"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4M7 9l5-5 5 5M5 20h14"/></svg></div>
           <div class="ud-drop-t">Drop your MT5 / broker export here</div>
           <div class="ud-drop-s">or click to choose a .csv or .html file</div>
           <input type="file" id="udFile" accept=".csv,.html,.htm" hidden>
@@ -1038,11 +1038,11 @@
 
     <div class="up-col">
       <div class="up-card glass up-reveal" style="animation-delay:110ms">
-        <div class="up-card-head">🧾 What syncing keeps</div>
+        <div class="up-card-head"><span class="a-s-ic"><svg viewBox="0 0 24 24"><path d="M5 3h14v18l-3-2-2 2-2-2-2 2-2-2-3 2z"/><path d="M9 8h6M9 12h6"/></svg></span>What syncing keeps</div>
         <div class="ud-note"><b>Sync balance</b> reads your account balance from MT5 and adds recent trades that are not in your journal yet. For older history, export your MT5 history as .html or .csv and drop it below; a report import stays the final word. Your journal notes, screenshots and psychology checks always stay local and are never overwritten.</div>
       </div>
       <div class="up-card glass up-reveal" style="animation-delay:150ms">
-        <div class="up-card-head">🛠️ Bridge setup</div>
+        <div class="up-card-head"><span class="a-s-ic"><svg viewBox="0 0 24 24"><path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.4 2.4-2.6-.6-.6-2.6z"/></svg></span>Bridge setup</div>
         <div class="ud-steps">
           <div class="ud-step"><span class="ud-step-n">1</span><div><b>Run the local bridge</b><span class="ud-step-d">Start the local bridge (<code>local-server.ps1</code>) with MT5 open.</span></div></div>
           <div class="ud-step"><span class="ud-step-n">2</span><div><b>Keep MT5 signed in</b><span class="ud-step-d">The bridge reads your account balance from the terminal.</span></div></div>
