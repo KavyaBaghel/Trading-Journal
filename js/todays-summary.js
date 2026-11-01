@@ -65,13 +65,7 @@
   // Real date-based tracking via localStorage — no fake/hardcoded break state.
   // Trading-day boundary matches the prop-firm reset used elsewhere on this tab (06:00 IST) —
   // a trade at 05:50 IST still belongs to yesterday's trading day, not the new calendar date.
-  function getTradingDayIST(){
-    const IST_OFFSET_MS = 5.5*60*60*1000, RESET_HOUR_IST = 6;
-    const shifted = new Date(Date.now() + IST_OFFSET_MS);
-    if(shifted.getUTCHours() < RESET_HOUR_IST) shifted.setUTCDate(shifted.getUTCDate()-1);
-    const pad = n => String(n).padStart(2,'0');
-    return shifted.getUTCFullYear()+'-'+pad(shifted.getUTCMonth()+1)+'-'+pad(shifted.getUTCDate());
-  }
+  function getTradingDayIST(){ return window.JLMath.tradingDayIST(Date.now()); }
   window.getTradingDayIST = getTradingDayIST; // shared with Account Settings (Daily loss remaining tile)
 
   (function(){
@@ -596,16 +590,7 @@ const $ = id => document.getElementById(id);
   })();
 
   // revenge trades card: reads the existing t.rev flag (jlRecomputeRevenge), no new rule
-  /*RV-PURE-START*/
-  function revStats(T){
-    const rev=[],rest=[];
-    (T||[]).forEach(t=>{(t&&t.rev?rev:rest).push(t)});
-    const sum=a=>a.reduce((x,t)=>x+(Number(t.pnl)||0),0);
-    const lots=a=>a.map(t=>Number(t.lot)).filter(v=>isFinite(v)&&v>0);
-    const avg=a=>{const l=lots(a);return l.length?l.reduce((x,v)=>x+v,0)/l.length:null};
-    return {n:rev.length,total:rev.length+rest.length,net:sum(rev),lotRev:avg(rev),lotRest:avg(rest)};
-  }
-  /*RV-PURE-END*/
+  const revStats=window.JLMath.revStats; /* pure function: js/trade-math.js */
   (function(){
     const kp=$('aRev');if(!kp)return;
     const st=revStats(window.__trades||[]),win=Number(window.jlRevWindowMin)||0;
@@ -628,26 +613,7 @@ const $ = id => document.getElementById(id);
   })();
 
   // overtrading card: days that reached the daily trade limit (same rule as the banner and discipline streak)
-  /*OV-PURE-START*/
-  function overStats(T,limit){
-    limit=Number(limit)||0;
-    if(!(limit>0))return {on:false,limit:0};
-    var days={},order=[];
-    (T||[]).forEach(function(t){
-      if(!t||!t.d)return;
-      var d=days[t.d];if(!d){d=days[t.d]={keys:{},net:0};order.push(t.d)}
-      d.keys[t.d+'|'+t.t+'|'+t.sym+'|'+t.side]=1;
-      d.net+=Number(t.pnl)||0;
-    });
-    var over=0,other=0,netOver=0,netOther=0;
-    order.forEach(function(k){
-      var d=days[k];
-      if(Object.keys(d.keys).length>=limit){over++;netOver+=d.net}else{other++;netOther+=d.net}
-    });
-    return {on:true,limit:limit,days:order.length,n:over,otherDays:other,netOver:netOver,netOther:netOther,
-      avgOver:over?netOver/over:null,avgOther:other?netOther/other:null};
-  }
-  /*OV-PURE-END*/
+  const overStats=window.JLMath.overStats; /* pure function: js/trade-math.js */
   function renderOver(){
     const kp=$('aOv');if(!kp)return;
     const st=overStats(window.__trades||[],window.jlMaxTradesPerDay);
@@ -677,38 +643,7 @@ const $ = id => document.getElementById(id);
   renderOver();setTimeout(renderOver,2000);setTimeout(renderOver,6000);
 
   // weak times card: weekdays and hours with a net loss and at least 3 trades (a trade = one position)
-  /*WT-PURE-START*/
-  function weakTimes(T,minTrades,off){
-    minTrades=Number(minTrades)||3;
-    var hasOff=off!=null&&off!==''&&isFinite(Number(off));off=hasOff?Number(off):null;
-    var DN=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'],pos={},order=[],raw=0;
-    (T||[]).forEach(function(t){
-      if(!t||!t.d||t.t==null)return;
-      var d=String(t.d),tm=String(t.t),h=parseInt(tm.slice(0,2),10),dt=new Date(d+'T00:00:00Z');
-      if(!isFinite(h)||isNaN(dt.getTime()))return;
-      var dow=DN[dt.getUTCDay()];
-      if(t._bt){
-        if(hasOff){
-          var ms=Date.parse(d+'T'+(tm.length===5?tm+':00':tm.slice(0,8))+'Z');
-          if(!isFinite(ms))return;
-          var s=new Date(ms-off*3600000+19800000);
-          h=s.getUTCHours();dow=DN[s.getUTCDay()];
-        } else raw++;
-      }
-      var k=t.d+'|'+t.t+'|'+t.sym+'|'+t.side,p=pos[k];
-      if(!p){p=pos[k]={h:h,dow:dow,net:0};order.push(k)}
-      p.net+=Number(t.pnl)||0;
-    });
-    var byD={},byH={};
-    order.forEach(function(k){
-      var p=pos[k],a=byD[p.dow]||(byD[p.dow]={k:p.dow,n:0,net:0}),b=byH[p.h]||(byH[p.h]={k:p.h,n:0,net:0});
-      a.n++;a.net+=p.net;b.n++;b.net+=p.net;
-    });
-    var flag=function(o){return Object.keys(o).map(function(x){return o[x]}).filter(function(x){return x.n>=minTrades&&x.net<-0.005}).sort(function(a,b){return a.net-b.net})};
-    var paused=raw>0,totNet=0;order.forEach(function(k){totNet+=pos[k].net});
-    return {total:order.length,avg:order.length?totNet/order.length:0,days:flag(byD),hours:paused?[]:flag(byH),paused:paused};
-  }
-  /*WT-PURE-END*/
+  const weakTimes=window.JLMath.weakTimes; /* pure function: js/trade-math.js */
   window.jlWeakTimes=weakTimes;
   function brokerOff(){try{var s=JSON.parse(localStorage.getItem('jlAccountSettings')||'null');if(s&&s.brokerUtcOffset!==''&&s.brokerUtcOffset!=null&&isFinite(Number(s.brokerUtcOffset)))return Number(s.brokerUtcOffset)}catch(e){console.debug('[journall] ignored error in todays-summary.js:', e);}return null}
   function renderWeak(){
@@ -1018,13 +953,7 @@ let lastRules=[0,0,0,0];
     }
   }
 
-  function weekLoss(){
-    const b = (function(){ const today = getTradingDayIST(), p = today.split('-').map(Number), dt = new Date(Date.UTC(p[0],p[1]-1,p[2])), dow = (dt.getUTCDay()+6)%7;
-      return {ws:new Date(dt.getTime()-dow*864e5).toISOString().slice(0,10), we:new Date(dt.getTime()+(6-dow)*864e5).toISOString().slice(0,10)}; })();
-    // Net P&L for the week (Monday-Sunday IST); only a net loss counts toward the limit.
-    const net = (window.__trades||[]).reduce((s,t)=>(t && t.d && t.d>=b.ws && t.d<=b.we) ? s + (Number(t.pnl)||0) : s, 0);
-    return Math.max(0, -net);
-  }
+  function weekLoss(){ return window.JLMath.weekLoss(window.__trades||[], getTradingDayIST()); }
   function updateRules(pnl, lossUsed, n, w){
     lastRules=[pnl,lossUsed,n,w];
     const lim = ruleLimits();
@@ -1056,16 +985,7 @@ let lastRules=[0,0,0,0];
   // Date.now() is an epoch ms value, not tied to the viewer's local clock, so this reads correctly
   // for any user regardless of their device's timezone — the reset hour itself is a shared prop-firm
   // rule, not a per-user setting, so it's a real constant rather than hardcoded per-trader state.
-  const IST_OFFSET_MS = 5.5 * 60 * 60 * 1000, RESET_HOUR_IST = 6;
-  function msUntilRuleReset(){
-    const nowMs = Date.now();
-    const istShifted = new Date(nowMs + IST_OFFSET_MS);
-    let resetAsUtc = Date.UTC(
-      istShifted.getUTCFullYear(), istShifted.getUTCMonth(), istShifted.getUTCDate(), RESET_HOUR_IST, 0, 0
-    ) - IST_OFFSET_MS;
-    if(resetAsUtc <= nowMs) resetAsUtc += 24*60*60*1000;
-    return resetAsUtc - nowMs;
-  }
+  function msUntilRuleReset(){ return window.JLMath.msUntilRuleReset(Date.now()); }
   function updateRuleCountdown(){
     const wrap = document.getElementById('rulesReset'), el = document.getElementById('rulesResetTime');
     if(!wrap || !el) return;

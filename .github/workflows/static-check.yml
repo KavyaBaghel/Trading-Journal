@@ -23,3 +23,6 @@ jobs:
 
       - name: Check index.html, script references and syntax
         run: node scripts/check-static.mjs .
+
+      - name: Unit test for js/trade-math.js
+        run: node tests/unit/trade-math.test.cjs
