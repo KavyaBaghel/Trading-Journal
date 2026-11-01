@@ -82,3 +82,24 @@
 @media(max-width:900px){#view-market .mk-grid{grid-template-columns:minmax(0,1fr)}#view-market .mk-stats{grid-template-columns:1fr 1fr 1fr}}
 @media(max-width:640px){#view-market .mk-stats{grid-template-columns:1fr}#view-market .mk-status{margin-left:0}#view-market .mk-chips[data-group=range],#view-market .mk-chips[data-group=impact]{overflow-x:auto;max-width:100%}#view-market #mkCcyChips{flex-wrap:nowrap;overflow-x:auto}}
 @media(prefers-reduced-motion:reduce){#view-market .mk-sk{animation:none}#view-market .mk-k,#view-market .mk-st{transition:none}}
+
+/* ===== Market re-themed to match the Analytics tab (final override; CSS only; appended last so it wins without !important) ===== */
+#view-market .glass{border-radius:18px;-webkit-backdrop-filter:none;backdrop-filter:none;box-shadow:none;background:linear-gradient(160deg,rgba(255,255,255,.035),rgba(255,255,255,0) 42%),var(--panel)}
+#view-market .mk-bar{border-radius:16px}
+#view-market .mk-card::before{display:none}
+#view-market .mk-card h3{font-size:14.5px;font-weight:650}
+#view-market .mk-ttl{display:flex;align-items:center;gap:10px;min-width:0}
+#view-market .mk-card:hover .a-s-ic{border-color:var(--border-hi)}
+#view-market .mk-card:hover .a-s-ic svg{stroke:var(--accent-2)}
+/* stat tiles: the same joined strip as the Analytics KPIs (accent bar on top) */
+#view-market .mk-stats:empty{display:none}
+#view-market .mk-stats{gap:1px;background:var(--border);border:1px solid var(--border);border-radius:16px;overflow:hidden}
+#view-market .mk-st{position:relative;overflow:hidden;padding:15px 16px;border:0;border-radius:0;background:var(--panel)}
+#view-market .mk-st:hover{transform:none}
+#view-market .mk-st::before{content:"";position:absolute;left:0;top:0;right:0;height:2.5px;background:var(--accent);opacity:.85;transform:scaleX(0);transform-origin:0 50%;animation:kpBarIn .85s cubic-bezier(.16,1,.3,1) forwards}
+#view-market .mk-st:nth-child(2)::before{animation-delay:.09s}
+#view-market .mk-st:nth-child(3)::before{animation-delay:.16s}
+#view-market .mk-st small{font-size:11px;font-weight:600;letter-spacing:0;text-transform:none;color:var(--sub);margin-bottom:0}
+#view-market .mk-st b{font-size:20px;font-weight:750;letter-spacing:-.02em;line-height:1.2;margin-top:5px}
+#view-market #mkCcyChips::before{font-size:11px;font-weight:600;letter-spacing:0;text-transform:none;color:var(--sub)}
+@media(prefers-reduced-motion:reduce){#view-market .mk-st::before{animation-duration:.01ms}}
