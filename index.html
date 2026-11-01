@@ -7444,26 +7444,26 @@ window.__renderAnSetups=renderBoth;window.__renderAnEmotions=renderEmo;setTimeou
 
     $('rcBody').innerHTML=
       '<div class="rings">'+
-        ringCard('DAY P&amp;L',dollars(net),net<0?'var(--red)':'',hasTg?pct+'% of '+'$'+target.toFixed(0)+' daily target':'Profit target not set','<span class="tag win">'+wins.length+'W</span><span class="tag loss">'+losses.length+'L</span>',pct/100,net<0?'var(--red)':'var(--green)')+
-        ringCard('DAY LOSS USED','$'+lossUsed.toFixed(2)+' / '+(hasL?'$'+lossLimit.toFixed(0):'not set'),'',hasL?'$'+Math.max(0,lossLimit-lossUsed).toFixed(2)+' room left':'No loss limit set',esc(plural(losses.length,'losing trade')),lr,lr>.9?'var(--red)':lr>=.6?'var(--warn)':'var(--green)')+
-        ringCard('DAY TRADES',tradeCount+' / '+(hasT?tradeLimit:'not set'),'',broken.length?broken.join(' and ').replace(/^./,function(m){ return m.toUpperCase(); }):'Within the daily rules',hasT?(tradeCount<=tradeLimit?Math.max(0,tradeLimit-tradeCount)+' slots were left':(tradeCount-tradeLimit)+' over the limit'):'No trade limit set',hasT?tradeCount/tradeLimit:0,'var(--accent-2)')+
+        ringCard('Day P&amp;L',dollars(net),net<0?'var(--red)':'',hasTg?pct+'% of '+'$'+target.toFixed(0)+' daily target':'Profit target not set','<span class="tag win">'+wins.length+'W</span><span class="tag loss">'+losses.length+'L</span>',pct/100,net<0?'var(--red)':'var(--green)')+
+        ringCard('Day loss used','$'+lossUsed.toFixed(2)+' / '+(hasL?'$'+lossLimit.toFixed(0):'not set'),'',hasL?'$'+Math.max(0,lossLimit-lossUsed).toFixed(2)+' room left':'No loss limit set',esc(plural(losses.length,'losing trade')),lr,lr>.9?'var(--red)':lr>=.6?'var(--warn)':'var(--green)')+
+        ringCard('Day trades',tradeCount+' / '+(hasT?tradeLimit:'not set'),'',broken.length?broken.join(' and ').replace(/^./,function(m){ return m.toUpperCase(); }):'Within the daily rules',hasT?(tradeCount<=tradeLimit?Math.max(0,tradeLimit-tradeCount)+' slots were left':(tradeCount-tradeLimit)+' over the limit'):'No trade limit set',hasT?tradeCount/tradeLimit:0,'var(--accent-2)')+
       '</div>'+
       '<div class="row4">'+
-        card('RULES',broken.length?'Rule broken':(hasL||hasT?'Rules kept':'No limits set'),broken.length?broken.join(' and '):(hasL||hasT?'Stayed inside the daily limits':'Set limits in Account Settings'),broken.length?'var(--red)':'')+
-        card('BEST TRADE',esc(best.sym)+' '+money(Number(best.pnl)),String(best.t).slice(0,5)+' · '+(best.side==='BUY'?'Long':'Short'),Number(best.pnl)>0?'var(--green)':'')+
-        card('WORST TRADE',esc(worst.sym)+' '+money(Number(worst.pnl)),String(worst.t).slice(0,5)+' · '+(worst.side==='BUY'?'Long':'Short'),Number(worst.pnl)<0?'var(--red)':'')+
-        card('FEELING',mood,jn+' of '+plural(rows.length,'trade')+' journaled')+
+        card('Rules',broken.length?'Rule broken':(hasL||hasT?'Rules kept':'No limits set'),broken.length?broken.join(' and '):(hasL||hasT?'Stayed inside the daily limits':'Set limits in Account Settings'),broken.length?'var(--red)':'')+
+        card('Best trade',esc(best.sym)+' '+money(Number(best.pnl)),String(best.t).slice(0,5)+' · '+(best.side==='BUY'?'Long':'Short'),Number(best.pnl)>0?'var(--green)':'')+
+        card('Worst trade',esc(worst.sym)+' '+money(Number(worst.pnl)),String(worst.t).slice(0,5)+' · '+(worst.side==='BUY'?'Long':'Short'),Number(worst.pnl)<0?'var(--red)':'')+
+        card('Feeling',mood,jn+' of '+plural(rows.length,'trade')+' journaled')+
       '</div>'+
       '<div class="split"><div class="panel glass"><div class="panel-head"><div class="a-s-ttl"><span class="a-s-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/></svg></span><h2>Day notes</h2></div><span class="hint">'+plural(notes.length,'insight')+'</span></div>'+
         notes.map(function(n){ return '<div class="note-item"><div class="note-dot" style="background:'+n[0]+'"></div><div><div class="t">'+n[1]+'</div><div class="s">'+esc(n[2])+'</div></div></div>'; }).join('')+'</div>'+
       '<div class="panel glass"><div class="panel-head"><div class="a-s-ttl"><span class="a-s-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3v18h18M7 14l4-4 3 3 5-6"/></svg></span><h2>Day equity curve</h2></div><span class="hint">Hover a point for detail</span></div>'+curveHtml(rows)+'</div></div>'+
       '<div class="panel glass" style="margin-bottom:14px"><div class="panel-head"><div class="a-s-ttl"><span class="a-s-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v16M6 20h12M5 8h14M5 8l-2.5 6a3 3 0 0 0 5 0zM19 8l-2.5 6a3 3 0 0 0 5 0z"/></svg></span><h2>Risk / reward — this day</h2></div><span class="hint">Session view</span></div><div class="rr-grid">'+
         '<div class="rr-tile"><div class="l">Avg win / avg loss</div><div class="v">$'+avgWin.toFixed(2)+' / $'+avgLoss.toFixed(2)+'</div></div>'+
-        '<div class="rr-tile"><div class="l">OF DAILY TARGET</div><div class="v">'+(hasTg?pct+'%':'—')+'</div></div>'+
+        '<div class="rr-tile"><div class="l">Of daily target</div><div class="v">'+(hasTg?pct+'%':'—')+'</div></div>'+
         '<div class="rr-tile"><div class="l">Profit factor</div><div class="v">'+pf+'</div></div>'+
         '<div class="rr-tile"><div class="l">Expectancy / trade</div><div class="v">'+(exp>=0?'+$':'-$')+Math.abs(exp).toFixed(2)+'</div></div>'+
         '<div class="rr-tile"><div class="l">Mood</div><div class="v">'+esc(mood)+'</div></div>'+
-        '<div class="rr-tile"><div class="l">ENDING STREAK</div><div class="v">'+streak+'</div></div>'+
+        '<div class="rr-tile"><div class="l">Ending streak</div><div class="v">'+streak+'</div></div>'+
       '</div></div>'+
       '<div class="panel glass rc-sim" id="rcSim">'+simHtml(key)+'</div>'+(function(){var h=typeof window.jlDjView==='function'?window.jlDjView(key):'';return h?'<div class="panel glass" id="rcDj">'+h+'</div>':''})()+
       '<div class="panel glass"><div class="tbl-head"><h2 style="margin:0">Trades this day</h2><span class="pill">'+plural(rows.length,'trade')+'</span></div><div style="overflow-x:auto"><table><thead><tr><th style="width:32px"></th><th>Time</th><th>Symbol</th><th>Side</th><th>Session</th><th>Entry</th><th>Exit</th><th>Duration</th><th>P&amp;L</th><th>Reason</th>'+(hasQl?'<th></th>':'')+'</tr></thead><tbody>'+rowsHtml+'</tbody></table></div></div>';
