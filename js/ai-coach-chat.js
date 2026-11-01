@@ -11,14 +11,14 @@
     var su={},em={},tg={};
     J.forEach(function(j){if(!use(j))return;var p=+j.pnl,s=String(j.setup||'').trim().slice(0,40),e=String(j.emotion||'').trim().slice(0,40);
       if(s){add(su,s,p);if(j.key)bykey[j.key]=s}if(e)add(em,e,p);(Array.isArray(j.tags)?j.tags:[]).forEach(function(x){x=String(x||'').trim().slice(0,40);if(x==='Lot Over 0.02')x='Lot Over Limit';if(x)add(tg,x,p)})});
-    var pb=[];try{var raw=JSON.parse(localStorage.getItem('journall_playbook_v1')||'[]');if(Array.isArray(raw))raw.slice(0,8).forEach(function(p){if(p&&p.name)pb.push({name:String(p.name).slice(0,40),take:String(p.take||'').replace(/\s+/g,' ').trim().slice(0,300),skip:String(p.skip||'').replace(/\s+/g,' ').trim().slice(0,300)})})}catch(e){console.debug('[journall] ignored error in ai-coach-chat.js:', e);}
+    var pb=[];try{var raw=JSON.parse(localStorage.getItem(JL_KEYS.keys.JOURNALL_PLAYBOOK_V1)||'[]');if(Array.isArray(raw))raw.slice(0,8).forEach(function(p){if(p&&p.name)pb.push({name:String(p.name).slice(0,40),take:String(p.take||'').replace(/\s+/g,' ').trim().slice(0,300),skip:String(p.skip||'').replace(/\s+/g,' ').trim().slice(0,300)})})}catch(e){console.debug('[journall] ignored error in ai-coach-chat.js:', e);}
     return{setups:top(su),emotions:top(em),tags:top(tg),playbook:pb,bykey:bykey}}
   function ctx(){
     var A=window.__A||{},T=window.__trades||[],L=['Journall trade-review context (real logged trades only)'];
     if(!T.length)return L.concat('No trades logged yet.').join('\n');
     L.push('Trades: '+A.n+', win rate '+Number(A.wr||0).toFixed(1)+'%, net '+m$(A.net||0)+', profit factor '+Number(A.pf||0).toFixed(2)+', wins '+A.W+', losses '+A.L+', breakeven '+A.BE+'.');
     (A.ses||[]).forEach(function(x){L.push('Session '+x[0]+': '+m$(x[1])+' over '+x[2]+' trades')});
-    try{var c=JSON.parse(localStorage.getItem('journall_account_config_v1')||'null');
+    try{var c=JSON.parse(localStorage.getItem(JL_KEYS.keys.JOURNALL_ACCOUNT_CONFIG_V1)||'null');
       if(c&&c.accountSize)L.push('Account: size $'+c.accountSize+', phase '+(c.phase||'n/a')+', max trades/day '+(c.maxTradesPerDay||'n/a')+'.')}catch(e){console.debug('[journall] ignored error in ai-coach-chat.js:', e);}
     var JS=jstats();
     JS.setups.forEach(function(x){L.push('Setup '+x[0]+': '+x[1].n+' trades, '+x[1].w+'W '+x[1].l+'L, net '+m$(x[1].net))});

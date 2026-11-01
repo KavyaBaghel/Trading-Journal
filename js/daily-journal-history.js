@@ -1,6 +1,6 @@
 (function(){
 /* Read-only view of past daily journal entries. Data comes from krishna_daily_journal, written by the Daily journal panel. */
-var KEY='krishna_daily_journal';
+var KEY=JL_KEYS.keys.KRISHNA_DAILY_JOURNAL;
 /*DH-PURE-START*/
 var DN=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'],MN=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 function esc(v){return String(v==null?'':v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;')}

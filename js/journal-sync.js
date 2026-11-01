@@ -18,7 +18,7 @@
   };
 })();
 (function(){
-  var A=window.JLAdapter,imp=window.__jlImp,LK='krishna_journal_page_entries';if(!A||!imp)return;
+  var A=window.JLAdapter,imp=window.__jlImp,LK=JL_KEYS.keys.KRISHNA_JOURNAL_PAGE_ENTRIES;if(!A||!imp)return;
   function rd(k){try{var v=JSON.parse(localStorage.getItem(k)||'null');return Array.isArray(v)?v:[]}catch(e){return []}}
   function lid(id){id=String(id);var c=id.charAt(0);return(c==='L'||c==='j')?id.slice(1):id}
   var F=['key','date','time','sym','side','pnl','setup','mistake','before','after','improve','emotion'];
@@ -26,8 +26,8 @@
   try{var _l=rd(LK),_u=window.__jlUniqIds(_l);if(_u!==_l)localStorage.setItem(LK,JSON.stringify(_u))}catch(_){console.debug('[journall] ignored error in journal-sync.js:', _);}
   try{
     var des=rd(LK).filter(function(e){return e&&typeof e==='object'&&e.id!=null}).map(function(e){return A.journalToDesign(e,imp)});
-    if(des.length)localStorage.setItem('jlJournals',JSON.stringify(des));else localStorage.removeItem('jlJournals');
-  }catch(e){try{localStorage.removeItem('jlJournals')}catch(_){console.debug('[journall] ignored error in journal-sync.js:', _);}console.error('[Journall] journal bootstrap failed',e)}
+    if(des.length)localStorage.setItem(JL_KEYS.keys.JL_JOURNALS,JSON.stringify(des));else localStorage.removeItem(JL_KEYS.keys.JL_JOURNALS);
+  }catch(e){try{localStorage.removeItem(JL_KEYS.keys.JL_JOURNALS)}catch(_){console.debug('[journall] ignored error in journal-sync.js:', _);}console.error('[Journall] journal bootstrap failed',e)}
   function writeBack(v,oldV){
     try{
       var J=JSON.parse(v);if(!Array.isArray(J))return;
@@ -38,7 +38,7 @@
         var e=A.journalToLive(d,o,imp);if(!o)e.id=/^\d+$/.test(id)?Number(id):id;return e});
       /* deletions: remember them so cloud sync cannot bring a deleted journal back from another device (d:1 deleted, d:0 restored) */
       try{
-        var TKD='journall_deleted_journals',tomb={},ts=Date.now(),tch=false,newIds={},oldL=[];
+        var TKD=JL_KEYS.keys.JOURNALL_DELETED_JOURNALS,tomb={},ts=Date.now(),tch=false,newIds={},oldL=[];
         try{var tv=JSON.parse(localStorage.getItem(TKD)||'null');if(tv&&typeof tv==='object'&&!Array.isArray(tv))tomb=tv}catch(_){console.debug('[journall] ignored error in journal-sync.js:', _);}
         try{var ov=JSON.parse(oldV||'null');if(Array.isArray(ov))oldL=ov}catch(_){console.debug('[journall] ignored error in journal-sync.js:', _);}
         J.forEach(function(d){if(d&&d.id!=null){var k=lid(d.id);newIds[k]=1;if(tomb[k]&&tomb[k].d===1){tomb[k]={t:ts,d:0};tch=true}}});
@@ -50,5 +50,5 @@
     }catch(e){console.error('[Journall] journal write-back failed',e)}
   }
   var prev=Storage.prototype.setItem;
-  Storage.prototype.setItem=function(k,v){var old=(this===localStorage&&k==='jlJournals')?this.getItem('jlJournals'):null;prev.call(this,k,v);if(this===localStorage&&k==='jlJournals')writeBack(v,old)};
+  Storage.prototype.setItem=function(k,v){var old=(this===localStorage&&k===JL_KEYS.keys.JL_JOURNALS)?this.getItem(JL_KEYS.keys.JL_JOURNALS):null;prev.call(this,k,v);if(this===localStorage&&k===JL_KEYS.keys.JL_JOURNALS)writeBack(v,old)};
 })();

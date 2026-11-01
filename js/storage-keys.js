@@ -59,7 +59,8 @@
     jlOvChk: function (isoDate) { return 'jlOvChk:' + isoDate; },
     customUsername: function (uid) { return 'journall_custom_username_' + uid; },
     userEmail: function (uid) { return 'journall_user_email_' + uid; },
-    userName: function (uid) { return 'journall_user_name_' + uid; }
+    userName: function (uid) { return 'journall_user_name_' + uid; },
+    userPhoto: function (uid) { return 'journall_user_photo_' + uid; }
   });
   window.JL_KEYS = Object.freeze({ keys: K, dyn: D });
 })();

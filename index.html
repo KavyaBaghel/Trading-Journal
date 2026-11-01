@@ -1156,7 +1156,7 @@ window.journallAiProxyUrl = aiProxyConfig?.url || '';
 if(authRetryBtn) authRetryBtn.addEventListener('click', () => location.reload());
 
 function shouldSyncKey(key){
-  if (key === 'krishna_journal_form_draft' || key === 'krishna_psychology_form_draft') return false;
+  if (key === JL_KEYS.keys.KRISHNA_JOURNAL_FORM_DRAFT || key === JL_KEYS.keys.KRISHNA_PSYCHOLOGY_FORM_DRAFT) return false;
   return syncExactKeys.includes(key) || syncPrefixes.some(prefix=>key === prefix || key.startsWith(prefix));
 }
 
@@ -1244,9 +1244,9 @@ function mergeImportedTrades(existingTrades, incomingTrades){
   return [...merged.values()].sort((a,b) => `${a.date || ''} ${a.time || ''}`.localeCompare(`${b.date || ''} ${b.time || ''}`));
 }
 
-const JOURNAL_TOMB_KEY = 'journall_deleted_journals';
-const JOURNAL_LIST_KEY = 'krishna_journal_page_entries';
-const TRADE_TOMB_KEY = 'journall_deleted_trades';
+const JOURNAL_TOMB_KEY = JL_KEYS.keys.JOURNALL_DELETED_JOURNALS;
+const JOURNAL_LIST_KEY = JL_KEYS.keys.KRISHNA_JOURNAL_PAGE_ENTRIES;
+const TRADE_TOMB_KEY = JL_KEYS.keys.JOURNALL_DELETED_TRADES;
 
 function mergeJournalTombstones(a, b){
   /* {journalId: {t: timestamp, d: 1 deleted | 0 restored}} - the newest decision per id wins */
@@ -1289,7 +1289,7 @@ function mergeSyncedStorageMaps(remoteStorage = {}, localStorageSnapshot = {}){
       return;
     }
 
-    if(key === 'viztrade_trades' || key === 'viztrade_trading_page_trades'){
+    if(key === JL_KEYS.keys.VIZTRADE_TRADES || key === JL_KEYS.keys.VIZTRADE_TRADING_PAGE_TRADES){
       const remoteArr = parseSyncValue(remoteVal);
       const localArr = parseSyncValue(localVal);
       if(Array.isArray(remoteArr) && Array.isArray(localArr)){
@@ -1298,7 +1298,7 @@ function mergeSyncedStorageMaps(remoteStorage = {}, localStorageSnapshot = {}){
       }
     }
 
-    if(key === 'krishna_journal_page_entries'){
+    if(key === JL_KEYS.keys.KRISHNA_JOURNAL_PAGE_ENTRIES){
       const remoteArr = parseSyncValue(remoteVal);
       const localArr = parseSyncValue(localVal);
       if(Array.isArray(remoteArr) && Array.isArray(localArr)){
@@ -1318,7 +1318,7 @@ function mergeSyncedStorageMaps(remoteStorage = {}, localStorageSnapshot = {}){
   });
   /* drop Quick Log trades that were deleted on any device, whichever side still holds them (trade lists merge as a union, so without this a deleted trade comes back) */
   if(Object.keys(tombsT).length){
-    ['viztrade_trades', 'viztrade_trading_page_trades'].forEach(k => {
+    [JL_KEYS.keys.VIZTRADE_TRADES, JL_KEYS.keys.VIZTRADE_TRADING_PAGE_TRADES].forEach(k => {
       if(typeof merged[k] !== 'string') return;
       const l = parseSyncValue(merged[k]);
       if(!Array.isArray(l)) return;
@@ -1438,7 +1438,7 @@ async function saveCloudState(){
     updatedAt: stamp,
     storage: mergedStorage
   }, { merge: true });
-  const uName = localStorage.getItem('journall_custom_username') || window.currentUser.displayName || window.currentUser.email || 'trader';
+  const uName = localStorage.getItem(JL_KEYS.keys.JOURNALL_CUSTOM_USERNAME) || window.currentUser.displayName || window.currentUser.email || 'trader';
   setAuthStatus(`Signed in as ${uName} - synced`);
   } finally {
     cloudSaveInFlight = false;
@@ -1450,7 +1450,7 @@ async function saveCloudState(){
 }
 
 window.checkAndPromptUsername = function checkAndPromptUsername(callback) {
-  const savedUsername = localStorage.getItem('journall_custom_username') || localStorage.getItem('journall_onboarding_completed');
+  const savedUsername = localStorage.getItem(JL_KEYS.keys.JOURNALL_CUSTOM_USERNAME) || localStorage.getItem(JL_KEYS.keys.JOURNALL_ONBOARDING_COMPLETED);
   if (savedUsername) {
     if (callback) callback();
     return;
@@ -1545,10 +1545,10 @@ window.checkAndPromptUsername = function checkAndPromptUsername(callback) {
       alert('Please enter a username.');
       return;
     }
-    localStorage.setItem('journall_custom_username', val);
+    localStorage.setItem(JL_KEYS.keys.JOURNALL_CUSTOM_USERNAME, val);
     localStorage.setItem('journall_user_name', val);
     if (window.currentUser?.email && window.currentUser.email !== 'local@journall.app') {
-      localStorage.setItem('journall_user_email', window.currentUser.email.trim());
+      localStorage.setItem(JL_KEYS.keys.JOURNALL_USER_EMAIL, window.currentUser.email.trim());
     }
     if (window.currentUser?.photoURL) {
       localStorage.setItem('journall_user_photo', window.currentUser.photoURL);
@@ -1616,7 +1616,7 @@ async function loadCloudState(){
       }
       if (changed && typeof window.journallReloadDataFromStorage === 'function') {
         window.journallReloadDataFromStorage();
-        const uName = localStorage.getItem('journall_custom_username') || window.currentUser.displayName || window.currentUser.email || 'trader';
+        const uName = localStorage.getItem(JL_KEYS.keys.JOURNALL_CUSTOM_USERNAME) || window.currentUser.displayName || window.currentUser.email || 'trader';
         setAuthStatus(`Signed in as ${uName} - synced`);
       }
     }
@@ -1629,7 +1629,7 @@ async function loadCloudState(){
   patchLocalStorageForCloud();
 
   const finalizeSignIn = () => {
-    const uName = localStorage.getItem('journall_custom_username') || window.currentUser?.displayName || window.currentUser?.email || 'trader';
+    const uName = localStorage.getItem(JL_KEYS.keys.JOURNALL_CUSTOM_USERNAME) || window.currentUser?.displayName || window.currentUser?.email || 'trader';
     if (window.splashHoldActive) {
       window.setAuthStatus(`Signed in as ${uName}`);
       if(typeof window.renderAll === 'function') window.renderAll();
@@ -1807,12 +1807,12 @@ async function initFirebaseAuth(){
       }
 
       sessionStorage.clear();
-      localStorage.removeItem('journall_user_email');
+      localStorage.removeItem(JL_KEYS.keys.JOURNALL_USER_EMAIL);
       localStorage.removeItem('journall_google_email');
-      localStorage.removeItem('journall_custom_username');
+      localStorage.removeItem(JL_KEYS.keys.JOURNALL_CUSTOM_USERNAME);
       localStorage.removeItem('journall_user_name');
       localStorage.removeItem('journall_user_custom_avatar');
-      localStorage.removeItem('journall_active_uid');
+      localStorage.removeItem(JL_KEYS.keys.JOURNALL_ACTIVE_UID);
 
       // Delay slightly for smooth transition, then reload
       setTimeout(() => {

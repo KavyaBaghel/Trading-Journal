@@ -3,7 +3,7 @@
    it cannot close MT5 positions. Override needs typed confirmation and is logged. Set localStorage jlDayLockLosses=0 to turn off. */
 (function () {
   'use strict';
-  var LOSS_KEY = 'jlDayLockLosses', UNLOCK_KEY = 'jlDayLockUnlocked', LOG_KEY = 'jlDayLockOverrides', PEEK_KEY = 'jlDayLockPeekUntil';
+  var LOSS_KEY = JL_KEYS.keys.JL_DAY_LOCK_LOSSES, UNLOCK_KEY = JL_KEYS.keys.JL_DAY_LOCK_UNLOCKED, LOG_KEY = 'jlDayLockOverrides', PEEK_KEY = JL_KEYS.keys.JL_DAY_LOCK_PEEK_UNTIL;
   var PHRASE = 'BREAK RULE';
   function get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
   function set(k, v) { try { localStorage.setItem(k, v); } catch (e) {console.debug('[journall] ignored error in day-lock.js:', e);} }

@@ -94,7 +94,7 @@ if(root){
 }
 var view=$('view-ai');
 if(view&&typeof MutationObserver==='function')new MutationObserver(function(){if(!view.hidden)render(true)}).observe(view,{attributes:true,attributeFilter:['hidden']});
-window.addEventListener('storage',function(ev){if(!ev.key||ev.key===PBK||ev.key===NK||ev.key==='jlJournals')render()});
+window.addEventListener('storage',function(ev){if(!ev.key||ev.key===PBK||ev.key===NK||ev.key===JL_KEYS.keys.JL_JOURNALS)render()});
 document.addEventListener('visibilitychange',function(){if(!document.hidden)render()});
 setTimeout(function(){render(true)},1500);render(true);
 })();

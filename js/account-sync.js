@@ -1,6 +1,6 @@
 /* Step 3.4: account settings. Live journall_account_config_v1 <-> design jlAccountSettings (derived, unsynced cache). */
 (function(){
-  var CK='journall_account_config_v1',DK='jlAccountSettings';
+  var CK=JL_KEYS.keys.JOURNALL_ACCOUNT_CONFIG_V1,DK=JL_KEYS.keys.JL_ACCOUNT_SETTINGS;
   function rdo(){try{var v=JSON.parse(localStorage.getItem(CK)||'null');return v&&typeof v==='object'&&!Array.isArray(v)?v:null}catch(e){return null}}
   var r4=function(x){return Math.round(x*10000)/10000},n=function(x){x=Number(x);return isFinite(x)?x:null};
   function toDesign(c){c=c||{};var size=n(c.accountSize);size=size>0?size:null;

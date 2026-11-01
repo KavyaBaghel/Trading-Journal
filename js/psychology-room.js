@@ -24,7 +24,7 @@
   function liveDesc(d){
     d=String(d==null?'':d);
     const fm=v=>String(Math.round(v*100)/100);
-    let acc={};try{acc=JSON.parse(localStorage.getItem('jlAccountSettings')||'null')||{}}catch(e){console.debug('[journall] ignored error in psychology-room.js:', e);}
+    let acc={};try{acc=JSON.parse(localStorage.getItem(JL_KEYS.keys.JL_ACCOUNT_SETTINGS)||'null')||{}}catch(e){console.debug('[journall] ignored error in psychology-room.js:', e);}
     const lot=Number(window.jlLotSize)||0,tr=Number(window.jlMaxTradesPerDay)||0,mcl=Number(window.jlMaxConsecLosses)||0,wl=Number(window.jlWeeklyLossLimit)||0;
     const bal=Number(window.jlStartBalance)||Number(acc.balance)||0,rp=Number(acc.riskPerTrade)||0,risk=bal>0&&rp>0?bal*rp/100:0;
     if(lot>0) d=d.replace(/Lot is \d*\.?\d+/,'Lot is '+fm(lot));

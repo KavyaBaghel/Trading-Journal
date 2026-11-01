@@ -14,7 +14,7 @@
   // doc), and stop reading/writing it from localStorage — it should only ever reflect the
   // bridge, never a manual choice. Only relevant when Account type = funded; for live
   // accounts, phase does not apply and the whole field is hidden (see ggApplyAcctType below).
-  const ACC_KEY = 'jlAccountSettings';
+  const ACC_KEY = JL_KEYS.keys.JL_ACCOUNT_SETTINGS;
   function ggLoadAccount(){
     let s = null;
     try{ s = JSON.parse(localStorage.getItem(ACC_KEY)); }catch(e){console.debug('[journall] ignored error in account-settings.js:', e);}
@@ -302,7 +302,7 @@
       desc:'Any freeform goal with your own target and deadline.',
       def:{title:'Custom milestone', target:100, current:0}}
   ];
-  const GG_KEY = 'jlGoals2';
+  const GG_KEY = JL_KEYS.keys.JL_GOALS2;
   let ggGoals = [];
   try{ ggGoals = JSON.parse(localStorage.getItem(GG_KEY)) || null; }catch(e){console.debug('[journall] ignored error in account-settings.js:', e);}
   if(!ggGoals){

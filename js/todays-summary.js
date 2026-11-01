@@ -11,10 +11,10 @@
   window.jlBreakEvenUSD=1;
   window.jlKind=p=>Math.abs(p)<window.jlBreakEvenUSD?'be':p>0?'win':'loss';
   window.jlMode=mode;window.__openTrades=[];
-  if(mode==='real'){try{const im=JSON.parse(localStorage.getItem('jlImport')||'null');if(im&&Array.isArray(im.closed)){/* fold commission + swap into P&L so every figure is net, like the MT5 report */const nt=t=>{if(t&&!t._n){t.gpnl=t.pnl;t.pnl=Math.round((t.pnl+(t.cost||0))*100)/100;t.cost=0;t._n=1}return t};im.closed.forEach(nt);(im.open||[]).forEach(nt);window.__trades=im.closed;window.__openTrades=im.open||[];window.__imported=im.file}}catch(e){console.debug('[journall] ignored error in todays-summary.js:', e);}}
+  if(mode==='real'){try{const im=JSON.parse(localStorage.getItem(JL_KEYS.keys.JL_IMPORT)||'null');if(im&&Array.isArray(im.closed)){/* fold commission + swap into P&L so every figure is net, like the MT5 report */const nt=t=>{if(t&&!t._n){t.gpnl=t.pnl;t.pnl=Math.round((t.pnl+(t.cost||0))*100)/100;t.cost=0;t._n=1}return t};im.closed.forEach(nt);(im.open||[]).forEach(nt);window.__trades=im.closed;window.__openTrades=im.open||[];window.__imported=im.file}}catch(e){console.debug('[journall] ignored error in todays-summary.js:', e);}}
   /* aggregates every Analytics widget reads (nothing per-widget is hardcoded) */
   const T=(window.__trades||[]).slice().sort((a,b)=>a.d+a.t<b.d+b.t?-1:1),demo=mode==='demo',n=T.length;
-  let JJ=[];try{JJ=JSON.parse(localStorage.getItem('jlJournals'))||[]}catch(e){console.debug('[journall] ignored error in todays-summary.js:', e);}const jm={};JJ.forEach(e=>{if(e&&e.key&&e.tags&&e.tags.length)jm[e.key]=e.tags.map(x=>x==='Lot Over 0.02'?'Lot Over Limit':x)});
+  let JJ=[];try{JJ=JSON.parse(localStorage.getItem(JL_KEYS.keys.JL_JOURNALS))||[]}catch(e){console.debug('[journall] ignored error in todays-summary.js:', e);}const jm={};JJ.forEach(e=>{if(e&&e.key&&e.tags&&e.tags.length)jm[e.key]=e.tags.map(x=>x==='Lot Over 0.02'?'Lot Over Limit':x)});
   (window.__trades||[]).forEach(t=>{t.tags=demo?(t.tag?[t.tag]:[]):(jm[t.d+' '+t.t+' '+t.side+' '+t.en+' '+t.pnl]||[])});
   let gp=0,gl=0,W=0,L=0,BE=0,c=0,pk=0,dd=0;const eq=[];
   let sw=0,sl=0; /* sw/sl = money in trades classed win/loss; gp/gl stay total money for net and profit factor */
@@ -79,7 +79,7 @@
       const todayKey = (typeof getTradingDayIST==='function') ? getTradingDayIST() : new Date().toISOString().slice(0,10); // 06:00 IST trading day, same as the rest of the app
       const badge = document.getElementById('streakBadge');
       const nudge = document.getElementById('streakNudge');
-      const raw = localStorage.getItem('jlStreak');
+      const raw = localStorage.getItem(JL_KEYS.keys.JL_STREAK);
       let data = raw ? JSON.parse(raw) : null;
       if(!data){
         // First time this device has tracked a real streak — keep the existing
@@ -103,7 +103,7 @@
         data.lastDate = todayKey;
       }
       badge.textContent = data.count + '-day streak';
-      localStorage.setItem('jlStreak', JSON.stringify(data));
+      localStorage.setItem(JL_KEYS.keys.JL_STREAK, JSON.stringify(data));
     }catch(e){ /* localStorage unavailable — leave the static baseline badge as-is */ console.debug('[journall] ignored error in todays-summary.js:', e);}
   })();
 
@@ -147,7 +147,7 @@
   function ovChkItems(){
     return ovLoadList('jlPsy:setup:requirements', PSY_SETUP_DEFAULTS, 's:');
   }
-  function ovChkKey(){ return 'jlOvChk:' + (typeof getTradingDayIST==='function' ? getTradingDayIST() : ''); }
+  function ovChkKey(){ return JL_KEYS.dyn.jlOvChk(typeof getTradingDayIST==='function' ? getTradingDayIST() : ''); }
   function ovChkLoad(){ try{ const o = JSON.parse(localStorage.getItem(ovChkKey())||'{}'); return (o && typeof o==='object') ? o : {}; }catch(e){ return {}; } }
   function ovChkSave(o){ try{ localStorage.setItem(ovChkKey(), JSON.stringify(o)); }catch(e){console.debug('[journall] ignored error in todays-summary.js:', e);} }
   let ovChkDay = '';
@@ -710,7 +710,7 @@ const $ = id => document.getElementById(id);
   }
   /*WT-PURE-END*/
   window.jlWeakTimes=weakTimes;
-  function brokerOff(){try{var s=JSON.parse(localStorage.getItem('jlAccountSettings')||'null');if(s&&s.brokerUtcOffset!==''&&s.brokerUtcOffset!=null&&isFinite(Number(s.brokerUtcOffset)))return Number(s.brokerUtcOffset)}catch(e){console.debug('[journall] ignored error in todays-summary.js:', e);}return null}
+  function brokerOff(){try{var s=JSON.parse(localStorage.getItem(JL_KEYS.keys.JL_ACCOUNT_SETTINGS)||'null');if(s&&s.brokerUtcOffset!==''&&s.brokerUtcOffset!=null&&isFinite(Number(s.brokerUtcOffset)))return Number(s.brokerUtcOffset)}catch(e){console.debug('[journall] ignored error in todays-summary.js:', e);}return null}
   function renderWeak(){
     const body=$('aWt');if(!body)return;
     const st=weakTimes(window.__trades||[],3,brokerOff());
@@ -950,8 +950,8 @@ let lastRules=[0,0,0,0];
   // 1 trade before the max; "Daily rule reminders" -> before the first trade of the day, a note if the last
   // trading day broke a rule. Preferences live in localStorage 'jlPrefs' (both default on).
   const WARN_RATIO = 0.8;
-  window.jlPref = function(k, d){ try{ const o = JSON.parse(localStorage.getItem('jlPrefs')||'{}'); return k in o ? !!o[k] : d; }catch(e){ return d; } };
-  window.jlSetPref = function(k, v){ try{ const o = JSON.parse(localStorage.getItem('jlPrefs')||'{}'); o[k] = !!v; localStorage.setItem('jlPrefs', JSON.stringify(o)); }catch(e){console.debug('[journall] ignored error in todays-summary.js:', e);} if(window.__refreshHeadsUp) window.__refreshHeadsUp(); };
+  window.jlPref = function(k, d){ try{ const o = JSON.parse(localStorage.getItem(JL_KEYS.keys.JL_PREFS)||'{}'); return k in o ? !!o[k] : d; }catch(e){ return d; } };
+  window.jlSetPref = function(k, v){ try{ const o = JSON.parse(localStorage.getItem(JL_KEYS.keys.JL_PREFS)||'{}'); o[k] = !!v; localStorage.setItem(JL_KEYS.keys.JL_PREFS, JSON.stringify(o)); }catch(e){console.debug('[journall] ignored error in todays-summary.js:', e);} if(window.__refreshHeadsUp) window.__refreshHeadsUp(); };
   let lastAlertArgs = [0, 0], alertBroken = false;
   function lastDayBroke(){
     const key = getTradingDayIST(), lim = ruleLimits(), by = {};
