@@ -4,6 +4,22 @@ State of `main` @ `7d87233` (PR #22 merged). Written 2026-11-01.
 
 **Verified vs not verified.** Items marked *verified* were checked by script against the files on `main`. Nothing here has been run in a browser. The live site has not been opened.
 
+## Status update (main @ `90c73c5`, 2026-11-02)
+
+The numbers and "not run in a browser" notes below are from the original write-up on `7d87233`. Since then:
+
+| Item | State |
+| --- | --- |
+| 1 auth module | Done (#26). `js/auth-module.js`. Needs a real Google sign-in check after each deploy. |
+| 2 trade math | Done for the pure parts (#34): `js/trade-math.js` with `tests/unit/trade-math.test.cjs`. The P&L aggregates at the top of `todays-summary.js`, `ruleLimits` and `lastDayBroke` still read `window.jl*` and `__trades` directly and were not moved. |
+| 3 dead code | Done (#27). Shared helpers (`esc`, `rd`, `wr`, `render`) were deliberately not merged: they are different functions that share a name. |
+| 4 storage | Registry only (#35): `js/storage-keys.js`, every script reads key names from it. There is no wrapper around `localStorage` and no state store, on purpose, because the auth module patches `localStorage.setItem`. `theme`, `selectedDate` and the `jlPsy:` prefix are still literals. List of keys: `docs/storage-keys.md`. |
+| 5 empty catches | Done (#25, and the auth module in #33). |
+| 6 config | Done (#30): `js/app-config.js`. |
+| 7 docs | `README.md` and `ARCHITECTURE.md` updated. `component-inventory.md` and `preserve-ids.md` carry an out-of-date banner: they describe the pre-redesign UI and were not rewritten. |
+
+Known and left alone: `revStats` in `trade-math.js` throws when the trade list contains `null`.
+
 ## Where things stand
 
 - `index.html` went from about 1.08 MB to about 149 KB. 51 scripts now live in `js/`.
