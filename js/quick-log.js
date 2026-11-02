@@ -95,13 +95,13 @@
   }
   /*QL-PURE-END*/
 
-  var KT='viztrade_trading_page_trades',KB='viztrade_trades',KJ='krishna_journal_page_entries',KS='journall_shots_v1';
+  var KT=JL_KEYS.keys.VIZTRADE_TRADING_PAGE_TRADES,KB=JL_KEYS.keys.VIZTRADE_TRADES,KJ=JL_KEYS.keys.KRISHNA_JOURNAL_PAGE_ENTRIES,KS=JL_KEYS.keys.JOURNALL_SHOTS_V1;
   function $(id){return document.getElementById(id)}
   function rd(k){try{var v=JSON.parse(localStorage.getItem(k)||'null');return Array.isArray(v)?v:[]}catch(e){return[]}}
   function rdShots(){try{var v=JSON.parse(localStorage.getItem(KS)||'null');return v&&typeof v==='object'&&!Array.isArray(v)?v:{}}catch(e){return{}}}
   function chars(l){return(Array.isArray(l)?l:[]).reduce(function(n,x){return n+(typeof x==='string'?x.length:0)},0)}
   function shotsTotal(m){return Object.keys(m).reduce(function(n,k){return n+chars(m[k])},0)}
-  function syncedSize(){var n=0;try{for(var i=0;i<localStorage.length;i++){var k=localStorage.key(i);if(!k||k==='krishna_journal_form_draft'||k==='krishna_psychology_form_draft')continue;
+  function syncedSize(){var n=0;try{for(var i=0;i<localStorage.length;i++){var k=localStorage.key(i);if(!k||k===JL_KEYS.keys.KRISHNA_JOURNAL_FORM_DRAFT||k===JL_KEYS.keys.KRISHNA_PSYCHOLOGY_FORM_DRAFT)continue;
     if(k==='theme'||k==='selectedDate'||['viz','viztrade','krishna','journall'].some(function(p){return k.indexOf(p)===0}))n+=k.length+(localStorage.getItem(k)||'').length}}catch(e){console.debug('[journall] ignored error in quick-log.js:', e);}return n}
   function shrink(file){return new Promise(function(res,rej){var url=URL.createObjectURL(file),im=new Image();
     im.onload=function(){URL.revokeObjectURL(url);try{
@@ -220,7 +220,7 @@
   }
   function toast(o){if(typeof window.jlToast==='function')window.jlToast(o)}
   function qlEv(n,id,en){try{window.dispatchEvent(new CustomEvent(n,{detail:{id:id,entry:en?JSON.parse(JSON.stringify(en)):null}}))}catch(e){console.debug('[journall] ignored error in quick-log.js:', e);}}
-  var KJT='journall_deleted_journals';
+  var KJT=JL_KEYS.keys.JOURNALL_DELETED_JOURNALS;
   function rdObj(k){try{var v=JSON.parse(localStorage.getItem(k)||'null');return v&&typeof v==='object'&&!Array.isArray(v)?v:{}}catch(e){return{}}}
   function findQl(id){
     var t=rd(KT).filter(function(x){return x&&x.id===id})[0];if(!t||!/^ql-/.test(String(id)))return null;
@@ -280,7 +280,7 @@
     setTimeout(function(){try{location.reload()}catch(e){console.debug('[journall] ignored error in quick-log.js:', e);}},2500);
   }
   window.qlEditTrade=editTrade;
-  var KTT='journall_deleted_trades',delBusy=false;
+  var KTT=JL_KEYS.keys.JOURNALL_DELETED_TRADES,delBusy=false;
   function deleteTrade(id,btn){
     if(delBusy)return;
     var f=findQl(id);

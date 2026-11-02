@@ -1,6 +1,6 @@
 /* Step 3.7: Upload Data. Real imports into the LIVE trade keys, real MT5 bridge sync, honest sync status. No fake timers. */
 (function(){
-  var TK=['viztrade_trades','viztrade_trading_page_trades'],SS='journall_broker_sync_settings',CK='journall_account_config_v1';
+  var TK=[JL_KEYS.keys.VIZTRADE_TRADES,JL_KEYS.keys.VIZTRADE_TRADING_PAGE_TRADES],SS=JL_KEYS.keys.JOURNALL_BROKER_SYNC_SETTINGS,CK=JL_KEYS.keys.JOURNALL_ACCOUNT_CONFIG_V1;
   function rd(k){try{var v=JSON.parse(localStorage.getItem(k)||'null');return Array.isArray(v)?v:[]}catch(e){return []}}
   function rdo(k){try{var v=JSON.parse(localStorage.getItem(k)||'null');return v&&typeof v==='object'&&!Array.isArray(v)?v:null}catch(e){return null}}
   function r2(x){return Math.round(x*100)/100}
@@ -40,7 +40,7 @@
       if(String(t.date)>=lo&&String(t.date)<=hi){gone[t.id]=1;out.removed++}});
     var kill=out.replaced+out.removed;
     if(kill){TK.forEach(function(k){var a=rd(k).filter(function(t){return !(t&&gone[t.id])});localStorage.setItem(k,JSON.stringify(a))});
-      var LK='krishna_journal_page_entries',J=rd(LK),ch=false;
+      var LK=JL_KEYS.keys.KRISHNA_JOURNAL_PAGE_ENTRIES,J=rd(LK),ch=false;
       J.forEach(function(e){var r=e&&link[e.tradeKey];if(!r)return;
         e.tradeKey=JLAdapter.liveKey(r);e.trade=e.trade||{};
         ['date','time','symbol','side','entry','exit','pnl','volume','duration','sl'].forEach(function(f){if(r[f]!=null)e.trade[f]=r[f]});
@@ -57,7 +57,7 @@
         t.exit=r.exit;t.pnl=r.pnl;if(r.rawProfit!=null)t.rawProfit=r.rawProfit;if(r.commission!=null)t.commission=r.commission;if(r.duration!=null)t.duration=r.duration;
         hit=true;if(k===TK[0]){link[c.oldKey]=JLAdapter.liveKey(t);out.updated++}});
       if(hit)localStorage.setItem(k,JSON.stringify(a))});
-    var LK='krishna_journal_page_entries',J=rd(LK),ch=false,live=rd(TK[0]);
+    var LK=JL_KEYS.keys.KRISHNA_JOURNAL_PAGE_ENTRIES,J=rd(LK),ch=false,live=rd(TK[0]);
     J.forEach(function(e){var nk=e&&link[e.tradeKey];if(!nk)return;e.tradeKey=nk;e.trade=e.trade||{};
       var t=live.filter(function(x){return x&&JLAdapter.liveKey(x)===nk})[0];
       if(t)['exit','pnl','duration'].forEach(function(f){if(t[f]!=null)e.trade[f]=t[f]});
@@ -67,7 +67,7 @@
   window.jlSaveImport=function(R){var recs=(R.closed||[]).map(toLive),seenId={};
     recs.forEach(function(r,i){if(seenId[r.id]){r.id=r.id+'-p'+(r.position||('n'+i))}seenId[r.id]=1});
     var rp=replaceBridge(recs),added=merge(rp.fresh),up=refreshMatched(rp.matched);
-    localStorage.setItem('jlOpenPositions',JSON.stringify(R.open||[]));return {added:added,total:recs.length,replaced:rp.replaced,removed:rp.removed,skipped:rp.skipped,relinked:rp.relinked+up.relinked,updated:up.updated}};
+    localStorage.setItem(JL_KEYS.keys.JL_OPEN_POSITIONS,JSON.stringify(R.open||[]));return {added:added,total:recs.length,replaced:rp.replaced,removed:rp.removed,skipped:rp.skipped,relinked:rp.relinked+up.relinked,updated:up.updated}};
   window.jlSaveSyncTrades=function(list){var have={};rd(TK[0]).forEach(function(t){if(t&&typeof t==='object'&&!BR.test(String(t.id))&&t.position)have[String(t.position)]=1});
     var all=list||[],recs=all.map(toLive).filter(function(r){return !(r.position&&have[String(r.position)])}),seenId={};
     recs.forEach(function(r,i){if(seenId[r.id]){r.id=r.id+'-p'+(r.position||('n'+i))}seenId[r.id]=1});

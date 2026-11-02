@@ -179,9 +179,9 @@
   // ---------- profile photo / banner: shrink, show, keep, and sync across devices ----------
   // Stored under journall_* keys so the existing cloud sync carries them. Images are shrunk hard, and if the
   // synced data would get too close to Firestore's 1 MB document limit they stay on this device instead.
-  const SYNC_KEY = {avatar:'journall_profile_avatar_img', cover:'journall_profile_cover_img'};
-  const DEV_KEY = {avatar:'jlimg_profile_avatar_dev', cover:'jlimg_profile_cover_dev'};
-  const LEGACY_KEY = {avatar:'jlimg_profile_avatar_v1', cover:'jlimg_profile_cover_v1'};
+  const SYNC_KEY = {avatar:JL_KEYS.keys.JOURNALL_PROFILE_AVATAR_IMG, cover:JL_KEYS.keys.JOURNALL_PROFILE_COVER_IMG};
+  const DEV_KEY = {avatar:JL_KEYS.keys.JLIMG_PROFILE_AVATAR_DEV, cover:JL_KEYS.keys.JLIMG_PROFILE_COVER_DEV};
+  const LEGACY_KEY = {avatar:JL_KEYS.keys.JLIMG_PROFILE_AVATAR_V1, cover:JL_KEYS.keys.JLIMG_PROFILE_COVER_V1};
   const SYNC_BUDGET = 800000;
   const IMG_OK = /^data:image\/(jpeg|png|webp|gif);base64,[A-Za-z0-9+\/=]+$/;
   const storedImg = (kind)=>{
@@ -372,7 +372,7 @@
 
   // ---- live profile: no hardcoded identity or risk numbers ----
   (function(){
-    const PK='journall_profile_v1', CK='journall_account_config_v1';
+    const PK=JL_KEYS.keys.JOURNALL_PROFILE_V1, CK=JL_KEYS.keys.JOURNALL_ACCOUNT_CONFIG_V1;
     const rd=()=>{try{const v=JSON.parse(localStorage.getItem(PK)||'{}');return v&&typeof v==='object'?v:{}}catch(e){return {}}};
     const wr=o=>{try{localStorage.setItem(PK,JSON.stringify(o))}catch(e){console.debug('[journall] ignored error in profile-tab.js:', e);}};
     const st=document.createElement('style'); st.textContent='.up-bio:empty::before{content:attr(data-ph);color:var(--faint)}'; document.head.appendChild(st);

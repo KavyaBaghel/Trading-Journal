@@ -16,8 +16,8 @@ function tday(){var d=new Date(Date.now()+5.5*3600000);if(d.getUTCHours()<6)d.se
 function rd(k){try{return JSON.parse(localStorage.getItem(k))}catch(_){return null}}
 var lastSig='',had=false;
 window.jlApplyChLimits=function(o){
-  var today=(typeof window.getTradingDayIST==='function')?window.getTradingDayIST():tday(),acc=rd('jlAccountSettings');if(!acc||typeof acc!=='object')acc={};
-  var bal=Number(acc.balance)||Number(window.jlStartBalance)||0,ch=bal>0?activeCh(rd('journall_challenges_v1'),today):null,lims=chLims(ch),e=effective(acc,bal,lims);
+  var today=(typeof window.getTradingDayIST==='function')?window.getTradingDayIST():tday(),acc=rd(JL_KEYS.keys.JL_ACCOUNT_SETTINGS);if(!acc||typeof acc!=='object')acc={};
+  var bal=Number(acc.balance)||Number(window.jlStartBalance)||0,ch=bal>0?activeCh(rd(JL_KEYS.keys.JOURNALL_CHALLENGES_V1),today):null,lims=chLims(ch),e=effective(acc,bal,lims);
   if(lims||had){window.jlDailyLossLimit=e.dlUSD;window.jlProfitTargetUSD=e.ptUSD}
   had=!!lims;window.jlChMddPct=e.mddPct;window.jlChInfo=lims?{name:ch.name.trim(),dl:lims.dl,md:lims.md,pt:lims.pt}:null;
   var sig=JSON.stringify([e.dlUSD,e.ptUSD,e.mddPct,lims?1:0]),changed=sig!==lastSig;lastSig=sig;

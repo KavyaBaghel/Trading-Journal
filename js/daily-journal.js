@@ -2,7 +2,7 @@
 /* Daily journal: one entry per IST trading day (06:00 reset), a "before" part and an "after" part.
    Stored as one object under krishna_daily_journal ({day:{pre:{...},post:{...}}}) so it syncs with the rest of the app.
    Only what you type or tap is saved. Nothing is prefilled. */
-var KEY='krishna_daily_journal';
+var KEY=JL_KEYS.keys.KRISHNA_DAILY_JOURNAL;
 /*DJ-PURE-START*/
 var MOODS=['Calm','Confident','FOMO','Fear','Greed','Anxious','Frustrated','Revenge'];
 var FOLLOW=['Yes','Partly','No'];

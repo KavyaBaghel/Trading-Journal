@@ -1,6 +1,6 @@
 (function(){
 /* AI Coach: today's rule (typed, else latest Daily journal fix), today's focus and widget pins, all saved. */
-var RK='journall_ai_rule_v1',FK='journall_ai_focus_v1',PK='journall_ai_pins_v1',DJ='krishna_daily_journal';
+var RK=JL_KEYS.keys.JOURNALL_AI_RULE_V1,FK=JL_KEYS.keys.JOURNALL_AI_FOCUS_V1,PK=JL_KEYS.keys.JOURNALL_AI_PINS_V1,DJ=JL_KEYS.keys.KRISHNA_DAILY_JOURNAL;
 /*AF-PURE-START*/
 function clean(v){return String(v==null?'':v).replace(/\s+/g,' ').trim()}
 function pickRule(typed,map,today){var t=clean(typed&&typeof typed==='object'?typed.text:'').slice(0,140);if(t)return{text:t,src:'typed',day:''};

@@ -1,5 +1,5 @@
 (function(){
-const $=id=>document.getElementById(id),T=window.__trades||[],DK='jlJournals';
+const $=id=>document.getElementById(id),T=window.__trades||[],DK=JL_KEYS.keys.JL_JOURNALS;
 $('dateStrJ').textContent=new Date().toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
 const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const money=v=>(v<0?'-$':'+$')+Math.abs(v).toFixed(2),kind=p=>window.jlKind(p);
@@ -76,7 +76,7 @@ function tags(){$('jTags').innerHTML=TAGS.map(t=>{const on=cur.tags.includes(t);
 /*SH-START*/
 /* Several screenshots per journal. Stored as tiny JPEGs in one synced key, journall_shots_v1, with a small total budget
    and a check against the cloud document size limit, because every synced key lives in one Firestore document. */
-const SHK='journall_shots_v1',SH_PER=4,SH_IMG=28000,SH_TOTAL=300000,SH_DOC=800000;
+const SHK=JL_KEYS.keys.JOURNALL_SHOTS_V1,SH_PER=4,SH_IMG=28000,SH_TOTAL=300000,SH_DOC=800000;
 /*SH-PURE-START*/
 const shId=id=>{id=String(id==null?'':id);const c=id.charAt(0);return(c==='L'||c==='j')?id.slice(1):id};
 const shClean=raw=>{const out={};if(!raw||typeof raw!=='object'||Array.isArray(raw))return out;Object.keys(raw).forEach(k=>{const v=raw[k];if(!Array.isArray(v))return;out[k]=v.filter(x=>typeof x==='string'&&/^data:image\/jpeg;base64,/.test(x)).slice(0,4)});return out};
@@ -89,7 +89,7 @@ const shWrite=m=>{try{localStorage.setItem(SHK,JSON.stringify(m));return true}ca
 const shFor=id=>(shRead()[shId(id)]||[]).slice();
 function shSave(id){const m=shRead(),k=shId(id),l=(cur.shots||[]).slice();if(!l.length&&!(k in m))return true;m[k]=l;return shWrite(m)}
 function shClear(id){const m=shRead(),k=shId(id);if(m[k]&&m[k].length){m[k]=[];shWrite(m)}}
-function shSynced(){let n=0;try{for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(!k||k==='krishna_journal_form_draft'||k==='krishna_psychology_form_draft')continue;if(k==='theme'||k==='selectedDate'||['viz','viztrade','krishna','journall'].some(p=>k.indexOf(p)===0))n+=k.length+(localStorage.getItem(k)||'').length}}catch(_){console.debug('[journall] ignored error in journal-tab.js:', _);}return n}
+function shSynced(){let n=0;try{for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(!k||k===JL_KEYS.keys.KRISHNA_JOURNAL_FORM_DRAFT||k===JL_KEYS.keys.KRISHNA_PSYCHOLOGY_FORM_DRAFT)continue;if(k==='theme'||k==='selectedDate'||['viz','viztrade','krishna','journall'].some(p=>k.indexOf(p)===0))n+=k.length+(localStorage.getItem(k)||'').length}}catch(_){console.debug('[journall] ignored error in journal-tab.js:', _);}return n}
 function shShrink(file){return new Promise((res,rej)=>{const url=URL.createObjectURL(file),im=new Image();
   im.onload=()=>{URL.revokeObjectURL(url);try{
     for(const side of [560,480,400,320,260]){const sc=Math.min(1,side/Math.max(im.naturalWidth,im.naturalHeight)),w=Math.max(1,Math.round(im.naturalWidth*sc)),h=Math.max(1,Math.round(im.naturalHeight*sc)),cv=document.createElement('canvas');cv.width=w;cv.height=h;const g=cv.getContext('2d');g.fillStyle='#fff';g.fillRect(0,0,w,h);g.drawImage(im,0,0,w,h);
@@ -114,7 +114,7 @@ $('jShotBox').addEventListener('click',e=>{const x=e.target.closest('[data-shx]'
 function resetAtt(){if(urls.rec){URL.revokeObjectURL(urls.rec);urls.rec=null}$('jRecBox').textContent=cur.rec?cur.rec+' (attach again to preview)':PH.rec;shPaint()}
 function fields(e){e=e||{};$('jMis').value=e.mistake||'';$('jBef').value=e.before||'';$('jAft').value=e.after||'';$('jImp').value=e.improve||'';$('jDate').value=e.date||(window.getTradingDayIST?window.getTradingDayIST():new Date().toISOString().slice(0,10));$('jSetup').value=e.setup||''}
 /*CF-START*/
-const CFK='journall_confluence_list_v1';let CF=[];try{const v=JSON.parse(localStorage.getItem(CFK));if(Array.isArray(v))CF=v.filter(x=>typeof x==='string'&&x.trim()).map(x=>x.trim())}catch(e){console.debug('[journall] ignored error in journal-tab.js:', e);}
+const CFK=JL_KEYS.keys.JOURNALL_CONFLUENCE_LIST_V1;let CF=[];try{const v=JSON.parse(localStorage.getItem(CFK));if(Array.isArray(v))CF=v.filter(x=>typeof x==='string'&&x.trim()).map(x=>x.trim())}catch(e){console.debug('[journall] ignored error in journal-tab.js:', e);}
 let cfEdit=false;const cfSave=()=>{try{localStorage.setItem(CFK,JSON.stringify(CF))}catch(e){console.debug('[journall] ignored error in journal-tab.js:', e);}};
 function conf(){const w=$('jConf');if(!w)return;const all=CF.concat((cur.conf||[]).filter(x=>!CF.includes(x)));
   w.innerHTML=all.length?all.map(t=>{const on=cur.conf.includes(t),inList=CF.includes(t);return '<button type="button" class="j-tg cf'+(on?' on':'')+'" data-cf="'+esc(t)+'" aria-pressed="'+on+'">'+esc(t)+(cfEdit&&inList?'<span class="cf-x" data-cfx="'+esc(t)+'" role="button" aria-label="Remove '+esc(t)+' from list">×</span>':'')+'</button>'}).join(''):'<span class="j-cf-empty">No confluences yet. Add your first one below.</span>';
@@ -174,7 +174,7 @@ function ecard(e){(window.__jlShareE=window.__jlShareE||{})[e.id]=e;const k=e.pn
     (chips?'<div class="jv-chips">'+chips+'</div>':'')+(notes?'<div class="jv-notes">'+notes+'</div>':'')+
     '<div class="jv-foot">'+(e.pnl==null?'':'<button type="button" class="btn-ghost j-sm" data-share="'+esc(e.id)+'">Share</button>')+'<button type="button" class="btn-ghost j-sm" data-ed="'+esc(e.id)+'">Edit</button><button type="button" class="btn-ghost j-sm" data-del="'+esc(e.id)+'">Delete</button>'+(qlByKey[e.key]?'<button type="button" class="btn-ghost j-sm" data-qled="'+esc(qlByKey[e.key])+'">Edit trade</button><button type="button" class="btn-ghost j-sm j-ql-del" data-qldel="'+esc(qlByKey[e.key])+'">Delete trade</button>':'')+'</div></article>'}
 var qlByKey={};
-function qlKeys(){const m={},lk={};try{(JSON.parse(localStorage.getItem('viztrade_trading_page_trades')||'[]')||[]).forEach(t=>{if(t&&/^ql-/.test(String(t.id)))lk[window.JLAdapter.liveKey(t)]=t.id})}catch(_){console.debug('[journall] ignored error in journal-tab.js:', _);}
+function qlKeys(){const m={},lk={};try{(JSON.parse(localStorage.getItem(JL_KEYS.keys.VIZTRADE_TRADING_PAGE_TRADES)||'[]')||[]).forEach(t=>{if(t&&/^ql-/.test(String(t.id)))lk[window.JLAdapter.liveKey(t)]=t.id})}catch(_){console.debug('[journall] ignored error in journal-tab.js:', _);}
   T.forEach(t=>{const id=t&&t._lk!=null?lk[t._lk]:null;if(id)m[key(t)]=id});return m}
 function renderList(){qlByKey=qlKeys();const s=qs.toLowerCase(),a=J.filter(e=>(jf==='All'||(e.pnl==null?'note':kind(e.pnl))===jf)&&(!s||JSON.stringify(e).toLowerCase().includes(s)));
   $('jCnt').textContent=J.length+(J.length===1?' entry':' entries');
@@ -255,7 +255,7 @@ $('jImpFile').addEventListener('change',e=>{const f=e.target.files[0];if(!f)retu
 [['jMis','jMisC'],['jBef','jBefC'],['jAft','jAftC'],['jImp','jImpC']].forEach(([id,cid])=>$(id).addEventListener('input',()=>{$(cid).textContent=$(id).value.length}));
 function syncCounts(){[['jMis','jMisC'],['jBef','jBefC'],['jAft','jAftC'],['jImp','jImpC']].forEach(([id,cid])=>{$(cid).textContent=$(id).value.length})}
 /*DR-START*/
-const DRK='krishna_journal_form_draft';
+const DRK=JL_KEYS.keys.KRISHNA_JOURNAL_FORM_DRAFT;
 /*DR-PURE-START*/
 const drNorm=v=>v==null||v===''||(Array.isArray(v)&&v.every(x=>x==null||x===''))?'':v;
 const DRF=['date','setup','q','tags','conf','emotion','mistake','before','after','improve','shot','rec'];
