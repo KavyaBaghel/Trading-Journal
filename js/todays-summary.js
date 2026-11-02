@@ -189,52 +189,92 @@
 
 
   // ---------- market session rows + real overlaps ----------
-  const SESS = [
-    {name:'Sydney', color:'#7c6cf0', spans:[[22,24],[0,7]]},
-    {name:'Tokyo', color:'#b39ffb', spans:[[0,9]]},
-    {name:'London', color:'#c7cbd6', spans:[[8,17]]},
-    {name:'New York', color:'#43d787', spans:[[13,22]]}
+  // Sessions follow each city's local business hours (8:00-17:00, Tokyo 9:00-18:00) and are
+  // recomputed from the real daylight-saving offsets, so nothing needs editing when clocks change.
+  const SESS_DEF = [
+    {name:'Sydney',   color:'#7c6cf0', tz:'Australia/Sydney', from:8, to:17, fallback:10},
+    {name:'Tokyo',    color:'#b39ffb', tz:'Asia/Tokyo',       from:9, to:18, fallback:9},
+    {name:'London',   color:'#c7cbd6', tz:'Europe/London',    from:8, to:17, fallback:0},
+    {name:'New York', color:'#43d787', tz:'America/New_York', from:8, to:17, fallback:-5}
   ];
-  const OVERLAPS = [
-    {label:'Sydney × Tokyo', sub:'Asian session, lighter volume', start:0, end:7, color:'199,203,214'},
-    {label:'Tokyo × London', sub:'Handover window, brief liquidity dip', start:8, end:9, color:'199,203,214'},
-    {label:'London × New York', sub:'Highest volatility window of the day', start:13, end:17, color:'199,203,214'}
+  const OVERLAP_DEF = [
+    {a:'Sydney', b:'Tokyo', label:'Sydney × Tokyo', sub:'Asian session, lighter volume', color:'199,203,214'},
+    {a:'Tokyo', b:'London', label:'Tokyo × London', sub:'Handover window, brief liquidity dip', color:'199,203,214'},
+    {a:'London', b:'New York', label:'London × New York', sub:'Highest volatility window of the day', color:'199,203,214'}
   ];
+  let SESS = [], OVERLAPS = [], SESS_OPEN_UTC = {}, nowLine = null, sessSig = '';
   function pct(h){ return (h/24*100)+'%'; }
-  let sessHtml = '';
-  SESS.forEach(s=>{
-    sessHtml += '<div class="sess-row"><div class="sess-name"><span class="sess-dot" style="background:'+s.color+';box-shadow:0 0 6px '+s.color+'"></span>'+s.name.toUpperCase()+'</div><div class="sess-track">';
-    s.spans.forEach(sp=>{
-      sessHtml += '<div class="sess-bar" style="left:'+pct(sp[0])+';width:'+pct(sp[1]-sp[0])+';background:'+s.color+';color:'+s.color+'"></div>';
+  function tzOffsetHours(tz, d, fallback){
+    try {
+      const parts = new Intl.DateTimeFormat('en-US',{timeZone:tz,hourCycle:'h23',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit'}).formatToParts(d);
+      const o = {}; parts.forEach(p=>{ o[p.type] = p.value; });
+      const asUtc = Date.UTC(+o.year, +o.month-1, +o.day, (+o.hour)%24, +o.minute, +o.second);
+      const off = Math.round((asUtc - Math.floor(d.getTime()/1000)*1000)/900000)/4; // hours, nearest quarter
+      return isFinite(off) ? off : fallback;
+    } catch(e){ return fallback; }
+  }
+  function computeSessions(d){
+    SESS = SESS_DEF.map(s=>{
+      const off = tzOffsetHours(s.tz, d, s.fallback);
+      const open = (((s.from - off) % 24) + 24) % 24;
+      const close = open + (s.to - s.from);
+      SESS_OPEN_UTC[s.name] = open;
+      return {name:s.name, color:s.color, off:off, spans: close <= 24 ? [[open,close]] : [[open,24],[0,close-24]]};
     });
-    sessHtml += '</div></div>';
-  });
-  document.getElementById('sessBody').innerHTML =
-    sessHtml +
-    '<div class="overlay-layer" id="overlayLayer"></div>';
-  const overlay = document.getElementById('overlayLayer');
-  const rowsH = SESS.length*27 - 9;
-  OVERLAPS.forEach(o=>{
-    const band = document.createElement('div');
-    band.className = 'overlap-band';
-    band.style.left = pct(o.start); band.style.width = pct(o.end-o.start); band.style.height = rowsH+'px';
-    band.style.pointerEvents = 'auto';
-    band.addEventListener('mouseenter', e=>showTip(e,
-      '<div class="th">'+o.label+'</div><div class="tsub">'+o.sub+'</div><div class="tr" style="margin-top:6px"><span>Window</span><b>'+String(o.start).padStart(2,'0')+':00–'+String(o.end).padStart(2,'0')+':00 UTC</b></div>'));
-    band.addEventListener('mousemove', e=>showTip(e, ttip.innerHTML));
-    band.addEventListener('mouseleave', hideTip);
-    overlay.appendChild(band);
-  });
-  const nowLine = document.createElement('div');
-  nowLine.className = 'now-line'; nowLine.style.height = rowsH+'px';
-  overlay.appendChild(nowLine);
+    OVERLAPS = [];
+    OVERLAP_DEF.forEach(def=>{
+      const A = SESS.find(x=>x.name===def.a).spans, B = SESS.find(x=>x.name===def.b).spans;
+      A.forEach(sa=>B.forEach(sb=>{
+        const st = Math.max(sa[0],sb[0]), en = Math.min(sa[1],sb[1]);
+        if(en > st) OVERLAPS.push({label:def.label, sub:def.sub, start:st, end:en, color:def.color});
+      }));
+    });
+    return JSON.stringify(SESS.map(s=>s.spans));
+  }
+  function renderSessions(){
+    let sessHtml = '';
+    SESS.forEach(s=>{
+      sessHtml += '<div class="sess-row"><div class="sess-name"><span class="sess-dot" style="background:'+s.color+';box-shadow:0 0 6px '+s.color+'"></span>'+s.name.toUpperCase()+'</div><div class="sess-track">';
+      s.spans.forEach(sp=>{
+        sessHtml += '<div class="sess-bar" style="left:'+pct(sp[0])+';width:'+pct(sp[1]-sp[0])+';background:'+s.color+';color:'+s.color+'"></div>';
+      });
+      sessHtml += '</div></div>';
+    });
+    document.getElementById('sessBody').innerHTML =
+      sessHtml +
+      '<div class="overlay-layer" id="overlayLayer"></div>';
+    const overlay = document.getElementById('overlayLayer');
+    const rowsH = SESS.length*27 - 9;
+    OVERLAPS.forEach(o=>{
+      const band = document.createElement('div');
+      band.className = 'overlap-band';
+      band.style.left = pct(o.start); band.style.width = pct(o.end-o.start); band.style.height = rowsH+'px';
+      band.style.pointerEvents = 'auto';
+      band.addEventListener('mouseenter', e=>showTip(e,
+        '<div class="th">'+o.label+'</div><div class="tsub">'+o.sub+'</div><div class="tr" style="margin-top:6px"><span>Window</span><b>'+String(o.start).padStart(2,'0')+':00–'+String(o.end).padStart(2,'0')+':00 UTC</b></div>'));
+      band.addEventListener('mousemove', e=>showTip(e, ttip.innerHTML));
+      band.addEventListener('mouseleave', hideTip);
+      overlay.appendChild(band);
+    });
+    nowLine = document.createElement('div');
+    nowLine.className = 'now-line'; nowLine.style.height = rowsH+'px';
+    overlay.appendChild(nowLine);
+  }
+  // Rebuild the rows only when a daylight-saving change actually moves a session.
+  function ensureSessions(d){
+    const sig = computeSessions(d);
+    if(sig !== sessSig){ sessSig = sig; renderSessions(); }
+  }
 
   // One live clock (UTC) drives the marker, the IST label and the pill.
-  const SESS_OPEN_UTC = {'Sydney':22,'Tokyo':0,'London':8,'New York':13};
   function marketSessionState(d){
     const h = d.getUTCHours() + d.getUTCMinutes()/60;
-    const dow = d.getUTCDay(); // 0 Sun ... 6 Sat
-    const closed = dow===6 || (dow===5 && h>=22) || (dow===0 && h<22);
+    // Forex week: closes Fri 17:00 and reopens Sun 17:00 New York time (22:00 UTC in winter, 21:00 UTC in summer)
+    const nyS = SESS.find(x=>x.name==='New York');
+    const nl = new Date(d.getTime() + (nyS ? nyS.off : -5)*3600000);
+    const dow = nl.getUTCDay(); // 0 Sun ... 6 Sat, New York calendar day
+    const lh = nl.getUTCHours() + nl.getUTCMinutes()/60;
+    const closed = dow===6 || (dow===5 && lh>=17) || (dow===0 && lh<17);
     let pill;
     if(closed){ pill = 'Forex closed (weekend)'; }
     else {
@@ -255,6 +295,7 @@
   }
   function updateMarketSession(){
     const d = new Date();
+    ensureSessions(d);
     const st = marketSessionState(d);
     let ist;
     try { ist = new Intl.DateTimeFormat('en-GB',{timeZone:'Asia/Kolkata',hour:'2-digit',minute:'2-digit',hour12:false}).format(d); }
