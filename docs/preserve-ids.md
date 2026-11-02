@@ -1,5 +1,7 @@
 # preserve-ids.md
 
+> **Out of date.** This file describes the UI before the redesign and the split of `index.html` into `js/` and `css/`. On `main` @ `bfc121c`, 185 of the 200 ids listed below no longer exist in `index.html` or `js/` (checked by script). The ids that matter now are the ones the code reads; find them with a search instead of this list. Use it only as history. Current layout: `docs/ARCHITECTURE.md`.
+
 ## Purpose
 This is the ground-truth list of every `id="..."` attribute referenced via `getElementById()` in `index.html`, extracted directly from the file (not guessed). During the full visual redesign, **every one of these IDs must remain exactly as-is** — same spelling, same casing, on the same type of element performing the same role. Visible text, styling, layout position, and surrounding markup can all change freely. The ID itself cannot.
 

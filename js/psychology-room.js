@@ -779,7 +779,7 @@
       <button class="btn-primary psy-full" style="margin-top:14px" data-act="complete-debrief">Complete live trade</button>
       <div class="psy-actions">
         <button class="btn-ghost" data-act="goto" data-n="4">Back</button>
-        <a href="https://kavyabaghel.github.io/Trading-Journal" target="_blank" style="flex:1;min-width:120px;text-decoration:none;display:block"><button class="btn-ghost" type="button" style="width:100%">Open Journal</button></a>
+        <a href="${(window.JL_CONFIG&&window.JL_CONFIG.siteUrl)||'https://kavyabaghel.github.io/Trading-Journal'}" target="_blank" style="flex:1;min-width:120px;text-decoration:none;display:block"><button class="btn-ghost" type="button" style="width:100%">Open Journal</button></a>
       </div>`;
   }
 

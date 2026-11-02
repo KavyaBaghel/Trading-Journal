@@ -87,7 +87,7 @@
     function done(){window.__jlSyncBusy=false;btn.disabled=false;btn.textContent='\u27f3 Sync balance'}
     window.__jlSyncBusy=true;window.__jlSyncMsg='';btn.disabled=true;btn.textContent='Syncing\u2026';msg('Connecting to MT5 bridge\u2026');
     var ac=typeof AbortController==='function'?new AbortController():null,to=ac&&setTimeout(function(){ac.abort()},45000);
-    fetch('http://localhost:8787/api/sync-broker',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({platform:'mt5',days:3}),cache:'no-store',signal:ac?ac.signal:undefined})
+    fetch(((window.JL_CONFIG&&window.JL_CONFIG.localBridgeUrl)||'http://localhost:8787')+'/api/sync-broker',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({platform:'mt5',days:3}),cache:'no-store',signal:ac?ac.signal:undefined})
     .then(function(r){return r.json()}).then(function(d){if(to)clearTimeout(to);
       if(d&&d.error){msg('MT5 error: '+d.error);done();return}
       /* Sync reads the balance and adds recent trades. Trade times come from the bridge's openTime (MT5 server clock, same as a report), and a position already in the journal is never added twice. */
