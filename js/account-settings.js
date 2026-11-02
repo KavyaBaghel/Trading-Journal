@@ -242,13 +242,6 @@
     });
   });
 
-  function ggBump(el){
-    if(!el) return;
-    el.classList.remove('bump');
-    void el.offsetWidth; // restart animation
-    el.classList.add('bump');
-  }
-
   function ggCountUp(el, end, prefix, dur){
     const t0 = performance.now();
     function tick(t){

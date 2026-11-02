@@ -555,7 +555,6 @@ const $ = id => document.getElementById(id);
   $('dateStrA').textContent = new Date().toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
   const G='#43d787',R='#f0685c',GR='#8b90a3';
   const money=(v,d=2)=>(v<0?'-$':'+$')+Math.abs(v).toLocaleString('en-US',{minimumFractionDigits:d,maximumFractionDigits:d});
-  function rng(s){return()=>{s|=0;s=s+0x6D2B79F5|0;let t=Math.imul(s^s>>>15,1|s);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
   function ticks(min,max,n){const raw=(max-min)/n,p=Math.pow(10,Math.floor(Math.log10(raw))),f=raw/p,st=(f<=1?1:f<=2?2:f<=5?5:10)*p,t=[];for(let v=Math.floor(min/st)*st;v<=Math.ceil(max/st)*st+1e-9;v+=st)t.push(v);return t}
   function tip(el,fn){el.addEventListener('mousemove',e=>showTip(e,fn(e)));el.addEventListener('mouseleave',hideTip)}
   function frame(vals,W,H,pl,pr,pt,pb,n){const t=ticks(Math.min(0,...vals),Math.max(0,...vals),n||4),lo=t[0],hi=t[t.length-1],y=v=>pt+(hi-v)/(hi-lo)*(H-pt-pb);let g='';
