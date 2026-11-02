@@ -5,7 +5,7 @@
   if(!root) return;
   var DAY=864e5, IST=5.5*36e5;
   var CCY={US:'USD',EU:'EUR',GB:'GBP',UK:'GBP',JP:'JPY',CA:'CAD',AU:'AUD',CN:'CNY',CH:'CHF',NZ:'NZD',DE:'EUR',FR:'EUR',IT:'EUR',ES:'EUR'};
-  var RULE_KEY='krishna_tomorrow_rule';
+  var RULE_KEY=JL_KEYS.keys.KRISHNA_TOMORROW_RULE;
   function $(id){ return document.getElementById(id); }
   function esc(v){ return String(v==null?'':v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
   function pad(n){ return n<10?'0'+n:''+n; }
@@ -15,7 +15,7 @@
   function fmtDay(k,o){ return parseKey(k).toLocaleDateString('en-US',Object.assign({timeZone:'UTC'},o)); }
   function money(v){ return (v<0?'-$':'+$')+Math.abs(v).toFixed(2); }
   /* Preview switch: open the app with ?weekendPreview=1 to see this panel on a weekday (as of the most recent Saturday, so it shows last week's real trades). ?weekendPreview=0 or the Exit preview button turns it off. */
-  var PREV_KEY='jl_weekend_preview';
+  var PREV_KEY=JL_KEYS.keys.JL_WEEKEND_PREVIEW;
   try{ var pm=/[?&]weekendPreview=([^&#]*)/.exec(location.search||''); if(pm){ if(pm[1]==='1'||pm[1]==='on') localStorage.setItem(PREV_KEY,'1'); else if(pm[1]==='0'||pm[1]==='off') localStorage.removeItem(PREV_KEY); } }catch(e){console.debug('[journall] ignored error in weekly-review.js:', e);}
   function previewOn(){ try{ return localStorage.getItem(PREV_KEY)==='1'; }catch(e){ return false; } }
   function realToday(){ return typeof window.getTradingDayIST==='function' ? window.getTradingDayIST() : ''; }

@@ -48,11 +48,11 @@ function weakNow(){
   try{
     if(typeof window.jlWeakTimes!=='function')return{warn:false,parts:[]};
     var off=null;
-    try{var s=JSON.parse(localStorage.getItem('jlAccountSettings')||'null');if(s&&s.brokerUtcOffset!==''&&s.brokerUtcOffset!=null&&isFinite(Number(s.brokerUtcOffset)))off=Number(s.brokerUtcOffset)}catch(e){console.debug('[journall] ignored error in circuit-breaker.js:', e);}
+    try{var s=JSON.parse(localStorage.getItem(JL_KEYS.keys.JL_ACCOUNT_SETTINGS)||'null');if(s&&s.brokerUtcOffset!==''&&s.brokerUtcOffset!=null&&isFinite(Number(s.brokerUtcOffset)))off=Number(s.brokerUtcOffset)}catch(e){console.debug('[journall] ignored error in circuit-breaker.js:', e);}
     return weakNowEval(window.jlWeakTimes(window.__trades||[],3,off),Date.now());
   }catch(e){return{warn:false,parts:[]}}
 }
-var SNZ_KEY='jlWeakSnoozeUntil',SNZ_MS=6*3600000,CB_KEY='jlCircuitDismissed',cbCur={day:'',sig:''};
+var SNZ_KEY=JL_KEYS.keys.JL_WEAK_SNOOZE_UNTIL,SNZ_MS=6*3600000,CB_KEY=JL_KEYS.keys.JL_CIRCUIT_DISMISSED,cbCur={day:'',sig:''};
 function weakSnoozed(){try{return Number(localStorage.getItem(SNZ_KEY)||0)>Date.now()}catch(e){return false}}
 function cbDismissed(day,sig){try{var o=JSON.parse(localStorage.getItem(CB_KEY)||'null');return !!o&&o.day===day&&o.sig===sig}catch(e){return false}}
 function cbSig(why){return (why||[]).map(function(w){return String(w).split(' (')[0].replace(/\d+/g,'#')}).join('|')}

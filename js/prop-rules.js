@@ -1,7 +1,7 @@
 (function(){
 /* Prop firm progress: consistency rule, minimum trading days, profit split and a payout log.
    Every number comes from Account Settings or from what you type. Nothing is assumed. */
-var PK='journall_payouts_v1';
+var PK=JL_KEYS.keys.JOURNALL_PAYOUTS_V1;
 /*PR-PURE-START*/
 function dayNets(trades){var m={},order=[];(Array.isArray(trades)?trades:[]).forEach(function(t){if(!t||!t.d)return;var p=Number(t.pnl);if(!isFinite(p))return;if(!(t.d in m)){m[t.d]=0;order.push(t.d)}m[t.d]+=p});
   return order.sort().map(function(d){return{d:d,net:Math.round(m[d]*100)/100}})}
@@ -81,7 +81,7 @@ function rd(){try{return JSON.parse(localStorage.getItem(PK))}catch(_){return nu
 function wr(v){try{localStorage.setItem(PK,JSON.stringify(v));return true}catch(_){msg('Could not save. Browser storage may be full.');return false}}
 function msg(t){var m=$('prMsg');if(m)m.textContent=t||''}
 function opts(){return{consPct:Number(window.jlConsistencyPct)||0,minDays:Number(window.jlMinTradingDays)||0,split:Number(window.jlProfitSplit)||0}}
-var CK='journall_challenges_v1',SK='journall_prop_scope_v1';
+var CK=JL_KEYS.keys.JOURNALL_CHALLENGES_V1,SK=JL_KEYS.keys.JOURNALL_PROP_SCOPE_V1;
 function rdC(){try{return JSON.parse(localStorage.getItem(CK))}catch(_){return null}}
 function wrC(v){try{localStorage.setItem(CK,JSON.stringify(v));return true}catch(_){cmsg('Could not save. Browser storage may be full.');return false}}
 function cmsg(t){var m=$('chMsg');if(m)m.textContent=t||''}
@@ -110,7 +110,7 @@ if(card)card.addEventListener('click',function(e){var t=e.target;if(!t.closest)r
   var del=t.closest('[data-prdel]');if(del){
     if(del.getAttribute('data-arm')!=='1'){del.setAttribute('data-arm','1');del.textContent='Tap again to delete';clearTimeout(armT);armT=setTimeout(render,3000);return}
     clearTimeout(armT);var id=del.getAttribute('data-prdel');wr(cleanPayouts(rd()).filter(function(p){return p.id!==id}));render()}});
-function rdA(){try{return JSON.parse(localStorage.getItem('jlAccountSettings'))}catch(_){return null}}
+function rdA(){try{return JSON.parse(localStorage.getItem(JL_KEYS.keys.JL_ACCOUNT_SETTINGS))}catch(_){return null}}
 var planTouched=false;
 function pmsg(t){var m=$('prPlanMsg');if(m)m.textContent=t||''}
 function planPhases(key,sel){var p=fpFind(key),ph=$('prPlanPh');if(!ph)return;
