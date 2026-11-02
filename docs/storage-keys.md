@@ -1,5 +1,7 @@
 # Storage keys
 
+The names below are also defined in `js/storage-keys.js` (`window.JL_KEYS`), and every script reads them from there. Add a new key to that file first, then to this list.
+
 Captured at runtime on `main` @ `bfc121c` (2026-11-01) by wrapping `Storage.prototype.getItem/setItem/removeItem` and clicking all 12 tabs in the browser smoke test (`tests/e2e/smoke.py`, signed in with stubbed Firebase, 40 sample trades). This is the real key list that `docs/REFACTOR_HANDOFF.md` said was unknown.
 
 **Coverage caveat.** Only keys touched during that session are listed. Keys that need a real action (a screenshot upload, deleting a journal, a broker sync, a snooze) can be missing. The "Seen in code only" section lists those, found by reading the source. Dynamic key families are listed separately. Keys ending in `_test_uid` come from the test user and are really `_<uid>` per user.
@@ -88,7 +90,7 @@ Constants found by reading `js/`.
 
 - `jlPsy:<stage>:<name>` built from `LS_PREFIX` in `psychology-room.js`. Device-only.
 - `jlOvChk:<YYYY-MM-DD>` from `ovChkKey()`. Device-only.
-- `journall_custom_username_<uid>`, `journall_user_email_<uid>`, `journall_user_name_<uid>`. Synced.
+- `journall_custom_username_<uid>`, `journall_user_email_<uid>`, `journall_user_name_<uid>`, `journall_user_photo_<uid>` (found in code, not hit by the smoke run). Synced.
 - Profile images in `profile-tab.js`: `journall_profile_{avatar,cover}_img` (synced copy) and `jlimg_profile_{avatar,cover}_{dev,v1}` (device and legacy copies).
 
 ## Rules for the storage layer (item 4)
