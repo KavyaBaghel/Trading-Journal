@@ -1,0 +1,5 @@
+.aic-rule-edit{display:flex;gap:6px;margin-top:10px}
+.aic-rule-edit input{flex:1;min-width:0;background:var(--panel-2);border:1px solid var(--border);border-radius:var(--r-2);color:var(--text);font-family:inherit;font-size:var(--fs-3);padding:8px 10px}
+.aic-rule-edit input:focus{outline:none;border-color:var(--accent-2)}
+.aic-rule-edit .gg-btn-outline{padding:8px 12px}
+.aic-priv{color:var(--faint);font-size:var(--fs-1);margin-top:8px}

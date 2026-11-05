@@ -1,0 +1,1181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<meta name="robots" content="noindex, nofollow, noarchive"/>
+<meta name="theme-color" content="#08080d"/>
+<link rel="manifest" href="manifest.webmanifest"/>
+<meta name="mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-title" content="Journall"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg?v=20261004"/>
+<link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png?v=20261004"/>
+<link rel="icon" type="image/png" sizes="192x192" href="assets/icon-192.png?v=20261004"/>
+<link rel="shortcut icon" href="assets/app-icon.ico?v=20261004"/>
+<link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png?v=20261004"/>
+<title>Journall</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300..800&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="css/auth-gate.css"/>
+<link rel="stylesheet" href="css/design.css"/>
+<link rel="stylesheet" href="css/accounts.css"/>
+<link rel="preload" href="css/weekly-review.css" as="style"/>
+<link rel="stylesheet" href="css/profile.css"/>
+<script id="jl-storage-keys" src="js/storage-keys.js"></script>
+<script id="jl-perf-timers" src="js/perf-timers.js"></script>
+<script src="js/profile-card-spotlight.js"></script>
+<script id="jl-app-config" src="js/app-config.js"></script>
+<style id="jl-guard-css">
+/* ID-scoped guard: keeps the design's global rules (*, html, body, table) off the sign-in gate. Refined by the pixel-diff (Step 3.8). */
+#firebaseAuthBar,#firebaseAuthGate,#firebaseAuthLoading,#firebaseAuthBar *,#firebaseAuthGate *,#firebaseAuthLoading *{box-sizing:border-box}
+#jlDesign{height:100%}
+#jlDesign[hidden]{display:none !important}
+</style>
+<style id="journall-logo-img">.logo>img,.jl-mark>img,.journall-loading-mark>img{display:block;width:100%;height:100%;object-fit:cover;pointer-events:none;-webkit-user-drag:none;user-select:none}.logo>img{border-radius:10px}.jl-mark>img,.journall-loading-mark>img{border-radius:12px}</style>
+</head>
+<body>
+<button id="androidInstallBtn" class="android-install-btn" type="button" hidden>Install Journall</button>
+<div id="firebaseAuthBar" class="firebase-auth-bar">
+  <div>
+    <strong>Journall</strong>
+    <span id="firebaseAuthStatus">Sign in required</span>
+  </div>
+  <div class="firebase-auth-actions">
+    <button id="firebaseSignInBtn" class="btn primary" type="button">Sign in with Google</button>
+    <button id="firebaseSignOutBtn" class="btn" type="button">Sign out</button>
+  </div>
+</div>
+<div id="firebaseAuthGate" class="firebase-auth-gate show">
+  <div class="jl-bg" aria-hidden="true"><span class="jl-bg-glow"></span><canvas class="jl-bg-canvas"></canvas><span class="jl-bg-spot-glow"></span></div>
+
+    <div id="firebaseAuthLoading" class="login-loading"><div class="journall-loading-bg" aria-hidden="true"><span class="journall-bg-glow"></span><canvas class="journall-bg-canvas"></canvas><span class="journall-bg-spot-glow"></span></div><div class="journall-loading-tilt" id="loadingTilt"><div class="journall-loading-logo" role="img" aria-label="Journall"><span class="journall-loading-mark" id="loadingMark" aria-hidden="true"><img src="assets/icon-192.png?v=20261004" alt="" decoding="async"/></span><span class="journall-loading-wordmark" aria-hidden="true">Journall</span></div></div><p id="firebaseAuthLoadingText" class="journall-loading-subtitle">Loading Journall...</p><div class="journall-loading-progress" aria-hidden="true"><span class="journall-loading-progress-track"></span></div><button id="firebaseAuthRetryBtn" class="btn primary" type="button" hidden>Retry</button></div>
+<div class="jl-logo-wrap">
+  <div class="jl-logo" role="img" aria-label="Journall">
+    <span class="jl-mark"><img src="assets/icon-192.png?v=20261004" alt="" decoding="async"/></span>
+    <span class="jl-wordmark">Journall</span>
+  </div>
+</div>
+<div class="jl-heading">
+  <p class="jl-title">Welcome back</p>
+  <p class="jl-subtitle">Sign in to get back to your trades.</p>
+</div>
+<form id="jlEmailForm" class="firebase-auth-card journall-signin-card" method="post" action="#" onsubmit="event.preventDefault();return false;" novalidate hidden>
+  <button id="firebaseGateSignInBtn" class="jl-btn jl-btn-google" type="button"><span id="googleBtnContent" class="jl-btn-google-content"><svg class="google-logo-svg" viewBox="0 0 24 24" width="18" height="18"><path fill="#EA4335" d="M12 5.04c1.7 0 3.2.6 4.4 1.8l3.3-3.3C17.7 1.6 15 1 12 1 7.3 1 3.4 3.7 1.5 7.7l3.9 3C6.3 7.7 8.9 5.04 12 5.04z"/><path fill="#4285F4" d="M23.5 12.3c0-.8-.1-1.7-.2-2.5H12v4.8h6.5c-.3 1.5-1.1 2.8-2.4 3.7l3.7 2.9c2.2-2 3.7-5 3.7-8.9z"/><path fill="#FBBC05" d="M5.4 14.7c-.3-.8-.4-1.7-.4-2.7s.1-1.9.4-2.7L1.5 6.3C.5 8.2 0 10.3 0 12.5s.5 4.3 1.5 6.2l3.9-3z"/><path fill="#34A853" d="M12 23c3.2 0 6-1.1 7.9-2.9l-3.7-2.9c-1.1.7-2.5 1.2-4.2 1.2-3.1 0-5.7-2.7-6.6-5.7L1.5 15.7C3.4 19.7 7.3 23 12 23z"/></svg><span>Continue with Google</span></span></button>
+  <div class="jl-divider">or</div>
+  <div class="jl-field">
+    <label for="jlEmailInput">Email</label>
+    <input type="email" id="jlEmailInput" name="email" placeholder="you@example.com" autocomplete="email" required>
+    <span class="jl-error" id="jlEmailError"></span>
+  </div>
+  <div class="jl-field">
+    <label for="jlPasswordInput">Password</label>
+    <div class="jl-field-row">
+      <input type="password" id="jlPasswordInput" name="password" placeholder="Enter your password" autocomplete="current-password" required minlength="8">
+      <button type="button" class="jl-toggle-pw" id="jlTogglePw" aria-label="Show password" aria-pressed="false"><svg id="jlEyeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M1.5 12S5 5 12 5s10.5 7 10.5 7-3.5 7-10.5 7S1.5 12 1.5 12Z"/><circle cx="12" cy="12" r="3"/></svg></button>
+    </div>
+    <span class="jl-error" id="jlPasswordError"></span>
+    <div class="jl-field-meta">
+      <button type="button" class="jl-link" id="jlForgotBtn">Forgot password?</button>
+    </div>
+  </div>
+  <button type="submit" class="jl-btn jl-btn-primary" id="jlEmailBtn"><span class="jl-spinner" aria-hidden="true"></span><span class="jl-btn-label">Sign in</span></button>
+  <p class="jl-status" id="jlStatusText" aria-live="polite"></p>
+</form>
+<div id="firebaseGateMessage" class="jl-message">Checking website sign-in...</div>
+<p class="jl-footnote">By continuing, you agree to Journall's Terms and Privacy Policy.</p>
+</div>
+<script src="js/live-balance.js"></script>
+<script id="jl-adapter" src="js/data-adapter.js"></script>
+<script id="jl-accounts" src="js/accounts.js"></script>
+<script id="jl-bootstrap" src="js/data-bootstrap.js"></script>
+<script id="jl-journal-sync" src="js/journal-sync.js"></script>
+<script id="jl-account-sync" src="js/account-sync.js"></script>
+<script id="jl-profile" src="js/profile-username.js"></script>
+<script id="jl-upload-sync" src="js/upload-sync.js"></script>
+<script id="jl-mt-sync" src="js/matchtrader-sync.js"></script>
+<script id="jl-coach" src="js/ai-coach-chat.js"></script>
+<script id="jl-market" src="js/market-data.js"></script>
+<div id="jlDesign" hidden>
+<div class="dotgrid" id="dotgrid" aria-hidden="true"></div>
+<div class="app" id="app">
+<aside class="sidebar" id="sidebar" aria-label="Main navigation">
+  <div class="sb-brand">
+    <div class="logo"><img src="assets/icon-192.png?v=20261004" alt="Journall" width="34" height="34" decoding="async"/></div><span class="brand-name">JOURNALL</span>
+  </div>
+  <nav class="sb-nav" id="sbNav"></nav>
+  <div class="rules">
+    <h4>DAILY RULES</h4>
+    <div class="meter" id="mLoss"><div class="mh"><span>Loss limit</span><b></b></div><div class="bar"><i></i></div></div>
+    <div class="meter" id="mWeek" style="display:none"><div class="mh"><span>Week loss</span><b></b></div><div class="bar"><i></i></div></div>
+    <div class="meter" id="mTrades"><div class="mh"><span>Trade limit</span><b></b></div><div class="bar"><i></i></div></div>
+    <div class="meter" id="mPnl"><div class="mh"><span>Today P&amp;L</span><b></b></div><div class="bar"><i></i></div></div>
+    <div class="meter" id="mWin"><div class="mh"><span>Win rate</span><b></b></div><div class="bar"><i></i></div></div>
+    <div class="rules-reset" id="rulesReset"><span>Rules reset</span><b id="rulesResetTime">--:--:--</b></div>
+  </div>
+</aside>
+<div class="scrim" id="scrim"></div>
+<button class="menu-btn" id="menuBtn" aria-label="Open menu"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
+<main class="main">
+<div class="jl-circuit" id="jlCircuit" role="alert" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 9v4M12 17h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg><div><b id="jlCircuitTitle">Circuit breaker tripped</b><span id="jlCircuitWhy"></span><small id="jlCircuitWait"></small></div><button type="button" class="jl-circuit-x" id="jlCircuitX" aria-label="Dismiss this warning" title="Dismiss" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+<div class="view" id="view-summary">
+<div class="wrap">
+
+  <div class="top aic-reveal" style="animation-delay:0ms">
+    <div>
+      <div class="eyebrow">
+        <span class="streak" id="streakBadge">1-day streak</span>
+        <span class="streak-nudge" id="streakNudge" hidden></span>
+        <span class="date mono" id="dateStr"></span>
+      </div>
+      <h1>Today's Summary</h1>
+      <p>AI-powered · Trade review</p>
+    </div>
+    <div class="top-right">
+      <div class="who"><span class="dot"></span><span data-user-name></span></div>
+    </div>
+  </div>
+
+  <div class="rule-alert" id="ruleAlert">
+    <div class="ic"><svg viewBox="0 0 24 24"><path d="M12 3 2 20h20z"/><path d="M12 10v4M12 17h.01"/></svg></div>
+    <div><b id="ruleAlertTitle">Rule broken</b><span id="ruleAlertMsg"></span></div>
+  </div>
+
+<link rel="stylesheet" href="css/weekly-review-month.css"/>
+  <section class="panel glass" id="weeklyReview" hidden aria-label="Weekly review">
+    <div class="panel-head"><h2>Weekly review</h2><span class="hint" id="wrRange"></span></div>
+    <div id="wrStats"></div>
+    <div class="panel-head wr-prep-head"><h2>Next week prep</h2><span class="hint" id="wrNextRange"></span></div>
+    <div class="wr-prep-grid"><div id="wrRule"></div>
+    <div class="wr-mnote" id="wrMonNote"><label for="wrMonText">Note for Monday</label><textarea id="wrMonText" rows="3" maxlength="1000" placeholder="Write your plan, key levels or reminders for Monday..."></textarea><div class="wr-mnote-f"><span id="wrMonSt">Saved on this device</span><span id="wrMonCt">0/1000</span></div></div></div>
+    <div class="wr-bar">
+      <div class="a-tabs wr-chips" id="wrImpactChips" role="group" aria-label="News impact">
+        <button type="button" class="wr-chip a-tab on" data-val="high" aria-pressed="true">High</button>
+        <button type="button" class="wr-chip a-tab" data-val="medium" aria-pressed="false">Medium+</button>
+        <button type="button" class="wr-chip a-tab" data-val="all" aria-pressed="false">All</button>
+      </div>
+      <button type="button" class="btn-ghost wr-refresh" id="wrRefresh">Refresh events</button>
+    </div>
+    <div id="wrEvents"></div>
+    <div class="hint wr-note" id="wrNote"></div>
+  </section>
+
+  <div class="rings">
+    <div class="ring-card glass">
+      <svg width="76" height="76" viewBox="0 0 88 88">
+        <circle class="ring-track" cx="44" cy="44" r="38"/>
+        <circle class="ring-val" id="ringPnl" cx="44" cy="44" r="38" stroke="var(--green)" style="--off:239"/>
+      </svg>
+      <div>
+        <div class="ring-label">Today P&amp;L</div>
+        <div class="ring-num" id="pnlNum">$0.00</div>
+        <div class="ring-sub" id="pnlSub">Weekly target not set</div>
+        <div class="ring-detail" id="pnlDetail"></div>
+      </div>
+    </div>
+    <div class="ring-card glass">
+      <svg width="76" height="76" viewBox="0 0 88 88">
+        <circle class="ring-track" cx="44" cy="44" r="38"/>
+        <circle class="ring-val" id="ringLoss" cx="44" cy="44" r="38" stroke="var(--green)" style="--off:239"/>
+      </svg>
+      <div>
+        <div class="ring-label">Daily loss used</div>
+        <div class="ring-num" id="lossNum">$0 / $20</div>
+        <div class="ring-sub" id="lossSub">Full room left</div>
+        <div class="ring-detail" id="lossDetail"></div>
+      </div>
+    </div>
+    <div class="ring-card glass">
+      <svg width="76" height="76" viewBox="0 0 88 88">
+        <circle class="ring-track" cx="44" cy="44" r="38"/>
+        <circle class="ring-val" id="ringTrades" cx="44" cy="44" r="38" stroke="var(--accent-2)" style="--off:239"/>
+      </svg>
+      <div>
+        <div class="ring-label">Today's trades</div>
+        <div class="ring-num" id="tradesNum">0 / 8</div>
+        <div class="ring-sub" id="tradesSub">0 rule breaks</div>
+        <div class="ring-detail" id="tradesDetail"></div>
+      </div>
+    </div>
+    </div>
+
+  <div class="session glass" id="sessionCard">
+    <div class="session-top">
+      <div class="l">Market session</div>
+      <div class="now-txt mono" id="nowTxt">--</div>
+    </div>
+    <div class="sess-body" id="sessBody"></div>
+    <div class="ticks"><span>00:00</span><span>06:00</span><span>12:00</span><span>18:00</span><span>24:00 UTC</span></div>
+  </div>
+
+  <div class="row4" id="summaryRow4">
+    <div class="card glass">
+      <div class="card-head"><span class="l">Best next action</span>
+        <svg viewBox="0 0 24 24"><path d="M13 2 3 14h7l-1 8 11-14h-7l1-6z"/></svg></div>
+      <div class="v" id="bestAction">Wait for A+ setup</div>
+      <div class="meta" id="bestActionMeta">No trades logged yet today</div>
+    </div>
+    <div class="card glass">
+      <div class="card-head"><span class="l">Status</span>
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/></svg></div>
+      <div class="v"><span class="status-dot" id="statusDot"></span><span id="statusVal">Safe to trade</span></div>
+      <div class="meta" id="statusMeta">Since 06:00 IST reset</div>
+    </div>
+    <div class="card glass">
+      <div class="card-head"><span class="l">Suggested risk / trade</span>
+        <svg viewBox="0 0 24 24"><path d="M12 2 2 7v6c0 5 4 8.5 10 9 6-.5 10-4 10-9V7z"/></svg></div>
+      <div class="v" id="riskVal">$20.00</div>
+      <div class="meta" id="riskMeta">Set a profit target and trade limit in Account Settings</div>
+    </div>
+    <div class="card glass">
+      <div class="card-head"><span class="l">Today's focus</span>
+        <svg viewBox="0 0 24 24"><path d="M4 4h16v16H4z"/><path d="M8 9h8M8 13h5"/></svg></div>
+      <div class="v" id="focusVal" style="color:var(--faint);font-weight:500">No saved rule</div>
+      <div class="meta" id="focusMeta">Set one below after review</div>
+    </div>
+  </div>
+
+  <div class="split">
+    <div class="panel glass">
+      <div class="panel-head"><div class="a-s-ttl"><span class="a-s-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="m8.5 12.5 2.5 2.5 4.5-5"/></svg></span><h2>Setup scan</h2></div><span class="hint" id="chkHint">0 / 0 complete</span></div>
+      <div class="progress" id="chkBarWrap"><i id="chkBar" style="width:0%"></i></div>
+      <ul class="checklist" id="checklist"></ul>
+      <div class="chk-foot"><a href="#psychology" id="chkEditLink">Edit setup scan in Psychology tab</a><button type="button" id="chkReset">Reset today</button></div>
+      <div class="rule-box">
+        <div class="l">Tomorrow's rule</div>
+        <input type="text" id="ruleInput" maxlength="200" autocomplete="off" placeholder="e.g. Only trade the London open">
+        <button type="button" class="btn-primary j-sm" id="ruleSave" style="margin-top:10px">Save rule</button>
+      </div>
+    </div>
+    <div class="panel glass">
+      <div class="panel-head"><div class="a-s-ttl"><span class="a-s-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/></svg></span><h2>Today AI notes</h2></div><span class="hint" id="notesHint"></span></div>
+      <div id="notesPanel">
+        <div class="notes-empty">
+          <div class="t">No insights yet</div>
+          <div class="s">Upload today's trading export to generate live review notes.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="split">
+    <div class="panel glass">
+      <div class="panel-head"><div class="a-s-ttl"><span class="a-s-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3v18h18M7 14l4-4 3 3 5-6"/></svg></span><h2>Today equity curve</h2></div><span class="hint" id="curveHint"></span></div>
+      <div id="curvePanel">
+        <div class="curve-empty">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="var(--faint)" stroke-width="1.5"><path d="M3 17l6-6 4 4 8-8"/></svg>
+          Upload today's trading export to generate the intraday curve.
+        </div>
+      </div>
+    </div>
+    <div class="panel glass">
+      <div class="panel-head"><div class="a-s-ttl"><span class="a-s-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v16M6 20h12M5 8h14M5 8l-2.5 6a3 3 0 0 0 5 0zM19 8l-2.5 6a3 3 0 0 0 5 0z"/></svg></span><h2>Risk / reward — today</h2></div><span class="hint">Session view</span></div>
+      <div class="rr-grid">
+        <div class="rr-tile"><div class="l">Avg win / avg loss</div><div class="v" id="avgWL">—</div></div>
+        <div class="rr-tile"><div class="l">Trades to target</div><div class="v" id="toTarget">—</div></div>
+        <div class="rr-tile"><div class="l">Profit factor</div><div class="v" id="pfactor">—</div></div>
+        <div class="rr-tile"><div class="l">Expectancy / trade</div><div class="v" id="expectancy">—</div></div>
+        <div class="rr-tile"><div class="l">Mood</div><div class="v" id="mood">—</div></div>
+        <div class="rr-tile"><div class="l">Win streak</div><div class="v" id="streak">—</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel glass" style="margin-bottom:14px" id="djPanel">
+    <div class="panel-head"><div class="a-s-ttl"><span class="a-s-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h11a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3z"/><path d="M5 17a3 3 0 0 1 3-3h11"/></svg></span><div class="a-s-ttl"><span class="a-s-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h11a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3z"/><path d="M5 17a3 3 0 0 1 3-3h11"/></svg></span><h2>Daily journal</h2></div></div><span class="hint" id="djHint"></span></div>
+    <div class="dj-grid"><div class="dj-col" id="djPre"></div><div class="dj-col" id="djPost"></div></div>
+  </div>
+
+  <div class="panel glass" style="margin-bottom:14px">
+    <div class="panel-head">
+      <div class="a-s-ttl"><span class="a-s-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/></svg></span><h2>Post Session Review</h2></div>
+      <span class="pill">AI end-of-day coach</span>
+    </div>
+    <div style="display:flex;gap:10px;margin-bottom:14px">
+      <button class="btn-primary" id="genReview">Generate Review</button>
+      <button class="btn-ghost" id="clearReview">Clear</button>
+    </div>
+    <div class="hint" id="reviewStatus" style="margin-bottom:14px">No trades found for today.</div>
+    <div id="reviewBox">
+      <div class="review-empty">
+        <span class="review-dot"></span>
+        <div><div class="t">No post-session review yet.</div><div class="s">Upload today's trades, then generate the review.</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel glass">
+    <div class="tbl-head">
+      <div class="a-s-ttl"><span class="a-s-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 6h13M8 12h13M8 18h13M3.5 6h.01M3.5 12h.01M3.5 18h.01"/></svg></span><h2 style="margin:0">Today's trades</h2></div>
+      <span class="pill" id="tradesPill">0 trades</span>
+    </div>
+    <div style="overflow-x:auto">
+    <table>
+      <thead><tr><th style="width:32px"></th><th>Time</th><th>Symbol</th><th>Side</th><th>Session</th><th>Entry</th><th>Exit</th><th>Duration</th><th>P&amp;L</th><th>Reason</th></tr></thead>
+      <tbody id="tradesBody"><tr><td colspan="10">No trades found for today. Upload today's export.</td></tr></tbody>
+    </table>
+    </div>
+    <div class="footer-meta">
+      <span><span class="lit" id="ftLit"></span>MT5 bridge</span>
+      <span id="syncTxt">Not synced yet</span>
+    </div>
+  </div>
+</div>
+</div>
+<div class="view" id="view-analytics" hidden>
+<div class="wrap">
+<div class="top aic-reveal" style="animation-delay:0ms"><div><div class="eyebrow"><span class="date mono" id="dateStrA"></span></div><h1>Analytics</h1><p></p></div><div class="top-right"><div class="who"><span class="dot"></span><span data-user-name></span></div></div></div>
+
+<section class="a-s a-v">
+ <div class="a-v1"><div class="a-top"><span>Account balance</span><span class="a-badge">Loss zone</span></div>
+  <div class="a-big" style="color:var(--red)">$0.00</div><div class="hint" style="font-size:12px;color:var(--faint)"><b style="color:var(--red)">$0.00</b> from the $0.00 start</div>
+  <div class="a-scale"><div class="a-mk" style="left:0"><span>$4,500<br>max drawdown</span></div><div class="a-mk" style="left:55.56%"><span>$5,000<br>start</span></div><div class="a-mk" style="left:100%"><span>$5,400<br>target</span></div><div class="a-now" style="left:0%"><em>$0.00</em></div></div></div>
+ <div class="a-v2"><div class="a-top"><span>Daily drawdown</span><span class="a-badge ok" id="ddBadge">0% used</span></div>
+  <div class="a-big" id="ddBig" style="color:var(--green)">$0.00</div><div style="font-size:12px;color:var(--faint)"><span id="ddDate"></span> · <span id="ddCnt">0 trades</span> today</div>
+  <div class="a-track"><i id="ddBar" style="width:0%"></i></div><div id="ddNote" style="font-size:12px;color:var(--sub)">Loading your saved limit…</div></div>
+ <div class="a-led"><div><span>Net P&amp;L</span><b style="color:var(--text)">$0.00</b><small>After commission and swap</small></div><div><span>Win rate</span><b style="color:var(--text)">0%</b><small>0W / 0L / 0BE</small></div><div><span>Profit factor</span><b style="color:var(--amber)">0.00</b><small>Gross profit / gross loss</small></div><div><span>Avg win</span><b style="color:var(--green)">$0.00</b><small>Mean winning trade</small></div><div><span>Avg loss</span><b style="color:var(--red)">$0.00</b><small>Mean losing trade</small></div><div><span>Max drawdown</span><b style="color:var(--red)">$0.00</b><small>Worst equity dip</small></div><div><span>Mistakes</span><b style="color:var(--text)">0</b><small>Universal rule mistakes</small></div></div>
+</section>
+
+<div class="a-g a-eq">
+ <section class="a-s"><div class="a-s-head"><div class="a-s-ttl"><span class="a-s-ic"><svg viewBox="0 0 24 24"><path d="M4 19V9M11 19V4M18 19v-7"/></svg></span><h3>Equity curve</h3></div></div><div class="sub" style="margin-left:38px">Cumulative P&amp;L across 0 trades</div><div class="a-plot" id="cEq"></div>
+  <div class="a-read">A rising line means the account is growing; a falling line means losses or a discipline leak. Current result: <b>$0.00</b>.</div></section>
+ <section class="a-s"><div class="a-s-head"><div class="a-s-ttl"><span class="a-s-ic"><svg viewBox="0 0 24 24"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/></svg></span><h3>AI insights</h3></div></div><div class="sub" style="margin-left:38px">Pattern detector</div><ul class="a-ins"><li style="--c:var(--faint)"><b>No trades yet:</b> Nothing to analyse in this dataset.<span></span></li></ul></section>
+</div>
+
+<div class="a-h"><div class="a-h-t"><span class="a-h-ic"><svg viewBox="0 0 24 24"><path d="M12 2 2 7v6c0 5 4 8.5 10 9 6-.5 10-4 10-9V7z"/><path d="M12 8v5M12 16h.01"/></svg></span><h2>Where the money leaks</h2></div><p>Net P&amp;L by category. Pick a lens to see what costs you the most.</p></div>
+<section class="a-s"><div class="a-tabs" role="group" aria-label="Leak category" style="margin-top:0"><button class="a-tab on" data-k="Mistakes" aria-pressed="true">Mistakes</button><button class="a-tab" data-k="Session" aria-pressed="false">Session</button><button class="a-tab" data-k="Direction" aria-pressed="false">Direction</button><button class="a-tab" data-k="Weekday" aria-pressed="false">Weekday</button><button class="a-tab" data-k="Hold time" aria-pressed="false">Hold time</button><button class="a-tab" data-k="Lot size" aria-pressed="false">Lot size</button></div><div class="a-hb" id="aLeak"></div><div class="a-read" id="aLeakRead"></div></section>
+
+<div class="a-h"><div class="a-h-t"><span class="a-h-ic"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/></svg></span><h2>Trade mix</h2></div><p>How your trades split by outcome, weight, session and exit.</p></div>
+<section class="a-s"><div class="a-mix" id="aMix"></div></section>
+
+<div class="a-h"><div class="a-h-t"><span class="a-h-ic"><svg viewBox="0 0 24 24"><path d="M12 2 2 7l10 5 10-5z"/><path d="m2 17 10 5 10-5M2 12l10 5 10-5"/></svg></span><h2>Edge check</h2></div><p>Is the strategy mathematically profitable? Break-even maths, a scorecard against your targets and the key takeaways.</p></div>
+<div class="a-kp" id="aKP"></div>
+<div class="a-g a-3"><section class="a-s"><div class="a-s-head"><div class="a-s-ttl"><span class="a-s-ic"><svg viewBox="0 0 24 24"><path d="M4 17a8 8 0 0 1 16 0M12 17l4-5"/></svg></span><h3>Win rate vs break-even</h3></div></div><div class="sub" style="margin-left:38px">Hit rate needed at your payoff</div><div class="a-plot" id="cGauge"></div><div class="a-read" id="cGaugeR"></div></section>
+<section class="a-s"><div class="a-s-head"><div class="a-s-ttl"><span class="a-s-ic"><svg viewBox="0 0 24 24"><path d="M12 3l8 6-3 10H7L4 9z"/></svg></span><h3>Scorecard vs targets</h3></div></div><div class="sub" style="margin-left:38px">100% = target reached</div><div class="a-plot" id="cRadar"></div></section>
+<section class="a-s"><div class="a-s-head"><div class="a-s-ttl"><span class="a-s-ic"><svg viewBox="0 0 24 24"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/></svg></span><h3>Key takeaways</h3></div></div><div class="sub" style="margin-left:38px">Computed from your numbers</div><ul class="a-ins tight" id="aTake"></ul></section></div>
+<div class="a-h"><div class="a-h-t"><span class="a-h-ic"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 3v9h9"/></svg></span><h2>Breakdown</h2></div><p>How your trades split, shown as donuts. Hover a slice to read its share.</p></div>
+<div class="a-g a-4"><section class="a-s"><div class="a-s-head"><div class="a-s-ttl"><span class="a-s-ic"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 3v9h9"/></svg></span><h3>Trade outcome</h3></div></div><div class="sub" style="margin-left:38px">Wins, losses, scratches</div><div class="a-plot" id="dOut"></div></section>
+<section class="a-s"><div class="a-s-head"><div class="a-s-ttl"><span class="a-s-ic"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 3v9h9"/></svg></span><h3>Session activity</h3></div></div><div class="sub" style="margin-left:38px">Trades by session</div><div class="a-plot" id="dSes"></div></section>
+<section class="a-s"><div class="a-s-head"><div class="a-s-ttl"><span class="a-s-ic"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 3v9h9"/></svg></span><h3>Exit reason</h3></div></div><div class="sub" style="margin-left:38px">How trades were closed</div><div class="a-plot" id="dExit"></div></section>
+<section class="a-s"><div class="a-s-head"><div class="a-s-ttl"><span class="a-s-ic"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 3v9h9"/></svg></span><h3>Mistake cost</h3></div></div><div class="sub" style="margin-left:38px">Loss attributed per rule break</div><div class="a-plot" id="dMis"></div></section>
+</div>
+<div class="a-h"><div class="a-h-t"><span class="a-h-ic"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l3 2"/></svg></span><h2>Where the losses come from</h2></div><p>Share of total loss by hold time, direction and weekday (profitable buckets excluded).</p></div>
+<div class="a-g a-3"><section class="a-s"><div class="a-s-head"><div class="a-s-ttl"><span class="a-s-ic"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 3v9h9"/></svg></span><h3>Loss by hold time</h3></div></div><div class="sub" style="margin-left:38px">Scalps under a minute dominate</div><div class="a-plot" id="dHold"></div></section>
+<section class="a-s"><div class="a-s-head"><div class="a-s-ttl"><span class="a-s-ic"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 3v9h9"/></svg></span><h3>Loss by direction</h3></div></div><div class="sub" style="margin-left:38px">BUY vs SELL</div><div class="a-plot" id="dDir"></div></section>
+<section class="a-s"><div class="a-s-head"><div class="a-s-ttl"><span class="a-s-ic"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 3v9h9"/></svg></span><h3>Loss by weekday</h3></div></div><div class="sub" style="margin-left:38px">Which days drain the account</div><div class="a-plot" id="dDay"></div></section>
+</div>
+<div class="a-h"><div class="a-h-t"><span class="a-h-ic"><svg viewBox="0 0 24 24"><path d="M3 3v18h18M7 14l4-4 3 3 5-6"/></svg></span><h2>Cash flow and session edge</h2></div><p>From gross profit to net result, and what each session earns per trade.</p></div>
+<div class="a-g a-2e"><section class="a-s"><div class="a-s-head"><div class="a-s-ttl"><span class="a-s-ic"><svg viewBox="0 0 24 24"><path d="M4 19V9M11 19V4M18 19v-7"/></svg></span><h3>P&amp;L bridge</h3></div></div><div class="sub" style="margin-left:38px">Gross profit to net result</div><div class="a-plot" id="cWF"></div><div class="a-read" id="cWFR"></div></section>
+<section class="a-s"><div class="a-s-head"><div class="a-s-ttl"><span class="a-s-ic"><svg viewBox="0 0 24 24"><path d="M4 19V9M11 19V4M18 19v-7"/></svg></span><h3>Edge per trade by session</h3></div></div><div class="sub" style="margin-left:38px">Net P&amp;L divided by trades</div><div class="a-hb" id="aSE"></div><div class="a-read" id="aSER"></div></section></div>
+<div class="a-h"><div class="a-h-t"><span class="a-h-ic"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4"/></svg></span><h2>Rhythm</h2></div><p>Net result by weekday and how your trade count splits by hour.</p></div>
+<div class="a-g a-2e"><section class="a-s"><div class="a-s-head"><div class="a-s-ttl"><span class="a-s-ic"><svg viewBox="0 0 24 24"><path d="M4 19V9M11 19V4M18 19v-7"/></svg></span><h3>Weekday net P&amp;L</h3></div></div><div class="sub" style="margin-left:38px">Mon to Fri</div><div class="a-plot" id="cWD"></div><div class="a-read" id="cWDR"></div></section>
+<section class="a-s"><div class="a-s-head"><div class="a-s-ttl"><span class="a-s-ic"><svg viewBox="0 0 24 24"><path d="M4 19V9M11 19V4M18 19v-7"/></svg></span><h3>Trades per hour</h3></div></div><div class="sub" style="margin-left:38px">Profit hours (up) vs loss hours (down)</div><div class="a-plot" id="cHR"></div><div class="a-read" id="cHRR"></div></section>
+</div>
+<div class="a-h"><div class="a-h-t"><span class="a-h-ic"><svg viewBox="0 0 24 24"><path d="M3 3v18h18M6 8l4 5 3-3 5 7"/></svg></span><h2>Risk over time</h2></div><p>How deep and how long the account sits below its peak, and the recent trend.</p></div>
+<div class="a-g a-2e"><section class="a-s"><div class="a-s-head"><div class="a-s-ttl"><span class="a-s-ic"><svg viewBox="0 0 24 24"><path d="M3 6h18M3 12c3 4 6-4 9 0s6 4 9 0"/></svg></span><h3>Underwater curve</h3></div></div><div class="sub" style="margin-left:38px">Distance below equity peak</div><div class="a-plot" id="cUW"></div><div class="a-read" id="cUWR"></div></section>
+<section class="a-s"><div class="a-s-head"><div class="a-s-ttl"><span class="a-s-ic"><svg viewBox="0 0 24 24"><path d="M3 17l6-6 4 4 8-8"/></svg></span><h3>Rolling 50-trade P&amp;L</h3></div></div><div class="sub" style="margin-left:38px">Is it improving lately?</div><div class="a-plot" id="cRO"></div><div class="a-read" id="cROR"></div></section>
+</div>
+<div class="a-h"><div class="a-h-t"><span class="a-h-ic"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg></span><h2>Timing</h2></div><p>When you trade, and how quickly you re-enter after a trade.</p></div>
+<div class="a-g a-2e">
+ <section class="a-s"><div class="a-s-head"><div class="a-s-ttl"><span class="a-s-ic"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg></span><h3>Trade heatmap</h3></div></div><div class="sub" style="margin-left:38px">Weekday by hour</div><div class="a-plot" id="cHM"></div>
+  <div class="a-read">Number is trades in that hour. <span style="color:var(--green)">Green</span> is net profit, <span style="color:var(--red)">red</span> is net loss. Brighter means more trades.</div></section>
+ <section class="a-s"><div class="a-s-head"><div class="a-s-ttl"><span class="a-s-ic"><svg viewBox="0 0 24 24"><path d="M7 4 3 8l4 4M3 8h14M17 12l4 4-4 4M21 16H7"/></svg></span><h3>Back-to-back re-entries</h3></div></div><div class="sub" style="margin-left:38px">Revenge clusters</div><div class="a-plot" id="cRE"></div>
+  <div class="a-read">Each bar is a trade taken right after another. Tight red runs are revenge clusters.</div></section>
+</div>
+<div class="a-h"><div class="a-h-t"><span class="a-h-ic"><svg viewBox="0 0 24 24"><path d="M7 4 3 8l4 4M3 8h14M17 12l4 4-4 4M21 16H7"/></svg></span><h2>Revenge trades</h2></div><p id="aRevSub">Trades opened soon after a loss, compared with the rest.</p></div>
+<div class="a-kp" id="aRev"></div>
+<div class="a-read" id="aRevR"></div>
+<div class="a-h"><div class="a-h-t"><span class="a-h-ic"><svg viewBox="0 0 24 24"><path d="M3 12h4l3-8 4 16 3-8h4"/></svg></span><h2>Overtrading</h2></div><p id="aOvSub">Days that reached your daily trade limit, compared with the rest.</p></div>
+<div class="a-kp" id="aOv"></div>
+<div class="a-read" id="aOvR"></div>
+<div class="a-h"><div class="a-h-t"><span class="a-h-ic"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span><h2>Weak times</h2></div><p>Weekdays and hours with a net loss, at least 3 trades, and a per-trade average worse than your overall average.</p></div>
+<section class="a-s"><div style="overflow-x:auto"><table><thead><tr><th>WHEN</th><th>TYPE</th><th>TRADES</th><th>NET P&amp;L</th><th>AVG</th></tr></thead>
+<tbody id="aWt"></tbody></table></div></section>
+
+<div class="a-h"><div class="a-h-t"><span class="a-h-ic"><svg viewBox="0 0 24 24"><path d="M4 4h16v16H4z"/><path d="M8 9h8M8 13h5"/></svg></span><h2>Setups</h2></div><p>Performance by setup, from your saved journals.</p></div>
+<section class="a-s"><div style="overflow-x:auto"><table><thead><tr><th>SETUP</th><th>TRADES</th><th>WIN RATE</th><th>NET P&amp;L</th><th>AVG</th><th>BEST</th><th>WORST</th><th>RESULT MIX</th></tr></thead>
+<tbody id="aSetupBody"></tbody></table></div></section>
+<div class="a-h"><div class="a-h-t"><span class="a-h-ic"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M8.5 14.5c1 1.3 2.2 2 3.5 2s2.5-.7 3.5-2M9 9.5h.01M15 9.5h.01"/></svg></span><h2>Emotions</h2></div><p>Performance by the feeling you tagged, from your saved journals.</p></div>
+<section class="a-s"><div style="overflow-x:auto"><table><thead><tr><th>EMOTION</th><th>TRADES</th><th>WIN RATE</th><th>NET P&amp;L</th><th>AVG</th><th>BEST</th><th>WORST</th><th>RESULT MIX</th></tr></thead>
+<tbody id="aEmoBody"></tbody></table></div></section>
+</div>
+</div>
+<div class="view" id="view-trades" hidden><div class="wrap">
+<div class="top aic-reveal" style="animation-delay:0ms"><div><div class="eyebrow"><span class="date mono" id="dateStrT"></span></div><h1>Trades</h1><p id="tSub"></p></div><div class="top-right"><div class="who"><span class="dot"></span><span data-user-name></span></div></div></div>
+<div class="a-kp" id="tKP"></div>
+<section class="a-s" id="tOpen" style="margin:0 0 16px"><div class="a-s-head"><div class="a-s-ttl"><span class="a-s-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3v18h18M7 14l4-4 3 3 5-6"/></svg></span><h3>Open positions</h3></div><span class="pill" id="tOpenCnt">0</span></div><div id="tOpenBody"></div></section>
+<link rel="stylesheet" href="css/trades-open.css"/>
+<script src="js/trades-open-positions.js"></script>
+<div class="t-bar"><div class="a-tabs" data-g="ses" role="group" aria-label="Session"></div><div class="a-tabs" data-g="res" role="group" aria-label="Result"></div><div class="a-tabs" data-g="rec" role="group" aria-label="Recent trades"></div><div class="a-tabs" data-g="merge" role="group" aria-label="Grouping"><button class="a-tab" aria-pressed="false" title="Combine fills opened together into one trade">Merge paired fills</button></div></div>
+<div id="tDays"></div><div id="tMore"></div>
+</div></div>
+<div class="view" id="view-journal" hidden><div class="wrap">
+<div class="top aic-reveal" style="animation-delay:0ms"><div><div class="eyebrow"><span class="date mono" id="dateStrJ"></span></div><h1>Journal</h1><p id="jSub">One journal per trade · saved on this device</p></div><div class="top-right"><div class="who"><span class="dot"></span><span data-user-name></span></div></div></div>
+<div class="a-kp" id="jKP"></div>
+<div class="j-grid">
+<div class="j-main">
+<section class="a-s">
+<div class="a-s-head"><div class="a-s-ttl"><span class="a-s-ic"><svg viewBox="0 0 24 24"><path d="M12 6v14M12 6C10 4.5 7 4 3 4v14c4 0 7 .5 9 2 2-1.5 5-2 9-2V4c-4 0-7 .5-9 2z"/></svg></span><h3>Trade journal</h3></div><div class="j-cov"><svg class="j-ring" width="32" height="32" viewBox="0 0 36 36"><circle class="j-ring-tr" cx="18" cy="18" r="16"/><circle class="j-ring-v" id="jRingV" cx="18" cy="18" r="16" stroke-dashoffset="100.5"/></svg><span class="pill" id="jCov"></span></div></div>
+<div class="progress" id="jBarWrap" style="margin:14px 0 0"><i id="jBar" style="width:0"></i></div>
+<div class="j-r2"><div class="j-f"><span class="j-l">Show trades</span><div class="a-tabs j-yn" id="jFilt" style="margin:0" role="group" aria-label="Trade filter"><button type="button" class="a-tab on" data-v="All" aria-pressed="true">All</button><button type="button" class="a-tab" data-v="need" aria-pressed="false">Needs journal</button><button type="button" class="a-tab" data-v="done" aria-pressed="false">Journaled</button></div></div>
+<div class="j-f"><label for="jSelBtn">Trade</label><div class="j-cb" id="jCb"><button type="button" class="j-cb-btn" id="jSelBtn" aria-haspopup="listbox" aria-expanded="false"><span id="jSelLbl">Choose a trade…</span><svg class="j-cb-chev" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg></button><div class="j-cb-pop" id="jSelPop" role="listbox" hidden><div class="j-cb-search"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg><input type="search" id="jSelSearch" placeholder="Search by date, side or result…" aria-label="Search trades"></div><div class="j-cb-list" id="jSelList"></div></div></div></div></div>
+<div class="j-tc empty" id="jTrade"></div>
+<div class="j-sh"><span class="j-sh-ic"><svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4M22 12v6a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h11"/></svg></span><h4>Checklist</h4><span>Setup and execution quality</span></div>
+<div class="j-r2" style="margin-top:12px"><div class="j-f"><label for="jDate">Date</label><div class="j-fw"><span class="j-fw-ic"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg></span><input class="j-in j-fw-in" type="date" id="jDate"></div></div><div class="j-f"><label for="jSetupBtn">Setup</label><div class="j-cb" id="jSetupCb"><span class="j-fw-ic"><svg viewBox="0 0 24 24"><path d="M4 6h8M18 6h2M4 12h2M12 12h8M4 18h10M20 18h0"/><circle cx="15" cy="6" r="2"/><circle cx="9" cy="12" r="2"/><circle cx="17" cy="18" r="2"/></svg></span><button type="button" class="j-cb-btn" id="jSetupBtn" style="padding-left:36px" aria-haspopup="listbox" aria-expanded="false"><span id="jSetupLbl" style="color:var(--faint)">Select setup</span><svg class="j-cb-chev" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg></button><div class="j-cb-pop" id="jSetupPop" role="listbox" hidden><div class="j-cb-list" id="jSetupList"></div></div><input type="hidden" id="jSetup" value=""></div><div class="j-setrules" id="jSetupRules" hidden></div></div></div>
+<div class="j-q3"><div class="j-f"><span class="j-l">Entry at a good point?</span><div class="a-tabs j-yn" data-q="0" role="group" aria-label="Entry at a good point?"><button type="button" class="a-tab" data-v="Yes" aria-pressed="false">Yes</button><button type="button" class="a-tab" data-v="No" aria-pressed="false">No</button></div></div><div class="j-f"><span class="j-l">Entry with confirmation?</span><div class="a-tabs j-yn" data-q="1" role="group" aria-label="Entry with confirmation?"><button type="button" class="a-tab" data-v="Yes" aria-pressed="false">Yes</button><button type="button" class="a-tab" data-v="No" aria-pressed="false">No</button></div></div><div class="j-f"><span class="j-l">Exit with confirmation?</span><div class="a-tabs j-yn" data-q="2" role="group" aria-label="Exit with confirmation?"><button type="button" class="a-tab" data-v="Yes" aria-pressed="false">Yes</button><button type="button" class="a-tab" data-v="No" aria-pressed="false">No</button></div></div></div><div class="j-gr-box" id="jGradeBox"></div><div class="j-cf" id="jConfWrap"><div class="j-cf-h"><span class="j-l">Confluences</span><button type="button" class="j-cf-mg" id="jConfMg" aria-pressed="false">Edit list</button></div><div class="j-chips" id="jConf"></div><div class="j-cf-add"><input class="j-in" id="jConfNew" type="text" maxlength="40" placeholder="Add a confluence…" autocomplete="off" aria-label="New confluence name"><button type="button" class="btn-ghost j-sm" id="jConfAdd">Add</button></div></div>
+<div class="j-sh"><span class="j-sh-ic"><svg viewBox="0 0 24 24"><path d="M12 9v4M12 17h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg></span><h4>What went wrong</h4><span>Tap any that apply</span></div>
+<div class="glass j-mc" id="jMisCard"><div class="j-mc-h"><b>Mistakes</b><div class="a-tabs" id="jMisTabs" role="group" aria-label="Mistake period" style="margin:0"><button type="button" class="a-tab on" data-p="Today" aria-pressed="true">Today</button><button type="button" class="a-tab" data-p="Week" aria-pressed="false">This Week</button><button type="button" class="a-tab" data-p="Month" aria-pressed="false">This Month</button><button type="button" class="a-tab" data-p="All" aria-pressed="false">All time</button></div></div><div id="jMisBody"></div></div>
+<div class="j-chips" id="jTags" style="margin-top:12px"></div>
+<div class="j-f" style="margin-top:12px"><label for="jMis" class="j-l">Mistake, if any</label><div class="j-fw"><span class="j-fw-ic j-fw-ic-ta"><svg viewBox="0 0 24 24"><path d="M12 9v4M12 17h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg></span><textarea class="j-ta j-fw-ta" id="jMis" placeholder="What did you do that broke your rules?"></textarea><span class="j-cnt" id="jMisC">0</span></div></div>
+<div class="j-sh"><span class="j-sh-ic"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M8 14s1.5 2 4 2 4-2 4-2M9 9.5h.01M15 9.5h.01"/></svg></span><h4>Mindset</h4><span>Before and after the trade</span></div>
+<div class="j-r2" style="margin-top:12px"><div class="j-f"><label for="jBef">Emotion before entry</label><div class="j-fw"><span class="j-fw-ic j-fw-ic-ta"><svg viewBox="0 0 24 24"><path d="M12 3v3M12 18v3M3 12h3M18 12h3M6 6l2 2M16 16l2 2M18 6l-2 2M8 16l-2 2"/></svg></span><textarea class="j-ta j-fw-ta" id="jBef" placeholder="What did you feel before clicking?"></textarea><span class="j-cnt" id="jBefC">0</span></div></div><div class="j-f"><label for="jAft">Emotion after exit</label><div class="j-fw"><span class="j-fw-ic j-fw-ic-ta"><svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4M22 12v6a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h11"/></svg></span><textarea class="j-ta j-fw-ta" id="jAft" placeholder="What did you feel after the exit?"></textarea><span class="j-cnt" id="jAftC">0</span></div></div></div>
+<div class="j-f" style="margin-top:14px"><label for="jImp">Improvement</label><div class="j-fw"><span class="j-fw-ic j-fw-ic-ta"><svg viewBox="0 0 24 24"><path d="M9 18h6M10 22h4M12 2a6 6 0 0 0-4 10.5c.6.6 1 1.4 1 2.5h6c0-1.1.4-1.9 1-2.5A6 6 0 0 0 12 2z"/></svg></span><textarea class="j-ta j-fw-ta" id="jImp" placeholder="One concrete change for the next trade"></textarea><span class="j-cnt" id="jImpC">0</span></div></div>
+<div class="j-sh"><span class="j-sh-ic"><svg viewBox="0 0 24 24"><path d="M21.44 11.05 12.25 20.24a5 5 0 0 1-7.07-7.07l9.19-9.19a3.5 3.5 0 0 1 4.95 4.95L10.13 17.1a2 2 0 0 1-2.83-2.83l8.49-8.49"/></svg></span><h4>Attachments</h4><span>Optional, kept on this device</span></div>
+<div class="j-att"><div class="j-drop"><div class="j-drop-h"><span class="j-drop-ic"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="11" r="2"/><path d="m21 15-4.5-4.5L9 18"/></svg></span><b class="j-l">Screenshot</b></div><div class="j-pv" id="jShotBox"></div><button type="button" class="btn-ghost j-sm" data-pick="jShotF">Attach screenshots</button><input type="file" id="jShotF" accept="image/*" multiple hidden></div>
+<div class="j-drop"><div class="j-drop-h"><span class="j-drop-ic"><svg viewBox="0 0 24 24"><rect x="2" y="6" width="14" height="12" rx="2"/><path d="m22 8-6 4 6 4z"/></svg></span><b class="j-l">Screen recording</b></div><div class="j-pv" id="jRecBox"></div><button type="button" class="btn-ghost j-sm" data-pick="jRecF">Attach recording</button><input type="file" id="jRecF" accept="video/*" hidden></div></div>
+<div class="j-chk"><div class="a-s-head"><div class="a-s-ttl"><span class="a-s-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="m8.5 12.5 2.5 2.5 4.5-5"/></svg></span><div><h3 style="margin:0;font-size:14px">Journal check</h3><div class="sub" style="margin:2px 0 0">Flags gaps and rule breaks before you save</div></div></div><button type="button" class="btn-primary j-sm" id="jCheck">Check journal</button></div><div id="jChk" aria-live="polite"></div></div>
+<div class="j-act" style="margin-top:20px"><button type="button" class="btn-primary" id="jSave">Save journal</button><button type="button" class="btn-ghost" id="jDraft">Save draft</button><button type="button" class="btn-ghost" id="jPrev">Previous trade</button><button type="button" class="btn-ghost" id="jNext">Next trade</button><button type="button" class="btn-ghost" id="jClear">Clear form</button><span id="jMsg" role="status"></span></div>
+</section>
+<section class="a-s" id="jDraftSec" style="display:none"><div class="a-s-head"><div class="a-s-ttl"><span class="a-s-ic"><svg viewBox="0 0 24 24"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg></span><h3>Drafts</h3></div><span class="pill" id="jDraftPill"></span></div>
+<div class="sub" style="margin:4px 0 12px">Your form saves itself as you type. One draft is kept, and it goes away once you save the journal.</div>
+<div id="jDraftBody"></div></section>
+<section class="a-s" id="djHist"><div class="a-s-head"><div class="a-s-ttl"><span class="a-s-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h11a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3z"/><path d="M5 17a3 3 0 0 1 3-3h11"/></svg></span><h3>Daily journal history</h3></div><span class="pill" id="djhCnt"></span></div>
+<div class="sub" style="margin:4px 0 12px">Read only. Write today's entry in Today's Summary.</div>
+<div id="djhBody"></div><button type="button" class="btn-ghost j-sm" id="djhMore" hidden>Show more days</button></section>
+</div>
+<aside class="a-s j-side">
+<div class="a-s-head"><div class="a-s-ttl"><span class="a-s-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 6h13M8 12h13M8 18h13M3.5 6h.01M3.5 12h.01M3.5 18h.01"/></svg></span><h3>Saved journals</h3></div><span class="pill" id="jCnt"></span></div>
+<input class="j-in" id="jSrch" type="search" placeholder="Search notes, symbol, date" aria-label="Search journals" style="margin-top:14px">
+<div class="j-act" style="margin-top:12px"><button type="button" class="btn-ghost j-sm" id="jImpB">Import JSON</button><input type="file" id="jImpFile" accept=".json,application/json" hidden><button type="button" class="btn-ghost j-sm" id="jExp">Export</button></div>
+<div class="a-tabs" id="jRes" style="margin:12px 0 0" role="group" aria-label="Result filter"><button type="button" class="a-tab on" data-v="All" aria-pressed="true">All</button><button type="button" class="a-tab" data-v="win" aria-pressed="false">Wins</button><button type="button" class="a-tab" data-v="loss" aria-pressed="false">Losses</button><button type="button" class="a-tab" data-v="be" aria-pressed="false">Break-even</button></div>
+<div id="jList"></div>
+</aside>
+</div></div></div>
+<div class="view" id="view-calendar" hidden><div class="wrap">
+<div class="cal-top">
+  <div><div class="eyebrow"><span class="date mono" id="dateStrC"></span></div><h1>Trading calendar</h1><p>Daily P&amp;L, trade count and rule discipline · <span class="mono" id="cBarScale">Full bar = $50 move</span></p></div>
+  <div class="cal-nav"><button type="button" class="cal-arrow" id="cPrevM" aria-label="Previous month"><svg viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg></button><button type="button" class="cal-now" id="cNowM">Current month</button><button type="button" class="cal-arrow" id="cNextM" aria-label="Next month"><svg viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg></button>
+  <div class="j-cb cal-cb cal-cb-mon" id="cMonCb"><input type="hidden" id="cMonSel"><button type="button" class="j-cb-btn" id="cMonBtn" aria-haspopup="listbox" aria-expanded="false" aria-label="Month"><span id="cMonLbl"></span><svg class="j-cb-chev" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg></button><div class="j-cb-pop" id="cMonPop" role="listbox" hidden><div class="j-cb-list" id="cMonList"></div></div></div><div class="j-cb cal-cb cal-cb-yr" id="cYrCb"><input type="hidden" id="cYrSel"><button type="button" class="j-cb-btn" id="cYrBtn" aria-haspopup="listbox" aria-expanded="false" aria-label="Year"><span id="cYrLbl"></span><svg class="j-cb-chev" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg></button><div class="j-cb-pop" id="cYrPop" role="listbox" hidden><div class="j-cb-list" id="cYrList"></div></div></div></div>
+</div>
+<div class="a-kp" id="cKP"></div>
+<section class="a-s cal-eq-wrap">
+<div class="cal-eq-top"><span class="l"><span class="a-s-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3v18h18M7 14l4-4 3 3 5-6"/></svg></span><span>Month equity curve</span></span><span class="v" id="cEqV"></span></div>
+<div class="cal-eq-chart" id="cEqChart"></div>
+</section>
+<div class="cal-legend"><span><em style="background:var(--green)"></em>Profit day</span><span><em style="background:var(--red)"></em>Loss day</span><span><em style="background:var(--faint)"></em>Break-even / no result</span><span><em style="background:var(--amber);border-radius:5px"></em><i id="calLegLim" style="font-style:normal">Over the trade limit</i></span></div>
+<div class="cal-days"><div class="cal-dh">MON</div><div class="cal-dh">TUE</div><div class="cal-dh">WED</div><div class="cal-dh">THU</div><div class="cal-dh">FRI</div><div class="cal-dh cal-dh-wk">SAT</div><div class="cal-dh cal-dh-wk">SUN</div></div>
+<div class="cal-grid" id="cGrid"></div>
+<section class="a-s cal-flat">
+<div class="a-s-head"><div class="a-s-ttl"><span class="a-s-ic"><svg viewBox="0 0 24 24"><path d="M4 19V9M12 19V5M20 19v-7"/></svg></span><h3>Day-of-week performance</h3></div></div>
+<div class="cal-dow-grid" id="cDow"></div>
+</section>
+<section class="a-s cal-flat">
+<div class="a-s-head"><div class="a-s-ttl"><span class="a-s-ic"><svg viewBox="0 0 24 24"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/></svg></span><h3>Month insights</h3></div></div>
+<ul class="a-ins" id="cIns" style="margin-top:14px"></ul>
+</section>
+
+<div class="cal-yr-hd"><div><div class="eyebrow"><span class="date mono" id="cYrTag">TRADING YEAR</span></div><h2 id="cYrH">2026</h2><div class="cal-yr-badges" id="cYrBadges"></div></div>
+<div class="cal-nav"><button type="button" class="cal-arrow" id="cPrevY" aria-label="Previous year"><svg viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg></button><button type="button" class="cal-now" id="cNowY">Current year</button><button type="button" class="cal-arrow" id="cNextY" aria-label="Next year"><svg viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg></button></div>
+</div>
+<div class="a-kp" id="cYKP"></div>
+<section class="a-s cal-yr-chart-wrap">
+<div class="cal-yr-chart-top"><span class="l"><span class="a-s-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3v18h18M7 14l4-4 3 3 5-6"/></svg></span><span>Cumulative P&amp;L this year</span></span><span class="v" id="cYEqV"></span></div>
+<div class="cal-yr-chart" id="cYEqChart"></div>
+</section>
+<div class="cal-months" id="cMonths"></div>
+</div></div>
+<div class="view" id="view-recap" hidden><div class="wrap">
+<div class="cal-top">
+  <button type="button" class="rc-back" id="rcBack" aria-label="Back to calendar"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6"/></svg><span>Back to calendar</span><kbd>Esc</kbd></button>
+  <div><div class="eyebrow"><span class="date mono" id="rcEyebrow"></span></div><h1 id="rcTitle">Day recap</h1><p id="rcSub"></p></div>
+</div>
+<div id="rcBody"></div>
+</div></div>
+<div class="view" id="view-psychology" hidden><div class="wrap psy-layout" style="max-width:960px">
+  <div id="psyHost"></div>
+  <aside class="psy-side">
+    <div class="psy-side-card glass up-reveal" style="animation-delay:80ms">
+      <div class="psy-side-head"><span class="psy-side-ic"><svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></span><h3>The 6-stage ritual</h3></div>
+      <div class="psy-list">
+        <div class="psy-list-item"><b>1 · Mind check</b><span>Six honest questions before you're allowed near a chart.</span></div>
+        <div class="psy-list-item"><b>2 · Setup scan</b><span>Confirm a valid setup is actually forming — no forcing it.</span></div>
+        <div class="psy-list-item"><b>3 · Checklist</b><span>News, risk, entry and exit plan all signed off before the trigger.</span></div>
+        <div class="psy-list-item"><b>4 · Live trade</b><span>Three hard rules while the position is open — no SL/TP tinkering.</span></div>
+        <div class="psy-list-item"><b>5 · Debrief</b><span>Screenshot it, feel it, write it down while it's fresh.</span></div>
+        <div class="psy-list-item"><b>6 · Cooldown</b><span>Mandatory pause. No re-entry on impulse, ever.</span></div>
+      </div>
+    </div>
+    <div class="psy-side-card glass up-reveal" style="animation-delay:120ms">
+      <div class="psy-side-head"><span class="psy-side-ic"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg></span><h3>Your standing rules</h3></div>
+      <div class="psy-list">
+        <div class="psy-list-item"><b>Max daily loss</b><span id="psyRlLoss">Not set</span></div>
+        <div class="psy-list-item"><b>Max trades per day</b><span id="psyRlTrades">Not set</span></div>
+        <div class="psy-list-item"><b>Cooldown after a trade</b><span id="psyRlCool">Not set</span></div>
+        <div class="psy-list-item"><b>This year so far</b><span id="psyYr"></span></div>
+      </div>
+    </div>
+  </aside>
+</div></div>
+<div class="view" id="view-settings" hidden>
+<div class="gg-wrap">
+  <div class="gg-main">
+    <div class="gg-head">
+      <div><div class="eyebrow"><span class="pill">Account setting</span><span class="date mono" id="dateStrG"></span></div><h1>Account settings</h1></div>
+      <div class="who"><span class="dot"></span><span data-user-name></span></div>
+    </div>
+
+    <div class="gg-hero">
+      <div class="gg-hero-top">
+        <div><div class="l">Account phase</div><div class="gg-hero-phase" id="ggHeroPhase">Not set</div>
+          <div class="meta" id="psyMeta"></div></div>
+        <button class="gg-edit-btn" onclick="ggToggleSetup()"><span id="ggEditLbl">Edit setup</span> <svg id="ggEditChev" viewBox="0 0 24 24" width="14" height="14"><path d="m6 9 6 6 6-6" stroke="currentColor" fill="none" stroke-width="2"/></svg></button>
+      </div>
+      <div class="gg-journey">
+        <div class="gg-journey-track gg-j2">
+          <div class="gg-j2-now" id="ggJNow"><b id="ggBalVal">$0.00</b><span>current balance</span></div>
+          <div class="gg-j2-half loss"><i id="ggJLossFill"></i></div>
+          <div class="gg-j2-half gain"><i id="ggJGainFill"></i></div>
+          <div class="gg-j2-mid"></div>
+          <div class="gg-journey-dot" id="ggJourneyDot" style="left:50%"></div>
+        </div>
+        <div class="gg-journey-labels">
+          <div><b id="ggJFloor">&mdash;</b><span>max drawdown</span></div>
+          <div class="gg-j-mid"><b id="ggStartedAtVal">Not set</b><span>started at</span></div>
+          <div class="gg-j-end"><b id="ggJEnd">$0.00</b><span id="ggJTogo"></span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="gg-setup" id="ggSetup">
+      <div class="gg-tabs">
+        <button class="gg-tab on" data-t="acc">Account</button>
+        <button class="gg-tab" data-t="tgt">Targets</button>
+        <button class="gg-tab" data-t="risk">Risk limits</button>
+      </div>
+      <div class="gg-tab-panel" data-p="acc">
+        <div class="gg-preset"><button type="button" class="gg-btn-outline" id="ggFpFlexBtn" onclick="ggApplyFpFlex(1)">Apply FundingPips 2 Step Flex (Phase 1)</button><button type="button" class="gg-btn-outline" id="ggFpFlexBtn2" onclick="ggApplyFpFlex(2)">Apply FundingPips 2 Step Flex (Phase 2)</button>
+          <small class="gg-field-note">Fills daily loss 4%, max drawdown 12%, profit target (10% for Phase 1, 6% for Phase 2), consistency rule 0, minimum trading days 0 and profit split 0. Nothing is saved until you tap Save setup. Check the values against your FundingPips dashboard.</small></div>
+        <div class="gg-mgrid">
+          <div class="gg-field"><span class="l">Initial account balance ($)</span>
+            <div class="gg-stepper"><button onclick="ggStep('bal',-100)">−</button><input id="ggBal" value="" readonly><button onclick="ggStep('bal',100)">+</button></div></div>
+          <div class="gg-field" id="ggPhaseField"><span class="l">Account phase</span>
+            <div class="gg-select" id="ggPhaseDisplay" style="cursor:default;user-select:none">Not set</div>
+            <small class="gg-field-note">Set when you apply a FundingPips preset above, then Save setup.</small></div>
+          <div class="gg-field"><span class="l">Account type</span>
+            <select class="gg-select" id="ggAcctType"><option value="">Not set</option><option value="funded">Funded account (prop firm)</option><option value="live">Live account</option></select>
+            <small class="gg-field-note">Prop-firm rules like daily loss and drawdown limits only apply to a funded account. Journall can't tell this from the sync automatically — set it here.</small></div>
+        </div>
+      </div>
+      <div class="gg-tab-panel" data-p="tgt" hidden>
+        <div class="gg-mgrid">
+          <div class="gg-field"><span class="l">Profit target</span>
+            <div class="gg-combo"><div class="gg-stepper" style="flex:1"><button onclick="ggStep('pt',-1)">−</button><input id="ggPt" value="8" readonly><button onclick="ggStep('pt',1)">+</button></div><select><option>%</option><option>$</option></select></div></div>
+          <div class="gg-field"><span class="l">Phase deadline (optional)</span><input class="gg-select" id="ggDeadline" type="date"></div>
+          <div class="gg-field"><span class="l">Max trades per day</span>
+            <div class="gg-stepper"><button onclick="ggStep('mt',-1)">−</button><input id="ggMt" value="8" readonly><button onclick="ggStep('mt',1)">+</button></div></div>
+          <div class="gg-field"><span class="l">Day profit target</span>
+            <div class="gg-combo"><div class="gg-stepper" style="flex:1"><button onclick="ggStep('dpt',-1)">-</button><input id="ggDpt" value="0" readonly><button onclick="ggStep('dpt',1)">+</button></div><select id="ggDptUnit"><option>%</option><option>$</option></select></div></div>
+          <div class="gg-field"><span class="l">Weekly profit target</span>
+            <div class="gg-combo"><div class="gg-stepper" style="flex:1"><button onclick="ggStep('wpt',-1)">-</button><input id="ggWpt" value="0" readonly><button onclick="ggStep('wpt',1)">+</button></div><select id="ggWptUnit"><option>%</option><option>$</option></select></div></div>
+        </div>
+      </div>
+      <div class="gg-tab-panel" data-p="risk" hidden>
+        <div class="gg-mgrid">
+          <div class="gg-field"><span class="l">Risk per trade (%)</span>
+            <div class="gg-stepper"><button onclick="ggStep('rpt',-.1)">−</button><input id="ggRpt" value="" placeholder="Not set" readonly><button onclick="ggStep('rpt',.1)">+</button></div></div>
+          <div class="gg-field"><span class="l">Minimum RR</span>
+            <div class="gg-stepper"><button onclick="ggStep('rr',-1)">−</button><input id="ggRr" value="" placeholder="Not set" readonly><button onclick="ggStep('rr',1)">+</button></div></div>
+          <div class="gg-field"><span class="l">Max daily loss</span>
+            <div class="gg-combo"><div class="gg-stepper" style="flex:1"><button onclick="ggStep('mdl',-5)">−</button><input id="ggMdl" value="20" readonly><button onclick="ggStep('mdl',5)">+</button></div><select id="ggMdlUnit"><option>$</option><option>%</option></select></div></div>
+          <div class="gg-field"><span class="l">Max weekly loss</span>
+            <div class="gg-combo"><div class="gg-stepper" style="flex:1"><button onclick="ggStep('mwl',-10)">−</button><input id="ggMwl" value="0" readonly><button onclick="ggStep('mwl',10)">+</button></div><select id="ggMwlUnit"><option>$</option><option>%</option></select></div></div>
+          <div class="gg-field"><span class="l">Max losses in a row</span>
+            <div class="gg-stepper"><button onclick="ggStep('mcl',-1)">&minus;</button><input id="ggMcl" value="0" readonly><button onclick="ggStep('mcl',1)">+</button></div>
+            <small class="gg-field-note">After this many losing trades in a row, the circuit breaker banner shows on every tab until the 06:00 IST reset. 0 = off.</small></div>
+          <div class="gg-field"><span class="l">Max revenge trades</span>
+            <div class="gg-stepper"><button onclick="ggStep('mrv',-1)">&minus;</button><input id="ggMrv" value="0" readonly><button onclick="ggStep('mrv',1)">+</button></div>
+            <small class="gg-field-note">After this many revenge trades in a day, the circuit breaker banner shows on every tab until the 06:00 IST reset. Needs the revenge window above. 0 = off.</small></div>
+          <div class="gg-field"><span class="l">Same-direction loss cap (% of initial balance)</span>
+            <div class="gg-stepper"><button onclick="ggStep('sdl',-0.1)">&minus;</button><input id="ggSdl" value="0" readonly><button onclick="ggStep('sdl',0.1)">+</button></div>
+            <small class="gg-field-note">Net loss of all BUY trades, or all SELL trades, in one trading day across every symbol. When it reaches this share of your initial balance, the circuit breaker banner shows until the 06:00 IST reset. Closed trades only. 0 = off.</small></div>
+          <div class="gg-field"><span class="l">Friday cutoff (IST)</span><input class="gg-select" id="ggFri" type="time">
+            <small class="gg-field-note">On Fridays, a banner shows on every tab for the 30 minutes before this time. The journal only warns. It cannot close positions. Empty = off.</small></div>
+          <div class="gg-field"><span class="l">Consistency rule (% of profit)</span>
+            <div class="gg-stepper"><button onclick="ggStep('cns',-5)">&minus;</button><input id="ggCns" value="0" readonly><button onclick="ggStep('cns',5)">+</button></div>
+            <small class="gg-field-note">Your best day must stay at or under this share of your total profit. 0 = off.</small></div>
+          <div class="gg-field"><span class="l">Minimum trading days</span>
+            <div class="gg-stepper"><button onclick="ggStep('mtd',-1)">&minus;</button><input id="ggMtd" value="0" readonly><button onclick="ggStep('mtd',1)">+</button></div>
+            <small class="gg-field-note">Days with at least one closed trade count. 0 = off.</small></div>
+          <div class="gg-field"><span class="l">Profit split (% to you)</span>
+            <div class="gg-stepper"><button onclick="ggStep('spl',-5)">&minus;</button><input id="ggSpl" value="0" readonly><button onclick="ggStep('spl',5)">+</button></div>
+            <small class="gg-field-note">Used to estimate your share of the profit. 0 = off.</small></div>
+          <div class="gg-field"><span class="l">Max overall drawdown</span>
+            <div class="gg-combo"><div class="gg-stepper" style="flex:1"><button onclick="ggStep('mdd',-1)">−</button><input id="ggMdd" value="10" readonly><button onclick="ggStep('mdd',1)">+</button></div><select id="ggMddUnit"><option>%</option><option>$</option></select></div></div>
+          <div class="gg-field"><span class="l">Revenge trade window (minutes)</span>
+            <div class="gg-stepper"><button onclick="ggStep('revWin',-1)">−</button><input id="ggRevWin" value="" placeholder="Not set" readonly><button onclick="ggStep('revWin',1)">+</button></div>
+            <small class="gg-field-note">A trade opened within this many minutes of a same-day loss closing is flagged as a revenge trade.</small></div>
+          <div class="gg-field"><span class="l">Lot size</span>
+            <div class="gg-stepper"><button onclick="ggStep('lot',-.01)">&minus;</button><input id="ggLot" value="0" readonly><button onclick="ggStep('lot',.01)">+</button></div>
+            <small class="gg-field-note">The lot size you trade. Any position with a different lot is flagged as a rule break in Today's Summary. 0 = off.</small></div>
+          <div class="gg-field"><span class="l">Trade during news?</span>
+            <select class="gg-select" id="ggNews"><option value="">Not set</option><option value="yes">Yes</option><option value="no">No (warn 30 min before news)</option></select></div>
+          <div class="gg-field"><span class="l">Broker UTC offset</span>
+            <select class="gg-select" id="ggBro"><option value="">Not set</option><option value="-12">UTC-12</option><option value="-11.5">UTC-11:30</option><option value="-11">UTC-11</option><option value="-10.5">UTC-10:30</option><option value="-10">UTC-10</option><option value="-9.5">UTC-9:30</option><option value="-9">UTC-9</option><option value="-8.5">UTC-8:30</option><option value="-8">UTC-8</option><option value="-7.5">UTC-7:30</option><option value="-7">UTC-7</option><option value="-6.5">UTC-6:30</option><option value="-6">UTC-6</option><option value="-5.5">UTC-5:30</option><option value="-5">UTC-5</option><option value="-4.5">UTC-4:30</option><option value="-4">UTC-4</option><option value="-3.5">UTC-3:30</option><option value="-3">UTC-3</option><option value="-2.5">UTC-2:30</option><option value="-2">UTC-2</option><option value="-1.5">UTC-1:30</option><option value="-1">UTC-1</option><option value="-0.5">UTC-0:30</option><option value="0">UTC+0</option><option value="0.5">UTC+0:30</option><option value="1">UTC+1</option><option value="1.5">UTC+1:30</option><option value="2">UTC+2</option><option value="2.5">UTC+2:30</option><option value="3">UTC+3</option><option value="3.5">UTC+3:30</option><option value="4">UTC+4</option><option value="4.5">UTC+4:30</option><option value="5">UTC+5</option><option value="5.5">UTC+5:30</option><option value="6">UTC+6</option><option value="6.5">UTC+6:30</option><option value="7">UTC+7</option><option value="7.5">UTC+7:30</option><option value="8">UTC+8</option><option value="8.5">UTC+8:30</option><option value="9">UTC+9</option><option value="9.5">UTC+9:30</option><option value="10">UTC+10</option><option value="10.5">UTC+10:30</option><option value="11">UTC+11</option><option value="11.5">UTC+11:30</option><option value="12">UTC+12</option><option value="12.5">UTC+12:30</option><option value="13">UTC+13</option><option value="13.5">UTC+13:30</option><option value="14">UTC+14</option></select>
+            <small class="gg-field-note">The UTC offset of your broker server clock, which is the clock in your MT5 report and sync. Used to turn those trade times into IST for the Weak times card. Not set = hour flags are paused.</small></div>
+        </div>
+      </div>
+      <div class="gg-setup-foot">
+        <button class="gg-btn-outline" onclick="ggToggleSetup()">Cancel</button>
+        <button class="gg-btn-solid" onclick="ggSaveSetup()">Save setup</button>
+      </div>
+    </div>
+
+    <div class="gg-tiles">
+      <div class="gg-tile">
+        <svg viewBox="0 0 80 80" class="gg-gauge"><circle cx="40" cy="40" r="34" class="gg-gauge-track"/><circle cx="40" cy="40" r="34" class="gg-gauge-val" id="ggGaugeDays" style="--off:214"/></svg>
+        <div><div class="l">Days remaining</div><div class="v" id="ggDaysV">No deadline</div><div class="meta" id="ggDaysM">Phase deadline not set</div></div>
+      </div>
+      <div class="gg-tile">
+        <svg viewBox="0 0 80 80" class="gg-gauge"><circle cx="40" cy="40" r="34" class="gg-gauge-track"/><circle cx="40" cy="40" r="34" class="gg-gauge-val amber" id="ggGaugeLoss" style="--off:214"/></svg>
+        <div><div class="l">Daily loss remaining</div><div class="v" id="ggLossV">$20.00</div><div class="meta" id="ggLossM">$0.00 used of $20.00</div></div>
+      </div>
+      <div class="gg-tile">
+        <svg viewBox="0 0 80 80" class="gg-gauge"><circle cx="40" cy="40" r="34" class="gg-gauge-track"/><circle cx="40" cy="40" r="34" class="gg-gauge-val red" id="ggGaugeDD" style="--off:214"/></svg>
+        <div><div class="l">Drawdown buffer</div><div class="v" id="ggDDv">$0.00</div><div class="meta" id="ggDDm"></div></div>
+      </div>
+    </div>
+
+    <div class="pr-card" id="ggPropCard">
+      <div class="pr-head">
+        <div class="pr-badge" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 3l7 3v5c0 4.5-3 8.2-7 10-4-1.8-7-5.5-7-10V6l7-3z"/><path d="M9 12l2 2 4-4"/></svg></div>
+        <div class="pr-titles"><h2>Prop firm progress</h2><span class="pr-sub" id="prSub">Uses all trades in your data. Add a challenge below to scope it to a phase.</span></div>
+      </div>
+      <div class="pr-tabs" role="tablist" aria-label="Prop firm sections">
+        <button type="button" class="pr-tab on" role="tab" id="prTabBtn-ov" aria-selected="true" aria-controls="prPanel-ov" data-prtab="ov">Overview</button>
+        <button type="button" class="pr-tab" role="tab" id="prTabBtn-ch" aria-selected="false" aria-controls="prPanel-ch" data-prtab="ch" tabindex="-1">Challenges<span class="pr-count" id="prTabCh">0</span></button>
+        <button type="button" class="pr-tab" role="tab" id="prTabBtn-pay" aria-selected="false" aria-controls="prPanel-pay" data-prtab="pay" tabindex="-1">Payouts<span class="pr-count" id="prTabPay">0</span></button>
+      </div>
+
+      <div class="pr-panel" role="tabpanel" id="prPanel-ov" aria-labelledby="prTabBtn-ov" data-prpanel="ov">
+        <section class="pr-sec pr-plan" id="prPlan">
+          <div class="pr-sec-h"><span class="pr-l">FundingPips plan (5K)</span></div>
+          <div class="pr-plan-det" id="prPlanDet"></div>
+          <div class="pr-chips" id="prPlanChips" role="radiogroup" aria-label="FundingPips plan"></div>
+          <div class="pr-plan-row">
+            <div class="pr-seg" id="prPhaseSeg" role="radiogroup" aria-label="Phase"></div>
+            <button type="button" class="pr-btn pr-btn-primary" id="prPlanApply">Fill setup</button>
+          </div>
+          <select id="prPlanSel" class="pr-sr" tabindex="-1" aria-hidden="true"></select><select id="prPlanPh" class="pr-sr" tabindex="-1" aria-hidden="true"></select>
+          <div class="pr-split">
+            <div class="pr-f"><label class="pr-fl" for="prPlanSpl">Your profit split %</label><input type="number" id="prPlanSpl" min="0" max="100" step="any" placeholder="For example 80"></div>
+            <button type="button" class="pr-btn" id="prPlanSplBtn">Set split</button>
+          </div>
+          <small class="pr-note" id="prPlanNote">Pick a plan to fill daily loss, max loss and target in Account Settings and in the Challenges form below. Your profit split depends on the payout cycle you chose, so you set it yourself. Nothing is saved until you tap Save setup.</small>
+          <div class="pr-msg" id="prPlanMsg" role="status"></div>
+        </section>
+        <section class="pr-sec">
+          <div class="pr-sec-h"><span class="pr-l">Rules</span><div class="pr-scope" id="prScope" role="group" aria-label="Challenge scope"></div></div>
+          <div id="ggPropBody"></div>
+        </section>
+      </div>
+
+      <div class="pr-panel" role="tabpanel" id="prPanel-ch" aria-labelledby="prTabBtn-ch" data-prpanel="ch" hidden>
+        <section class="pr-sec">
+          <div class="pr-sec-h"><span class="pr-l">New challenge</span></div>
+          <div class="pr-form">
+            <div class="pr-f pr-f-name"><label class="pr-fl" for="chName">Name</label><input type="text" id="chName" maxlength="40" placeholder="Name, for example Phase 1"></div>
+            <div class="pr-f"><label class="pr-fl" for="chStart">Start date</label><input type="date" id="chStart"></div>
+            <div class="pr-f"><label class="pr-fl" for="chEnd">End date <em>optional</em></label><input type="date" id="chEnd"></div>
+            <div class="pr-f pr-f-gap"></div>
+            <div class="pr-f"><label class="pr-fl" for="chDl">Daily loss %</label><input type="number" id="chDl" min="0" max="100" step="any" placeholder="4"></div>
+            <div class="pr-f"><label class="pr-fl" for="chMd">Max loss %</label><input type="number" id="chMd" min="0" max="100" step="any" placeholder="12"></div>
+            <div class="pr-f"><label class="pr-fl" for="chPt">Target %</label><input type="number" id="chPt" min="0" max="100" step="any" placeholder="10"></div>
+            <div class="pr-form-act"><button type="button" class="pr-btn pr-btn-primary" id="chAdd">Add challenge</button></div>
+          </div>
+          <small class="pr-note">Trades dated from the start through the end date count in that challenge. Leave the end date empty while it is still running. The three percent boxes are optional: while today falls inside a challenge, the app uses its daily loss, max loss and target instead of Account Settings, converted from your initial balance. A box left empty keeps the Account Settings value.</small>
+          <div class="pr-msg" id="chMsg" role="status"></div>
+        </section>
+        <section class="pr-sec">
+          <div class="pr-sec-h"><span class="pr-l">Logged challenges</span></div>
+          <div id="chList"></div>
+        </section>
+      </div>
+
+      <div class="pr-panel" role="tabpanel" id="prPanel-pay" aria-labelledby="prTabBtn-pay" data-prpanel="pay" hidden>
+        <div class="pr-paidhero"><span class="pr-l">Paid out so far</span><b id="prPaidBig">$0.00</b></div>
+        <section class="pr-sec">
+          <div class="pr-sec-h"><span class="pr-l">Log a payout</span></div>
+          <div class="pr-form pr-form-pay">
+            <div class="pr-f"><label class="pr-fl" for="prDate">Payout date</label><input type="date" id="prDate"></div>
+            <div class="pr-f"><label class="pr-fl" for="prAmt">Amount ($)</label><input type="number" id="prAmt" min="0" step="any" placeholder="0.00"></div>
+            <div class="pr-form-act"><button type="button" class="pr-btn pr-btn-primary" id="prAdd">Add payout</button></div>
+          </div>
+          <div class="pr-msg" id="prMsg" role="status"></div>
+        </section>
+        <section class="pr-sec">
+          <div class="pr-sec-h"><span class="pr-l">History</span></div>
+          <div id="prList"></div>
+        </section>
+      </div>
+    </div>
+
+    <div class="gg-goals-sec">
+      <div class="gg-goals-head">
+        <div><h2>Your goals</h2><div class="meta" id="ggGoalsMeta">Track more than the phase target — set win-rate, streak, volume and custom goals</div></div>
+        <button class="gg-btn-outline gg-add-goal-btn" onclick="ggOpenTypePicker()">
+          <svg viewBox="0 0 24 24" width="13" height="13"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.2" fill="none" stroke-linecap="round"/></svg>
+          Add goal
+        </button>
+      </div>
+      <div class="gg-goals-grid" id="ggGoalsGrid"></div>
+    </div>
+  </div>
+</div>
+<div class="gg-toast" id="ggToast">Setup saved</div>
+
+
+<div class="gg-modal-scrim" id="ggModalScrim" onclick="if(event.target===this)ggCloseModal()">
+  <div class="gg-modal">
+    <div class="gg-modal-head"><h3 id="ggModalTitle">Choose a goal type</h3><button class="gg-modal-x" onclick="ggCloseModal()">✕</button></div>
+    <div class="gg-modal-body">
+      <div class="gg-type-grid" id="ggTypeGrid"></div>
+      <div class="gg-goal-form" id="ggGoalForm" hidden></div>
+    </div>
+    <div class="gg-modal-foot" id="ggModalFoot" hidden>
+      <button class="gg-btn-outline" onclick="ggBackToTypes()">← Back</button>
+      <button class="gg-btn-solid" onclick="ggCreateGoal()">Create goal</button>
+    </div>
+  </div>
+</div>
+</div>
+<div class="view" id="view-ai" hidden><div class="wrap">
+
+  <div class="top aic-reveal" style="animation-delay:0ms">
+    <div>
+      <div class="eyebrow"><span class="streak aic-live"><span class="aic-live-dot"></span>AI Coach · reading your trade log</span><span class="date mono" id="dateStrAI"></span></div>
+      <h1>AI Coach</h1>
+      <p>Grounded in what you actually logged. No hype, no signals — just what the numbers say.</p>
+    </div>
+    <div class="top-right"><div class="who"><span class="dot"></span><span data-user-name></span></div></div>
+  </div>
+
+  <div class="aic-snap">
+    <div class="aic-snap-card glass aic-reveal" style="animation-delay:60ms"><div class="l"><svg viewBox="0 0 24 24"><path d="M5 20V11M12 20V4M19 20v-6"/></svg>Trades logged</div><div class="v mono" id="aicN1">0</div><div class="s">All sessions</div></div>
+    <div class="aic-snap-card glass aic-reveal" style="animation-delay:120ms"><div class="l"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/></svg>Win rate</div><div class="v mono" id="aicN2">0%</div><div class="s">0W · 0L · 0BE</div></div>
+    <div class="aic-snap-card glass neg aic-reveal" style="animation-delay:180ms"><div class="l"><svg viewBox="0 0 24 24"><path d="M4 6l6 6 4-4 6 8M14 16h6v-6"/></svg>Net P&amp;L</div><div class="v mono" id="aicN3">$0.00</div><div class="s">PF 0.00 · exp $0.00/trade</div></div>
+    <div class="aic-snap-card glass neg aic-reveal" style="animation-delay:240ms"><div class="l"><svg viewBox="0 0 24 24"><path d="M12 3 2 20h20z"/><path d="M12 10v4M12 17h.01"/></svg>Main leak</div><div class="v">None flagged</div><div class="s" id="aicN4">−$0.00 logged</div></div>
+  </div>
+
+  <div class="aic-grid">
+    <div class="aic-chat glass aic-reveal" style="animation-delay:280ms">
+      <div class="aic-chat-head">
+        <span class="aic-avatar-wrap"><span class="aic-avatar" id="aicHeadAvatar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/></svg></span></span>
+        <div><div class="t">Ask the coach</div><div class="s">Answers pull from your logged trades — never a reason to size up.</div></div>
+      </div>
+      <div class="aic-thread" id="aicThread">
+        <div class="aic-msg ai"><span class="aic-avatar sm"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/></svg></span><div class="aic-bubble"><span id="aicHello"></span> Pick a question below, or type your own — performance, your biggest leak, today's one fix, psychology, or whether you actually have a proven setup.</div></div>
+      </div>
+      <div class="aic-chips" id="aicChips">
+        <button class="aic-chip" data-q="performance">Review performance</button>
+        <button class="aic-chip" data-q="weakness">Biggest weakness</button>
+        <button class="aic-chip" data-q="today">Fix for today</button>
+        <button class="aic-chip" data-q="psychology">Psychology check</button>
+        <button class="aic-chip" data-q="setup">Best setup?</button>
+      </div>
+      <div class="aic-input-row">
+        <input id="aicInput" type="text" placeholder="Ask: why am I losing? what's my best session?" autocomplete="off" maxlength="180">
+        <button id="aicSend" class="aic-send">Ask</button>
+      </div>
+      <div class="aic-priv">Asking sends your stats, last 30 trades, setup stats and playbook rules to your AI backend.</div>
+    </div>
+
+    <div class="aic-rail">
+      <div class="aic-card glass aic-reveal" style="animation-delay:340ms">
+        <div class="aic-card-head"><span class="l"><svg viewBox="0 0 24 24"><path d="M12 3 2 20h20z"/><path d="M12 10v4M12 17h.01"/></svg>Focus leak</span><span class="pill">worst offender</span></div>
+        <div class="aic-focus-title">Revenge trading</div>
+        <div class="aic-focus-amt" id="aicFocAmt"></div>
+        <div class="aic-bar"><i id="aicBar1" style="width:0%"></i></div>
+        <div class="aic-focus-note" id="aicFocNote"></div>
+      </div>
+      <div class="aic-card glass aic-reveal" style="animation-delay:400ms">
+        <div class="aic-card-head"><span class="l"><svg viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="M7 15l4-5 3 3 5-7"/></svg>Session damage</span></div>
+        <div id="aicSessBox"></div>
+      </div>
+      <div class="aic-card glass aic-action aic-reveal" style="animation-delay:460ms">
+        <div class="aic-card-head"><span class="l"><svg viewBox="0 0 24 24"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="9"/></svg>Today's one rule</span></div>
+        <div class="aic-focus-title" style="font-size:14.5px" id="aicRuleTxt">No rule set yet</div>
+        <div class="aic-focus-note" id="aicRuleSrc" style="margin-top:4px"></div>
+        <div class="aic-focus-note" style="margin-top:6px"><span id="aicRuleNote"></span></div>
+        <div class="aic-rule-edit"><input type="text" id="aicRuleIn" maxlength="140" placeholder="Type your own rule" autocomplete="off" aria-label="Your own rule"><button type="button" class="gg-btn-outline" id="aicRuleSave">Save</button><button type="button" class="gg-btn-outline" id="aicRuleClear" hidden>Clear</button></div>
+        <button class="aic-mark" id="aicMark">Mark as today's focus</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="aic-report glass aic-reveal" style="animation-delay:520ms">
+    <div class="aic-card-head">
+      <div><div class="t" style="font-size:15px;font-weight:650">AI report card</div><div class="s" style="color:var(--sub);font-size:12px;margin-top:2px">Full-log grade, generated on request — not saved anywhere</div></div>
+      <div class="aic-report-actions">
+        <button class="gg-btn-solid" id="aicGen">Generate report</button>
+        <button class="gg-btn-outline" id="aicClear">Clear</button>
+      </div>
+    </div>
+    <div id="aicReportBox">
+      <div class="review-empty"><span class="review-dot"></span><div><div class="t">No report yet.</div><div class="s">Generate one to see today's grade, what's actually working, and the one rule to enforce next.</div></div></div>
+    </div>
+  </div>
+
+  <div class="aic-report glass aic-reveal" style="animation-delay:580ms">
+    <div class="aic-card-head">
+      <div><div class="t" style="font-size:15px;font-weight:650">AI widgets</div><div class="s" style="color:var(--sub);font-size:12px;margin-top:2px">One card per pattern in your log — pin the ones you want to watch daily</div></div>
+      <div class="aic-report-actions">
+        <button class="gg-btn-solid" id="aicWGen">Generate widgets</button>
+        <button class="gg-btn-outline" id="aicWClear">Clear</button>
+      </div>
+    </div>
+    <div id="aicWidgetBox">
+      <div class="review-empty"><span class="review-dot"></span><div><div class="t">No widgets yet.</div><div class="s">Generate them to turn each leak and session pattern into a card you can act on, ask about, or copy.</div></div></div>
+    </div>
+  </div>
+
+  <div class="aic-report glass" id="pbRoot">
+    <div class="aic-card-head">
+      <div><div class="t" style="font-size:15px;font-weight:650">Study notes</div><div class="s" style="color:var(--sub);font-size:12px;margin-top:2px">Your playbook of setups and free notes</div></div>
+      <div class="pb-tabs" role="tablist"><button type="button" class="pb-tab on" role="tab" aria-selected="true" data-pbt="play">Playbook</button><button type="button" class="pb-tab" role="tab" aria-selected="false" data-pbt="notes">Notes</button></div>
+    </div>
+    <div class="pb-msg" id="pbMsg" role="status"></div>
+    <div id="pbPlay">
+      <div class="pb-bar"><input type="text" class="pb-in" id="pbName" maxlength="40" placeholder="Setup name" autocomplete="off" aria-label="Setup name"><button type="button" class="gg-btn-solid" id="pbAdd">Add setup</button></div>
+      <div class="pb-hint">Playbook setups also appear in the Setup field in the Journal tab. To rename one, delete it and add it again.</div>
+      <div class="pb-un" id="pbUn" hidden></div>
+      <div id="pbList"></div>
+    </div>
+    <div id="pbNotes" hidden>
+      <div class="pb-bar"><input type="text" class="pb-in" id="pbSearch" placeholder="Search notes" autocomplete="off" aria-label="Search notes"><button type="button" class="gg-btn-solid" id="pbNew">New note</button></div>
+      <div id="pnList"></div>
+    </div>
+  </div>
+
+</div></div>
+
+<div class="view" id="view-profile" hidden><div class="wrap">
+
+  <div class="top up-reveal" style="animation-delay:0ms">
+    <div>
+      <div class="eyebrow"><span class="date mono" id="dateStrU"></span></div>
+      <h1>User Profile</h1>
+      <p>Your identity, lifetime numbers, and how Journall should treat you.</p>
+    </div>
+    <div class="top-right"><div class="who"><span class="dot"></span><span data-user-name></span></div></div>
+  </div>
+
+  <div class="up-hero glass up-reveal" style="animation-delay:60ms">
+    <div class="up-cover"></div>
+    <div class="up-hero-body">
+      <div class="up-hero-left">
+        <div class="up-avatar-wrap"><div class="up-avatar" id="upAvatar">?</div><span class="up-avatar-badge" title="MT5 sync active">✓</span></div>
+        <div>
+          <div class="up-name-row"><span class="up-name" id="upName" data-user-name contenteditable="true" spellcheck="false" title="Click to edit your name"></span><span class="up-phase-chip" id="upPhaseChip">Not set</span></div>
+          <div class="up-bio" id="upBio" contenteditable="true" spellcheck="false"></div>
+          <div class="up-meta"><span class="up-meta-chip" id="upMemberChip" hidden></span><span class="up-meta-chip" id="upJournalStreakChip">Loading…</span></div>
+        </div>
+      </div>
+      <div class="up-settings-wrap">
+        <button class="up-edit" id="upSettingsBtn" title="Change profile photo or banner" aria-label="Edit profile photo or banner" aria-haspopup="true" aria-expanded="false">
+          <svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+          <span>Edit profile</span>
+        </button>
+        <div class="up-settings-menu" id="upSettingsMenu">
+          <button type="button" data-act="avatar"><span class="ic"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="1.6"/><path d="m21 16-5-5-9 9"/></svg></span> Change profile photo</button>
+          <button type="button" data-act="cover"><span class="ic"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="9" rx="2"/><path d="M3 18h18"/></svg></span> Change banner</button>
+        </div>
+        <input type="file" id="upAvatarInput" accept="image/*" hidden>
+        <input type="file" id="upCoverInput" accept="image/*" hidden>
+      </div>
+    </div>
+  </div>
+
+  <div class="a-h"><div class="a-h-t"><span class="a-h-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19V9M11 19V4M18 19v-7"/></svg></span><h2>Lifetime numbers</h2></div><p>Your all-time results from every logged trade.</p></div>
+  <div class="up-stats a-kp">
+    <div class="up-stat up-reveal" style="animation-delay:110ms"><div class="l"><span class="ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h11a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3z"/><path d="M5 17a3 3 0 0 1 3-3h11"/></svg></span><span>Trades logged</span></div><div class="v mono" id="upN1">0</div></div>
+    <div class="up-stat up-reveal" style="animation-delay:150ms"><div class="l"><span class="ic"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg></span><span>Win rate</span></div><div class="v mono" id="upN2">0%</div></div>
+    <div class="up-stat neg up-reveal" style="animation-delay:190ms"><div class="l"><span class="ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v18M16 7.5c0-1.7-1.8-2.5-4-2.5s-4 1-4 2.6c0 3.8 8 2 8 6 0 1.7-1.8 2.9-4 2.9s-4-1-4-2.7"/></svg></span><span>Net P&amp;L</span></div><div class="v mono" id="upN3">$0.00</div></div>
+    <div class="up-stat up-reveal" style="animation-delay:230ms"><div class="l"><span class="ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v16M6 20h12M5 8h14M5 8l-2.5 6a3 3 0 0 0 5 0zM19 8l-2.5 6a3 3 0 0 0 5 0z"/></svg></span><span>Profit factor</span></div><div class="v mono" id="upN4">0.00</div></div>
+    <div class="up-stat neg up-reveal" style="animation-delay:270ms"><div class="l"><span class="ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7l6 6 4-4 8 8M21 11v6h-6"/></svg></span><span>Max drawdown</span></div><div class="v mono" id="upN5">$0.00</div></div>
+  </div>
+
+  <div class="a-h"><div class="a-h-t"><span class="a-h-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg></span><h2>Profile and record</h2></div><p>Your trading identity, risk limits, session results, monthly trend and milestones.</p></div>
+  <div class="up-grid">
+    <div class="up-col">
+      <div class="up-card a-s up-reveal" style="animation-delay:310ms">
+        <div class="a-s-head"><div class="a-s-ttl"><span class="a-s-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="m15.5 8.5-2 5-5 2 2-5z"/></svg></span><h3 class="up-card-head">Trading identity</h3></div></div><div class="sub">Tags that describe how you trade.</div>
+        <div class="up-tags" id="upTags">
+                    <button class="up-tag add" id="upTagAdd" type="button">+ Add</button>
+        </div>
+      </div>
+      <div class="up-card a-s up-reveal" style="animation-delay:350ms">
+        <div class="a-s-head"><div class="a-s-ttl"><span class="a-s-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 4 6v6c0 4.5 3.2 7.6 8 9 4.8-1.4 8-4.5 8-9V6z"/><path d="m9 12 2 2 4-4"/></svg></span><h3 class="up-card-head">Risk profile</h3></div></div><div class="sub">Limits taken from your Account Settings.</div>
+        <div class="up-risk-row"><span>Daily loss limit</span><b id="upRiskLoss">Not set</b></div>
+        <div class="up-risk-row"><span>Trade limit / day</span><b id="upRiskTrades">Not set</b></div>
+                <div class="up-risk-row"><span>Minimum reward:risk</span><b id="upRiskRR">Not set</b></div>
+      </div>
+      <div class="up-card a-s up-reveal" style="animation-delay:390ms">
+        <div class="a-s-head"><div class="a-s-ttl"><span class="a-s-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg></span><h3 class="up-card-head">Session record</h3></div></div><div class="sub">Net result by trading session.</div>
+        <div id="upSessRows"><div class="up-sess"><span>Loading…</span><b>—</b></div></div>
+      </div>
+    </div>
+
+    <div class="up-col">
+      <div class="up-card a-s up-reveal" style="animation-delay:310ms">
+        <div class="a-s-head"><div class="a-s-ttl"><span class="a-s-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3v18h18M7 14l4-4 3 3 5-6"/></svg></span><h3 class="up-card-head">Monthly trend</h3></div></div><div class="sub">Net P&amp;L for each month with trades.</div>
+        <div class="up-chart" id="upChart"></div>
+      </div>
+      <div class="up-card a-s up-reveal" style="animation-delay:350ms">
+        <div class="a-s-head"><div class="a-s-ttl"><span class="a-s-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0z"/><path d="M17 5h3v2a3 3 0 0 1-3 3M7 5H4v2a3 3 0 0 0 3 3"/></svg></span><h3 class="up-card-head">Achievements</h3></div></div><div class="sub">Real progress against each milestone.</div>
+        <div class="up-badges">
+          <div class="up-badge" id="upBadgeTrades"><span class="ic" id="upBadgeTradesIcon"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></span><div><b>700+ trades logged</b><span id="upBadgeTradesSub">Consistency milestone</span></div></div>
+          <div class="up-badge" id="upBadgeStreak"><span class="ic" id="upBadgeStreakIcon"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></span><div><b>30-day journal streak</b><span id="upBadgeStreakSub">0 / 30 days</span><div class="up-badge-bar"><i data-target="0"></i></div></div></div>
+          <div class="up-badge" id="upBadgeGreenMonth"><span class="ic" id="upBadgeGreenMonthIcon"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></span><div><b>First green month</b><span id="upBadgeGreenMonthSub">Not tracked yet</span></div></div>
+          <div class="up-badge" id="upBadgeRevenge"><span class="ic" id="upBadgeRevengeIcon"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></span><div><b>Zero revenge trades, 7 days</b><span id="upBadgeRevengeSub">Not tracked yet</span></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="up-card a-s up-reveal" style="animation-delay:430ms">
+    <div class="a-s-head"><div class="a-s-ttl"><span class="a-s-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2"/><circle cx="8" cy="17" r="2"/></svg></span><h3 class="up-card-head">Preferences</h3></div></div><div class="sub">How Journall reminds and warns you.</div>
+    <div class="up-toggle-row"><div><b>Daily rule reminders</b><span>Before your first trade, remind you on Today's Summary if the last trading day broke a rule</span></div><button class="up-switch on" data-k="reminders" type="button"></button></div>
+    <div class="up-toggle-row"><div><b>Risk warnings</b><span>Show a warning on Today's Summary at 80% of your daily loss limit, or 1 trade before the max</span></div><button class="up-switch on" data-k="risk" type="button"></button></div>
+    <div class="up-toggle-row"><div><b>Reduce motion</b><span>Turn off animated entrances and transitions across the app</span></div><button class="up-switch" data-k="motion" type="button"></button></div>
+  </div>
+
+</div></div>
+
+<div class="view" id="view-tools" hidden><div class="wrap">
+<div class="top"><div><h1>Trade tools</h1><p>Size a trade against your rules. It checks size and risk, not the setup.</p></div></div>
+<div id="tlHome" class="tl-cards"><button type="button" class="glass tl-cardbtn" data-open="size"><div class="tl-top"><span class="a-s-ic"><svg viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M8 7h8M8 12h.01M12 12h.01M16 12h.01M8 16h.01M12 16h.01M16 16h.01"/></svg></span><span class="tl-pill">Popular</span></div><h3>Position size calculator</h3><p>Calculate lot size from your risk in dollars and stop-loss distance in pips.</p><em>Open tool &rarr;</em></button><button type="button" class="glass tl-cardbtn" data-open="hours"><div class="tl-top"><span class="a-s-ic"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span><span class="tl-pill">Live</span></div><h3>Forex market hours</h3><p>See which sessions are open right now, in your time, and when London and New York overlap.</p><em>Open tool &rarr;</em></button><button type="button" class="glass tl-cardbtn" data-open="ex"><div class="tl-top"><span class="a-s-ic"><svg viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="M7 15l4-5 3 3 5-7"/></svg></span><span class="tl-pill">Edge</span></div><h3>Expectancy &amp; breakeven</h3><p>Win rate and R:R in, edge per trade out. Shows the win rate you need to break even.</p><em>Open tool &rarr;</em></button><button type="button" class="glass tl-cardbtn" data-open="pp"><div class="tl-top"><span class="a-s-ic"><svg viewBox="0 0 24 24"><path d="M7 7h13l-3-3M17 17H4l3 3"/></svg></span><span class="tl-pill">Gold</span></div><h3>Pip &amp; profit converter</h3><p>Turn pips and lot size into dollars, or entry and exit prices into pips.</p><em>Open tool &rarr;</em></button><button type="button" class="glass tl-cardbtn" data-open="lim"><div class="tl-top"><span class="a-s-ic"><svg viewBox="0 0 24 24"><path d="M12 3l7 3v5c0 4.5-3 8.2-7 10-4-1.8-7-5.5-7-10V6z"/></svg></span><span class="tl-pill">Plan</span></div><h3>Daily limit planner</h3><p>How many losses your daily limit allows, and how many wins reach your profit target.</p><em>Open tool &rarr;</em></button><button type="button" class="glass tl-cardbtn" data-open="st"><div class="tl-top"><span class="a-s-ic"><svg viewBox="0 0 24 24"><path d="M12 3 2 20h20z"/><path d="M12 10v4M12 17h.01"/></svg></span><span class="tl-pill">Risk</span></div><h3>Losing streak odds</h3><p>The chance of a losing run of a given length over your next set of trades.</p><em>Open tool &rarr;</em></button></div>
+<div class="tl-pane" data-tool="size" hidden><button type="button" class="tl-back">Close &times;</button>
+<div class="tl-grid">
+ <section class="glass tl-card"><h3>Trade inputs</h3>
+  <label>Risk per trade ($)<input id="tlRisk" type="number" min="0" step="0.5" value=""></label>
+  <label>Stop loss (pips)<input id="tlSl" type="number" min="1" step="1" value=""></label>
+  <label>Pip value per 1.00 lot ($)<input id="tlPv" type="number" min="0" step="any" placeholder="Not set"><small>Depends on your symbol and broker. Saved on this device.</small></label>
+  <label>Price move per pip (optional)<input id="tlPs" type="number" min="0" step="any" placeholder="Not set"><small>Only used for the stop loss and take profit prices.</small></label>
+  <label>Reward : risk<input id="tlRr" type="number" min="0.5" step="0.5" value=""></label>
+  <div class="tl-row"><label>Direction<select id="tlSide"><option>SELL</option><option>BUY</option></select></label>
+  <label>Entry price (optional)<input id="tlEntry" type="number" step="0.01" placeholder="e.g. 4331.71"></label></div>
+ </section>
+ <section class="glass tl-card"><h3>Result</h3>
+  <div id="tlVerdict" class="tl-verdict"></div>
+  <div id="tlOut" class="tl-out"></div>
+  <ul id="tlChecks" class="tl-checks"></ul>
+ </section>
+</div></div>
+<div class="tl-pane" data-tool="hours" hidden><button type="button" class="tl-back">Close &times;</button>
+<section class="glass tl-card"><h3>Forex market hours</h3><div id="mhNow" class="tl-note"></div><div id="mhList" class="mh-list"></div><small>Uses 8:00-17:00 business hours in each city (Tokyo 9-18), adjusted for daylight saving. Closed on weekends. An approximation, not an exchange feed.</small></section></div>
+<div class="tl-pane" data-tool="ex" hidden><button type="button" class="tl-back">Close &times;</button>
+<section class="glass tl-card"><h3>Expectancy &amp; breakeven</h3><div class="tl-row"><label>Win rate (%)<input id="exWr" type="number" step="any" value=""></label><label>Reward : risk<input id="exRr" type="number" step="any" value=""></label></div><div id="exV" class="tl-verdict"></div><div id="exOut" class="tl-out"></div><small>A win rate only means something over 100+ trades.</small></section></div>
+<div class="tl-pane" data-tool="pp" hidden><button type="button" class="tl-back">Close &times;</button>
+<section class="glass tl-card"><h3>Pip &amp; profit converter</h3><div class="tl-row"><label>Lot size<input id="ppLot" type="number" step="any" value=""></label><label>Pips<input id="ppPips" type="number" step="any" value=""></label></div><div class="tl-row"><label>Entry price (optional)<input id="ppEn" type="number" step="any" value=""></label><label>Exit price (optional)<input id="ppEx" type="number" step="any" value=""></label></div><div class="tl-row"><label>Pip value per 1.00 lot ($)<input id="ppPv" type="number" step="any" min="0" placeholder="Not set"></label><label>Price move per pip<input id="ppPs" type="number" step="any" min="0" placeholder="Not set"></label></div><div id="ppOut" class="tl-out"></div><small>Both numbers depend on your symbol and broker. Check your contract size. Saved on this device.</small></section></div>
+<div class="tl-pane" data-tool="lim" hidden><button type="button" class="tl-back">Close &times;</button>
+<section class="glass tl-card"><h3>Daily limit planner</h3><div class="tl-row"><label>Daily loss limit ($)<input id="lmLim" type="number" step="any" value=""></label><label>Profit target ($)<input id="lmTgt" type="number" step="any" value=""></label></div><div class="tl-row"><label>Risk per trade ($)<input id="lmRisk" type="number" step="any" value=""></label><label>Reward : risk<input id="lmRr" type="number" step="any" value=""></label><label>Win rate (%)<input id="lmWr" type="number" step="any" value=""></label></div><div id="lmOut" class="tl-out"></div><div id="lmNote" class="tl-note"></div></section></div>
+<div class="tl-pane" data-tool="st" hidden><button type="button" class="tl-back">Close &times;</button>
+<section class="glass tl-card"><h3>Losing streak odds</h3><div class="tl-row"><label>Win rate (%)<input id="stWr" type="number" step="any" value=""></label><label>Next trades<input id="stN" type="number" step="any" value=""></label><label>Losing streak of<input id="stK" type="number" step="any" value=""></label></div><div id="stOut" class="tl-out"></div><div id="stNote" class="tl-note"></div></section></div>
+</div></div>
+<link rel="stylesheet" href="css/tools.css"/>
+<script src="js/pip-value-settings.js"></script>
+<script src="js/tools-calculators.js"></script>
+<link rel="stylesheet" href="css/kpi-tiles.css"/>
+<link rel="stylesheet" href="css/market.css"/>
+<div class="view" id="view-market" hidden><div class="wrap">
+<div class="top"><div><h1>Market</h1><p>Upcoming economic events and market news.</p></div></div>
+<div class="mk-bar glass"><div class="mk-chips" id="mkRangeChips" data-group="range"><button type="button" class="mk-chip" data-val="today">Today</button><button type="button" class="mk-chip on" data-val="week">This week</button><button type="button" class="mk-chip" data-val="next">Next week</button></div><div class="mk-chips" id="mkImpactChips" data-group="impact"><button type="button" class="mk-chip" data-val="all">All</button><button type="button" class="mk-chip on" data-val="high">High</button><button type="button" class="mk-chip" data-val="medium">Medium</button><button type="button" class="mk-chip" data-val="low">Low</button></div><div class="mk-chips" id="mkCcyChips" data-group="ccy"><button type="button" class="mk-chip on" data-val="USD">USD</button><button type="button" class="mk-chip" data-val="EUR">EUR</button><button type="button" class="mk-chip" data-val="GBP">GBP</button><button type="button" class="mk-chip" data-val="JPY">JPY</button><button type="button" class="mk-chip" data-val="CAD">CAD</button><button type="button" class="mk-chip" data-val="AUD">AUD</button><button type="button" class="mk-chip" data-val="CHF">CHF</button><button type="button" class="mk-chip" data-val="NZD">NZD</button><button type="button" class="mk-chip" data-val="all">All</button></div><button type="button" class="mk-status" id="mkStatus"><i></i>Not connected</button></div>
+<div class="mk-stats" id="mkStats"></div>
+<div class="mk-grid">
+<section class="glass mk-card"><h3><span class="mk-ttl"><span class="a-s-ic"><svg viewBox="0 0 24 24"><path d="M7 3v3M17 3v3M4 9h16"/><rect x="4" y="5" width="16" height="15" rx="2"/></svg></span>Economic calendar</span> <small>Times in your local timezone</small></h3><div class="mk-scroll"><table class="mk-tbl"><thead><tr><th>Time</th><th>Cur</th><th>Impact</th><th>Event</th><th>Actual</th><th>Forecast</th><th>Previous</th></tr></thead><tbody id="mkCalBody"><tr class="mk-day"><td colspan="7">DAY, DATE</td></tr><tr><td><span class="mk-sk" style="width:44px"></span></td><td><span class="mk-sk" style="width:32px"></span></td><td><span class="mk-imp"><i></i><i></i><i></i></span></td><td><span class="mk-sk" style="width:80%"></span></td><td><span class="mk-sk" style="width:38px"></span></td><td><span class="mk-sk" style="width:38px"></span></td><td><span class="mk-sk" style="width:38px"></span></td></tr></tbody></table></div><p class="mk-note" id="mkCalNote">Loading calendar…</p></section>
+<div class="mk-side"><section class="glass mk-card"><h3><span class="mk-ttl"><span class="a-s-ic"><svg viewBox="0 0 24 24"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></svg></span>Key events</span> <small>Next up (High + Medium)</small></h3><div class="mk-key" id="mkKeyEvents"><div class="mk-k"><span class="mk-sk" style="width:60%"></span></div><div class="mk-k"><span class="mk-sk" style="width:48%"></span></div><div class="mk-k"><span class="mk-sk" style="width:55%"></span></div></div></section>
+<section class="glass mk-card"><h3><span class="mk-ttl"><span class="a-s-ic"><svg viewBox="0 0 24 24"><path d="M4 5h13v14H6a2 2 0 0 1-2-2z"/><path d="M17 9h3v8a2 2 0 0 1-2 2"/><path d="M8 9h5M8 13h5"/></svg></span>Market news</span> <small>Latest</small></h3><div class="mk-news" id="mkNewsList"><div class="mk-n"><span class="mk-sk" style="width:35%"></span><span class="mk-sk" style="width:95%"></span><span class="mk-sk" style="width:70%"></span></div></div></section></div>
+</div></div></div>
+<div class="view" id="view-upload" hidden><div class="wrap">
+
+  <div class="top up-reveal" style="animation-delay:0ms">
+    <div>
+      <div class="eyebrow"><span class="pill">Broker &amp; import</span><span class="date mono" id="dateStrUp"></span></div>
+      <h1>Upload data</h1>
+      <p>Sync your MT5 balance and recent trades, or import a broker report.</p>
+    </div>
+    <div class="top-right"><div class="who"><span class="dot"></span><span data-user-name></span></div></div>
+  </div>
+
+  <div class="ud-status glass up-reveal" style="animation-delay:60ms">
+    <div class="ud-status-left">
+      <span class="ud-dot" id="udDot"></span>
+      <div>
+        <div class="ud-status-title" id="udTitle">Awaiting sync</div>
+        <div class="ud-status-sub">MT5 bridge · <b id="udSyncTxt">not synced yet</b></div>
+      </div>
+    </div>
+    <button class="gg-btn-solid" id="udSyncBtn" style="width:auto;padding:10px 18px">Sync balance</button>
+  </div>
+
+  <div class="up-grid">
+    <div class="up-col">
+      <div class="up-card glass up-reveal" style="animation-delay:110ms">
+        <div class="up-card-head"><span class="a-s-ic"><svg viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/></svg></span>Broker connection</div>
+        <div class="up-risk-row"><span>Broker</span><b>MetaTrader 5</b></div>
+        <div class="up-risk-row"><span>Bridge</span><b>Local, localhost:8787</b></div>
+        <div class="up-risk-row"><span>Last synced</span><b id="udLastSync">—</b></div>
+      </div>
+
+      <div class="up-card glass up-reveal" style="animation-delay:150ms">
+        <div class="up-card-head"><span class="a-s-ic"><svg viewBox="0 0 24 24"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></svg></span>Import from CSV or HTML</div>
+        <div class="ud-drop" id="udDrop" tabindex="0" role="button">
+          <div class="ud-drop-ic"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4M7 9l5-5 5 5M5 20h14"/></svg></div>
+          <div class="ud-drop-t">Drop your MT5 / broker export here</div>
+          <div class="ud-drop-s">or click to choose a .csv or .html file</div>
+          <input type="file" id="udFile" accept=".csv,.html,.htm" hidden>
+        </div>
+        <div class="ud-drop-result" id="udResult" hidden></div>
+      </div>
+    </div>
+
+    <div class="up-col">
+      <div class="up-card glass up-reveal" style="animation-delay:110ms">
+        <div class="up-card-head"><span class="a-s-ic"><svg viewBox="0 0 24 24"><path d="M5 3h14v18l-3-2-2 2-2-2-2 2-2-2-3 2z"/><path d="M9 8h6M9 12h6"/></svg></span>What syncing keeps</div>
+        <div class="ud-note"><b>Sync balance</b> reads your account balance from MT5 and adds recent trades that are not in your journal yet. For older history, export your MT5 history as .html or .csv and drop it below; a report import stays the final word. Your journal notes, screenshots and psychology checks always stay local and are never overwritten.</div>
+      </div>
+      <div class="up-card glass up-reveal" style="animation-delay:150ms">
+        <div class="up-card-head"><span class="a-s-ic"><svg viewBox="0 0 24 24"><path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.4 2.4-2.6-.6-.6-2.6z"/></svg></span>Bridge setup</div>
+        <div class="ud-steps">
+          <div class="ud-step"><span class="ud-step-n">1</span><div><b>Run the local bridge</b><span class="ud-step-d">Start the local bridge (<code>local-server.ps1</code>) with MT5 open.</span></div></div>
+          <div class="ud-step"><span class="ud-step-n">2</span><div><b>Keep MT5 signed in</b><span class="ud-step-d">The bridge reads your account balance from the terminal.</span></div></div>
+          <div class="ud-step"><span class="ud-step-n">3</span><div><b>Press Sync balance</b><span class="ud-step-d">Sync runs when you press the button. It also adds recent trades.</span></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div></div>
+
+<script src="js/upload-page.js"></script>
+
+<script id="jl-ch-limits" src="js/challenge-limits.js"></script>
+
+<script src="js/account-settings.js"></script>
+</main>
+</div>
+<div class="ttip" id="ttip"></div>
+<div class="day-panel-scrim" id="dayPanelScrim"></div>
+<aside class="day-panel" id="dayPanel" aria-hidden="true" aria-label="Day trade detail">
+  <div class="day-panel-head">
+    <div><div class="day-panel-date" id="dpDate"></div><div class="day-panel-pnl" id="dpPnl"></div></div>
+    <button type="button" class="day-panel-close" id="dpClose" aria-label="Close">✕</button>
+  </div>
+  <div class="day-panel-stats" id="dpStats"></div>
+  <div class="day-panel-sub">TRADES THIS DAY · TAP ONE TO OPEN ITS JOURNAL</div>
+  <div class="day-panel-list" id="dpList"></div>
+</aside>
+<div class="day-panel-scrim" id="monthPanelScrim"></div>
+<aside class="day-panel" id="monthPanel" aria-hidden="true" aria-label="Month detail">
+  <div class="day-panel-head">
+    <div><div class="day-panel-date" id="mpTitle"></div><div class="day-panel-pnl" id="mpPnl"></div></div>
+    <button type="button" class="day-panel-close" id="mpClose" aria-label="Close">✕</button>
+  </div>
+  <div class="day-panel-stats" id="mpStats"></div>
+  <button type="button" class="day-panel-view" id="mpViewFull"><svg viewBox="0 0 24 24"><path d="M9 6h11M9 12h11M9 18h11M4 6h.01M4 12h.01M4 18h.01"/></svg>View full month calendar</button>
+  <div class="day-panel-sub">WEEKS THIS MONTH · TAP ONE TO JUMP TO IT</div>
+  <div class="day-panel-list" id="mpList"></div>
+</aside>
+<script id="jl-trade-math" src="js/trade-math.js"></script>
+<script src="js/todays-summary.js"></script>
+<script id="jl-focus-rule" src="js/focus-rule.js"></script>
+<script src="js/trades-tab.js"></script>
+<script src="js/confirm-toast.js"></script>
+<script src="js/profile-hero-spotlight.js"></script>
+<script src="js/journal-tab.js"></script>
+<script src="js/calendar-tab.js"></script>
+<script src="js/psychology-room.js"></script>
+<script src="js/ai-coach-tab.js"></script>
+<script src="js/profile-tab.js"></script>
+<link rel="stylesheet" href="css/analytics-empty.css"/>
+<script src="js/analytics-empty-state.js"></script>
+<script src="js/psychology-rules-paint.js"></script>
+<script src="js/extra-rules.js"></script>
+<script id="jl-circuit" src="js/circuit-breaker.js"></script>
+<link rel="stylesheet" href="css/share-card.css"/>
+<script id="jl-share-card" src="js/share-card.js"></script>
+
+<link rel="stylesheet" href="css/daily-journal.css"/>
+<script id="jl-daily-journal" src="js/daily-journal.js"></script>
+<link rel="stylesheet" href="css/daily-journal-history.css"/>
+<script id="jl-daily-journal-history" src="js/daily-journal-history.js"></script>
+<link rel="stylesheet" href="css/study-notes.css"/>
+<script id="jl-study-notes" src="js/study-notes.js"></script>
+<link rel="stylesheet" href="css/ai-coach.css"/>
+<script id="jl-ai-coach-fixes" src="js/ai-coach-fixes.js"></script>
+
+
+
+<script src="js/psychology-summary.js"></script>
+<script src="js/analytics-profit-target.js"></script>
+<script src="js/analytics-daily-drawdown.js"></script>
+<script src="js/analytics-setups.js"></script>
+<script src="js/market-tab.js"></script>
+<link rel="stylesheet" href="css/weekly-review.css"/>
+<script id="jl-weekly-review" src="js/weekly-review.js"></script>
+<link rel="stylesheet" href="css/day-recap.css"/>
+<script id="jl-day-recap" src="js/day-recap.js"></script>
+
+</div>
+<script src="js/pwa-install.js"></script>
+<script type="module" src="js/auth-module.js"></script>
+<script id="journall-email-form-guard" src="js/email-form-guard.js"></script>
+<script src="js/login-background.js"></script>
+<script id="journall-loading-screen-script" src="js/loading-screen.js"></script>
+<link rel="stylesheet" href="css/mobile-polish.css"/>
+<link rel="stylesheet" href="css/prop-firm.css"/>
+<script id="jl-prop-rules" src="js/prop-rules.js"></script>
+<style id="jl-ui-shared-css">
+/* Shared look for collapsible rows and small uppercase labels (used by Study notes and Daily journal history). */
+#pbRoot .pb-item,.djh-day{border:1px solid var(--border);border-radius:var(--r-3);margin-bottom:8px;background:rgba(255,255,255,.02)}
+#pbRoot .pb-item>summary,.djh-day>summary{list-style:none;cursor:pointer;display:flex;flex-wrap:wrap;align-items:center;padding:11px 14px}
+#pbRoot .pb-item>summary::-webkit-details-marker,.djh-day>summary::-webkit-details-marker{display:none}
+#pbRoot .pb-l,.djh-row small{display:block;font-size:var(--fs-1);font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--faint)}
+</style>
+<style id="jl-touch-focus-css">
+/* Touch targets and keyboard focus for the newer cards (Study notes, rule card, daily journal, share). Additive block. */
+@media (max-width:640px),(pointer:coarse){
+  #pbRoot .pb-tab,#pbRoot .pb-chip,#pbRoot .pb-del,#pbRoot .pb-in,
+  .aic-rule-edit input,.aic-rule-edit .gg-btn-outline,#aicMark,
+  #djPanel .dj-chip,.jls-btn{min-height:44px}
+  #pbRoot .pb-tab{padding-left:16px;padding-right:16px}
+  #pbRoot .pb-chip{display:inline-flex;align-items:center}
+  #pbRoot .pb-item>summary,.djh-day>summary{min-height:44px}
+  .jls-x{width:44px;height:44px}
+}
+#pbRoot .pb-tab:focus-visible,#pbRoot .pb-chip:focus-visible,#pbRoot .pb-del:focus-visible,
+#pbRoot .pb-in:focus-visible,#pbRoot .j-ta:focus-visible,#pbRoot .pb-item>summary:focus-visible,
+.aic-rule-edit input:focus-visible,.aic-rule-edit .gg-btn-outline:focus-visible,#aicMark:focus-visible,
+#djPanel .dj-chip:focus-visible,#djPanel .dj-ta:focus-visible,.djh-day>summary:focus-visible,
+.jls-x:focus-visible,.jls-btn:focus-visible,.jls-sw input:focus-visible{outline:2px solid var(--accent-2);outline-offset:2px}
+</style>
+<style id="jlTopCss">
+#jlTop{position:fixed;right:calc(20px + env(safe-area-inset-right,0px));bottom:calc(20px + env(safe-area-inset-bottom,0px));z-index:900;width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;padding:0;cursor:pointer;color:var(--text);
+  background:linear-gradient(160deg,rgba(255,255,255,.06),rgba(255,255,255,0) 60%),var(--panel-2);border:1px solid var(--border-hi);box-shadow:0 10px 28px -10px rgba(0,0,0,.7);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);
+  opacity:0;transform:translateY(14px) scale(.9);visibility:hidden;pointer-events:none;
+  transition:opacity .35s cubic-bezier(.16,1,.3,1),transform .35s cubic-bezier(.16,1,.3,1),visibility 0s linear .35s,border-color .25s cubic-bezier(.22,.61,.36,1),box-shadow .25s cubic-bezier(.22,.61,.36,1)}
+#jlTop.show{opacity:1;transform:none;visibility:visible;pointer-events:auto;transition-delay:0s}
+#jlTop:hover{border-color:var(--accent);box-shadow:0 12px 30px -8px rgba(124,108,240,.55)}
+#jlTop.show:active{transform:scale(.94)}
+#jlTop:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+#jlTop svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;transition:transform .25s cubic-bezier(.22,.61,.36,1)}
+#jlTop:hover svg{transform:translateY(-2px)}
+@media print{#jlTop{display:none}}
+</style>
+<script src="js/back-to-top.js"></script>
+<link rel="stylesheet" href="css/quick-log.css"/>
+<script id="jl-quicklog" src="js/quick-log.js"></script>
+</body>
+</html>

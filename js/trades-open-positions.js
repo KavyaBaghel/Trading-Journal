@@ -1,0 +1,4 @@
+window.jlN=function(n,w,p){return n+' '+(n===1?w:(p||w+'s'))};
+(function(){const e=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+window.__mountOpenPos=function(){const o=(window.__openTrades||[]).concat((window.__trades||[]).filter(t=>t.ex==null||t.ex==='')),b=document.getElementById('tOpenBody');document.getElementById('tOpenCnt').textContent=o.length;
+ b.innerHTML=o.length?'<table><thead><tr><th>Date</th><th>Time</th><th>Side</th><th>Session</th><th>Lot</th><th>Entry</th></tr></thead><tbody>'+o.map(t=>'<tr><td>'+e(t.d)+'</td><td>'+e(t.t)+'</td><td>'+e(t.side)+'</td><td>'+e(t.ses||'')+'</td><td>'+e(t.lot==null?'':t.lot)+'</td><td>'+e(t.en)+'</td></tr>').join('')+'</tbody></table>':'<p>No open positions in your uploaded data. Import a CSV in Upload Data that includes open trades. Not live: it only knows what you uploaded.</p>'}})();
