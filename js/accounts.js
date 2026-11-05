@@ -1,4 +1,5 @@
 /* Accounts layer: several trading accounts (MT5, Match-Trader, ...) in one journal.
+   Each account has its own settings (see storage-keys.js); the switcher sits on the Account settings page.
    A trade carries an `account` id. A trade with no id belongs to the default account, so existing data needs no migration.
    The account list is synced (journall_accounts_v1). Which account you are looking at is a per-device choice (jlActiveAccount, not synced). */
 (function(){
@@ -58,24 +59,32 @@
     save.addEventListener('click',function(){var r=add(nameIn.value,plat,brIn.value);if(!r.ok){msg.textContent=r.why;return}setActive(r.account.id)});
     nameIn.addEventListener('keydown',function(e){if(e.key==='Enter')save.click()})}
 
+  /* The switcher lives on the Account settings page (not the sidebar). The list opens in place, under the button. */
   function mount(){
-    var nav=document.getElementById('sbNav');if(!nav||document.getElementById('acct'))return;
-    var box=el('div','acct'),btn=el('button','acct-btn'),tx=el('span','acct-txt lbl'),nm=el('b'),sb=el('small'),menu=el('div','acct-menu');
+    var host=document.querySelector('#view-settings .gg-main'),head=host&&host.querySelector('.gg-head');
+    if(!host||!head||document.getElementById('acct'))return;
+    var box=el('div','acct'),cap=el('div','acct-cap','Trading account'),btn=el('button','acct-btn'),tx=el('span','acct-txt'),nm=el('b'),sb=el('small'),menu=el('div','acct-menu'),note=el('p','acct-note');
     box.id='acct';btn.type='button';btn.id='acctBtn';btn.setAttribute('aria-haspopup','listbox');btn.setAttribute('aria-expanded','false');
-    tx.appendChild(nm);tx.appendChild(sb);btn.appendChild(el('span','acct-dot'));btn.appendChild(tx);btn.appendChild(el('span','acct-chev lbl','\u25BE'));
-    menu.id='acctMenu';menu.setAttribute('role','listbox');menu.hidden=true;box.appendChild(btn);box.appendChild(menu);nav.parentNode.insertBefore(box,nav);
+    tx.appendChild(nm);tx.appendChild(sb);btn.appendChild(el('span','acct-dot'));btn.appendChild(tx);btn.appendChild(el('span','acct-chev','▾'));
+    menu.id='acctMenu';menu.setAttribute('role','listbox');menu.hidden=true;box.appendChild(cap);box.appendChild(btn);box.appendChild(menu);box.appendChild(note);
+    host.insertBefore(box,head.nextSibling);
     function close(){menu.hidden=true;btn.setAttribute('aria-expanded','false')}
     function item(text,sub,on,fn){var b=el('button','acct-it'+(on?' on':''));b.type='button';b.setAttribute('role','option');b.setAttribute('aria-selected',on?'true':'false');
       b.appendChild(el('b','',text));if(sub)b.appendChild(el('small','',sub));b.addEventListener('click',function(){close();fn()});return b}
     function build(){menu.textContent='';var L=list(),a=active();
       if(L.length>1)menu.appendChild(item('All accounts','Combined view',a===ALL,function(){setActive(ALL)}));
-      L.forEach(function(x){menu.appendChild(item(x.name,(PLAT[x.platform]||'')+(x.broker?' \u00b7 '+x.broker:''),a===x.id,function(){setActive(x.id)}))});
+      L.forEach(function(x){menu.appendChild(item(x.name,(PLAT[x.platform]||'')+(x.broker?' · '+x.broker:''),a===x.id,function(){setActive(x.id)}))});
       var ad=el('button','acct-it acct-add','+ Add account');ad.type='button';ad.addEventListener('click',function(){close();openAdd()});menu.appendChild(ad)}
     btn.addEventListener('click',function(){if(menu.hidden){build();menu.hidden=false;btn.setAttribute('aria-expanded','true')}else close()});
     document.addEventListener('click',function(e){if(!box.contains(e.target))close()});
     document.addEventListener('keydown',function(e){if(e.key==='Escape')close()});
-    var l=label();nm.textContent=l.n;sb.textContent=l.s}
-  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',mount);else mount();
+    var l=label();nm.textContent=l.n;sb.textContent=l.s;
+    /* Settings belong to one account. In the combined view the page shows the default account's settings, so say so. */
+    var ids=active();note.textContent=ids===ALL?'Combined view shows the settings of '+(find(DEF)||SEED).name+'. Pick an account to edit its own settings.':'Balance, limits, phase and challenges on this page belong to this account only.'}
+  /* If the page rebuilds the settings view, put the switcher back. */
+  function watch(){var host=document.querySelector('#view-settings');if(!host||!window.MutationObserver)return;new MutationObserver(function(){if(!document.getElementById('acct'))mount()}).observe(host,{childList:true,subtree:true})}
+  function start(){mount();watch()}
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start);else start();
 
   window.JLAccounts={ALL:ALL,DEFAULT_ID:DEF,list:list,find:find,active:active,accountOf:accountOf,filter:filter,platformOf:platformOf,writeId:writeId,showsOpen:showsOpen,add:add,setActive:setActive};
 })();
