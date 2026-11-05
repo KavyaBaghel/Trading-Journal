@@ -8,7 +8,8 @@
   try{
     var A=rd(JL_KEYS.keys.VIZTRADE_TRADES),B=rd(JL_KEYS.keys.VIZTRADE_TRADING_PAGE_TRADES),seen={},all=[];
     A.concat(B).forEach(function(t){if(!t||typeof t!=='object')return;var k=t.id!=null?'i'+t.id:'k'+JLAdapter.liveKey(t);if(seen[k])return;seen[k]=1;all.push(t)});
-    var imp=JLAdapter.buildImport(all);imp.open=rd(JL_KEYS.keys.JL_OPEN_POSITIONS);window.__jlImp=imp;
+    if(window.JLAccounts)all=window.JLAccounts.filter(all);   /* only the active account's trades reach the design; 'all' keeps everything */
+    var imp=JLAdapter.buildImport(all);imp.open=(!window.JLAccounts||window.JLAccounts.showsOpen())?rd(JL_KEYS.keys.JL_OPEN_POSITIONS):[];window.__jlImp=imp;
     if(imp.closed.length||imp.open.length){var slim={file:imp.file,closed:imp.closed,open:imp.open};localStorage.setItem(JL_KEYS.keys.JL_IMPORT,JSON.stringify(slim))}
     else localStorage.removeItem(JL_KEYS.keys.JL_IMPORT);
   }catch(e){window.__jlImp={file:'',closed:[],open:[],_lk:{}};try{localStorage.removeItem(JL_KEYS.keys.JL_IMPORT)}catch(_){console.debug('[journall] ignored error in data-bootstrap.js:', _);}

@@ -5,6 +5,7 @@
 (function () {
   var K = Object.freeze({
   JL_ACCOUNT_SETTINGS: 'jlAccountSettings',
+  JL_ACTIVE_ACCOUNT: 'jlActiveAccount',
   JL_CIRCUIT_DISMISSED: 'jlCircuitDismissed',
   JL_DAY_LOCK_LOSSES: 'jlDayLockLosses',
   JL_DAY_LOCK_PEEK_UNTIL: 'jlDayLockPeekUntil',
@@ -21,6 +22,7 @@
   JLIMG_PROFILE_AVATAR_V1: 'jlimg_profile_avatar_v1',
   JLIMG_PROFILE_COVER_DEV: 'jlimg_profile_cover_dev',
   JLIMG_PROFILE_COVER_V1: 'jlimg_profile_cover_v1',
+  JOURNALL_ACCOUNTS_V1: 'journall_accounts_v1',
   JOURNALL_ACCOUNT_CONFIG_V1: 'journall_account_config_v1',
   JOURNALL_ACTIVE_UID: 'journall_active_uid',
   JOURNALL_AI_FOCUS_V1: 'journall_ai_focus_v1',

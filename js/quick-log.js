@@ -191,7 +191,7 @@
     function snap(k){prev[k]=localStorage.getItem(k)}
     try{
       if(r.journal&&shot){snap(KS);var m=rdShots();m[String(r.journal.id)]=[shot];localStorage.setItem(KS,JSON.stringify(m));wrote.push(KS)}
-      snap(KT);var T=rd(KT);T.push(r.trade);localStorage.setItem(KT,JSON.stringify(T));wrote.push(KT);
+      snap(KT);var T=rd(KT);if(window.JLAccounts&&!r.trade.account)r.trade.account=window.JLAccounts.writeId();T.push(r.trade);localStorage.setItem(KT,JSON.stringify(T));wrote.push(KT);
       if(r.journal){snap(KJ);var J=rd(KJ);J.push(r.journal);localStorage.setItem(KJ,JSON.stringify(J));wrote.push(KJ)}
       return true;
     }catch(e){

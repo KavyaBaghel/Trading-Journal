@@ -10,7 +10,8 @@
     if(n){localStorage.setItem(k,JSON.stringify(cur));if(k===TK[0])added=n}});return added}
   function hash(s){var h=5381;for(var i=0;i<s.length;i++)h=((h<<5)+h+s.charCodeAt(i))|0;return (h>>>0).toString(36)}
   /* design trade (from the CSV/HTML importer) -> live record. pnl is NET (profit + commission + swap), like the MT5 report. */
-  function toLive(t){var cost=t.cost||0,net=r2((t.pnl||0)+cost),o={id:'import-'+hash([t.d,t.t,t.sym,t.side,t.en,t.ex,t.lot].join('|')),date:t.d,time:t.t,symbol:t.sym,side:t.side,volume:t.lot,
+  function accOf(t){return window.JLAccounts?window.JLAccounts.accountOf(t):'fundingpips-mt5'}
+  function toLive(t,acct){acct=acct||'fundingpips-mt5';var cost=t.cost||0,net=r2((t.pnl||0)+cost),o={id:'import-'+hash([t.d,t.t,t.sym,t.side,t.en,t.ex,t.lot].concat(acct==='fundingpips-mt5'?[]:[acct]).join('|')),account:acct,date:t.d,time:t.t,symbol:t.sym,side:t.side,volume:t.lot,
     entry:t.en,exit:t.ex,sl:t.sl||0,rawProfit:t.pnl||0,commission:cost,pnl:net,reason:t.why||'Import',mistakes:[],notes:''};
     if(t.pos)o.position=t.pos;
     if(t.hold!=null)o.duration=t.hold/60;return o}
@@ -19,11 +20,11 @@
   function ms(t){var m=Date.parse(String(t.date)+'T'+String(t.time||'00:00:00')+'Z');return isFinite(m)?m:NaN}
   function ots(t){return String(t.id).indexOf('fundingpips-mt5')===0&&/Z$/.test(t.openUtc||'')?Date.parse(t.openUtc)+19800000:ms(t)}  /* old imports store the CLOSE time; their OPEN time in IST is openUtc + 5:30 */
   function sameTrade(a,b){return a.symbol===b.symbol&&a.side===b.side&&Math.abs(Number(a.entry)-Number(b.entry))<1e-6&&Math.abs(Number(a.volume)-Number(b.volume))<1e-6}
-  function replaceBridge(recs){var out={replaced:0,removed:0,skipped:0,relinked:0,fresh:recs,matched:[]};
+  function replaceBridge(recs,acct){acct=acct||'fundingpips-mt5';var out={replaced:0,removed:0,skipped:0,relinked:0,fresh:recs,matched:[]};
     if(!recs.length)return out;
     var ds=recs.map(function(r){return r.date}).sort(),lo=ds[0],hi=ds[ds.length-1];
     var cur=rd(TK[0]),gone={},link={},used={};
-    var others=cur.filter(function(t){return t&&typeof t==='object'&&!BR.test(String(t.id))});
+    var others=cur.filter(function(t){return t&&typeof t==='object'&&!BR.test(String(t.id))&&accOf(t)===acct});
     var usedO=[];
     /* Two passes so identical twin positions pair with their own result first (same exit and P&L), then any leftover match loosely. */
     var hitOf=[];
@@ -33,10 +34,10 @@
       if(!usedO[i]&&sameTrade(o,r)&&Math.abs(ots(o)-rm)<=120000){hitOf[ri]=i;usedO[i]=1;break}}});
     var fresh=recs.filter(function(r,ri){if(hitOf[ri]!=null){out.skipped++;out.matched.push({old:others[hitOf[ri]],rec:r});return false}return true});
     fresh.forEach(function(r){var rm=ms(r),best=null,bd=1/0;
-      cur.forEach(function(t){if(!t||typeof t!=='object'||!BR.test(String(t.id))||used[t.id]||!sameTrade(t,r))return;
+      cur.forEach(function(t){if(!t||typeof t!=='object'||!BR.test(String(t.id))||accOf(t)!==acct||used[t.id]||!sameTrade(t,r))return;
         var d=Math.abs(ms(t)-rm);if(d<=43200000&&d<bd){best=t;bd=d}});
       if(best){used[best.id]=1;gone[best.id]=1;link[JLAdapter.liveKey(best)]=r;out.replaced++}});
-    cur.forEach(function(t){if(!t||typeof t!=='object'||!BR.test(String(t.id))||gone[t.id])return;
+    cur.forEach(function(t){if(!t||typeof t!=='object'||!BR.test(String(t.id))||accOf(t)!==acct||gone[t.id])return;
       if(String(t.date)>=lo&&String(t.date)<=hi){gone[t.id]=1;out.removed++}});
     var kill=out.replaced+out.removed;
     if(kill){TK.forEach(function(k){var a=rd(k).filter(function(t){return !(t&&gone[t.id])});localStorage.setItem(k,JSON.stringify(a))});
@@ -64,14 +65,14 @@
       out.relinked++;ch=true});
     if(ch)localStorage.setItem(LK,JSON.stringify(J));
     return out}
-  window.jlSaveImport=function(R){var recs=(R.closed||[]).map(toLive),seenId={};
+  window.jlSaveImport=function(R){var acct=window.JLAccounts?window.JLAccounts.writeId():'fundingpips-mt5',recs=(R.closed||[]).map(function(t){return toLive(t,acct)}),seenId={};
     recs.forEach(function(r,i){if(seenId[r.id]){r.id=r.id+'-p'+(r.position||('n'+i))}seenId[r.id]=1});
-    var rp=replaceBridge(recs),added=merge(rp.fresh),up=refreshMatched(rp.matched);
-    localStorage.setItem(JL_KEYS.keys.JL_OPEN_POSITIONS,JSON.stringify(R.open||[]));return {added:added,total:recs.length,replaced:rp.replaced,removed:rp.removed,skipped:rp.skipped,relinked:rp.relinked+up.relinked,updated:up.updated}};
-  window.jlSaveSyncTrades=function(list){var have={};rd(TK[0]).forEach(function(t){if(t&&typeof t==='object'&&!BR.test(String(t.id))&&t.position)have[String(t.position)]=1});
-    var all=list||[],recs=all.map(toLive).filter(function(r){return !(r.position&&have[String(r.position)])}),seenId={};
+    var rp=replaceBridge(recs,acct),added=merge(rp.fresh),up=refreshMatched(rp.matched);
+    if(!window.JLAccounts||window.JLAccounts.platformOf(acct)==='mt5')localStorage.setItem(JL_KEYS.keys.JL_OPEN_POSITIONS,JSON.stringify(R.open||[]));return {added:added,total:recs.length,replaced:rp.replaced,removed:rp.removed,skipped:rp.skipped,relinked:rp.relinked+up.relinked,updated:up.updated}};
+  window.jlSaveSyncTrades=function(list){var have={};rd(TK[0]).forEach(function(t){if(t&&typeof t==='object'&&!BR.test(String(t.id))&&t.position&&accOf(t)==='fundingpips-mt5')have[String(t.position)]=1});
+    var all=list||[],recs=all.map(function(t){return toLive(t,'fundingpips-mt5')}).filter(function(r){return !(r.position&&have[String(r.position)])}),seenId={};
     recs.forEach(function(r,i){if(seenId[r.id]){r.id=r.id+'-p'+(r.position||('n'+i))}seenId[r.id]=1});
-    var rp=replaceBridge(recs),added=merge(rp.fresh);
+    var rp=replaceBridge(recs,'fundingpips-mt5'),added=merge(rp.fresh);
     return {added:added,total:all.length,known:all.length-recs.length,replaced:rp.replaced,removed:rp.removed,skipped:rp.skipped}};
   function ago(ts){var d=Date.now()-ts;if(!(d>=0))return 'just now';var m=Math.floor(d/60000);if(m<1)return 'just now';if(m<60)return m+'m ago';var h=Math.floor(m/60);if(h<24)return h+'h ago';return Math.floor(h/24)+'d ago'}
   function last(){var s=rdo(SS),t=s&&s.lastSynced?Date.parse(s.lastSynced):NaN;return isFinite(t)?t:null}
