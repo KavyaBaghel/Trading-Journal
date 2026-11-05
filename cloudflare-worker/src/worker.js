@@ -326,6 +326,8 @@ async function handleMatchTrader(request, env, cors) {
       await range(a, mid);
       await range(mid + 1, b);
     } else {
+      // A slice of an hour or less that is still full cannot be split further, so say so instead of silently dropping the older trades.
+      if (list.length >= LIMIT) truncated = true;
       for (const p of list) if (p && p.id != null) byId.set(String(p.id), p);
     }
   }
