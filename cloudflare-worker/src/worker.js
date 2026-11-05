@@ -272,6 +272,76 @@ async function handleMarket(request, env, cors, ctx) {
   return json({ ok: true, calendar: { status: calStatus, source: calSource, finnhubStatus: cal.status, cache: calCache, stale: calStale, savedAt: calSavedAt, events }, news: { status: news.status, items } }, 200, cors);
 }
 
+const MT_BASE = "https://trader-api.match-trader.com";
+
+// Match-Trader read-only sync. The Trader API token is a Worker secret (MT_TRADER_TOKEN): it never reaches the browser or Firestore.
+// Only the Firebase user in MT_OWNER_UID may call this route, because the token belongs to one trading account.
+async function mtGet(path, params, env) {
+  const u = new URL(MT_BASE + path);
+  for (const [k, v] of Object.entries(params || {})) u.searchParams.set(k, String(v));
+  const r = await fetch(u.toString(), { headers: { "Authorization": "Bearer " + env.MT_TRADER_TOKEN, "Accept": "application/json" } });
+  const data = await r.json().catch(() => null);
+  return { status: r.status, data, retryAfter: r.headers.get("retry-after") };
+}
+
+function mtUpstreamError(r) {
+  if (r.status === 401) return { code: 502, message: "Match-Trader rejected the token (expired, revoked or wrong). Generate a new read-only token and update the MT_TRADER_TOKEN secret." };
+  if (r.status === 403) return { code: 502, message: "The Match-Trader token is missing a read right (account summary or closed positions), or the broker disabled it." };
+  if (r.status === 429) return { code: 429, message: "Match-Trader rate limit reached. Try again in " + (r.retryAfter || "a minute") + " seconds." };
+  return { code: 502, message: "Match-Trader returned " + r.status + "." };
+}
+
+async function handleMatchTrader(request, env, cors) {
+  const authHeader = request.headers.get("authorization") || "";
+  const idToken = authHeader.startsWith("Bearer ") ? authHeader.slice(7) : "";
+  if (!idToken) return json({ error: "Sign in required." }, 401, cors);
+  let user;
+  try { user = await verifyFirebaseIdToken(idToken, env); }
+  catch (error) { return json({ error: error.message || "Invalid or expired sign-in token." }, 401, cors); }
+
+  if (!env.MT_OWNER_UID) return json({ error: "MT_OWNER_UID is not configured on the Worker." }, 500, cors);
+  if (user.localId !== env.MT_OWNER_UID) return json({ error: "This sign-in is not allowed to use the Match-Trader sync (user " + user.localId + ")." }, 403, cors);
+  if (!env.MT_TRADER_TOKEN) return json({ error: "MT_TRADER_TOKEN secret is not configured." }, 500, cors);
+
+  const body = await request.json().catch(() => ({}));
+  const now = Date.now(), DAY = 86400000;
+  let from = Number(body.from), to = Number(body.to);
+  if (!Number.isFinite(to)) to = now + DAY;
+  if (!Number.isFinite(from)) from = now - 30 * DAY;
+  if (!(from <= to)) return json({ error: "from must not be later than to." }, 400, cors);
+  if (to - from > 400 * DAY) from = to - 400 * DAY;
+
+  // History has no paging: a range holding more than the limit returns only the newest records, so split it until each part fits.
+  const LIMIT = 500, MAX_CALLS = 14;
+  let calls = 0, truncated = false;
+  const byId = new Map();
+  async function range(a, b) {
+    if (calls >= MAX_CALLS) { truncated = true; return; }
+    calls++;
+    const r = await mtGet("/v1/closed-positions", { from: a, to: b, limit: LIMIT }, env);
+    if (r.status !== 200) { const e = mtUpstreamError(r); const err = new Error(e.message); err.code = e.code; throw err; }
+    const list = Array.isArray(r.data && r.data.closedPositions) ? r.data.closedPositions : [];
+    if (list.length >= LIMIT && b - a > 3600000) {
+      const mid = Math.floor((a + b) / 2);
+      await range(a, mid);
+      await range(mid + 1, b);
+    } else {
+      for (const p of list) if (p && p.id != null) byId.set(String(p.id), p);
+    }
+  }
+  try { await range(from, to); }
+  catch (error) { return json({ error: error.message || "Match-Trader sync failed." }, error.code || 502, cors); }
+
+  let summary = null, summaryError = "";
+  try {
+    const r = await mtGet("/v1/account-summary", {}, env);
+    if (r.status === 200 && r.data && typeof r.data === "object") summary = r.data;
+    else summaryError = mtUpstreamError(r).message;
+  } catch (error) { summaryError = "Account summary could not be read."; }
+
+  return json({ ok: true, from, to, truncated, calls, summary, summaryError, closedPositions: Array.from(byId.values()) }, 200, cors);
+}
+
 export default {
   async fetch(request, env, ctx) {
     const origin = request.headers.get("origin") || "";
@@ -291,6 +361,13 @@ export default {
         return await handleMarket(request, env, cors, ctx);
       } catch (error) {
         return json({ error: error.message || "Market backend failed." }, 500, cors);
+      }
+    }
+    if (request.method === "POST" && url.pathname === "/matchtrader") {
+      try {
+        return await handleMatchTrader(request, env, cors);
+      } catch (error) {
+        return json({ error: error.message || "Match-Trader backend failed." }, 500, cors);
       }
     }
     return json({ ok: true, service: "Journall AI Worker" }, 200, cors);
