@@ -95,8 +95,11 @@
   };
 
   // One-tap FundingPips 2 Step Flex (Phase 1) preset: fills the fields only, saving stays with Save setup.
+  let ggPendingPhase = null;
   window.ggApplyFpFlex = function(ph){
     const ggFpPt = (ph === 2) ? 6 : 10;
+    ggPendingPhase = (ph === 2) ? 'Phase 2' : 'Phase 1';
+    const _pd = document.getElementById('ggPhaseDisplay'); if(_pd) _pd.textContent = ggPendingPhase;
     ggState.mdl = 4; ggState.mdd = 12; ggState.pt = ggFpPt; ggState.cns = 0; ggState.mtd = 0; ggState.spl = 0;
     const put = function(id, v){ const e = document.getElementById(id); if(e) e.value = v; };
     put('ggMdl', 4); put('ggMdlUnit', '%'); put('ggMdd', 12); put('ggMddUnit', '%'); put('ggPt', ggFpPt); put('ggCns', 0); put('ggMtd', 0); put('ggSpl', 0);
@@ -148,6 +151,9 @@
   const ggMddUnitEl = document.getElementById('ggMddUnit'); if(ggMddUnitEl) ggMddUnitEl.value = ggAccount.maxDrawdownUnit === '$' ? '$' : '%';
   if(ggMddUnitEl) ggMddUnitEl.addEventListener('change', ()=>{ if(window.__renderDDRing) window.__renderDDRing(); });
   const ggPhaseDisplay = document.getElementById('ggPhaseDisplay'); if(ggPhaseDisplay) ggPhaseDisplay.textContent = ggAccount.phase || 'Not set';
+  try{ const _ja = window.JLAccounts, _pn = document.querySelector('#ggPhaseField .gg-field-note');
+    if(_pn) _pn.textContent = (_ja && _ja.platformOf(_ja.active()) === 'matchtrader') ? 'Match-Trader does not report the phase. It is set when you apply a FundingPips preset above, then Save setup.' : 'Set when you apply a FundingPips preset above, then Save setup.';
+  }catch(e){console.debug('[journall] ignored error in account-settings.js:', e);}
   const ggAcctTypeSel = document.getElementById('ggAcctType'); if(ggAcctTypeSel) ggAcctTypeSel.value = ggAccount.type;
   const ggDeadlineEl = document.getElementById('ggDeadline'); if(ggDeadlineEl) ggDeadlineEl.value = ggAccount.deadline || '';
   ggApplyAccountDisplay(ggAccount);
@@ -181,7 +187,7 @@
   window.ggSaveSetup = function(){
     ggAccount = {
       balance: ggState.bal,
-      phase: ggAccount.phase, // not user-set — carries over until real bridge sync is wired (see TODO above)
+      phase: ggPendingPhase || ggAccount.phase, // set by the FundingPips preset buttons; no platform sync reports it
       type: ggAcctTypeSel ? ggAcctTypeSel.value : ggAccount.type,
       revWindowMin: ggState.revWin,
       profitTargetPct: ggState.pt,
@@ -225,6 +231,8 @@
     if(typeof window.jlCircuitRefresh === 'function') window.jlCircuitRefresh();
     ggApplyAccountDisplay(ggAccount);
     ggApplyAcctType(ggAccount.type);
+    if(window.__A){ window.__A.start = Number(window.jlStartBalance) || 0; }
+    if(window.__renderJourneyLabels) window.__renderJourneyLabels();
     ggRenderGoals(); // streak depends on the limits just saved
     if(window.__renderDDRing) window.__renderDDRing();
     if(window.__renderProp) window.__renderProp();

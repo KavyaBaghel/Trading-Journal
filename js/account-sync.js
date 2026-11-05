@@ -34,6 +34,7 @@
       if(d.tradeDuringNews!==old.tradeDuringNews)c.tradeDuringNews=d.tradeDuringNews==='no'?'no':d.tradeDuringNews==='yes'?'yes':'';
       if(!same(d,old,['deadline'])){c.phaseDeadline=d.deadline||''}
       if(d.type!==old.type)c.type=d.type;
+      if((d.phase||'')!==(old.phase||''))c.phase=d.phase||'';
       if(!same(d,old,['revWindowMin'])){var rw=n(d.revWindowMin);if(rw!=null)c.revWindowMin=rw}
       if(!o&&Object.keys(c).length&&d.phase)c.phase=d.phase;   // new config: carry phase only if the user actually set something
       var next=JSON.stringify(c);if(Object.keys(c).length&&next!==JSON.stringify(o||null)){localStorage.setItem(CK,next);window.__jlNeedsAccountSetup=!(n(c.accountSize)>0)}

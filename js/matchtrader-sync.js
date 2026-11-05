@@ -31,6 +31,13 @@
     return {id:'matchtrader-'+p.id,account:acct,date:s.slice(0,10),time:s.slice(11,19),symbol:String(p.symbol||p.alias||''),side:String(p.side||'').toUpperCase(),
       volume:num(p.volume),entry:num(p.openPrice),exit:num(p.closePrice),sl:sl>0?sl:0,rawProfit:r2(raw),commission:r2(net-raw),pnl:r2(net),
       reason:reasonOf(p.closeReason),mistakes:[],notes:'',position:String(p.id),duration:c!=null&&c>o?(c-o)/60000:0,source:'matchtrader',closeTime:c}}
+  /* Account size from Match-Trader itself: balance minus every closed Match-Trader trade saved for this account. Only used when no size is saved yet,
+     only when the history was not cut short, and only when the result is a clean multiple of 100 (so a wrong guess is never saved). */
+  function sizeFromHistory(bal,acct,truncated){
+    if(truncated)return null;
+    var net=0;rd(TK[0]).forEach(function(t){if(t&&t.account===acct&&t.source==='matchtrader'&&isFinite(Number(t.pnl)))net+=Number(t.pnl)});
+    var raw=bal-net,r=Math.round(raw/100)*100;
+    return(r>=1000&&Math.abs(raw-r)<=5)?r:null}
   function merge(recs){var added=0;
     TK.forEach(function(k){var cur=rd(k),seen={};cur.forEach(function(t){if(t&&t.id!=null)seen[String(t.id)]=1});var n=0;
       recs.forEach(function(r){if(seen[r.id])return;seen[r.id]=1;cur.push(r);n++});
@@ -57,12 +64,15 @@
         if(!x.ok||d.error){msg(String(d.error||'Match-Trader sync failed.'));done();return}
         if(d.service&&!d.closedPositions){msg('The Worker has no /matchtrader route yet. Deploy the updated Worker.');done();return}
         var recs=(Array.isArray(d.closedPositions)?d.closedPositions:[]).map(function(p){return toRec(p,acct)}).filter(Boolean),added=merge(recs);
-        var bal=d.summary&&num(d.summary.balance),c=rdo(CK),balOk=false;
-        if(bal!=null&&bal>0&&c){c.mt5CurrentBalance=bal;c.mt5BalanceSource='mt5';c.mt5BalanceTimestamp=Date.now();localStorage.setItem(CK,JSON.stringify(c));balOk=true}
+        var bal=d.summary&&num(d.summary.balance),c=rdo(CK),balOk=false,sz=null;
+        /* Balance comes from Match-Trader and is kept even before Account Settings exist for this account (the keys keep their old mt5* names). */
+        if(bal!=null&&bal>0){if(!c)c={};c.mt5CurrentBalance=bal;c.mt5BalanceSource='mt5';c.mt5BalanceTimestamp=Date.now();
+          if(!(num(c.accountSize)>0)){sz=sizeFromHistory(bal,acct,d.truncated);if(sz)c.accountSize=sz}
+          localStorage.setItem(CK,JSON.stringify(c));balOk=true}
         localStorage.setItem(syncKey(),JSON.stringify({lastSynced:new Date().toISOString()}));
         var parts=[added?added+' new trade'+(added===1?'':'s'):'no new trades'];
         if(balOk)parts.unshift('balance updated');
-        else if(bal!=null&&!c)parts.unshift('balance read, set up Account Settings to keep it');
+        if(sz)parts.push('account size set to $'+sz+' from Match-Trader');
         else if(d.summaryError)parts.push(d.summaryError);
         if(d.truncated)parts.push('history is long, sync again to fetch older trades');
         msg('Synced: '+parts.join(', '));done();window.jlPaintSync&&window.jlPaintSync();

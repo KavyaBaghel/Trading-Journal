@@ -7,10 +7,10 @@ window.__renderAnScale=function(b){const sc=document.querySelector('.a-scale');i
   sc.style.setProperty('--zp',pc(A.start)+'%');
   if(now){now.style.left=pc(b)+'%';now.querySelector('em').textContent=m(b);const tone=b>=A.start?'var(--green)':'var(--red)';now.style.borderColor=tone;now.style.setProperty('--nc',b>=A.start?'67,215,135':'240,104,92');now.querySelector('em').style.color=tone}};
 window.__renderAnScale();
-const set=(id,t)=>{const e=$(id);if(e)e.textContent=t};if(A.start>0){set('ggJEnd',tg>0?m(A.start+tg):'No target');set('ggJTogo',tg>0?(A.net>=tg?'target reached':m(tg-A.net)+' to go'):'No profit target set');}else{set('ggJEnd','\u2014');set('ggJTogo','Set your balance and profit target');}
+const set=(id,t)=>{const e=$(id);if(e)e.textContent=t};window.__renderJourneyLabels=function(){const Z=window.__A||A,t=Math.round(window.jlProfitTargetUSD||0);if(Z.start>0){set('ggJEnd',t>0?m(Z.start+t):'No target');set('ggJTogo',t>0?(Z.net>=t?'target reached':m(t-Z.net)+' to go'):'No profit target set')}else{set('ggJEnd','\u2014');set('ggJTogo','Set your balance and profit target')}};window.__renderJourneyLabels();
 /* Hero balance bar: centred on the starting balance. Left half = loss side (start down to the max-drawdown floor), right half = profit side (start up to the profit target). Each side is scaled on its own, so the dot never pins to one end unless a limit is actually reached. */
 window.__renderJourney=function(){const Z=window.__A||A,start=Z.start,tgt=Math.round(window.jlProfitTargetUSD||0),dd=getMdd(),b=window.jlLiveBalance?window.jlLiveBalance(Z):start+(Z.net||0),net=b-start;
-  const dot=$('ggJourneyDot'),lf=$('ggJLossFill'),gf=$('ggJGainFill'),now=$('ggJNow');if(!dot)return;
+  const dot=$('ggJourneyDot'),lf=$('ggJLossFill'),gf=$('ggJGainFill'),now=$('ggJNow');if(!dot)return;window.__renderJourneyLabels&&window.__renderJourneyLabels();
   set('ggJFloor',start>0&&dd>0?m(start-dd):'\u2014');
   if(!(start>0)){dot.style.left='50%';if(now)now.style.left='50%';if(lf)lf.style.width='0%';if(gf)gf.style.width='0%';dot.classList.remove('neg','pos');return}
   let lp=0,gp=0;
