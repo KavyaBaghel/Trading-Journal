@@ -9,3 +9,4 @@
 #weeklyReview .wr-navlbl{font-size:12.5px;font-weight:650;color:var(--text);padding:0 4px}
 #weeklyReview .wr-navbtn{padding:6px 12px;font-size:12.5px}
 #weeklyReview .wr-navbtn:disabled{opacity:.4;cursor:default;pointer-events:none}
+#weeklyReview.wr-viewing .wr-prep-head,#weeklyReview.wr-viewing .wr-prep-grid,#weeklyReview.wr-viewing .wr-bar,#weeklyReview.wr-viewing #wrEvents,#weeklyReview.wr-viewing #wrNote{display:none}

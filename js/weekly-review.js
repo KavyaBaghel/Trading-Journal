@@ -33,9 +33,11 @@
     el.innerHTML='<span>Preview mode. Showing the panel as it will look on '+esc(fmtDay(today(),{weekday:'long',month:'short',day:'numeric'}))+'. This is not live.</span><button type="button" class="btn-ghost wr-exit">Exit preview</button>';
   }
   function bounds(k){ var dow=(parseKey(k).getUTCDay()+6)%7, ws=addDays(k,-dow); return {ws:ws,we:addDays(ws,6),nm:addDays(ws,7)}; }
-  /* Week switcher: wkOff = how many weeks back the review stats are showing (0 = current week). Next week prep and the Monday note always stay on the real current week. */
-  var wkOff=0;
-  function viewK(){ var k=today(); return k?addDays(k,-7*wkOff):k; }
+  /* Week switcher: selWs = start date of the week the review stats show ('' = current week). Next week prep and the Monday note always stay on the real current week. */
+  var selWs='', forced=false;
+  function curWs(){ var k=today(); return k?bounds(k).ws:''; }
+  function viewK(){ return selWs||today(); }
+  function wkAgo(){ var c=curWs(), v=viewK(); return (c&&v)?Math.max(0,Math.round((parseKey(c)-parseKey(bounds(v).ws))/(7*DAY))):0; }
   function firstTradeDay(){ var m=''; (window.__trades||[]).forEach(function(t){ if(t&&t.d&&isFinite(Number(t.pnl))&&(!m||t.d<m)) m=t.d; }); return m; }
   function syncNav(){
     var el=$('wrNav'); if(!el){
@@ -43,17 +45,22 @@
       var head=root.querySelector('.panel-head'); head.parentNode.insertBefore(el,head.nextSibling);
       el.addEventListener('click',function(e){
         var b=e.target.closest('button'); if(!b||b.disabled) return;
-        var a=b.getAttribute('data-wr-nav');
-        if(a==='prev') wkOff++; else if(a==='next'&&wkOff>0) wkOff--; else if(a==='now') wkOff=0;
+        var a=b.getAttribute('data-wr-nav'), ws=bounds(viewK()).ws;
+        if(a==='back'){ forced=false; selWs=''; if(window.__route) window.__route('calendar'); tick(); return; }
+        if(a==='prev') selWs=addDays(ws,-7);
+        else if(a==='next'){ var n=addDays(ws,7); selWs=(n>=curWs())?'':n; }
+        else if(a==='now') selWs='';
         tick();
       });
     }
     var k=viewK(); if(!k) return;
     var b=bounds(k), first=firstTradeDay(), canPrev=!!first&&first<b.ws;
-    var h='<button type="button" class="btn-ghost wr-navbtn" data-wr-nav="prev"'+(canPrev?'':' disabled')+' aria-label="Previous week">&lsaquo; Previous week</button>'
-      +'<span class="wr-navlbl">'+(wkOff===0?'This week':wkOff===1?'Last week':wkOff+' weeks ago')+'</span>'
-      +'<button type="button" class="btn-ghost wr-navbtn" data-wr-nav="next"'+(wkOff>0?'':' disabled')+' aria-label="Next week">Next week &rsaquo;</button>'
-      +(wkOff>0?'<button type="button" class="btn-ghost wr-navbtn" data-wr-nav="now">This week</button>':'');
+    var ago=wkAgo();
+    var h=(forced?'<button type="button" class="btn-ghost wr-navbtn" data-wr-nav="back">&lsaquo; Back to Calendar</button>':'')
+      +'<button type="button" class="btn-ghost wr-navbtn" data-wr-nav="prev"'+(canPrev?'':' disabled')+' aria-label="Previous week">&lsaquo; Previous week</button>'
+      +'<span class="wr-navlbl">'+(ago===0?'This week':ago===1?'Last week':ago+' weeks ago')+'</span>'
+      +'<button type="button" class="btn-ghost wr-navbtn" data-wr-nav="next"'+(ago>0?'':' disabled')+' aria-label="Next week">Next week &rsaquo;</button>'
+      +(ago>0?'<button type="button" class="btn-ghost wr-navbtn" data-wr-nav="now">This week</button>':'');
     if(el.getAttribute('data-h')!==h){ el.setAttribute('data-h',h); el.innerHTML=h; }
   }
   function kind(p){ return typeof window.jlKind==='function' ? window.jlKind(p) : (p>0?'win':p<0?'loss':'be'); }
@@ -258,7 +265,7 @@
     var k=viewK(), b=bounds(k);
     var rows=(window.__trades||[]).filter(function(t){ return t&&t.d&&t.d>=b.ws&&t.d<=b.we&&isFinite(Number(t.pnl)); });
     $('wrRange').textContent=fmtDay(b.ws,{month:'short',day:'numeric'})+' to '+fmtDay(b.we,{month:'short',day:'numeric'})+' (IST)';
-    if(!rows.length) return '<div class="wr-empty">'+(wkOff?'No trades logged in this week.':'No trades logged this week.')+'</div>';
+    if(!rows.length) return '<div class="wr-empty">'+(wkAgo()?'No trades logged in this week.':'No trades logged this week.')+'</div>';
     var net=0,gw=0,gl=0,W=0,L=0,BE=0,seen={},days={},ses={},tags={},rev=0,nosl=0;
     rows.forEach(function(t){
       var p=Number(t.pnl); net+=p; if(p>0) gw+=p; else if(p<0) gl-=p;
@@ -488,19 +495,29 @@
     ta.addEventListener('blur',function(){ clearTimeout(monTimer); try{ if(monKey){ if(ta.value) localStorage.setItem(monKey,ta.value); else localStorage.removeItem(monKey); if(st) st.textContent='Saved on this device'; } }catch(e){console.debug('[journall] ignored error in weekly-review.js:', e);} });
   })();
   function tick(){
-    var wk=isWeekend();
+    var wk=isWeekend()||forced, viewing=forced&&!isWeekend();
     place();
     root.hidden=!wk;
+    root.classList.toggle('wr-viewing',viewing);
     hideBelow(wk);
     syncPreview();
-    if(!wk){ wkOff=0; return; }
+    if(!wk){ selWs=''; return; }
     try{ syncNav(); }catch(e){console.debug('[journall] ignored error in weekly-review.js:', e);}
     try{
       var h=statsHtml(); if(h!==lastStats){ lastStats=h; $('wrStats').innerHTML=h; }
       $('wrRule').innerHTML=ruleHtml(); monSync();
     }catch(e){ $('wrStats').innerHTML='<div class="wr-empty">Could not build the weekly review.</div>'; }
-    fetchEvents(false);
+    if(!viewing) fetchEvents(false);
   }
+  /* Opened from a Calendar week card: show that week's review here on any day, until the person leaves Today's Summary. */
+  window.__openWeeklyReview=function(ws){
+    if(!/^\d{4}-\d{2}-\d{2}$/.test(String(ws))) return;
+    var b=bounds(ws).ws, c=curWs();
+    selWs=(!c||b>=c)?'':b; forced=true;
+    if(window.__route) window.__route('summary');
+    tick(); window.scrollTo(0,0);
+  };
+  try{ var sumView=$('view-summary'); if(sumView) new MutationObserver(function(){ if(sumView.hidden&&forced){ forced=false; selWs=''; tick(); } }).observe(sumView,{attributes:true,attributeFilter:['hidden']}); }catch(e){console.debug('[journall] ignored error in weekly-review.js:', e);}
   $('wrImpactChips').addEventListener('click',function(e){
     var btn=e.target.closest('.wr-chip'); if(!btn) return;
     this.querySelectorAll('.wr-chip').forEach(function(x){ var on=x===btn; x.classList.toggle('on',on); x.setAttribute('aria-pressed',on?'true':'false'); });

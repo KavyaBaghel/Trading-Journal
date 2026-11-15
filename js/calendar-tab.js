@@ -226,7 +226,7 @@ function renderGrid(){
       const NM=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
       const spark='<div class="ldg-wk-spark" aria-hidden="true">'+vals.map((v,k)=>v==null?'<i class="e"></i>':'<i title="'+NM[k]+' '+money(v)+'" style="height:'+Math.max(14,Math.abs(v)/mx*100)+'%;color:'+(v>0?'var(--green)':v<0?'var(--red)':'var(--faint)')+';animation-delay:'+(k*60)+'ms"></i>').join('')+'</div>';
       const daysRow='<div class="ldg-wk-days" aria-hidden="true">'+['M','T','W','T','F','S','S'].map(x=>'<span>'+x+'</span>').join('')+'</div>';
-      return '<div class="ldg-row ldg-wk'+(isToday?' today':'')+cls+(over?'':' upcoming')+'" data-wk="'+wi+'" role="button" tabindex="0" aria-label="Weekly review, week '+(wi+1)+'">'+
+      return '<div class="ldg-row ldg-wk'+(isToday?' today':'')+cls+(over?'':' upcoming')+'" data-wk="'+wi+'" data-wkd="'+new Date(Date.UTC(vy,vm,monD)).toISOString().slice(0,10)+'" role="button" tabindex="0" aria-label="Weekly review, week '+(wi+1)+'">'+
         '<div class="ldg-d"><b>'+d+'</b><small>'+(off===5?'SAT':'SUN')+'</small><span class="ldg-wk-pill">W'+(wi+1)+'</span></div>'+
         spark+daysRow+
         '<div class="ldg-pnl"'+(over&&wt?' style="color:'+col+'"':'')+'>'+res+'</div>'+
@@ -380,7 +380,7 @@ function openDayPanel(d){
 }
 function closeDayPanel(){document.body.classList.remove('dp-open');$('dayPanel').setAttribute('aria-hidden','true');dpOpen=false}
 $('cGrid').addEventListener('click',e=>{const row=e.target.closest('.ldg-row[data-d]');if(!row)return;if(window.__openDayRecap){window.__openDayRecap(vy+'-'+String(vm+1).padStart(2,'0')+'-'+String(+row.dataset.d).padStart(2,'0'))}else{openDayPanel(+row.dataset.d)}});
-function jumpToWeek(el){const sub=document.querySelector('#cGrid .ldg-sub[data-week="'+el.dataset.wk+'"]');if(!sub)return;sub.scrollIntoView({behavior:'smooth',block:'center'});sub.classList.add('flash');setTimeout(()=>sub.classList.remove('flash'),1400)}
+function jumpToWeek(el){if(el.dataset.wkd&&!el.classList.contains('upcoming')&&window.__openWeeklyReview){window.__openWeeklyReview(el.dataset.wkd);return}const sub=document.querySelector('#cGrid .ldg-sub[data-week="'+el.dataset.wk+'"]');if(!sub)return;sub.scrollIntoView({behavior:'smooth',block:'center'});sub.classList.add('flash');setTimeout(()=>sub.classList.remove('flash'),1400)}
 $('cGrid').addEventListener('click',e=>{const wk=e.target.closest('.ldg-wk[data-wk]');if(wk)jumpToWeek(wk)});
 $('cGrid').addEventListener('keydown',e=>{if(e.key!=='Enter'&&e.key!==' ')return;const wk=e.target.closest('.ldg-wk[data-wk]');if(wk){e.preventDefault();jumpToWeek(wk)}});
 $('dpClose').addEventListener('click',closeDayPanel);
