@@ -33,6 +33,29 @@
     el.innerHTML='<span>Preview mode. Showing the panel as it will look on '+esc(fmtDay(today(),{weekday:'long',month:'short',day:'numeric'}))+'. This is not live.</span><button type="button" class="btn-ghost wr-exit">Exit preview</button>';
   }
   function bounds(k){ var dow=(parseKey(k).getUTCDay()+6)%7, ws=addDays(k,-dow); return {ws:ws,we:addDays(ws,6),nm:addDays(ws,7)}; }
+  /* Week switcher: wkOff = how many weeks back the review stats are showing (0 = current week). Next week prep and the Monday note always stay on the real current week. */
+  var wkOff=0;
+  function viewK(){ var k=today(); return k?addDays(k,-7*wkOff):k; }
+  function firstTradeDay(){ var m=''; (window.__trades||[]).forEach(function(t){ if(t&&t.d&&isFinite(Number(t.pnl))&&(!m||t.d<m)) m=t.d; }); return m; }
+  function syncNav(){
+    var el=$('wrNav'); if(!el){
+      el=document.createElement('div'); el.id='wrNav'; el.className='wr-nav';
+      var head=root.querySelector('.panel-head'); head.parentNode.insertBefore(el,head.nextSibling);
+      el.addEventListener('click',function(e){
+        var b=e.target.closest('button'); if(!b||b.disabled) return;
+        var a=b.getAttribute('data-wr-nav');
+        if(a==='prev') wkOff++; else if(a==='next'&&wkOff>0) wkOff--; else if(a==='now') wkOff=0;
+        tick();
+      });
+    }
+    var k=viewK(); if(!k) return;
+    var b=bounds(k), first=firstTradeDay(), canPrev=!!first&&first<b.ws;
+    var h='<button type="button" class="btn-ghost wr-navbtn" data-wr-nav="prev"'+(canPrev?'':' disabled')+' aria-label="Previous week">&lsaquo; Previous week</button>'
+      +'<span class="wr-navlbl">'+(wkOff===0?'This week':wkOff===1?'Last week':wkOff+' weeks ago')+'</span>'
+      +'<button type="button" class="btn-ghost wr-navbtn" data-wr-nav="next"'+(wkOff>0?'':' disabled')+' aria-label="Next week">Next week &rsaquo;</button>'
+      +(wkOff>0?'<button type="button" class="btn-ghost wr-navbtn" data-wr-nav="now">This week</button>':'');
+    if(el.getAttribute('data-h')!==h){ el.setAttribute('data-h',h); el.innerHTML=h; }
+  }
   function kind(p){ return typeof window.jlKind==='function' ? window.jlKind(p) : (p>0?'win':p<0?'loss':'be'); }
   function dayName(k){ return fmtDay(k,{weekday:'short'}); }
 
@@ -232,10 +255,10 @@
 
   /* ---------- week stats (real trades only) ---------- */
   function statsHtml(){
-    var k=today(), b=bounds(k);
+    var k=viewK(), b=bounds(k);
     var rows=(window.__trades||[]).filter(function(t){ return t&&t.d&&t.d>=b.ws&&t.d<=b.we&&isFinite(Number(t.pnl)); });
     $('wrRange').textContent=fmtDay(b.ws,{month:'short',day:'numeric'})+' to '+fmtDay(b.we,{month:'short',day:'numeric'})+' (IST)';
-    if(!rows.length) return '<div class="wr-empty">No trades logged this week.</div>';
+    if(!rows.length) return '<div class="wr-empty">'+(wkOff?'No trades logged in this week.':'No trades logged this week.')+'</div>';
     var net=0,gw=0,gl=0,W=0,L=0,BE=0,seen={},days={},ses={},tags={},rev=0,nosl=0;
     rows.forEach(function(t){
       var p=Number(t.pnl); net+=p; if(p>0) gw+=p; else if(p<0) gl-=p;
@@ -470,7 +493,8 @@
     root.hidden=!wk;
     hideBelow(wk);
     syncPreview();
-    if(!wk) return;
+    if(!wk){ wkOff=0; return; }
+    try{ syncNav(); }catch(e){console.debug('[journall] ignored error in weekly-review.js:', e);}
     try{
       var h=statsHtml(); if(h!==lastStats){ lastStats=h; $('wrStats').innerHTML=h; }
       $('wrRule').innerHTML=ruleHtml(); monSync();
