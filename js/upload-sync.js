@@ -50,12 +50,12 @@
     out.fresh=fresh;return out}
   /* Report wins: a report row that matches an existing (non-bridge) record refreshes that record's result fields (exit, P&L, commission, duration). The id, date, time and position never change. Journals follow the new trade key. Values within 0.005 count as equal, so re-importing the same report changes nothing. */
   function refreshMatched(pairs){var out={updated:0,relinked:0},chg={},dif=function(a,b){return typeof a==='number'&&typeof b==='number'?Math.abs(a-b)>0.005:a!==b};
-    pairs.forEach(function(p){var o=p.old,r=p.rec;if(o&&r&&(dif(o.pnl,r.pnl)||dif(o.exit,r.exit)))chg[o.id]={rec:r,oldKey:JLAdapter.liveKey(o)}});
+    pairs.forEach(function(p){var o=p.old,r=p.rec;if(o&&r&&(dif(o.pnl,r.pnl)||dif(o.exit,r.exit)||(!(Number(o.sl)>0)&&Number(r.sl)>0)))chg[o.id]={rec:r,oldKey:JLAdapter.liveKey(o)}});
     if(!Object.keys(chg).length)return out;
     var link={};
     TK.forEach(function(k){var a=rd(k),hit=false;
       a.forEach(function(t){var c=t&&chg[t.id];if(!c)return;var r=c.rec;
-        t.exit=r.exit;t.pnl=r.pnl;if(r.rawProfit!=null)t.rawProfit=r.rawProfit;if(r.commission!=null)t.commission=r.commission;if(r.duration!=null)t.duration=r.duration;
+        t.exit=r.exit;t.pnl=r.pnl;if(Number(r.sl)>0&&!(Number(t.sl)>0))t.sl=r.sl;if(r.rawProfit!=null)t.rawProfit=r.rawProfit;if(r.commission!=null)t.commission=r.commission;if(r.duration!=null)t.duration=r.duration;
         hit=true;if(k===TK[0]){link[c.oldKey]=JLAdapter.liveKey(t);out.updated++}});
       if(hit)localStorage.setItem(k,JSON.stringify(a))});
     var LK=JL_KEYS.keys.KRISHNA_JOURNAL_PAGE_ENTRIES,J=rd(LK),ch=false,live=rd(TK[0]);
@@ -69,11 +69,15 @@
     recs.forEach(function(r,i){if(seenId[r.id]){r.id=r.id+'-p'+(r.position||('n'+i))}seenId[r.id]=1});
     var rp=replaceBridge(recs,acct),added=merge(rp.fresh),up=refreshMatched(rp.matched);
     if(!window.JLAccounts||window.JLAccounts.platformOf(acct)==='mt5')localStorage.setItem(JL_KEYS.keys.JL_OPEN_POSITIONS,JSON.stringify(R.open||[]));return {added:added,total:recs.length,replaced:rp.replaced,removed:rp.removed,skipped:rp.skipped,relinked:rp.relinked+up.relinked,updated:up.updated}};
+  /* SL backfill: a synced position that is already in the journal is never added again, so trades synced before this fix keep sl 0. When the bridge reports a real stop for a known position, fill it in. Never overwrites an SL that is already set. */
+  function fillSl(list){var m={},n=0;(list||[]).forEach(function(t){var p=String(t&&t.pos||''),s=Number(t&&t.sl);if(p&&s>0)m[p]=s});if(!Object.keys(m).length)return 0;
+    TK.forEach(function(k){var a=rd(k),hit=false;a.forEach(function(t){if(!t||typeof t!=='object'||accOf(t)!=='fundingpips-mt5')return;var p=String(t.position||((/^mt5-(\d+)$/.exec(String(t.id||''))||[])[1])||'');
+      if(p&&m[p]&&!(Number(t.sl)>0)){t.sl=m[p];hit=true;if(k===TK[0])n++}});if(hit)localStorage.setItem(k,JSON.stringify(a))});return n}
   window.jlSaveSyncTrades=function(list){var have={};rd(TK[0]).forEach(function(t){if(t&&typeof t==='object'&&!BR.test(String(t.id))&&t.position&&accOf(t)==='fundingpips-mt5')have[String(t.position)]=1});
     var all=list||[],recs=all.map(function(t){return toLive(t,'fundingpips-mt5')}).filter(function(r){return !(r.position&&have[String(r.position)])}),seenId={};
     recs.forEach(function(r,i){if(seenId[r.id]){r.id=r.id+'-p'+(r.position||('n'+i))}seenId[r.id]=1});
-    var rp=replaceBridge(recs,'fundingpips-mt5'),added=merge(rp.fresh);
-    return {added:added,total:all.length,known:all.length-recs.length,replaced:rp.replaced,removed:rp.removed,skipped:rp.skipped}};
+    var rp=replaceBridge(recs,'fundingpips-mt5'),added=merge(rp.fresh),slFilled=fillSl(all);
+    return {added:added,slFilled:slFilled,total:all.length,known:all.length-recs.length,replaced:rp.replaced,removed:rp.removed,skipped:rp.skipped}};
   function ago(ts){var d=Date.now()-ts;if(!(d>=0))return 'just now';var m=Math.floor(d/60000);if(m<1)return 'just now';if(m<60)return m+'m ago';var h=Math.floor(m/60);if(h<24)return h+'h ago';return Math.floor(h/24)+'d ago'}
   function last(){var s=rdo(SS),t=s&&s.lastSynced?Date.parse(s.lastSynced):NaN;return isFinite(t)?t:null}
   function T(id,txt){var e=document.getElementById(id);if(e)e.textContent=txt}
@@ -94,12 +98,12 @@
       /* Sync reads the balance and adds recent trades. Trade times come from the bridge's openTime (MT5 server clock, same as a report), and a position already in the journal is never added twice. */
       var bal=d&&typeof d.account_balance==='number'&&isFinite(d.account_balance)?d.account_balance:null;
       if(bal==null){msg('Bridge connected, but MT5 returned no balance.');done();return}
-       var imp=null;try{imp=window.jlSaveSyncTrades((Array.isArray(d.trades)?d.trades:[]).map(function(t){if(!t||!t.openTime)return null;var p=String(t.openTime).split(' ');if(p.length<2)return null;return {d:p[0],t:p[1],side:t.side,en:t.openPrice,ex:t.closePrice,pnl:typeof t.profit==='number'?t.profit:t.pnl,cost:r2((t.commission||0)+(t.swap||0)),lot:t.volume,sym:t.symbol,pos:String(t.id||'').replace(/\D/g,''),hold:typeof t.holdSec==='number'?t.holdSec:null,sl:null,why:(t.reason==='TP'||t.reason==='SL')?t.reason:''}}).filter(Boolean))}catch(e){imp=null}
+       var imp=null;try{imp=window.jlSaveSyncTrades((Array.isArray(d.trades)?d.trades:[]).map(function(t){if(!t||!t.openTime)return null;var p=String(t.openTime).split(' ');if(p.length<2)return null;return {d:p[0],t:p[1],side:t.side,en:t.openPrice,ex:t.closePrice,pnl:typeof t.profit==='number'?t.profit:t.pnl,cost:r2((t.commission||0)+(t.swap||0)),lot:t.volume,sym:t.symbol,pos:String(t.id||'').replace(/\D/g,''),hold:typeof t.holdSec==='number'?t.holdSec:null,sl:(typeof t.sl==='number'&&t.sl>0)?t.sl:null,why:(t.reason==='TP'||t.reason==='SL')?t.reason:''}}).filter(Boolean))}catch(e){imp=null}
       var c=rdo(CK);if(c){c.mt5CurrentBalance=bal;c.mt5BalanceSource='mt5';c.mt5BalanceTimestamp=Date.now();localStorage.setItem(CK,JSON.stringify(c))}
       localStorage.setItem(SS,JSON.stringify({platform:'mt5',days:30,lastSynced:new Date().toISOString()}));
       window.__jlSyncMsg=(c?'Synced, balance updated':'Synced, balance read (save Account Settings to keep it)')+(imp?(imp.added?', '+imp.added+' new trade'+(imp.added===1?'':'s'):', no new trades'):'');
       if(ti)ti.textContent=window.__jlSyncMsg;done();window.jlPaintSync();
-      if(c||(imp&&imp.added>0))setTimeout(function(){location.reload()},1200)})
+      if(c||(imp&&(imp.added>0||imp.slFilled>0)))setTimeout(function(){location.reload()},1200)})
     .catch(function(e){if(to)clearTimeout(to);done();
       msg(e&&e.name==='AbortError'?'MT5 bridge timed out (45 s). Is MetaTrader 5 open?':'MT5 bridge not reachable. Open MetaTrader 5, start the local bridge, then try again.')})}
 })();
