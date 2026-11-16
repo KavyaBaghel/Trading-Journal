@@ -34,7 +34,7 @@
       const C={ty:pick(['type','direction','side','action']),vol:pick(['volume','lots','lot','size','quantity']),sym:pick(['symbol','instrument','item']),
         ot:pick(['open time','opening time','time open','open date'],['time',0]),ct:pick(['close time','closing time','time close','close date'],['time',1]),
         op:pick(['open price','entry price','entry','price open'],['price',0]),cp:pick(['close price','exit price','exit','price close'],['price',1]),
-        cm:pick(['commission']),sw:pick(['swap']),pr:pick(['profit']),pos:pick(['position','ticket'])};
+        cm:pick(['commission']),sw:pick(['swap']),pr:pick(['profit']),pos:pick(['position','ticket']),sl:pick(['s / l','s/l','sl','stop loss','stoploss','stop_loss'])};
       const miss=['ty','ot','op','pr'].filter(k=>C[k]<0);
       if(miss.length)return{err:'Missing column(s): '+miss.map(k=>({ty:'Type',ot:'Open time',op:'Open price',pr:'Profit'}[k])).join(', ')+'.'};
       const num=v=>{let x=String(v==null?'':v).replace(/\s/g,'');if(dl===';'&&x.includes(',')&&!x.includes('.'))x=x.replace(',','.');else x=x.replace(/,/g,'');const f=parseFloat(x);return isNaN(f)?null:f};
@@ -45,7 +45,7 @@
         const ty=(r[C.ty]||'').toLowerCase(),side=ty.startsWith('buy')?'BUY':ty.startsWith('sell')?'SELL':null;if(!side)continue;
         const o=dt(r[C.ot]),en=num(r[C.op]);if(!o||en==null)continue;
         const c=C.ct>=0?dt(r[C.ct]):null,ex=C.cp>=0?num(r[C.cp]):null,h=+o.t.slice(0,2);
-        const t={d:o.d,t:o.t,side,ses:h<8?'Asia':h<14?'London':'New York',en,ex:null,why:'',pnl:num(r[C.pr])||0,lot:C.vol>=0?(num(r[C.vol])||.01):.01,sl:null,tag:'',j:false,pos:C.pos>=0?String(r[C.pos]||'').replace(/\D/g,''):'',sym:(C.sym>=0&&r[C.sym])||'XAUUSD',hold:null,cost:(num(r[C.cm])||0)+(num(r[C.sw])||0)};
+        const t={d:o.d,t:o.t,side,ses:h<8?'Asia':h<14?'London':'New York',en,ex:null,why:'',pnl:num(r[C.pr])||0,lot:C.vol>=0?(num(r[C.vol])||.01):.01,sl:(C.sl>=0&&num(r[C.sl])>0)?num(r[C.sl]):null,tag:'',j:false,pos:C.pos>=0?String(r[C.pos]||'').replace(/\D/g,''):'',sym:(C.sym>=0&&r[C.sym])||'XAUUSD',hold:null,cost:(num(r[C.cm])||0)+(num(r[C.sw])||0)};
         if(ex!=null&&ex!==0){t.ex=ex;t.hold=c?Math.max(0,Math.round((c.ms-o.ms)/1000)):null;closed.push(t)}else open.push(t); /* open position = no exit price */
       }
       closed.sort((a,b)=>a.d+a.t<b.d+b.t?1:-1);
