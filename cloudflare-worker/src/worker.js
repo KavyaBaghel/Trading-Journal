@@ -319,7 +319,7 @@ async function handleMatchTrader(request, env, cors) {
     if (calls >= MAX_CALLS) { truncated = true; return; }
     calls++;
     const r = await mtGet("/v1/closed-positions", { from: a, to: b, limit: LIMIT }, env);
-    if (r.status !== 200) { const e = mtUpstreamError(r); const err = new Error(e.message); err.code = e.code; throw err; }
+    if (r.status !== 200) { const e = mtUpstreamError(r); const err = new Error("Closed positions request refused (" + r.status + "): " + e.message); err.code = e.code; throw err; }
     const list = Array.isArray(r.data && r.data.closedPositions) ? r.data.closedPositions : [];
     if (list.length >= LIMIT && b - a > 3600000) {
       const mid = Math.floor((a + b) / 2);
@@ -336,7 +336,7 @@ async function handleMatchTrader(request, env, cors) {
   try {
     const r = await mtGet("/v1/account-summary", {}, env);
     if (r.status === 200 && r.data && typeof r.data === "object") summary = r.data;
-    else summaryError = mtUpstreamError(r).message;
+    else summaryError = "Account summary request refused (" + r.status + "): " + mtUpstreamError(r).message;
   } catch (error) { summaryError = "Account summary could not be read."; }
 
   return json({ ok: true, from, to, truncated, calls, summary, summaryError, closedPositions: Array.from(byId.values()) }, 200, cors);
