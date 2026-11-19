@@ -1,0 +1,14 @@
+{
+  "name": "journall-functions",
+  "description": "Secure backend functions for Journall",
+  "engines": {
+    "node": "20"
+  },
+  "main": "index.js",
+  "dependencies": {
+    "firebase-admin": "^12.7.0",
+    "firebase-functions": "^6.1.2",
+    "openai": "^4.77.0"
+  },
+  "private": true
+}
