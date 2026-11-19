@@ -13,6 +13,7 @@
   function lastSynced(){var s=rdo(syncKey()),t=s&&s.lastSynced?Date.parse(s.lastSynced):NaN;return isFinite(t)?t:null}
   function ago(ts){var d=Date.now()-ts;if(!(d>=0))return 'just now';var m=Math.floor(d/60000);if(m<1)return 'just now';if(m<60)return m+'m ago';var h=Math.floor(m/60);if(h<24)return h+'h ago';return Math.floor(h/24)+'d ago'}
   function T(id,txt){var e=document.getElementById(id);if(e)e.textContent=txt}
+  function errDot(on){var e=document.getElementById('udDot');if(e)e.style.background=on?'#ef4444':''}
 
   /* Match-Trader closed position -> live trade record. Time shown is the OPEN time in IST, like the rest of the journal.
      Net P&L is the platform's netProfit, so it always matches what Match-Trader reports. */
@@ -61,7 +62,8 @@
       return fetch(ep.replace(/\/+$/,'')+'/matchtrader',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+tok},body:JSON.stringify({from:from,to:now+DAY}),cache:'no-store',signal:ac?ac.signal:undefined})
       .then(function(r){return r.json().catch(function(){return {error:'The Worker returned an unreadable answer.'}}).then(function(d){return {ok:r.ok,d:d}})})
       .then(function(x){if(to)clearTimeout(to);var d=x.d||{};
-        if(!x.ok||d.error){msg(String(d.error||'Match-Trader sync failed.'));done();return}
+        if(!x.ok||d.error){msg(String(d.error||'Match-Trader sync failed.'));errDot(true);done();return}
+        errDot(false);
         if(d.service&&!d.closedPositions){msg('The Worker has no /matchtrader route yet. Deploy the updated Worker.');done();return}
         var recs=(Array.isArray(d.closedPositions)?d.closedPositions:[]).map(function(p){return toRec(p,acct)}).filter(Boolean),added=merge(recs);
         var bal=d.summary&&num(d.summary.balance),c=rdo(CK),balOk=false,sz=null;
@@ -77,7 +79,7 @@
         if(d.truncated)parts.push('history is long, sync again to fetch older trades');
         msg('Synced: '+parts.join(', '));done();window.jlPaintSync&&window.jlPaintSync();
         if(added>0||balOk)setTimeout(function(){location.reload()},1400)})
-    }).catch(function(e){done();msg(e&&e.name==='AbortError'?'Match-Trader sync timed out (45 s). Try again.':'Could not reach the Worker. Check your connection and try again.')})}
+    }).catch(function(e){done();errDot(true);msg(e&&e.name==='AbortError'?'Match-Trader sync timed out (45 s). Try again.':'Could not reach the Worker. Check your connection and try again.')})}
 
   /* Hooks: the Upload page button and status painter call these by name, so wrapping them leaves the MT5 account exactly as before. */
   var origSync=window.jlSyncMt5;
