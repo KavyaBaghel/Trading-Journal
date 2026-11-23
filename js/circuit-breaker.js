@@ -92,16 +92,48 @@ function paint(){
   if(xb){xb.dataset.mode='cb';xb.setAttribute('aria-label','Hide this warning until the 06:00 IST reset');xb.title='Hide until the 06:00 IST reset';xb.hidden=false}
   el.hidden=false;
 }
-(function(){var xb=document.getElementById('jlCircuitX');if(!xb)return;xb.addEventListener('click',function(){
-  if(xb.dataset.mode==='cb'){
-    if(!window.confirm('Hide this "Circuit breaker tripped" banner until the 06:00 IST reset? It comes back if another rule trips. Nothing is blocked either way.'))return;
-    try{localStorage.setItem(CB_KEY,JSON.stringify({day:cbCur.day,sig:cbCur.sig}))}catch(e){console.debug('[journall] ignored error in circuit-breaker.js:', e);}
+(function(){var xb=document.getElementById('jlCircuitX');if(!xb)return;
+function istClock(ms){try{return new Date(ms).toLocaleTimeString('en-IN',{timeZone:'Asia/Kolkata',hour:'numeric',minute:'2-digit',hour12:true}).toUpperCase()+' IST'}catch(e){return ''}}
+function ask(o,fallback){
+  if(typeof window.jlConfirm==='function')return window.jlConfirm(o);
+  return Promise.resolve(window.confirm(fallback));
+}
+function notify(o){try{if(typeof window.jlToast==='function')window.jlToast(o)}catch(e){console.debug('[journall] ignored error in circuit-breaker.js:', e);}}
+xb.addEventListener('click',function(){
+  var mode=xb.dataset.mode,cur={day:cbCur.day,sig:cbCur.sig};
+  if(mode==='cb'){
+    ask({icon:'shield',title:'Hide this warning?',
+      body:'The Circuit breaker banner stays hidden until the 06:00 IST reset. It comes back if another rule trips. Nothing is blocked either way.',
+      preview:{title:'Circuit breaker tripped',sub:'Hidden until the 06:00 IST reset',value:'In '+fmtWait(msUntilReset(Date.now())),color:'var(--red)'},
+      confirmText:'Hide banner',cancelText:'Keep showing',opener:xb},
+      'Hide this "Circuit breaker tripped" banner until the 06:00 IST reset? It comes back if another rule trips. Nothing is blocked either way.')
+    .then(function(ok){
+      if(!ok)return;
+      try{localStorage.setItem(CB_KEY,JSON.stringify({day:cur.day,sig:cur.sig}))}catch(e){console.debug('[journall] ignored error in circuit-breaker.js:', e);}
+      paint();
+      notify({icon:'check',text:'Banner hidden',sub:'Back after the 06:00 IST reset',actionText:'Undo',onAction:function(){
+        try{localStorage.removeItem(CB_KEY)}catch(e){console.debug('[journall] ignored error in circuit-breaker.js:', e);}
+        paint();
+      }});
+    });
   }else{
-    if(!window.confirm('Snooze this "Weak time to trade" warning for 6 hours?'))return;
-    try{localStorage.setItem(SNZ_KEY,String(Date.now()+SNZ_MS))}catch(e){console.debug('[journall] ignored error in circuit-breaker.js:', e);}
+    ask({icon:'clock',title:'Snooze this warning?',
+      body:'The "Weak time to trade" warning is based on your past trades. Snoozing only hides it. Nothing is blocked either way.',
+      preview:{title:'Weak time to trade',sub:'Back at '+istClock(Date.now()+SNZ_MS),value:'6 hours'},
+      confirmText:'Snooze 6 hours',cancelText:'Keep showing',opener:xb},
+      'Snooze this "Weak time to trade" warning for 6 hours?')
+    .then(function(ok){
+      if(!ok)return;
+      try{localStorage.setItem(SNZ_KEY,String(Date.now()+SNZ_MS))}catch(e){console.debug('[journall] ignored error in circuit-breaker.js:', e);}
+      paint();
+      notify({icon:'check',text:'Warning snoozed',sub:'Back in 6 hours',actionText:'Undo',onAction:function(){
+        try{localStorage.removeItem(SNZ_KEY)}catch(e){console.debug('[journall] ignored error in circuit-breaker.js:', e);}
+        paint();
+      }});
+    });
   }
-  paint();
-})})();
+});
+})();
 window.jlCircuitRefresh=paint;window.jlCircuitEval=circuitEval;window.jlFridayEval=fridayEval;
 setInterval(paint,15000);setTimeout(paint,1500);setTimeout(paint,5000);
 })();
