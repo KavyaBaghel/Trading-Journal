@@ -1,0 +1,33 @@
+/* Account switcher (Account settings page) and the Add account dialog. Colors, radii and type come from the :root tokens in design.css. */
+#acct{position:relative;margin:0 0 16px;max-width:360px}
+#acct .acct-cap{margin:0 0 6px;font-size:var(--fs-2);color:var(--sub);text-transform:uppercase;letter-spacing:.06em}
+#acct .acct-note{margin:8px 0 0;font-size:var(--fs-2);color:var(--sub);line-height:1.4}
+#acct .acct-btn{width:100%;display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:var(--r-3);background:var(--panel);border:1px solid var(--border);color:var(--text);font:inherit;cursor:pointer;text-align:left;transition:border-color .25s cubic-bezier(.22,.61,.36,1),background .25s cubic-bezier(.22,.61,.36,1)}
+#acct .acct-btn:hover,#acct .acct-btn[aria-expanded="true"]{border-color:var(--border-hi);background:rgba(255,255,255,.04)}
+#acct .acct-btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+#acct .acct-dot{width:8px;height:8px;flex:none;border-radius:50%;background:var(--accent-2);box-shadow:0 0 0 3px rgba(124,108,240,.18)}
+#acct .acct-txt{flex:1;min-width:0;display:flex;flex-direction:column;line-height:1.25}
+#acct .acct-txt b{font-size:var(--fs-3);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#acct .acct-txt small{font-size:var(--fs-1);color:var(--sub)}
+#acct .acct-chev{color:var(--faint);font-size:11px}
+#acct .acct-menu{position:static;margin-top:6px;padding:6px;border-radius:var(--r-3);background:var(--panel);border:1px solid var(--border-hi);box-shadow:0 14px 34px -10px rgba(0,0,0,.7);max-height:min(60vh,360px);overflow:auto}
+#acct .acct-menu[hidden]{display:none}
+#acct .acct-it{display:flex;flex-direction:column;align-items:flex-start;gap:1px;width:100%;padding:8px 10px;border:0;border-radius:var(--r-2);background:transparent;color:var(--text);font:inherit;text-align:left;cursor:pointer}
+#acct .acct-it b{font-size:var(--fs-3);font-weight:600}
+#acct .acct-it small{font-size:var(--fs-1);color:var(--sub)}
+#acct .acct-it:hover{background:rgba(255,255,255,.05)}
+#acct .acct-it.on{background:rgba(124,108,240,.14)}
+#acct .acct-it.acct-add{color:var(--accent-2);font-size:var(--fs-3);font-weight:600}
+.acct-scrim{position:fixed;inset:0;z-index:300;display:grid;place-items:center;padding:16px;background:rgba(4,4,8,.66);-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px)}
+.acct-scrim .acct-card{width:min(400px,100%);padding:18px;display:flex;flex-direction:column;gap:12px;border-radius:var(--r-4);background:var(--panel);border:1px solid var(--border-hi);box-shadow:0 24px 60px -16px rgba(0,0,0,.8);color:var(--text)}
+.acct-scrim .acct-card h2{margin:0;font-size:16px}
+.acct-scrim .acct-card label,.acct-scrim .acct-lab{display:flex;flex-direction:column;gap:6px;font-size:var(--fs-2);color:var(--sub)}
+.acct-scrim .acct-card input{padding:10px 12px;border-radius:var(--r-2);border:1px solid var(--border);background:var(--panel-2);color:var(--text);font:inherit;font-size:var(--fs-4)}
+.acct-scrim .acct-card input:focus{outline:none;border-color:var(--accent)}
+.acct-scrim .acct-seg{display:flex;gap:6px}
+.acct-scrim .acct-seg button{flex:1;padding:9px 8px;border-radius:var(--r-2);border:1px solid var(--border);background:var(--panel-2);color:var(--sub);font:inherit;font-size:var(--fs-3);cursor:pointer}
+.acct-scrim .acct-seg button[aria-pressed="true"]{border-color:var(--accent);color:var(--text);background:rgba(124,108,240,.16)}
+.acct-scrim .acct-msg{min-height:16px;margin:0;font-size:var(--fs-2);color:var(--red)}
+.acct-scrim .acct-foot{display:flex;justify-content:flex-end;gap:8px}
+.acct-scrim .acct-btn2{padding:9px 14px;border-radius:var(--r-2);border:1px solid var(--border);background:transparent;color:var(--text);font:inherit;font-size:var(--fs-3);cursor:pointer}
+.acct-scrim .acct-btn2.pri{background:linear-gradient(135deg,var(--accent),#5b4fd6);border-color:transparent;color:#fff;font-weight:600}
