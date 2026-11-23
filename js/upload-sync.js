@@ -91,9 +91,18 @@
     function msg(t){window.__jlSyncMsg=t;if(ti)ti.textContent=t}
     function done(){window.__jlSyncBusy=false;btn.disabled=false;btn.textContent='\u27f3 Sync balance'}
     window.__jlSyncBusy=true;window.__jlSyncMsg='';btn.disabled=true;btn.textContent='Syncing\u2026';msg('Connecting to MT5 bridge\u2026');
-    var ac=typeof AbortController==='function'?new AbortController():null,to=ac&&setTimeout(function(){ac.abort()},45000);
-    fetch(((window.JL_CONFIG&&window.JL_CONFIG.localBridgeUrl)||'http://localhost:8787')+'/api/sync-broker',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({platform:'mt5',days:3}),cache:'no-store',signal:ac?ac.signal:undefined})
-    .then(function(r){return r.json()}).then(function(d){if(to)clearTimeout(to);
+    var to=null,url=((window.JL_CONFIG&&window.JL_CONFIG.localBridgeUrl)||'http://localhost:8787')+'/api/sync-broker';
+    function pull(){var ac=typeof AbortController==='function'?new AbortController():null,t=ac&&setTimeout(function(){ac.abort()},45000);
+      return fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({platform:'mt5',days:3}),cache:'no-store',signal:ac?ac.signal:undefined})
+      .then(function(r){if(t)clearTimeout(t);return r.json()},function(e){if(t)clearTimeout(t);throw e})}
+    /* The first read after MT5 has been idle can return the terminal's last cached balance and history (a second tap used to fix it). So when the balance comes back identical to the last synced one, read once more after a short pause and use that fresher result. If the retry fails, keep the first result. */
+    pull().then(function(d0){
+      if(!d0||d0.error||typeof d0.account_balance!=='number')return d0;
+      var prev=rdo(CK),pb=prev?Number(prev.mt5CurrentBalance):NaN;
+      if(!(isFinite(pb)&&Math.abs(d0.account_balance-pb)<0.005))return d0;
+      msg('Refreshing from MT5\u2026');
+      return new Promise(function(res){setTimeout(res,2500)}).then(pull).then(function(d1){return d1&&!d1.error&&typeof d1.account_balance==='number'?d1:d0},function(){return d0})})
+    .then(function(d){
       if(d&&d.error){msg('MT5 error: '+d.error);done();return}
       /* Sync reads the balance and adds recent trades. Trade times come from the bridge's openTime (MT5 server clock, same as a report), and a position already in the journal is never added twice. */
       var bal=d&&typeof d.account_balance==='number'&&isFinite(d.account_balance)?d.account_balance:null;
